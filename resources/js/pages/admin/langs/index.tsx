@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { router, Link, usePage } from '@inertiajs/react';
 import { getLangs, deleteLang } from '@/services/langs';
 
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Lang, Pagination } from '@/types';
+import { CmsLang } from '@/types/models/cms-lang';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Check, Search, Plus } from 'lucide-react';
@@ -14,7 +15,7 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 
 export default function Index() {
 
-    const { items } = usePage<{ items: Pagination<Lang> }>().props;
+    const { items } = usePage<{ items: Pagination<CmsLang> }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -65,7 +66,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: Lang)=>{
+                        {items.data.map((item: CmsLang)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.name }</th>
@@ -82,14 +83,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('langs.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('langs.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteLangHandler(item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={()=>deleteLangHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

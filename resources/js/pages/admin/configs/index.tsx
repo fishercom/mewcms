@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { getConfigs, deleteConfig } from '@/services/configs';
 
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Config, Pagination } from '@/types';
+import { CmsConfig } from '@/types/models/cms-config';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Search } from 'lucide-react';
@@ -15,7 +16,7 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 
 export default function Index() {
 
-    const { items } = usePage<{ items: Pagination<Config> }>().props;
+    const { items } = usePage<{ items: Pagination<CmsConfig> }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -59,7 +60,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: Config)=>{
+                        {items.data.map((item: CmsConfig)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.alias }</th>
@@ -75,14 +76,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('configs.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('configs.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteConfigHandler(item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={()=>deleteConfigHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

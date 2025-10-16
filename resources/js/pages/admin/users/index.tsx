@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
 import { User, Pagination } from '@/types';
@@ -47,11 +47,10 @@ export default function Index() {
                         </form>
                     </div>
                     <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2">
+                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2" onClick={() => router.visit('/admin/users/create')}>
                             <Plus/>
-                            <Link href='/admin/users/create'>Agrgar Usuario</Link>
-                        </button>
-                    </div>
+                            Agrgar Usuario
+                        </button>                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -82,16 +81,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('users.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('users.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteUserHandler(item.id)} as="button" prefetch>
+                                                </Button>
+                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
+                                                <Button className="block w-full" onClick={()=>deleteUserHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
+                                                </Button>
+                                            </DropdownMenuItem>                                        </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>
                             </tr>

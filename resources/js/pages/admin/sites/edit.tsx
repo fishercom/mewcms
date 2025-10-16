@@ -18,7 +18,7 @@ export default function Edit() {
         segment: item.segment || '',
         site_url: item.site_url,
         schema_group_id: item.schema_group_id,
-        metadata: item.metadata || {},
+        metadata: item.metadata as Record<string, unknown> || {},
         default: Boolean(item.default),
         active: Boolean(item.active),
     });

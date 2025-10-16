@@ -5,7 +5,7 @@ interface JsonObject { [key: string]: JsonValue }
 type JsonArray = JsonValue[];
 type FormDataConvertible = string | number | boolean | null | File | Blob | Date | FormDataConvertible[] | { [key: string]: FormDataConvertible };
 
-export interface Article {
+export interface CmsArticle {
     id: number,
     parent_id: number,
     schema_id: number,
@@ -18,7 +18,7 @@ export interface Article {
     created_at: Date
 }
 
-export interface ArticleForm {
+export interface CmsArticleForm {
     id: number | null;
     parent_id: number | null;
     schema_id: number;

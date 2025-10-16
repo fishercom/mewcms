@@ -5,13 +5,13 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { updateArticle } from '@/services/articles';
-import { Article, ArticleForm, FormDataConvertible } from '@/types/models/article';
-import { Schema } from '@/types';
+import { CmsArticle, CmsArticleForm, FormDataConvertible } from '@/types/models/cms-article';
+import { CmsSchema } from '@/types/models/cms-schema';
 
 export default function Edit() {
-    const { item, schema } = usePage<{ item: Article, schema?: Schema }>().props;
+    const { item, schema } = usePage<{ item: CmsArticle, schema?: CmsSchema }>().props;
 
-    const initial: ArticleForm = {
+    const initial: CmsArticleForm = {
         id: item.id,
         parent_id: item.parent_id,
         schema_id: item.schema_id,
@@ -21,7 +21,7 @@ export default function Edit() {
         slug: item.slug,
         active: item.active,
     };
-    const [data, setData] = useState<ArticleForm>(initial);
+    const [data, setData] = useState<CmsArticleForm>(initial);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
 

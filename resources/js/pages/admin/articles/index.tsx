@@ -1,12 +1,14 @@
 
 import { useState, useEffect } from 'react';
 
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { getArticles, deleteArticle } from '@/services/articles';
 
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Article, Pagination, Schema } from '@/types';
+import { CmsArticle } from '@/types/models/cms-article';
+import { CmsSchema } from '@/types/models/cms-schema';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Check, Search, Plus, ListOrdered } from 'lucide-react';
@@ -18,7 +20,7 @@ import SortableArticlesModal from './partials/SortableArticlesModal';
 
 export default function Index() {
 
-    const { items, paging, parent } = usePage<{ items: Article[], paging: Pagination<Article>, parent: Schema | null }>().props;
+    const { items, paging, parent } = usePage<{ items: CmsArticle[], paging: Pagination<CmsArticle>, parent: CmsSchema | null }>().props;
     const [ query, setQuery ] = useState({s: ''});
     const [isModalOpen, setModalOpen] = useState(false);
     const [isSortableModalOpen, setSortableModalOpen] = useState(false);
@@ -87,7 +89,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {paging.data.map((item: Article)=>{
+                        {paging.data.map((item: CmsArticle)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.title }</th>
@@ -104,14 +106,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('articles.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('articles.edit', item.id))} variant="ghost">
                                                     Editar
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteArticleHandler(item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={()=>deleteArticleHandler(item.id)} variant="ghost">
                                                     Eliminar
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

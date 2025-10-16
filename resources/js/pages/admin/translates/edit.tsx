@@ -15,7 +15,7 @@ export default function Edit() {
         id: item.id,
         alias: item.alias,
         input_type: item.input_type,
-        metadata: item.metadata || {},
+        metadata: item.metadata as { iso: string, value: string }[] || [],
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);

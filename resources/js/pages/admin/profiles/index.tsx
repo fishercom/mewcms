@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { getProfiles, deleteProfile } from '@/services/profiles';
 
 import ModuleLayout from '@/layouts/module/layout';
@@ -49,11 +49,10 @@ export default function Index() {
                         </form>
                     </div>
                     <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2">
+                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2" onClick={() => router.visit('/admin/profiles/create')}>
                             <Plus/>
-                            <Link href='/admin/profiles/create'>Agrgar Perfil</Link>
-                        </button>
-                    </div>
+                            Agrgar Perfil
+                        </button>                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -84,16 +83,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('profiles.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('profiles.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteProfileHandler(item.id)} as="button" prefetch>
+                                                </Button>
+                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
+                                                <Button className="block w-full" onClick={()=>deleteProfileHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
+                                                </Button>
+                                            </DropdownMenuItem>                                        </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>
                             </tr>

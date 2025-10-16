@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Parameter, Pagination } from '@/types';
+import { CmsParameter } from '@/types/models/cms-parameter';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Check, Search, Plus } from 'lucide-react';
@@ -13,7 +14,7 @@ import { getParameters, deleteParameter } from '@/services/parameters';
 
 export default function Index() {
 
-    const { items } = usePage<{ items: Pagination<Parameter> }>().props;
+    const { items } = usePage<{ items: Pagination<CmsParameter> }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -47,11 +48,10 @@ export default function Index() {
                         </form>
                     </div>
                     <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2">
+                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2" onClick={() => router.visit('/admin/parameters/create')}>
                             <Plus/>
-                            <Link href='/admin/parameters/create'>Agrgar Parámetro</Link>
-                        </button>
-                    </div>
+                            Agrgar Parámetro
+                        </button>                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -65,7 +65,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: Parameter)=>{
+                        {items.data.map((item: CmsParameter)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.name }</th>
@@ -82,16 +82,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('parameters.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('parameters.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteParameterHandler(item.id)} as="button" prefetch>
+                                                </Button>
+                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
+                                                <Button className="block w-full" onClick={()=>deleteParameterHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
+                                                </Button>
+                                            </DropdownMenuItem>                                        </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>
                             </tr>

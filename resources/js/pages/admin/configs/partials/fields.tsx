@@ -32,7 +32,7 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
                     autoFocus
                     tabIndex={1}
                     autoComplete="name"
-                    value={data.name}
+                    value={data.name as string}
                     onChange={(e) => setData({ ...data, name: e.target.value })}
                     disabled={processing}
                 />
@@ -47,7 +47,7 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
                     required
                     tabIndex={2}
                     autoComplete="alias"
-                    value={data.alias}
+                    value={data.alias as string}
                     onChange={(e) => setData({ ...data, alias: e.target.value })}
                     disabled={processing}
                 />
@@ -57,7 +57,7 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
             <div className="grid gap-2">
                 <Label htmlFor="type">Type</Label>
                 <Select
-                    value={data.type}
+                    value={data.type as string}
                     onValueChange={(value) => setData({ ...data, type: value })}
                     disabled={processing}
                 >
@@ -79,15 +79,13 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
                 <Label htmlFor="value">Value</Label>
                 {data.type === 'text' ? (
                     <Textarea
-                        id="value"
-                        tabIndex={4}
-                        value={data.value}
+                        value={data.value as string}
                         onChange={(e) => setData({ ...data, value: e.target.value })}
                         disabled={processing}
                     />
                 ) : data.type === 'boolean' ? (
                     <Select
-                        value={data.value}
+                        value={data.value as string}
                         onValueChange={(value) => setData({ ...data, value: value })}
                         disabled={processing}
                     >
@@ -104,7 +102,7 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
                         id="value"
                         type={data.type === 'int' ? 'number' : data.type === 'date' ? 'date' : 'text'}
                         tabIndex={4}
-                        value={data.value}
+                        value={data.value as string}
                         onChange={(e) => setData({ ...data, value: e.target.value })}
                         disabled={processing}
                     />

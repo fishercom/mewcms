@@ -22,6 +22,15 @@ function objectToFormData(
 
             if (typeof value === 'boolean') {
                 fd.append(formKey, value ? '1' : '0');
+            } else if (Array.isArray(value)) { // Handle arrays
+                value.forEach((element, index) => {
+                    const arrayKey = `${formKey}[${index}]`;
+                    if (typeof element === 'object' && !(element instanceof File)) {
+                        objectToFormData(element as Record<string, unknown>, fd, arrayKey);
+                    } else {
+                        fd.append(arrayKey, element as string | Blob);
+                    }
+                });
             } else if (typeof value === 'object' && !(value instanceof File)) {
                 objectToFormData(value as Record<string, unknown>, fd, formKey);
             } else {

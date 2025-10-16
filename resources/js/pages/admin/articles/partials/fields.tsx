@@ -1,17 +1,17 @@
 import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArticleForm, JsonValue } from '@/types/models/article';
+import { CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Schema } from '@/types';
+import { CmsSchema } from '@/types/models/cms-schema';
 
 interface Props {
-    data: ArticleForm;
-    setData: (data: ArticleForm) => void;
+    data: CmsArticleForm;
+    setData: (data: CmsArticleForm) => void;
     errors: Record<string, string>;
     processing: boolean;
-    schema?: Schema;
+    schema?: CmsSchema;
 }
 
 export default function ArticleFields({ data, setData, errors, processing, schema }: Props) {

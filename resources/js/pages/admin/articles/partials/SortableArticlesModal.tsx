@@ -8,7 +8,7 @@ import {
     DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Article } from "@/types";
+import { CmsArticle } from "@/types/models/cms-article";
 import { ReactSortable } from "react-sortablejs";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -16,17 +16,17 @@ import axios from "axios";
 interface SortableArticlesModalProps {
     isOpen: boolean;
     onClose: () => void;
-    articles: Article[];
+    articles: CmsArticle[];
 }
 
 export default function SortableArticlesModal({ isOpen, onClose, articles }: SortableArticlesModalProps) {
-    const [sortedArticles, setSortedArticles] = useState<Article[]>([]);
+    const [sortedArticles, setSortedArticles] = useState<CmsArticle[]>([]);
 
     useEffect(() => {
         setSortedArticles(articles);
     }, [articles]);
 
-    const handleSort = (sortedList: Article[]) => {
+    const handleSort = (sortedList: CmsArticle[]) => {
         setSortedArticles(sortedList);
     };
 

@@ -13,6 +13,8 @@ export default function Edit() {
     const { item } = usePage<{ item: CmsConfig }>().props;
     const [data, setData] = useState<CmsConfigForm>({
         id: item.id,
+        event_id: item.event_id,
+        user_id: item.user_id,
         name: item.name,
         type: item.type,
         alias: item.alias,

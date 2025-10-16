@@ -1,23 +1,18 @@
-import { CmsForm } from './cms-form';
-import { User } from './user';
-
 export interface CmsNotify {
-    id: number;
-    form_id: number;
-    user_id: number;
-    recipients?: string;
-    active?: boolean;
-    created_at: string;
-    updated_at: string;
-    form: CmsForm;
-    user: User;
+    id: number,
+    form_id: number,
+    user_id: number,
+    recipients: string,
+    active: boolean,
+    updated_at: Date,
+    created_at: Date
 }
 
 export interface CmsNotifyForm {
-    id?: number;
-    form_id: number;
-    user_id: number;
-    recipients: string;
-    active: boolean;
-    [key: string]: string | number | boolean | null | undefined;
+    id?: number,
+    form_id: number,
+    user_id: number,
+    recipients: string,
+    active: boolean,
+    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
 }

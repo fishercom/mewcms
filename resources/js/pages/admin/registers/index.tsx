@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Register, Pagination } from '@/types';
+import { CmsRegister } from '@/types/models/cms-register';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Search } from 'lucide-react';
@@ -13,7 +14,7 @@ import { getRegisters, deleteRegister } from '@/services/registers';
 
 export default function Index() {
 
-    const { items } = usePage<{ items: Pagination<Register> }>().props;
+    const { items } = usePage<{ items: Pagination<CmsRegister> }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -61,7 +62,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: Register)=>{
+                        {items.data.map((item: CmsRegister)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.name }</th>
@@ -78,16 +79,14 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('registers.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('registers.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteRegisterHandler(item.id)} as="button" prefetch>
+                                                </Button>
+                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
+                                                <Button className="block w-full" onClick={()=>deleteRegisterHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
+                                                </Button>
+                                            </DropdownMenuItem>                                        </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>
                             </tr>

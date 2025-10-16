@@ -1,16 +1,16 @@
 export interface CmsTranslate {
-    id: number;
-    alias: string;
-    input_type: number;
-    metadata?: Record<string, unknown>;
-    created_at: string;
-    updated_at: string;
+    id: number,
+    alias: string,
+    input_type: number,
+    metadata: [],
+    updated_at: Date,
+    created_at: Date
 }
 
 export interface CmsTranslateForm {
-    id?: number;
-    alias: string;
-    input_type: number;
-    metadata: Record<string, unknown>;
-    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
+    id?: number,
+    alias: string,
+    input_type: number,
+    metadata: { iso: string, value: string }[],
+    [key: string]: string | number | boolean | null | undefined | Record<string, unknown> | { iso: string, value: string }[];
 }

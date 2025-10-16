@@ -14,7 +14,7 @@ export default function Create() {
     const item: CmsTranslateForm = {
         alias: '',
         input_type: 1, // Default to text input
-        metadata: {},
+        metadata: [] as { iso: string, value: string }[],
     }
     const [data, setData] = useState<CmsTranslateForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});

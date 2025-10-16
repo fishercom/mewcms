@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { getNotifies, deleteNotify } from '@/services/notifies';
 
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Notify, Pagination } from '@/types';
+import { CmsNotify } from '@/types/models/cms-notify';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Check, Search, Plus } from 'lucide-react';
@@ -14,7 +15,7 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 
 export default function Index() {
 
-    const { items } = usePage<{ items: Pagination<Notify> }>().props;
+    const { items } = usePage<{ items: Pagination<CmsNotify> }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -48,9 +49,9 @@ export default function Index() {
                         </form>
                     </div>
                     <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2">
+                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2" onClick={() => router.visit('/admin/notifies/create')}>
                             <Plus/>
-                            <Link href='/admin/notifies/create'>Agrgar Cuenta</Link>
+                            Agrgar Cuenta
                         </button>
                     </div>
                 </div>
@@ -66,7 +67,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: Notify)=>{
+                        {items.data.map((item: CmsNotify)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.user_id }</th>
@@ -83,14 +84,13 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('notifies.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('notifies.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteNotifyHandler(item.id)} as="button" prefetch>
+                                                </Button>
+                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
+                                                <Button className="block w-full" onClick={()=>deleteNotifyHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
+                                                </Button>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

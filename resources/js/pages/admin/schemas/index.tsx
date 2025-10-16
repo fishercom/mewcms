@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { deleteSchema } from '@/services/schemas';
 
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
-import { Schema, SchemaGroup, Pagination } from '@/types';
+import { CmsSchema } from '@/types/models/cms-schema';
+import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
+import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Check, Search, Plus, ChevronLeft } from 'lucide-react';
@@ -14,7 +16,7 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 
 export default function Index() {
 
-    const { items, groups, parent, group_id, parent_id } = usePage<{ items: Pagination<Schema>, groups: SchemaGroup[], parent: Schema, group_id: number, parent_id: number }>().props;
+    const { items, groups, parent, group_id, parent_id } = usePage<{ items: Pagination<CmsSchema>, groups: CmsSchemaGroup[], parent: CmsSchema, group_id: number, parent_id: number }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -60,22 +62,20 @@ export default function Index() {
                                     <DropdownMenuContent className="w-56" align="end">
                                         {groups.map(e=>
                                         <DropdownMenuItem key={e.id} asChild>
-                                            <Link className="block w-full" href={route('schemas.index', {'group_id': e.id})} as="button" prefetch>
+                                            <Button className="block w-full" onClick={() => router.visit(route('schemas.index', {'group_id': e.id}))} variant="ghost">
                                                 {e.name}
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        )}
+                                            </Button>
+                                        </DropdownMenuItem>                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         </form>
                     </div>
                     <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2">
+                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2" onClick={() => router.visit(route('schemas.create', {parent_id: parent_id, group_id: group_id}))}>
                             <Plus/>
-                            <Link href={route('schemas.create', {parent_id: parent_id, group_id: group_id})}>Agrgar Esquema</Link>
-                        </button>
-                    </div>
+                            Agrgar Esquema
+                        </button>                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -89,7 +89,7 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: Schema)=>{
+                        {items.data.map((item: CmsSchema)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -108,17 +108,15 @@ export default function Index() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end">
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href={route('schemas.edit', item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={() => router.visit(route('schemas.edit', item.id))} variant="ghost">
                                                     Edit
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            {item.type=='PAGE' &&
+                                                </Button>
+                                            </DropdownMenuItem>                                            {item.type=='PAGE' &&
                                             <DropdownMenuItem asChild>
-                                                <Link className="block w-full" href='#' onClick={()=>deleteSchemaHandler(item.id)} as="button" prefetch>
+                                                <Button className="block w-full" onClick={()=>deleteSchemaHandler(item.id)} variant="ghost">
                                                     Delete
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            }
+                                                </Button>
+                                            </DropdownMenuItem>                                            }
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>

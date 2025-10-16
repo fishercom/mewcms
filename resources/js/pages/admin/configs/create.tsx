@@ -11,6 +11,8 @@ import { CmsConfigForm } from '@/types/models/cms-config';
 export default function Create() {
 
     const item: CmsConfigForm = {
+        event_id: 0, // Default value
+        user_id: 0, // Default value
         name: '',
         type: 'string',
         alias: '',

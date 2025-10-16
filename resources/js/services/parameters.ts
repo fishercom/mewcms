@@ -24,8 +24,15 @@ export const deleteParameter = (id: number) => {
         onBefore: () => {
             return window.confirm('Esta seguro que desea eliminar este registro?');
         },
-        onError: () => {
+        onSuccess: () => {
+            // console.log('Parameter deletion successful:', page);
+        },
+        onError: (errors) => {
+            console.error('Parameter deletion failed:', errors);
             alert('Ocurrió un error al eliminar el registro.');
+        },
+        onFinish: () => {
+            // console.log('Parameter deletion request finished.');
         },
     });
 };
