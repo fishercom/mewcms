@@ -15,7 +15,7 @@ function objectToFormData(obj: Record<string, unknown>, form?: FormData, namespa
     let formKey: string;
 
     for (const property in obj) {
-        if (obj.hasOwnProperty(property)) {
+            if (Object.prototype.hasOwnProperty.call(obj, property)) {
             if (namespace) {
                 formKey = namespace + '[' + property + ']';
             } else {
