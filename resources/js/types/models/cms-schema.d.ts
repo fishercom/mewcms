@@ -20,11 +20,12 @@ export interface CmsSchema {
 
 export interface CmsSchemaForm {
     id?: number | null;
-    parent_id?: number | null;
+    parent_id?: number;
     group_id: number;
     name: string;
     fields: CustomField[];
     iterations: number;
-    type: 'PAGE' | 'HOME' | 'OPTIONS';
+    type: string;
     active: boolean;
+    [key: string]: string | number | boolean | null | undefined | CustomField[];
 }

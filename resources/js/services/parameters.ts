@@ -9,8 +9,33 @@ interface Callbacks {
     onFinish?: () => void;
 }
 
+function objectToFormData(obj: Record<string, unknown>, form?: FormData, namespace?: string): FormData {
+    const fd = form || new FormData();
+    let formKey: string;
+
+    for (const property in obj) {
+        if (obj.hasOwnProperty(property)) {
+            if (namespace) {
+                formKey = namespace + '[' + property + ']';
+            } else {
+                formKey = property;
+            }
+
+            // if the property is an object, but not a File, use recursivity.
+            if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
+                objectToFormData(obj[property] as Record<string, unknown>, fd, formKey);
+            } else {
+                // if it's a string or a File object
+                fd.append(formKey, obj[property] as string | Blob);
+            }
+        }
+    }
+
+    return fd;
+}
+
 export const getParameters = (query: Record<string, unknown>) => {
-    router.get(route('parameters.index'), query, {
+    router.get(route('parameters.index'), query as any, {
         preserveState: true,
         replace: true,
     });
@@ -29,9 +54,9 @@ export const deleteParameter = (id: number) => {
 };
 
 export const createParameter = (data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.post(route('parameters.store'), data, callbacks);
+    router.post(route('parameters.store'), objectToFormData(data), callbacks);
 };
 
 export const updateParameter = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('parameters.update', id), data, callbacks);
+    router.put(route('parameters.update', id), objectToFormData(data), callbacks);
 };

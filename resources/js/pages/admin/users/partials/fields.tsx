@@ -18,6 +18,7 @@ export interface UserForm {
     metadata: Record<string, unknown>;
     active: boolean;
     default: boolean;
+    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
 }
 
 interface Props {

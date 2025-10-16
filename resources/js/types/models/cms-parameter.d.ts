@@ -24,4 +24,5 @@ export interface CmsParameterForm {
     value: string;
     metadata: Record<string, unknown>;
     active: boolean;
+    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
 }

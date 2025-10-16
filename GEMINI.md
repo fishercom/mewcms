@@ -10,7 +10,7 @@ This file helps Gemini understand this project's specific conventions, commands,
 ## Common Commands
 
 *   **Installation:** `composer install && npm install`
-*   **Build:** `npm run prod`
+*   **Build:** `npm run build`
 *   **Development Server:** `php artisan serve`
 *   **Tests:** `php artisan test`
 *   **Linting/Static Analysis:** (e.g., `vendor/bin/phpcs`, `npm run lint`)

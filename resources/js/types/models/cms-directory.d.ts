@@ -13,10 +13,11 @@ export interface CmsDirectory {
 }
 
 export interface CmsDirectoryForm {
-    id?: number; // Add id as optional for create, required for edit
+    id?: number;
     name: string;
     type_id: number;
     alias: string;
     path: string;
     active: boolean;
+    [key: string]: string | number | boolean | null | undefined;
 }

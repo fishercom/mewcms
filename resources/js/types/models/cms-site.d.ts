@@ -23,4 +23,5 @@ export interface CmsSiteForm {
     schema_group_id: number;
     default: boolean;
     active: boolean;
+    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
 }

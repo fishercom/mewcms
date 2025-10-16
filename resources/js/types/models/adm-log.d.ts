@@ -17,4 +17,5 @@ export interface AdmLogForm {
     event_id: number;
     user_id: number;
     comment: string;
+    [key: string]: string | number | boolean | null | undefined;
 }

@@ -14,4 +14,5 @@ export interface CmsConfigForm {
     name: string;
     alias: string;
     value: string;
+    [key: string]: string | number | boolean | null | undefined;
 }

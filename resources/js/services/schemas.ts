@@ -10,6 +10,31 @@ interface Callbacks {
     onFinish?: () => void;
 }
 
+function objectToFormData(obj: Record<string, unknown>, form?: FormData, namespace?: string): FormData {
+    const fd = form || new FormData();
+    let formKey: string;
+
+    for (const property in obj) {
+        if (obj.hasOwnProperty(property)) {
+            if (namespace) {
+                formKey = namespace + '[' + property + ']';
+            } else {
+                formKey = property;
+            }
+
+            // if the property is an object, but not a File, use recursivity.
+            if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
+                objectToFormData(obj[property] as Record<string, unknown>, fd, formKey);
+            } else {
+                // if it's a string or a File object
+                fd.append(formKey, obj[property] as string | Blob);
+            }
+        }
+    }
+
+    return fd;
+}
+
 export const getSchemas = (parentSchemaId: number | null = null) => {
     const endpoint = parentSchemaId
         ? route('schemas.children', parentSchemaId)
@@ -30,9 +55,9 @@ export const deleteSchema = (id: number) => {
 };
 
 export const createSchema = (data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.post(route('schemas.store'), data, callbacks);
+    router.post(route('schemas.store'), objectToFormData(data), callbacks);
 };
 
 export const updateSchema = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('schemas.update', id), data, callbacks);
+    router.put(route('schemas.update', id), objectToFormData(data), callbacks);
 };

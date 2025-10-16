@@ -27,4 +27,5 @@ export interface ArticleForm {
     metadata: { [key: string]: FormDataConvertible };
     slug: string;
     active: boolean;
+    [key: string]: FormDataConvertible;
 }

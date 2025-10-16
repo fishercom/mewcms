@@ -12,4 +12,5 @@ export interface CmsLangForm {
     name: string;
     iso: string;
     active: boolean;
+    [key: string]: string | number | boolean | null | undefined;
 }

@@ -12,4 +12,5 @@ export interface CmsTranslateForm {
     alias: string;
     input_type: number;
     metadata: Record<string, unknown>;
+    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
 }

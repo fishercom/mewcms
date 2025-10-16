@@ -19,4 +19,5 @@ export interface CmsNotifyForm {
     user_id: number;
     recipients: string;
     active: boolean;
+    [key: string]: string | number | boolean | null | undefined;
 }
