@@ -13,7 +13,7 @@ This file helps Gemini understand this project's specific conventions, commands,
 *   **Build:** `npm run build`
 *   **Development Server:** `php artisan serve`
 *   **Tests:** `php artisan test`
-*   **Linting/Static Analysis:** `npm run lint` (to be executed before commit)
+*   **Linting/Static Analysis:** `npm run lint`, `npx tsc --noEmit` (to be executed before commit)
 
 ## Project Conventions
 
