@@ -18,5 +18,9 @@ export const sendVerificationEmail = (onStart: () => void, onFinish: () => void)
 };
 
 export const updatePassword = (data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('password.update'), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('password.update'), objectToFormData(options), callbacks);
 };

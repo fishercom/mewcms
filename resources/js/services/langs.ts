@@ -35,5 +35,9 @@ export const createLang = (data: Record<string, unknown>, callbacks: Callbacks) 
 };
 
 export const updateLang = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('langs.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('langs.update', id), objectToFormData(options), callbacks);
 };

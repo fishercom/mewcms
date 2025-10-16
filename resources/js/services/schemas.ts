@@ -35,5 +35,9 @@ export const createSchema = (data: Record<string, unknown>, callbacks: Callbacks
 };
 
 export const updateSchema = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('schemas.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('schemas.update', id), objectToFormData(options), callbacks);
 };

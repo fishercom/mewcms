@@ -35,5 +35,9 @@ export const createUser = (data: Record<string, unknown>, callbacks: Callbacks) 
 };
 
 export const updateUser = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('users.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('users.update', id), objectToFormData(options), callbacks);
 };

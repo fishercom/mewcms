@@ -31,5 +31,9 @@ export const deleteRegister = (id: number) => {
 };
 
 export const updateRegister = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('registers.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('registers.update', id), objectToFormData(options), callbacks);
 };

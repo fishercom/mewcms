@@ -35,5 +35,9 @@ export const createConfig = (data: Record<string, unknown>, callbacks: Callbacks
 };
 
 export const updateConfig = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('configs.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('configs.update', id), objectToFormData(options), callbacks);
 };

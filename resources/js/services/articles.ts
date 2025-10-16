@@ -35,5 +35,9 @@ export const createArticle = (data: Record<string, unknown>, callbacks: Callback
 };
 
 export const updateArticle = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('articles.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('articles.update', id), objectToFormData(options), callbacks);
 };

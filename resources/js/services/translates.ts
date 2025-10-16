@@ -35,5 +35,9 @@ export const createTranslate = (data: Record<string, unknown>, callbacks: Callba
 };
 
 export const updateTranslate = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('translates.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('translates.update', id), objectToFormData(options), callbacks);
 };

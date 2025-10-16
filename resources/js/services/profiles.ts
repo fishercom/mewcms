@@ -35,5 +35,9 @@ export const createProfile = (data: Record<string, unknown>, callbacks: Callback
 };
 
 export const updateProfile = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('profiles.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('profiles.update', id), objectToFormData(options), callbacks);
 };

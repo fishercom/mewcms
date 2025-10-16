@@ -35,5 +35,9 @@ export const createDirectory = (data: Record<string, unknown>, callbacks: Callba
 };
 
 export const updateDirectory = (id: number, data: Record<string, unknown>, callbacks: Callbacks) => {
-    router.put(route('directories.update', id), objectToFormData(data), callbacks);
+    const options = {
+        ...data,
+        _method: 'PUT',
+    };
+    router.post(route('directories.update', id), objectToFormData(options), callbacks);
 };
