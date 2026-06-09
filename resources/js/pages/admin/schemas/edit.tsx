@@ -19,6 +19,7 @@ export default function Edit() {
         fields: item.fields,
         iterations: item.iterations || 1,
         type: item.type || 'PAGE',
+        front_view: item.front_view || '',
         active: Boolean(item.active),
     };
     const [data, setData] = useState<CmsSchemaForm>(initial);

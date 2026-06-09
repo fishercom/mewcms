@@ -7,5 +7,5 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 abstract class TestCase extends BaseTestCase
 {
-    use WithoutMiddleware;
+    //
 }

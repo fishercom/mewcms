@@ -111,6 +111,19 @@ export default function SchemaFields({ data, setData, errors, processing, groups
             />
 
             <div className="grid gap-2">
+                <Label htmlFor="front_view">Plantilla Frontend (React View Path)</Label>
+                <Input
+                    id="front_view"
+                    type="text"
+                    placeholder="e.g. front/templates/page"
+                    value={data.front_view || ''}
+                    onChange={(e) => setData({ ...data, front_view: e.target.value })}
+                    disabled={processing}
+                />
+                <InputError message={errors.front_view} />
+            </div>
+
+            <div className="grid gap-2">
                 <Label htmlFor="iterations">Iterations</Label>
                 <Input
                     id="iterations"

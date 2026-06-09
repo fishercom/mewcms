@@ -14,7 +14,7 @@ class CmsSchema extends Model {
 	use \Rutorika\Sortable\SortableTrait;
 
 	protected $table = 'cms_schemas';
-	protected $fillable = ['parent_id', 'group_id', 'name', 'fields', 'iterations', 'type', 'active'];
+	protected $fillable = ['parent_id', 'group_id', 'name', 'fields', 'iterations', 'type', 'front_view', 'active'];
 
 	protected static $sortableField = 'position';
 	protected static $sortableGroupField = ['parent_id', 'parent_id'];

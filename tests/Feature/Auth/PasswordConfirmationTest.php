@@ -3,7 +3,7 @@
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class, WithoutMiddleware::class);
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 test('confirm password screen can be rendered', function () {
     $user = User::factory()->create();

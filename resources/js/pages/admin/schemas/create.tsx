@@ -20,6 +20,7 @@ export default function Create() {
         fields: [] as CustomField[],
         iterations: 1,
         type: 'PAGE',
+        front_view: '',
         active: false,
     };
     const [data, setData] = useState<CmsSchemaForm>(initial);

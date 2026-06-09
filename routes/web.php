@@ -8,9 +8,7 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']
     Lfm::routes();
 });
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin', function () {
@@ -21,3 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
+
+// Catch-all route to resolve dynamic CMS pages on the frontend
+Route::get('{any?}', [App\Http\Controllers\FrontController::class, 'show'])
+    ->where('any', '.*')
+    ->name('front.show');

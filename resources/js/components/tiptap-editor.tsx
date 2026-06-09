@@ -164,6 +164,12 @@ const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
     },
   });
 
+  React.useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value, { emitUpdate: false });
+    }
+  }, [value, editor]);
+
   return (
     <div>
       <MenuBar editor={editor} />

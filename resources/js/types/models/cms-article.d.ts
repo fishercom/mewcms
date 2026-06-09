@@ -15,7 +15,9 @@ export interface CmsArticle {
     slug: string,
     active: boolean,
     updated_at: Date,
-    created_at: Date
+    created_at: Date,
+    schema?: import('./cms-schema').CmsSchema,
+    children?: CmsArticle[]
 }
 
 export interface CmsArticleForm {
