@@ -20,7 +20,10 @@ require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 
+// Home route (named 'home' for compatibility with frontend components)
+Route::get('/', [App\Http\Controllers\FrontController::class, 'show'])->name('home');
+
 // Catch-all route to resolve dynamic CMS pages on the frontend
-Route::get('{any?}', [App\Http\Controllers\FrontController::class, 'show'])
+Route::get('{any}', [App\Http\Controllers\FrontController::class, 'show'])
     ->where('any', '.*')
     ->name('front.show');
