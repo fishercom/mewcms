@@ -1,40 +1,36 @@
 import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
-import ArticleFields from './partials/fields';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
+
 import { Button } from '@/components/ui/button';
-import { createArticle } from '@/services/articles';
-import { CmsArticleForm } from '@/types/models/cms-article';
-import { CmsSchema } from '@/types/models/cms-schema';
+import { createTerm } from '@/services/taxonomies';
+import TaxonomyTermFormFields from './partials/fields';
+import { CmsTaxonomy, CmsTaxonomyTerm, CmsTaxonomyTermForm } from '@/types/models/cms-taxonomy';
 
 export default function Create() {
-    const { schema, taxonomies } = usePage<{ schema?: CmsSchema, taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const { taxonomy, parents } = usePage<{ taxonomy: CmsTaxonomy, parents: CmsTaxonomyTerm[] }>().props;
 
-    const initial: CmsArticleForm = {
-        id: null,
-        parent_id: null,
-        schema_id: Number(schema?.id || 1),
-        lang_id: 1, // Assuming default lang_id
-        title: '',
-        metadata: {},
+    const item: CmsTaxonomyTermForm = {
+        name: '',
         slug: '',
+        parent_id: null,
+        description: '',
         active: true,
-        term_ids: [],
     };
-    const [data, setData] = useState<CmsArticleForm>(initial);
+    const [data, setData] = useState<CmsTaxonomyTermForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
 
-    const handleSubmit: FormEventHandler = (e) => {
+    const createTermHandler: FormEventHandler = (e) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
 
-        createArticle(data, {
+        createTerm(taxonomy.id, data, {
             onSuccess: () => {
                 setProcessing(false);
-                setData(initial);
+                setData(item);
             },
             onError: (err: Record<string, string>) => {
                 setErrors(err);
@@ -44,20 +40,20 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={`Agregar Término a ${taxonomy.name}`}>
             <FormLayout>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <ArticleFields
+                <form onSubmit={createTermHandler} className="space-y-6">
+                    <TaxonomyTermFormFields
                         data={data}
                         setData={setData}
                         errors={errors}
+                        parents={parents}
                         processing={processing}
-                        schema={schema}
-                        taxonomies={taxonomies}
                     />
+
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/articles'>Cancelar</Link>
+                        <Link href={`/admin/taxonomies/${taxonomy.id}/terms`}>Cancelar</Link>
                     </div>
                 </form>
             </FormLayout>

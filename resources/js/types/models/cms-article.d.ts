@@ -17,7 +17,8 @@ export interface CmsArticle {
     updated_at: Date,
     created_at: Date,
     schema?: import('./cms-schema').CmsSchema,
-    children?: CmsArticle[]
+    children?: CmsArticle[],
+    terms?: import('./cms-taxonomy').CmsTaxonomyTerm[]
 }
 
 export interface CmsArticleForm {
@@ -29,5 +30,6 @@ export interface CmsArticleForm {
     metadata: { [key: string]: FormDataConvertible };
     slug: string;
     active: boolean;
+    term_ids?: number[];
     [key: string]: FormDataConvertible;
 }

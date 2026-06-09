@@ -78,9 +78,14 @@ class ArticleController extends Controller
         'active' => true,
       ];
 
+      $taxonomies = \App\Models\CmsTaxonomy::with(['terms' => function ($query) {
+          $query->where('active', true)->orderBy('position');
+      }])->where('active', true)->get();
+
       return Inertia::render('admin/articles/create', [
         'item' => $args,
         'schema' => $schema,
+        'taxonomies' => $taxonomies,
       ]);
     }
 
@@ -88,6 +93,11 @@ class ArticleController extends Controller
     {
         $profile = new CmsArticle($request->all());
         $profile->save();
+
+        if ($request->has('term_ids')) {
+            $termIds = collect($request->input('term_ids'))->filter()->all();
+            $profile->terms()->sync($termIds);
+        }
 
         $args = [
             'lang_id' => $this->lang_id,
@@ -102,10 +112,15 @@ class ArticleController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsArticle::with('schema')->find($id);
+        $item = CmsArticle::with(['schema', 'terms'])->findOrFail($id);
+        $taxonomies = \App\Models\CmsTaxonomy::with(['terms' => function ($query) {
+            $query->where('active', true)->orderBy('position');
+        }])->where('active', true)->get();
+
         return Inertia::render('admin/articles/edit', [
             'item' => $item,
             'schema' => $item?->schema,
+            'taxonomies' => $taxonomies,
         ]);
     }
 
@@ -114,9 +129,16 @@ class ArticleController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsArticle::find($id);
+        $item = CmsArticle::findOrFail($id);
 		$item->fill($request->all());
 		$item->save();
+
+        if ($request->has('term_ids')) {
+            $termIds = collect($request->input('term_ids'))->filter()->all();
+            $item->terms()->sync($termIds);
+        } else {
+            $item->terms()->sync([]);
+        }
 
         $args = [
             'lang_id' => $this->lang_id,

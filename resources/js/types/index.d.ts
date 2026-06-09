@@ -17,6 +17,7 @@ export * from './models/cms-schema-group';
 export * from './models/cms-schema';
 export * from './models/cms-site';
 export * from './models/cms-translate';
+export * from './models/cms-taxonomy';
 export * from './models/auth';
 export * from './models/breadcrumb-item';
 export * from './models/custom-field';

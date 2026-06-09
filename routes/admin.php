@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\ParameterController;
 use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\NotifyController;
 use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\TaxonomyController;
+use App\Http\Controllers\Admin\TaxonomyTermController;
 use UniSharp\LaravelFilemanager\Lfm;
 
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('notifies', NotifyController::class);
     Route::resource('articles', ArticleController::class);
     Route::post('articles/sort', [ArticleController::class, 'sort'])->name('articles.sort');
+    Route::resource('taxonomies', TaxonomyController::class);
+    Route::resource('taxonomies.terms', TaxonomyTermController::class)->shallow();
+    Route::post('taxonomies/terms/sort', [TaxonomyTermController::class, 'sort'])->name('taxonomies.terms.sort');
 
 });
 

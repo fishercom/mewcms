@@ -9,7 +9,7 @@ import { CmsArticle, CmsArticleForm, FormDataConvertible } from '@/types/models/
 import { CmsSchema } from '@/types/models/cms-schema';
 
 export default function Edit() {
-    const { item, schema } = usePage<{ item: CmsArticle, schema?: CmsSchema }>().props;
+    const { item, schema, taxonomies } = usePage<{ item: CmsArticle, schema?: CmsSchema, taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
 
     const initial: CmsArticleForm = {
         id: item.id,
@@ -20,6 +20,7 @@ export default function Edit() {
         metadata: item.metadata as { [key: string]: FormDataConvertible },
         slug: item.slug,
         active: item.active,
+        term_ids: item.terms?.map(t => t.id) || [],
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -49,6 +50,7 @@ export default function Edit() {
                         errors={errors}
                         processing={processing}
                         schema={schema}
+                        taxonomies={taxonomies}
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>

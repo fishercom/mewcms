@@ -102,4 +102,9 @@ class CmsArticle extends Model {
             ->orderBy('position');
     }
 
+    public function terms()
+    {
+        return $this->belongsToMany('App\Models\CmsTaxonomyTerm', 'cms_article_term', 'article_id', 'term_id');
+    }
+
 }

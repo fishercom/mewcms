@@ -91,6 +91,7 @@ class DatabaseSeeder extends Seeder
 		$module_site = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Sites', 'title' => 'site', 'url' => '/admin/sites', 'icon'=>'globe', 'position'=>'2', 'visible'=>true]);
 		$module_schema = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Esquemas', 'title' => 'esquema', 'url' => '/admin/schemas', 'icon'=>'shuffle', 'position'=>'3', 'visible'=>true]);
 		$module_directory = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Directorio de Archivos', 'title' => 'directorio', 'url' => '/admin/directories', 'icon'=>'folder-open', 'position'=>'4', 'visible'=>true]);
+		$module_taxonomy = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Taxonomías', 'url' => '/admin/taxonomies', 'icon'=>'tags', 'position'=>'5', 'visible'=>true]);
 
 		$module_parameter = \App\Models\AdmModule::create(['menu_id' => $menu_modules->id, 'name' => 'Parámetros', 'title' => 'parámetro', 'url' => '/admin/parameters', 'icon'=>'cog', 'position'=>'1', 'visible'=>true]);
 		$module_article = \App\Models\AdmModule::create(['menu_id' => $module_contenido->id, 'name' => 'Páginas', 'title' => 'contenido', 'url' => '/admin/articles', 'icon'=>'file', 'position'=>'1', 'visible'=>true]);
@@ -124,6 +125,8 @@ class DatabaseSeeder extends Seeder
 		\App\Models\AdmEvent::create(['module_id' => $module_schema->id, 'action_id' => $action_admin->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_directory->id, 'action_id' => $action_lista->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_directory->id, 'action_id' => $action_admin->id]);
+		\App\Models\AdmEvent::create(['module_id' => $module_taxonomy->id, 'action_id' => $action_lista->id]);
+		\App\Models\AdmEvent::create(['module_id' => $module_taxonomy->id, 'action_id' => $action_admin->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_mensaje->id, 'action_id' => $action_lista->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_mensaje->id, 'action_id' => $action_admin->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_cuenta->id, 'action_id' => $action_lista->id]);
