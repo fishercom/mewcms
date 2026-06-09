@@ -61,3 +61,11 @@ The following phases are planned for the upcoming sessions:
 - **Tasks:**
   - Embed direct file manager lookup in TipTap editor image tools.
   - Implement bulk uploads and directory creation from the article editor.
+
+### Phase 7: Premium Dashboard Home (Stats & Reports)
+- **Goal:** Replace the basic dashboard landing page with a premium analytics and reports hub containing charts and quick-actions.
+- **Tasks:**
+  - Build key metric widgets: total articles, active taxonomy terms, file uploads / disk space usage, and contact message submissions.
+  - Integrate visual charts (using Recharts or Chart.js) showcasing recent activity, message counts, and log frequency.
+  - Create a "Quick Actions" shortcut console (e.g. Write Article, Manage Categories, View Logs).
+  - Embed a "Recent Activity Feed" widget drawing from `AdmLog`.
