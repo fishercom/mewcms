@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\NotifyController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\TaxonomyController;
 use App\Http\Controllers\Admin\TaxonomyTermController;
+use App\Http\Controllers\Admin\MenuController;
 use UniSharp\LaravelFilemanager\Lfm;
 
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('taxonomies', TaxonomyController::class);
     Route::resource('taxonomies.terms', TaxonomyTermController::class)->shallow();
     Route::post('taxonomies/terms/sort', [TaxonomyTermController::class, 'sort'])->name('taxonomies.terms.sort');
+    
+    Route::resource('menus', MenuController::class);
+    Route::post('menus/{menu}/items', [MenuController::class, 'storeItems'])->name('menus.items.store');
+    Route::post('menus/{menu}/items/sort', [MenuController::class, 'sortItems'])->name('menus.items.sort');
+    Route::delete('menus/items/{item}', [MenuController::class, 'destroyItem'])->name('menus.items.destroy');
 
 });
 

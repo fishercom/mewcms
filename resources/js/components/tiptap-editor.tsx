@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import ImageExtension from '@tiptap/extension-image';
+import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { 
     Bold, Italic, Strikethrough, 
     Heading1, Heading2, Heading3, 
     List, ListOrdered, Quote, 
-    Code, Undo, Redo 
+    Code, Undo, Redo, Image as ImageIcon
 } from 'lucide-react';
 
 interface TiptapProps {
@@ -15,9 +17,10 @@ interface TiptapProps {
 
 interface MenuBarProps {
   editor: Editor | null;
+  onOpenMedia: () => void;
 }
 
-const MenuBar = ({ editor }: MenuBarProps) => {
+const MenuBar = ({ editor, onOpenMedia }: MenuBarProps) => {
   if (!editor) {
     return null;
   }
@@ -28,7 +31,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleBold().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleBold().run(), 50);
       },
       isActive: editor.isActive('bold'),
     },
@@ -37,7 +40,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleItalic().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleItalic().run(), 50);
       },
       isActive: editor.isActive('italic'),
     },
@@ -46,7 +49,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleStrike().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleStrike().run(), 50);
       },
       isActive: editor.isActive('strike'),
     },
@@ -55,7 +58,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleHeading({ level: 1 }).run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleHeading({ level: 1 }).run(), 50);
       },
       isActive: editor.isActive('heading', { level: 1 }),
     },
@@ -64,7 +67,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleHeading({ level: 2 }).run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleHeading({ level: 2 }).run(), 50);
       },
       isActive: editor.isActive('heading', { level: 2 }),
     },
@@ -73,7 +76,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleHeading({ level: 3 }).run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleHeading({ level: 3 }).run(), 50);
       },
       isActive: editor.isActive('heading', { level: 3 }),
     },
@@ -82,7 +85,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleBulletList().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleBulletList().run(), 50);
       },
       isActive: editor.isActive('bulletList'),
     },
@@ -91,7 +94,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleOrderedList().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleOrderedList().run(), 50);
       },
       isActive: editor.isActive('orderedList'),
     },
@@ -100,7 +103,7 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleBlockquote().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleBlockquote().run(), 50);
       },
       isActive: editor.isActive('blockquote'),
     },
@@ -109,25 +112,33 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().toggleCodeBlock().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().toggleCodeBlock().run(), 50);
       },
       isActive: editor.isActive('codeBlock'),
+    },
+    {
+      icon: ImageIcon,
+      onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
+        e.preventDefault(); 
+        onOpenMedia();
+      },
+      isActive: editor.isActive('image'),
     },
     {
       icon: Undo,
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().undo().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().undo().run(), 50);
       },
-      isActive: false, // undo/redo don't have an active state
+      isActive: false,
     },
     {
       icon: Redo,
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => { 
         e.preventDefault(); 
         editor.commands.focus(); 
-        setTimeout(() => editor.chain().redo().run(), 50); // Added setTimeout
+        setTimeout(() => editor.chain().redo().run(), 50);
       },
       isActive: false,
     },
@@ -150,13 +161,15 @@ const MenuBar = ({ editor }: MenuBarProps) => {
 };
 
 const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
+  const [mediaOpen, setMediaOpen] = useState(false);
+
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, ImageExtension],
     content: value,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    editable: true, // Explicitly set editable to true
+    editable: true,
     editorProps: {
       attributes: {
         class: 'prose dark:prose-invert max-w-none p-4 border border-input rounded-b-md min-h-[300px] focus:outline-none',
@@ -170,10 +183,23 @@ const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
     }
   }, [value, editor]);
 
+  const handleSelectImage = (url: string) => {
+    if (editor) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+    setMediaOpen(false);
+  };
+
   return (
     <div>
-      <MenuBar editor={editor} />
+      <MenuBar editor={editor} onOpenMedia={() => setMediaOpen(true)} />
       <EditorContent editor={editor} />
+      <QuickMediaDrawer
+        isOpen={mediaOpen}
+        onClose={() => setMediaOpen(false)}
+        onSelect={handleSelectImage}
+        initialType="Images"
+      />
     </div>
   );
 };

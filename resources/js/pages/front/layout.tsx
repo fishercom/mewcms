@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { CmsArticle } from '@/types/models/cms-article';
+import { CmsMenu } from '@/types/models/cms-menu';
+import { ChevronDown } from 'lucide-react';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -8,10 +10,84 @@ interface LayoutProps {
 }
 
 export default function FrontLayout({ children, navigation }: LayoutProps) {
+    const { menus = [] } = usePage<{ menus: CmsMenu[] }>().props;
+    const headerMenu = menus.find((m) => m.slug === 'header' || m.slug === 'navigation' || m.slug === 'site-principal');
+    const menuItems = headerMenu?.items || [];
+
     // Helper to format underscores back to slashes for URLs
     const getUrl = (slug: string) => {
         if (!slug || slug === 'home') return '/';
         return '/' + slug.replace(/_/g, '/');
+    };
+
+    const renderNavLinks = () => {
+        if (menuItems.length > 0) {
+            const parents = menuItems.filter((i) => i.parent_id === null);
+            const getChildrenOf = (parentId: number) => menuItems.filter((i) => i.parent_id === parentId);
+
+            return parents.map((item) => {
+                const children = getChildrenOf(item.id);
+                const hasChildren = children.length > 0;
+
+                if (hasChildren) {
+                    return (
+                        <div key={item.id} className="relative group py-2">
+                            <button
+                                className="flex items-center gap-1 text-sm font-medium hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors capitalize cursor-pointer bg-transparent border-0"
+                            >
+                                <span>{item.title}</span>
+                                <ChevronDown className="h-3.5 w-3.5 opacity-60 group-hover:rotate-180 transition-transform duration-300" />
+                            </button>
+                            <div className="absolute left-0 mt-2 w-48 rounded-xl border border-[#19140015] bg-[#FDFDFC] p-2 dark:border-[#3E3E3A]/45 dark:bg-[#161615] shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transform translate-y-1 group-hover:translate-y-0 transition-all duration-300 z-50">
+                                {children.map((child) => (
+                                    <Link
+                                        key={child.id}
+                                        href={child.resolved_url || '#'}
+                                        target={child.target}
+                                        className="block px-3 py-2 rounded-lg text-xs text-[#706f6c] hover:text-[#f53003] dark:text-[#c5c4c0] dark:hover:text-[#FF4433] hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all capitalize"
+                                    >
+                                        {child.title}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <Link
+                        key={item.id}
+                        href={item.resolved_url || '#'}
+                        target={item.target}
+                        className="text-sm font-medium hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors capitalize"
+                    >
+                        {item.title}
+                    </Link>
+                );
+            });
+        }
+
+        return (
+            <>
+                <Link
+                    href="/"
+                    className="text-sm font-medium hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors"
+                >
+                    Inicio
+                </Link>
+                {navigation
+                    .filter((item) => item.slug !== 'home')
+                    .map((item) => (
+                        <Link
+                            key={item.id}
+                            href={getUrl(item.slug)}
+                            className="text-sm font-medium hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors capitalize"
+                        >
+                            {item.title}
+                        </Link>
+                    ))}
+            </>
+        );
     };
 
     return (
@@ -28,23 +104,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
                     {/* Navigation Links */}
                     <nav className="hidden md:flex items-center gap-6">
-                        <Link
-                            href="/"
-                            className="text-sm font-medium hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors"
-                        >
-                            Inicio
-                        </Link>
-                        {navigation
-                            .filter((item) => item.slug !== 'home')
-                            .map((item) => (
-                                <Link
-                                    key={item.id}
-                                    href={getUrl(item.slug)}
-                                    className="text-sm font-medium hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors capitalize"
-                                >
-                                    {item.title}
-                                </Link>
-                            ))}
+                        {renderNavLinks()}
                     </nav>
 
                     {/* Admin Access & Right Actions */}

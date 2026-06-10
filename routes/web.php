@@ -23,6 +23,10 @@ require __DIR__.'/admin.php';
 // Home route (named 'home' for compatibility with frontend components)
 Route::get('/', [App\Http\Controllers\FrontController::class, 'show'])->name('home');
 
+// Taxonomy listing routes
+Route::get('category/{slug}', [App\Http\Controllers\FrontController::class, 'category'])->name('front.category');
+Route::get('tag/{slug}', [App\Http\Controllers\FrontController::class, 'tag'])->name('front.tag');
+
 // Catch-all route to resolve dynamic CMS pages on the frontend
 Route::get('{any}', [App\Http\Controllers\FrontController::class, 'show'])
     ->where('any', '.*')

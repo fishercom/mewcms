@@ -57,6 +57,10 @@ class HandleInertiaRequests extends Middleware
             $adm_menu[] = ['id'=>$group->id, 'title' => $group->name, 'items'=>$items];
         }
 
+        $menus = \App\Models\CmsMenu::with(['items' => function ($query) {
+            $query->where('active', true)->orderBy('position')->with('article');
+        }])->where('active', true)->get();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -68,7 +72,8 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'adm_menu' => $adm_menu
+            'adm_menu' => $adm_menu,
+            'menus' => $menus
         ];
     }
 }

@@ -6,6 +6,8 @@ import { CmsArticle } from '@/types/models/cms-article';
 interface PageProps {
     article: CmsArticle;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
+    allTaxonomies?: import('@/types/models/cms-taxonomy').CmsTaxonomy[];
+    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
 interface PageMetadata {
@@ -20,16 +22,48 @@ export default function Page({ article, navigation }: PageProps) {
         return '/' + slug.replace(/_/g, '/');
     };
 
+    // Separate categories and tags
+    const categoryTerms = article.terms?.filter(
+        (term) => ['categorias', 'categories', 'category'].includes(term.taxonomy?.slug?.toLowerCase() || '')
+    ) || [];
+
+    const tagTerms = article.terms?.filter(
+        (term) => ['tags', 'etiquetas', 'tag'].includes(term.taxonomy?.slug?.toLowerCase() || '')
+    ) || [];
+
     return (
         <FrontLayout navigation={navigation}>
             <Head title={article.title} />
 
             <div className="max-w-3xl mx-auto py-6 space-y-8">
                 {/* Page Header */}
-                <div className="border-b border-[#19140015] dark:border-[#3E3E3A]/40 pb-6">
+                <div className="border-b border-[#19140015] dark:border-[#3E3E3A]/40 pb-6 space-y-2">
                     <h1 className="text-3xl font-extrabold sm:text-4xl tracking-tight">
                         {article.title}
                     </h1>
+                    
+                    {(categoryTerms.length > 0 || tagTerms.length > 0) && (
+                        <div className="flex flex-wrap gap-2 pt-2">
+                            {categoryTerms.map((term) => (
+                                <Link
+                                    key={term.id}
+                                    href={`/category/${term.slug}`}
+                                    className="text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-2 py-1 rounded capitalize hover:bg-amber-100 dark:hover:bg-amber-950/60 transition-colors"
+                                >
+                                    {term.name}
+                                </Link>
+                            ))}
+                            {tagTerms.map((term) => (
+                                <Link
+                                    key={term.id}
+                                    href={`/tag/${term.slug}`}
+                                    className="text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 px-2 py-1 rounded capitalize hover:bg-red-100 dark:hover:bg-red-950/60 transition-colors"
+                                >
+                                    #{term.name}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Custom Metadata Render */}

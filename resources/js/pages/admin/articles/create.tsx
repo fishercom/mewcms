@@ -3,6 +3,8 @@ import FormLayout from '@/layouts/module/Form';
 import ArticleFields from './partials/fields';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
+import QuickMediaDrawer from '@/components/quick-media-drawer';
+import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createArticle } from '@/services/articles';
 import { CmsArticleForm } from '@/types/models/cms-article';
@@ -25,6 +27,7 @@ export default function Create() {
     const [data, setData] = useState<CmsArticleForm>(initial);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
+    const [mediaOpen, setMediaOpen] = useState(false);
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -45,6 +48,17 @@ export default function Create() {
 
     return (
         <ModuleLayout view="Crear">
+            <div className="flex justify-end mb-4">
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="flex items-center gap-1.5"
+                    onClick={() => setMediaOpen(true)}
+                >
+                    <ImageIcon className="h-4 w-4" />
+                    <span>Biblioteca de Medios Rápida</span>
+                </Button>
+            </div>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <ArticleFields
@@ -61,6 +75,10 @@ export default function Create() {
                     </div>
                 </form>
             </FormLayout>
+            <QuickMediaDrawer
+                isOpen={mediaOpen}
+                onClose={() => setMediaOpen(false)}
+            />
         </ModuleLayout>
     );
 }

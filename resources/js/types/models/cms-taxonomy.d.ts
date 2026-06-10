@@ -30,6 +30,7 @@ export interface CmsTaxonomyTerm {
     updated_at: string;
     created_at: string;
     parent?: CmsTaxonomyTerm | null;
+    taxonomy?: CmsTaxonomy;
 }
 
 export interface CmsTaxonomyTermForm {
