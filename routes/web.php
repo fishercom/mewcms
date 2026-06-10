@@ -10,10 +10,10 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']
 
 
 
+use App\Http\Controllers\Admin\DashboardController;
+
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('admin', function () {
-        return Inertia::render('admin');
-    })->name('admin');
+    Route::get('admin', [DashboardController::class, 'index'])->name('admin');
 });
 
 require __DIR__.'/settings.php';
