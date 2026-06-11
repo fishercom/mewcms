@@ -3,7 +3,7 @@ import axios from 'axios';
 import { 
     X, FolderPlus, UploadCloud, Folder, 
     FileText, ChevronRight, 
-    ArrowLeft, Copy, Check, Loader2 
+    ArrowLeft, Copy, Check, Loader2, Trash2 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,11 @@ interface LfmItem {
     icon?: string;
 }
 
+const isImageFile = (filename: string) => {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    return ext ? ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(ext) : false;
+};
+
 export default function QuickMediaDrawer({ 
     isOpen, 
     onClose, 
@@ -35,6 +40,12 @@ export default function QuickMediaDrawer({
     const [type, setType] = useState<'Images' | 'Files'>(initialType);
     const [workingDir, setWorkingDir] = useState<string>('');
     const [items, setItems] = useState<LfmItem[]>([]);
+
+    const filteredItems = items.filter(item => {
+        if (!item.is_file) return true;
+        const isImg = isImageFile(item.name);
+        return type === 'Images' ? isImg : !isImg;
+    });
     const [loading, setLoading] = useState(false);
 
     // Folder creation state
@@ -172,6 +183,30 @@ export default function QuickMediaDrawer({
         setTimeout(() => setCopiedUrl(null), 2000);
     };
 
+    const handleDeleteItem = async (itemName: string) => {
+        if (!window.confirm(`¿Estás seguro de que deseas eliminar "${itemName}"?`)) {
+            return;
+        }
+        
+        try {
+            const response = await axios.get('/laravel-filemanager/delete', {
+                params: {
+                    type: type,
+                    working_dir: workingDir || '/',
+                    items: [itemName]
+                }
+            });
+            if (response.data === 'OK') {
+                fetchItems();
+            } else {
+                alert('Error al eliminar el elemento');
+            }
+        } catch (error) {
+            console.error('Delete item error:', error);
+            alert('Error al eliminar el elemento.');
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-200">
             {/* Backdrop */}
@@ -201,18 +236,18 @@ export default function QuickMediaDrawer({
                         onClick={() => { setType('Images'); setWorkingDir(''); }}
                         className={`py-3 text-center text-xs font-semibold border-b-2 transition-colors ${
                             type === 'Images' 
-                                ? 'border-primary-700 text-primary-700' 
+                                ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500' 
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
-                        Imágenes / Photos
+                        Imágenes / Fotos
                     </button>
                     <button
                         type="button"
                         onClick={() => { setType('Files'); setWorkingDir(''); }}
                         className={`py-3 text-center text-xs font-semibold border-b-2 transition-colors ${
                             type === 'Files' 
-                                ? 'border-primary-700 text-primary-700' 
+                                ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500' 
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -225,7 +260,7 @@ export default function QuickMediaDrawer({
                     {/* Action Block 1: Folder Creation */}
                     <form onSubmit={handleCreateFolder} className="bg-gray-50 dark:bg-black/15 p-4 rounded-xl border border-gray-200/50 dark:border-gray-900/50 space-y-3">
                         <Label htmlFor="drawer-folder-name" className="text-xs font-semibold flex items-center gap-1">
-                            <FolderPlus className="h-4 w-4 text-primary-700" />
+                            <FolderPlus className="h-4 w-4 text-red-600 dark:text-red-500" />
                             <span>Crear Carpeta en: {workingDir || '/'}</span>
                         </Label>
                         <div className="flex gap-2">
@@ -247,7 +282,7 @@ export default function QuickMediaDrawer({
                     {/* Action Block 2: Bulk Upload */}
                     <div className="bg-gray-50 dark:bg-black/15 p-4 rounded-xl border border-gray-200/50 dark:border-gray-900/50 space-y-3">
                         <Label className="text-xs font-semibold flex items-center gap-1">
-                            <UploadCloud className="h-4 w-4 text-primary-700" />
+                            <UploadCloud className="h-4 w-4 text-red-600 dark:text-red-500" />
                             <span>Subida Múltiple de Archivos</span>
                         </Label>
                         <div className="relative border border-dashed border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-900/20 transition-colors py-5 text-center cursor-pointer">
@@ -277,7 +312,7 @@ export default function QuickMediaDrawer({
                                         </div>
                                         <div className="w-full bg-gray-200 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
                                             <div 
-                                                className="bg-primary-700 h-full transition-all duration-300"
+                                                className="bg-red-600 dark:bg-red-500 h-full transition-all duration-300"
                                                 style={{ width: `${file.progress}%` }}
                                             />
                                         </div>
@@ -313,31 +348,42 @@ export default function QuickMediaDrawer({
                         {/* Files and Folders list */}
                         {loading ? (
                             <div className="flex items-center justify-center py-16 gap-2 text-xs text-gray-500">
-                                <Loader2 className="h-4 w-4 animate-spin text-primary-700" />
+                                <Loader2 className="h-4 w-4 animate-spin text-red-600 dark:text-red-500" />
                                 <span>Cargando archivos...</span>
                             </div>
-                        ) : items.length > 0 ? (
+                        ) : filteredItems.length > 0 ? (
                             <div className="grid grid-cols-2 gap-3">
-                                {items.map((item, idx) => {
+                                {filteredItems.map((item, idx) => {
                                     if (!item.is_file) {
                                         // Directory view
                                         return (
-                                            <button
-                                                key={idx}
-                                                type="button"
-                                                onClick={() => handleFolderClick(item.name)}
-                                                className="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white hover:border-primary-700/40 dark:bg-[#1f1f1e] hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-all text-center gap-2 group cursor-pointer"
-                                            >
-                                                <Folder className="h-8 w-8 text-amber-500 group-hover:scale-105 transition-transform duration-200" />
-                                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate w-full capitalize">
-                                                    {item.name}
-                                                </span>
-                                            </button>
+                                            <div key={idx} className="relative group/folder">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleFolderClick(item.name)}
+                                                    className="w-full flex flex-col items-center justify-center p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white hover:border-red-500/40 dark:bg-[#1f1f1e] hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-all text-center gap-2 group cursor-pointer"
+                                                >
+                                                    <Folder className="h-8 w-8 text-amber-500 group-hover:scale-105 transition-transform duration-200" />
+                                                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate w-full capitalize">
+                                                        {item.name}
+                                                    </span>
+                                                </button>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    type="button"
+                                                    className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 opacity-0 group-hover/folder:opacity-100 transition-opacity"
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.name); }}
+                                                    title="Eliminar carpeta"
+                                                >
+                                                    <Trash2 className="h-3 w-3" />
+                                                </Button>
+                                            </div>
                                         );
                                     }
 
                                     // File view
-                                    const isImg = type === 'Images';
+                                    const isImg = isImageFile(item.name);
                                     return (
                                         <div
                                             key={idx}
@@ -382,10 +428,20 @@ export default function QuickMediaDrawer({
                                                         title="Copiar URL"
                                                     >
                                                         {copiedUrl === item.url ? (
-                                                            <Check className="h-3 w-3 text-green-500" />
+                                                            <Check className="h-3.5 w-3.5 text-green-500" />
                                                         ) : (
-                                                            <Copy className="h-3 w-3" />
+                                                            <Copy className="h-3.5 w-3.5" />
                                                         )}
+                                                    </Button>
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        type="button"
+                                                        className="h-6 w-6 shrink-0 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                                        onClick={() => handleDeleteItem(item.name)}
+                                                        title="Eliminar elemento"
+                                                    >
+                                                        <Trash2 className="h-3.5 w-3.5" />
                                                     </Button>
                                                 </div>
                                             </div>

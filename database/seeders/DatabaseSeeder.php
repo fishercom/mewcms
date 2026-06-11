@@ -35,22 +35,7 @@ class DatabaseSeeder extends Seeder
 		// Seeding cms_parameters_group
 		$pgroup_asunto= \App\Models\CmsParameterGroup::create(['name' => 'Asunto de Contacto', 'alias'=>'asunto', 'active'=>true]);
 
-		// Seeding cms_filetypes
-		$ftype_image = \App\Models\CmsFileType::create(['name' => 'Imagen', 'extensions' => 'jpg,jpeg,gif,png', 'active'=>true]);
-		$ftype_doc   = \App\Models\CmsFileType::create(['name' => 'Documento', 'extensions' => 'pdf,doc,docx,xls,xlsx,ppt,pptx', 'active'=>true]);
-		$ftype_audio = \App\Models\CmsFileType::create(['name' => 'Audio', 'extensions' => 'mp3,aif,wav', 'active'=>true]);
-		$ftype_video = \App\Models\CmsFileType::create(['name' => 'Video', 'extensions' => 'mov,avi,mpg,mpeg,mp4,wmv', 'active'=>true]);
 
-
-		// Seeding cms_directories
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Meta-tag: imagen', 'alias' => 'metatag_imagen', 'path' => 'cms/metatag/imagen/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Página: imagen', 'alias' => 'pagina_imagen', 'path' => 'cms/pagina/imagen/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Página: icono', 'alias' => 'pagina_icono', 'path' => 'cms/pagina/icono/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_doc->id, 'name' => 'Página: documento', 'alias' => 'pagina_documento', 'path' => 'cms/pagina/documento/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Seccion: imagen', 'alias' => 'seccion_imagen', 'path' => 'cms/seccion/imagen/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Animación: foto', 'alias' => 'animacion_home', 'path' => 'cms/home/foto/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Término: Imagenes de Texto', 'alias' => 'termino_imagen', 'path' => 'cms/termino/imagen/', 'active'=>true]);
-		\App\Models\CmsDirectory::create(['type_id' => $ftype_image->id, 'name' => 'Usuario: foto', 'alias' => 'user_photo', 'path' => 'user/photo/', 'active'=>true]);
 
 
 		// Seeding cms_forms
@@ -90,7 +75,7 @@ class DatabaseSeeder extends Seeder
 		$module_config = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Configuración', 'title' => 'configuración', 'url' => '/admin/configs', 'icon'=>'cog', 'position'=>'1', 'visible'=>true]);
 		$module_site = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Sites', 'title' => 'site', 'url' => '/admin/sites', 'icon'=>'globe', 'position'=>'2', 'visible'=>true]);
 		$module_schema = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Esquemas', 'title' => 'esquema', 'url' => '/admin/schemas', 'icon'=>'shuffle', 'position'=>'3', 'visible'=>true]);
-		$module_directory = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Directorio de Archivos', 'title' => 'directorio', 'url' => '/admin/directories', 'icon'=>'folder-open', 'position'=>'4', 'visible'=>true]);
+
 		$module_taxonomy = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Taxonomías', 'url' => '/admin/taxonomies', 'icon'=>'tags', 'position'=>'5', 'visible'=>true]);
 		$module_menu = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Menús', 'title' => 'menús', 'url' => '/admin/menus', 'icon'=>'menu', 'position'=>'6', 'visible'=>true]);
 
@@ -124,8 +109,7 @@ class DatabaseSeeder extends Seeder
 		\App\Models\AdmEvent::create(['module_id' => $module_site->id, 'action_id' => $action_admin->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_schema->id, 'action_id' => $action_lista->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_schema->id, 'action_id' => $action_admin->id]);
-		\App\Models\AdmEvent::create(['module_id' => $module_directory->id, 'action_id' => $action_lista->id]);
-		\App\Models\AdmEvent::create(['module_id' => $module_directory->id, 'action_id' => $action_admin->id]);
+
 		\App\Models\AdmEvent::create(['module_id' => $module_taxonomy->id, 'action_id' => $action_lista->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_taxonomy->id, 'action_id' => $action_admin->id]);
 		\App\Models\AdmEvent::create(['module_id' => $module_menu->id, 'action_id' => $action_lista->id]);

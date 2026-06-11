@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\ConfigController;
-use App\Http\Controllers\Admin\DirectoryController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\SchemaController;
 use App\Http\Controllers\Admin\ParameterController;
@@ -32,7 +32,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('logs', LogController::class);
     Route::resource('translates', TranslateController::class);
     Route::resource('configs', ConfigController::class);
-    Route::resource('directories', DirectoryController::class);
+
     Route::resource('sites', SiteController::class);
     Route::resource('schemas', SchemaController::class);
     Route::resource('parameters', ParameterController::class);
@@ -50,6 +50,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('menus/items/{item}', [MenuController::class, 'destroyItem'])->name('menus.items.destroy');
 
     Route::resource('templates', TemplateController::class)->except(['show']);
+    Route::get('media', [MediaController::class, 'index'])->name('media.index');
 });
 
 Route::get('dashboard', function () {

@@ -55,3 +55,20 @@ it('allows listing files and directories via LFM jsonitems', function () {
     $response->assertStatus(200);
     $response->assertJsonStructure(['items', 'paginator', 'working_dir']);
 });
+
+it('allows authenticated admin to delete files via LFM', function () {
+    $file = UploadedFile::fake()->image('test_delete_image.jpg');
+
+    $this->actingAs($this->user)->post('/laravel-filemanager/upload', [
+        'upload' => $file,
+        'type' => 'Files',
+        'working_dir' => '/'
+    ], [
+        'Accept' => 'application/json'
+    ]);
+
+    $response = $this->actingAs($this->user)->get('/laravel-filemanager/delete?items[]=test_delete_image.jpg&type=Files&working_dir=/');
+    
+    $response->assertStatus(200);
+    $this->assertEquals('OK', $response->getContent());
+});
