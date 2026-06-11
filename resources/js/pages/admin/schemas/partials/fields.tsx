@@ -21,8 +21,7 @@ interface Props {
 export default function SchemaFields({ data, setData, errors, processing, groups, parents, templates }: Props) {
     const schemaTypes = [
         { value: 'PAGE', label: 'Page' },
-        { value: 'HOME', label: 'Home' },
-        { value: 'OPTIONS', label: 'Options' },
+        { value: 'SECTION', label: 'Section' },
     ];
 
     return (
@@ -89,7 +88,7 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                 <Label htmlFor="type">Type</Label>
                 <Select
                     value={data.type}
-                    onValueChange={(value) => setData({ ...data, type: value as 'PAGE' | 'HOME' | 'OPTIONS' })}
+                    onValueChange={(value) => setData({ ...data, type: value as 'PAGE' | 'SECTION' })}
                     disabled={processing}
                 >
                     <SelectTrigger>

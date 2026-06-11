@@ -22,10 +22,16 @@ class FrontController extends Controller
         if (empty($slug)) {
             // Find the Home page article
             $article = CmsArticle::whereHas('schema', function ($query) {
-                $query->where('type', 'HOME');
-            })->where('active', 1)->first();
+                $query->whereIn('type', ['HOME', 'PAGE']);
+            })->where('slug', 'home')->where('active', 1)->first();
 
-            // Fallback to first active article if no HOME type schema is seeded
+            if (!$article) {
+                $article = CmsArticle::whereHas('schema', function ($query) {
+                    $query->where('type', 'HOME');
+                })->where('active', 1)->first();
+            }
+
+            // Fallback to first active article if still not found
             if (!$article) {
                 $article = CmsArticle::where('active', 1)->orderBy('position')->first();
             }
