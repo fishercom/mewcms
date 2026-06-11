@@ -89,7 +89,7 @@ export default function Index() {
                             className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Agregar Esquema</span>
+                            <span>Agregar Campo Personalizado</span>
                         </Button>
                     </div>
                 </div>
@@ -131,7 +131,7 @@ export default function Index() {
                                         disabled={item.articles_count !== undefined && item.articles_count > 0}
                                         className="flex items-center gap-1 h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:text-gray-400 dark:disabled:text-gray-600"
                                         onClick={() => deleteSchemaHandler(item.id)}
-                                        title={item.articles_count !== undefined && item.articles_count > 0 ? "No se puede eliminar porque está asignado a uno o más artículos" : "Eliminar esquema"}
+                                        title={item.articles_count !== undefined && item.articles_count > 0 ? "No se puede eliminar porque está asignado a uno o más artículos" : "Eliminar campo personalizado"}
                                     >
                                         <Trash2 className="h-3.5 w-3.5" />
                                         <span>Eliminar</span>

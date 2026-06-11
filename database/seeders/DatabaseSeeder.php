@@ -74,7 +74,7 @@ class DatabaseSeeder extends Seeder
 
 		$module_config = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Configuración', 'title' => 'configuración', 'url' => '/admin/configs', 'icon'=>'cog', 'position'=>'1', 'visible'=>true]);
 		$module_site = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Sites', 'title' => 'site', 'url' => '/admin/sites', 'icon'=>'globe', 'position'=>'2', 'visible'=>true]);
-		$module_schema = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Esquemas', 'title' => 'esquema', 'url' => '/admin/schemas', 'icon'=>'shuffle', 'position'=>'3', 'visible'=>true]);
+		$module_schema = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Campos Personalizados', 'title' => 'esquema', 'url' => '/admin/schemas', 'icon'=>'shuffle', 'position'=>'3', 'visible'=>true]);
 
 		$module_taxonomy = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Taxonomías', 'url' => '/admin/taxonomies', 'icon'=>'tags', 'position'=>'5', 'visible'=>true]);
 		$module_menu = \App\Models\AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Menús', 'title' => 'menús', 'url' => '/admin/menus', 'icon'=>'menu', 'position'=>'6', 'visible'=>true]);
