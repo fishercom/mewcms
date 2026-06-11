@@ -42,7 +42,7 @@ class ArticleController extends Controller
         $lang_id = $this->lang_id;
         $s = $request->get('s');
 
-        $query = CmsArticle::with('schema')
+        $query = CmsArticle::with(['schema', 'parent'])
             ->where('lang_id', $lang_id);
 
         if (!empty($s)) {

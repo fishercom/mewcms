@@ -18,6 +18,7 @@ export interface CmsArticle {
     updated_at: Date,
     created_at: Date,
     schema?: import('./cms-schema').CmsSchema,
+    parent?: CmsArticle | null,
     children?: CmsArticle[],
     terms?: import('./cms-taxonomy').CmsTaxonomyTerm[]
 }

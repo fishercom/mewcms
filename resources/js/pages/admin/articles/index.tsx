@@ -9,7 +9,7 @@ import { format } from 'date-fns'
 import { CmsArticle } from '@/types/models/cms-article';
 import { Pagination } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Check, Search, Plus, ListOrdered, Edit, Trash2 } from 'lucide-react';
+import { Check, Search, Plus, ListOrdered, Edit, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { Input } from '@headlessui/react';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import SortableArticlesModal from './partials/SortableArticlesModal';
@@ -19,6 +19,26 @@ export default function Index() {
     const { items, paging } = usePage<{ items: CmsArticle[], paging: Pagination<CmsArticle> }>().props;
     const [ query, setQuery ] = useState({s: ''});
     const [isSortableModalOpen, setSortableModalOpen] = useState(false);
+    const [collapsedPageIds, setCollapsedPageIds] = useState<number[]>([]);
+
+    const toggleCollapse = (id: number) => {
+        setCollapsedPageIds(prev =>
+            prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]
+        );
+    };
+
+    const isRowVisible = (item: CmsArticle) => {
+        let current = item;
+        while (current.parent_id) {
+            if (collapsedPageIds.includes(current.parent_id)) {
+                return false;
+            }
+            const parent = items.find(p => p.id === current.parent_id);
+            if (!parent) break;
+            current = parent;
+        }
+        return true;
+    };
 
     const handleCloseSortableModal = () => {
         setSortableModalOpen(false);
@@ -82,6 +102,7 @@ export default function Index() {
                         <thead className="text-sm text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="px-4 py-3 rounded-l-md">Nombre</th>
+                                <th scope="col" className="px-4 py-3">Página Superior</th>
                                 <th scope="col" className="px-4 py-3">Activo</th>
                                 <th scope="col" className="px-4 py-3">Fecha de Creación</th>
                                 <th scope="col" className="px-4 py-3">Fecha de Actualización</th>
@@ -90,14 +111,40 @@ export default function Index() {
                         </thead>
                         <tbody>
                         {paging.data.map((item: CmsArticle)=>{
+                            if (!isRowVisible(item)) {
+                                return null;
+                            }
+                            const hasChildren = items.some(p => p.parent_id === item.id);
+                            const isCollapsed = collapsedPageIds.includes(item.id);
+
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    <span style={{ paddingLeft: `${(item.depth || 0) * 1.5}rem` }} className="flex items-center">
+                                    <span style={{ paddingLeft: `${(item.depth || 0) * 1.5}rem` }} className="flex items-center gap-1.5">
+                                        {hasChildren ? (
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleCollapse(item.id);
+                                                }}
+                                                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-gray-500"
+                                            >
+                                                {isCollapsed ? (
+                                                    <ChevronRight className="h-3.5 w-3.5" />
+                                                ) : (
+                                                    <ChevronDown className="h-3.5 w-3.5" />
+                                                )}
+                                            </button>
+                                        ) : (
+                                            <div className="w-6" />
+                                        )}
                                         {(item.depth || 0) > 0 && <span className="text-gray-400 mr-1.5">{"—".repeat(item.depth || 0)}</span>}
                                         { item.title }
                                     </span>
                                 </th>
+                                <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                    {item.parent ? item.parent.title : <span className="text-gray-300 dark:text-gray-600">Ninguna</span>}
+                                </td>
                                 <td className="px-4 py-3">{ item.active? <Check/>: <></> }</td>
                                 <td className="px-4 py-3">{ format(item.created_at, 'dd/MM/yyyy HH:mm') }</td>
                                 <td className="px-4 py-3">{ format(item.updated_at, 'dd/MM/yyyy HH:mm') }</td>
