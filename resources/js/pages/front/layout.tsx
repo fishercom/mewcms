@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Facebook, Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -10,7 +10,10 @@ interface LayoutProps {
 }
 
 export default function FrontLayout({ children, navigation }: LayoutProps) {
-    const { menus = [] } = usePage<{ menus: CmsMenu[] }>().props;
+    const { menus = [], layout_settings = {} } = usePage<{ 
+        menus: CmsMenu[]; 
+        layout_settings?: Record<string, string>;
+    }>().props;
     const headerMenu = menus.find((m) => m.slug === 'main' || m.slug === 'header' || m.slug === 'navigation' || m.slug === 'site-principal');
     const menuItems = headerMenu?.items || [];
 
@@ -101,7 +104,11 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                         <Link href="/" className="text-xl font-bold tracking-tight text-primary hover:opacity-85">
-                            MewCMS
+                            {layout_settings?.layout_header_logo ? (
+                                <img src={layout_settings.layout_header_logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
+                            ) : (
+                                'MewCMS'
+                            )}
                         </Link>
                     </div>
 
@@ -132,6 +139,12 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
             {/* Footer */}
             <footer className="border-t border-[#19140010] bg-[#FDFDFC] dark:border-[#3E3E3A]/20 dark:bg-[#0a0a0a] py-8 mt-16 transition-colors">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-xs text-[#706f6c] dark:text-[#A1A09A] space-y-4">
+                    {layout_settings?.layout_footer_logo && (
+                        <div className="flex justify-center mb-4">
+                            <img src={layout_settings.layout_footer_logo} alt="Footer Logo" className="h-8 max-w-[200px] object-contain" />
+                        </div>
+                    )}
+                    
                     {footerItems.length > 0 && (
                         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-medium">
                             {footerItems.map((item) => (
@@ -146,9 +159,44 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                             ))}
                         </div>
                     )}
-                    <p>© {new Date().getFullYear()} MewCMS. Powered by Laravel, Inertia, and React.</p>
+
+                    {/* Social Media Links */}
+                    <div className="flex justify-center gap-4 py-1.5 text-[#706f6c] dark:text-[#A1A09A]">
+                        {layout_settings?.layout_facebook && (
+                            <a href={layout_settings.layout_facebook} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors" title="Facebook">
+                                <Facebook className="h-4.5 w-4.5" />
+                            </a>
+                        )}
+                        {layout_settings?.layout_instagram && (
+                            <a href={layout_settings.layout_instagram} target="_blank" rel="noopener noreferrer" className="hover:text-pink-600 transition-colors" title="Instagram">
+                                <Instagram className="h-4.5 w-4.5" />
+                            </a>
+                        )}
+                        {layout_settings?.layout_twitter && (
+                            <a href={layout_settings.layout_twitter} target="_blank" rel="noopener noreferrer" className="hover:text-sky-500 transition-colors" title="Twitter/X">
+                                <Twitter className="h-4.5 w-4.5" />
+                            </a>
+                        )}
+                        {layout_settings?.layout_linkedin && (
+                            <a href={layout_settings.layout_linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-700 transition-colors" title="LinkedIn">
+                                <Linkedin className="h-4.5 w-4.5" />
+                            </a>
+                        )}
+                        {layout_settings?.layout_youtube && (
+                            <a href={layout_settings.layout_youtube} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors" title="YouTube">
+                                <Youtube className="h-4.5 w-4.5" />
+                            </a>
+                        )}
+                    </div>
+
+                    <p>{layout_settings?.layout_copyright || `© ${new Date().getFullYear()} MewCMS. Powered by Laravel, Inertia, and React.`}</p>
                 </div>
             </footer>
+
+            {/* Custom injected styles block */}
+            {layout_settings?.layout_custom_css && (
+                <style dangerouslySetInnerHTML={{ __html: layout_settings.layout_custom_css }} />
+            )}
         </div>
     );
 }

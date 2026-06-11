@@ -61,6 +61,12 @@ class HandleInertiaRequests extends Middleware
             $query->where('active', true)->orderBy('position')->with('article');
         }])->where('active', true)->get();
 
+        $layoutConfigs = \App\Models\CmsConfig::where('alias', 'like', 'layout_%')->get();
+        $layoutSettings = [];
+        foreach ($layoutConfigs as $config) {
+            $layoutSettings[$config->alias] = $config->value;
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -73,7 +79,8 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'adm_menu' => $adm_menu,
-            'menus' => $menus
+            'menus' => $menus,
+            'layout_settings' => $layoutSettings
         ];
     }
 }

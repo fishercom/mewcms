@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TaxonomyController;
 use App\Http\Controllers\Admin\TaxonomyTermController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\TemplateController;
+use App\Http\Controllers\Admin\LayoutController;
 use UniSharp\LaravelFilemanager\Lfm;
 
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     Route::resource('templates', TemplateController::class)->except(['show']);
     Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    
+    Route::get('layout', [LayoutController::class, 'index'])->name('layout.index');
+    Route::post('layout', [LayoutController::class, 'update'])->name('layout.update');
 });
 
 Route::get('dashboard', function () {
