@@ -1,6 +1,6 @@
 import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CmsSchemaForm, CmsSchema } from '@/types/models/cms-schema';
+import { CmsSchemaForm } from '@/types/models/cms-schema';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,16 +14,10 @@ interface Props {
     errors: Record<string, string>;
     processing: boolean;
     groups: CmsSchemaGroup[];
-    parents: CmsSchema[];
     templates?: { name: string; value: string }[];
 }
 
-export default function SchemaFields({ data, setData, errors, processing, groups, parents, templates }: Props) {
-    const schemaTypes = [
-        { value: 'PAGE', label: 'Page' },
-        { value: 'SECTION', label: 'Section' },
-    ];
-
+export default function SchemaFields({ data, setData, errors, processing, groups, templates }: Props) {
     return (
         <>
             <div className="grid gap-2">
@@ -61,48 +55,6 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                     </SelectContent>
                 </Select>
                 <InputError message={errors.group_id} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="parent_id">Parent</Label>
-                <Select
-                    value={data.parent_id?.toString() || ''}
-                    onValueChange={(value) => setData({ ...data, parent_id: Number(value) })}
-                    disabled={processing}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a parent" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {parents.map((parent) => (
-                            <SelectItem key={parent.id} value={parent.id.toString()}>
-                                {parent.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <InputError message={errors.parent_id} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="type">Type</Label>
-                <Select
-                    value={data.type}
-                    onValueChange={(value) => setData({ ...data, type: value as 'PAGE' | 'SECTION' })}
-                    disabled={processing}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {schemaTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <InputError message={errors.type} />
             </div>
 
             <CustomFieldManager

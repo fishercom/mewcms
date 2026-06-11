@@ -9,16 +9,14 @@ import { CmsSchemaForm, CmsSchema } from '@/types/models/cms-schema';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 
 export default function Edit() {
-    const { item, groups, parents, templates } = usePage<{ item: CmsSchema, groups: CmsSchemaGroup[], parents: CmsSchema[], templates: { name: string, value: string }[] }>().props;
+    const { item, groups, templates } = usePage<{ item: CmsSchema, groups: CmsSchemaGroup[], templates: { name: string, value: string }[] }>().props;
 
     const initial: CmsSchemaForm = {
         id: item.id,
-        parent_id: item.parent_id,
         group_id: item.group_id,
         name: item.name,
         fields: item.fields,
         iterations: item.iterations ?? null,
-        type: item.type || 'PAGE',
         front_view: item.front_view || '',
         active: Boolean(item.active),
     };
@@ -50,7 +48,6 @@ export default function Edit() {
                         errors={errors}
                         processing={processing}
                         groups={groups}
-                        parents={parents}
                         templates={templates}
                     />
                     <div className="flex items-center gap-4">

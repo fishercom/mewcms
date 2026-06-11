@@ -9,19 +9,17 @@ import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { Pagination } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Check, Search, Plus, ChevronLeft, Edit, Trash2 } from 'lucide-react';
+import { ChevronDown, Check, Search, Plus, Edit, Trash2 } from 'lucide-react';
 import { Icon } from '@/components/icon';
 import { Input } from '@headlessui/react';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 
 export default function Index() {
 
-    const { items, groups, parent, group_id, parent_id, errors } = usePage<{ 
+    const { items, groups, group_id, errors } = usePage<{ 
         items: Pagination<CmsSchema>, 
         groups: CmsSchemaGroup[], 
-        parent: CmsSchema, 
         group_id: number, 
-        parent_id: number,
         errors: Record<string, string>
     }>().props;
     const [ query, setQuery ] = useState({s: ''});
@@ -85,7 +83,7 @@ export default function Index() {
                     </div>
                     <div className="w-full md:w-auto flex justify-end">
                         <Button
-                            onClick={() => router.visit(route('schemas.create', { parent_id: parent_id, group_id: group_id }))}
+                            onClick={() => router.visit(route('schemas.create', { group_id: group_id }))}
                             className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600"
                         >
                             <Plus className="h-4 w-4" />
@@ -109,7 +107,7 @@ export default function Index() {
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
                                 <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    <a href={route('schemas.index', {parent_id: item.id, group_id: item.group_id})}>{ item.name }</a>
+                                    <a href={route('schemas.edit', item.id)} className="hover:underline">{ item.name }</a>
                                 </th>
                                 <td className="px-4 py-3">{ item.active? <Check/>: <></> }</td>
                                 <td className="px-4 py-3">{ format(item.created_at, 'dd/MM/yyyy HH:mm') }</td>
@@ -145,9 +143,6 @@ export default function Index() {
                 </div>
                 {items.links &&
                 <PaginationNav data={items}/>
-                }
-                {parent &&
-                <a href={route('schemas.index', {parent_id: parent.parent_id, group_id: group_id})} className='flex'><ChevronLeft/>Regresar</a>
                 }
             </div>
         </ModuleLayout>

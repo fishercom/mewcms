@@ -5,21 +5,19 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { createSchema } from '@/services/schemas';
-import { CmsSchemaForm, CmsSchema } from '@/types/models/cms-schema';
+import { CmsSchemaForm } from '@/types/models/cms-schema';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { CustomField } from '@/types/models/custom-field';
 
 export default function Create() {
-    const { groups, parents, templates } = usePage<{ groups: CmsSchemaGroup[], parents: CmsSchema[], templates: { name: string, value: string }[] }>().props;
+    const { groups, templates } = usePage<{ groups: CmsSchemaGroup[], templates: { name: string, value: string }[] }>().props;
 
     const initial: CmsSchemaForm = {
         id: null,
-        parent_id: undefined,
         group_id: groups[0]?.id || 0,
         name: '',
         fields: [] as CustomField[],
         iterations: null,
-        type: 'PAGE',
         front_view: '',
         active: false,
     };
@@ -54,7 +52,6 @@ export default function Create() {
                         errors={errors}
                         processing={processing}
                         groups={groups}
-                        parents={parents}
                         templates={templates}
                     />
                     <div className="flex items-center gap-4">

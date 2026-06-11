@@ -2,12 +2,12 @@ import type { CustomField } from './custom-field';
 
 export interface CmsSchema {
     id: number,
-    parent_id: number,
+    parent_id?: number | null,
     group_id: number,
     name: string,
     fields: CustomField[],
     iterations?: number | null,
-    type: string,
+    type?: string | null,
     front_view?: string | null,
     active: boolean,
     updated_at: Date,
@@ -22,7 +22,7 @@ export interface CmsSchemaForm {
     name: string,
     fields: CustomField[],
     iterations?: number | null,
-    type: string,
+    type?: string | null,
     front_view?: string | null,
     active: boolean,
     [key: string]: string | number | boolean | null | undefined | Record<string, unknown> | CustomField[];

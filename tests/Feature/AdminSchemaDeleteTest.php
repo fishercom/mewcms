@@ -43,7 +43,6 @@ it('allows deleting an unassigned schema', function () {
     $schema = CmsSchema::create([
         'name' => 'Unassigned Schema',
         'group_id' => $this->group->id,
-        'type' => 'PAGE',
         'fields' => [],
         'active' => 1,
     ]);
@@ -57,7 +56,6 @@ it('prevents deleting an assigned schema', function () {
     $schema = CmsSchema::create([
         'name' => 'Assigned Schema',
         'group_id' => $this->group->id,
-        'type' => 'PAGE',
         'fields' => [],
         'active' => 1,
     ]);

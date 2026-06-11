@@ -15,12 +15,11 @@ use App\Models\CmsSchemaGroup;
 
 class SchemaController extends Controller
 {
-    protected $group_id, $parent_id;
+    protected $group_id;
 
     public function __construct(Request $request)
     {
         $this->group_id = $request->get('group_id');
-        $this->parent_id = $request->get('parent_id');
         if(!$this->group_id){
             $group = CmsSchemaGroup::select()
             ->where('active', true)
@@ -30,7 +29,6 @@ class SchemaController extends Controller
         }
 
         Inertia::share('group_id', $this->group_id);
-        Inertia::share('parent_id', $this->parent_id);
     }
 
     /**
@@ -40,7 +38,6 @@ class SchemaController extends Controller
     {
         $s = $request->get('s');
         $group_id = $this->group_id;
-        $parent_id = $this->parent_id;
 
         $groups = CmsSchemaGroup::select()
         ->where('active', true)
@@ -54,15 +51,11 @@ class SchemaController extends Controller
             }
         })
         ->where('group_id', $group_id)
-        ->where('parent_id', $parent_id)
         ->paginate(15);
-
-        $parent = CmsSchema::find($parent_id);
 
         return Inertia::render('admin/schemas/index', [
             'items' => $items,
             'groups' => $groups,
-            'parent' => $parent
         ]);
     }
 
@@ -80,15 +73,12 @@ class SchemaController extends Controller
     public function create()
     {
         $groups = CmsSchemaGroup::all();
-        $parents = CmsSchema::whereNull('parent_id')->get();
         $args = [
             'group_id' => $this->group_id,
-            'parent_id' => $this->parent_id
         ];
         return Inertia::render('admin/schemas/create', [
             'item' => $args,
             'groups' => $groups,
-            'parents' => $parents,
             'templates' => CmsSchema::getAvailableTemplates(),
         ]);
     }
@@ -98,8 +88,6 @@ class SchemaController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'group_id' => 'required|integer|exists:cms_schema_groups,id',
-            'parent_id' => 'nullable|integer|exists:cms_schemas,id',
-            'type' => 'required|string|in:PAGE,SECTION,HOME,OPTIONS',
             'iterations' => 'nullable|integer|min:1',
             'front_view' => 'nullable|string',
             'fields' => 'nullable|array',
@@ -110,7 +98,6 @@ class SchemaController extends Controller
         $profile->save();
         $args = [
             'group_id' => $this->group_id,
-            'parent_id' => $this->parent_id
         ];
         return redirect()->route('schemas.index', $args);
     }
@@ -122,11 +109,9 @@ class SchemaController extends Controller
     {
         $item = CmsSchema::find($id);
         $groups = CmsSchemaGroup::all();
-        $parents = CmsSchema::whereNull('parent_id')->get();
         return Inertia::render('admin/schemas/edit', [
             'item' => $item,
             'groups' => $groups,
-            'parents' => $parents,
             'templates' => CmsSchema::getAvailableTemplates(),
         ]);
     }
@@ -139,8 +124,6 @@ class SchemaController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'group_id' => 'required|integer|exists:cms_schema_groups,id',
-            'parent_id' => 'nullable|integer|exists:cms_schemas,id',
-            'type' => 'required|string|in:PAGE,SECTION,HOME,OPTIONS',
             'iterations' => 'nullable|integer|min:1',
             'front_view' => 'nullable|string',
             'fields' => 'nullable|array',
@@ -153,7 +136,6 @@ class SchemaController extends Controller
 
         $args = [
             'group_id' => $this->group_id,
-            'parent_id' => $this->parent_id
         ];
         return redirect()->route('schemas.index', $args);
     }
