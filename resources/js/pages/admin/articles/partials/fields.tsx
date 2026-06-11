@@ -82,7 +82,7 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                     </span>
                 </div>
             ) : (
-                parents && parents.length > 0 && (
+                parents && (
                     <div className="grid gap-2">
                         <Label htmlFor="parent_id">Página Superior (Padre)</Label>
                         <Select
