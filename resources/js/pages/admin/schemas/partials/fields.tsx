@@ -137,8 +137,11 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                     id="iterations"
                     type="number"
                     autoComplete="iterations"
-                    value={data.iterations}
-                    onChange={(e) => setData({ ...data, iterations: parseInt(e.target.value) })}
+                    value={data.iterations === null || data.iterations === undefined || isNaN(data.iterations) ? '' : data.iterations}
+                    onChange={(e) => {
+                        const val = e.target.value;
+                        setData({ ...data, iterations: val === '' ? null : parseInt(val) });
+                    }}
                     disabled={processing}
                 />
                 <InputError message={errors.iterations} />

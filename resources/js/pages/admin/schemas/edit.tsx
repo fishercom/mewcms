@@ -17,7 +17,7 @@ export default function Edit() {
         group_id: item.group_id,
         name: item.name,
         fields: item.fields,
-        iterations: item.iterations || 1,
+        iterations: item.iterations ?? null,
         type: item.type || 'PAGE',
         front_view: item.front_view || '',
         active: Boolean(item.active),

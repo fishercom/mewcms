@@ -95,7 +95,18 @@ class SchemaController extends Controller
 
     public function store(Request $request)
     {
-        $profile = new CmsSchema($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'group_id' => 'required|integer|exists:cms_schema_groups,id',
+            'parent_id' => 'nullable|integer|exists:cms_schemas,id',
+            'type' => 'required|string|in:PAGE,SECTION,HOME,OPTIONS',
+            'iterations' => 'nullable|integer|min:1',
+            'front_view' => 'nullable|string',
+            'fields' => 'nullable|array',
+            'active' => 'boolean',
+        ]);
+
+        $profile = new CmsSchema($validated);
         $profile->save();
         $args = [
             'group_id' => $this->group_id,
@@ -125,9 +136,20 @@ class SchemaController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsSchema::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'group_id' => 'required|integer|exists:cms_schema_groups,id',
+            'parent_id' => 'nullable|integer|exists:cms_schemas,id',
+            'type' => 'required|string|in:PAGE,SECTION,HOME,OPTIONS',
+            'iterations' => 'nullable|integer|min:1',
+            'front_view' => 'nullable|string',
+            'fields' => 'nullable|array',
+            'active' => 'boolean',
+        ]);
+
+        $item = CmsSchema::findOrFail($id);
+        $item->fill($validated);
+        $item->save();
 
         $args = [
             'group_id' => $this->group_id,

@@ -49,7 +49,7 @@ export default function SchemaSelectorModal({ isOpen, onClose, parentSchemaId, d
             <p className="text-gray-600 dark:text-gray-300">Cargando...</p>
           ) : schemas.length > 0 ? (
             <ul className="space-y-2">
-              {schemas.filter(e=>e.iterations==0 || e.iterations>items.filter(a=>a.schema_id==e.id).length).map(schema => (
+              {schemas.filter(e => (e.iterations ?? 0) === 0 || (e.iterations ?? 0) > items.filter(a => a.schema_id == e.id).length).map(schema => (
                 <li key={schema.id}>
                   <Link
                     href={`/admin/articles/create?schema_id=${schema.id}`}
