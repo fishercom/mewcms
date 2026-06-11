@@ -11,7 +11,7 @@ import { CmsArticle, CmsArticleForm, FormDataConvertible } from '@/types/models/
 import { CmsSchema } from '@/types/models/cms-schema';
 
 export default function Edit() {
-    const { item, schema, taxonomies } = usePage<{ item: CmsArticle, schema?: CmsSchema, taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const { item, schema, schemas = [], taxonomies } = usePage<{ item: CmsArticle, schema?: CmsSchema, schemas?: CmsSchema[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
 
     const initial: CmsArticleForm = {
         id: item.id,
@@ -25,9 +25,15 @@ export default function Edit() {
         term_ids: item.terms?.map(t => t.id) || [],
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
+    const [activeSchema, setActiveSchema] = useState<CmsSchema | undefined>(schema);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [mediaOpen, setMediaOpen] = useState(false);
+
+    const handleChangeSchema = (schemaId: number) => {
+        const found = schemas.find(s => s.id === schemaId);
+        setActiveSchema(found);
+    };
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -63,8 +69,10 @@ export default function Edit() {
                         setData={setData}
                         errors={errors}
                         processing={processing}
-                        schema={schema}
+                        schema={activeSchema}
+                        schemas={schemas}
                         taxonomies={taxonomies}
+                        onChangeSchema={handleChangeSchema}
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>

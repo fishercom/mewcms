@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Props {
     data: CmsArticleForm;
@@ -13,10 +14,12 @@ interface Props {
     errors: Record<string, string>;
     processing: boolean;
     schema?: CmsSchema;
+    schemas?: CmsSchema[];
     taxonomies?: CmsTaxonomy[];
+    onChangeSchema?: (schemaId: number) => void;
 }
 
-export default function ArticleFields({ data, setData, errors, processing, schema, taxonomies }: Props) {
+export default function ArticleFields({ data, setData, errors, processing, schema, schemas, taxonomies, onChangeSchema }: Props) {
     return (
         <>
             <div className="grid gap-2">
@@ -35,6 +38,35 @@ export default function ArticleFields({ data, setData, errors, processing, schem
 
                 <InputError message={errors.title} />
             </div>
+
+            {schemas && schemas.length > 0 && (
+                <div className="grid gap-2">
+                    <Label htmlFor="schema_id">Plantilla (Campos Personalizados)</Label>
+                    <Select
+                        value={data.schema_id?.toString() || ''}
+                        onValueChange={(value) => {
+                            const newId = Number(value);
+                            setData({ ...data, schema_id: newId });
+                            if (onChangeSchema) {
+                                onChangeSchema(newId);
+                            }
+                        }}
+                        disabled={processing}
+                    >
+                        <SelectTrigger id="schema_id">
+                            <SelectValue placeholder="Seleccione una plantilla" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {schemas.map((s) => (
+                                <SelectItem key={s.id} value={s.id.toString()}>
+                                    {s.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <InputError message={errors.schema_id} />
+                </div>
+            )}
 
             {schema?.fields?.length ? (
                 <div className="space-y-4">

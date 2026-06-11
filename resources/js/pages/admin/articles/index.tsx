@@ -7,20 +7,17 @@ import { getArticles, deleteArticle } from '@/services/articles';
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
 import { CmsArticle } from '@/types/models/cms-article';
-import { CmsSchema } from '@/types/models/cms-schema';
 import { Pagination } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Check, Search, Plus, ListOrdered, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@headlessui/react';
 import { PaginationNav } from '@/components/ui/pagination-nav';
-import SchemaSelectorModal from './partials/SchemaSelectorModal';
 import SortableArticlesModal from './partials/SortableArticlesModal';
 
 export default function Index() {
 
-    const { items, paging, parent } = usePage<{ items: CmsArticle[], paging: Pagination<CmsArticle>, parent: CmsSchema | null }>().props;
+    const { items, paging } = usePage<{ items: CmsArticle[], paging: Pagination<CmsArticle> }>().props;
     const [ query, setQuery ] = useState({s: ''});
-    const [isModalOpen, setModalOpen] = useState(false);
     const [isSortableModalOpen, setSortableModalOpen] = useState(false);
 
     const handleCloseSortableModal = () => {
@@ -44,9 +41,7 @@ export default function Index() {
     }
 
     const handleCreateClick = () => {
-        // If there is no parent, or the parent has no children schemas, maybe go directly to create page
-        // For now, we always open the modal as requested.
-        setModalOpen(true);
+        router.visit(route('articles.create'));
     }
 
     return (
@@ -132,12 +127,6 @@ export default function Index() {
                 <PaginationNav data={paging}/>
                 }
             </div>
-            <SchemaSelectorModal
-                isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
-                parentSchemaId={parent?.id}
-                data={items}
-            />
             <SortableArticlesModal
                 isOpen={isSortableModalOpen}
                 onClose={handleCloseSortableModal}

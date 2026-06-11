@@ -64,8 +64,18 @@ class ArticleController extends Controller
 
     public function create(Request $request)
     {
-      $schemaId = (int) $request->get('schema_id', 1);
-      $schema = CmsSchema::find($schemaId);
+      $schemas = CmsSchema::where('active', 1)->get()->filter(function ($schema) {
+          if ($schema->isUnique()) {
+              return !CmsArticle::where('schema_id', $schema->id)->exists();
+          }
+          return true;
+      })->values();
+      
+      $schemaId = $request->get('schema_id');
+      if (!$schemaId && $schemas->isNotEmpty()) {
+          $schemaId = $schemas->first()->id;
+      }
+      $schema = $schemaId ? CmsSchema::find($schemaId) : null;
 
       $args = [
         'id' => null,
@@ -85,12 +95,26 @@ class ArticleController extends Controller
       return Inertia::render('admin/articles/create', [
         'item' => $args,
         'schema' => $schema,
+        'schemas' => $schemas,
         'taxonomies' => $taxonomies,
       ]);
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'schema_id' => 'required|integer|exists:cms_schemas,id',
+        ]);
+
+        $schemaId = $request->input('schema_id');
+        $schema = CmsSchema::find($schemaId);
+        if ($schema && $schema->isUnique()) {
+            if (CmsArticle::where('schema_id', $schema->id)->exists()) {
+                return back()->withErrors(['schema_id' => 'Esta plantilla es única y ya está asignada a otra página.']);
+            }
+        }
+
         $profile = new CmsArticle($request->all());
         $profile->save();
 
@@ -113,6 +137,14 @@ class ArticleController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsArticle::with(['schema', 'terms'])->findOrFail($id);
+        $schemas = CmsSchema::where('active', 1)->get()->filter(function ($schema) use ($id) {
+            if ($schema->isUnique()) {
+                return !CmsArticle::where('schema_id', $schema->id)
+                    ->where('id', '!=', $id)
+                    ->exists();
+            }
+            return true;
+        })->values();
         $taxonomies = \App\Models\CmsTaxonomy::with(['terms' => function ($query) {
             $query->where('active', true)->orderBy('position');
         }])->where('active', true)->get();
@@ -120,6 +152,7 @@ class ArticleController extends Controller
         return Inertia::render('admin/articles/edit', [
             'item' => $item,
             'schema' => $item?->schema,
+            'schemas' => $schemas,
             'taxonomies' => $taxonomies,
         ]);
     }
@@ -129,6 +162,19 @@ class ArticleController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'schema_id' => 'required|integer|exists:cms_schemas,id',
+        ]);
+
+        $schemaId = $request->input('schema_id');
+        $schema = CmsSchema::find($schemaId);
+        if ($schema && $schema->isUnique()) {
+            if (CmsArticle::where('schema_id', $schema->id)->where('id', '!=', $id)->exists()) {
+                return back()->withErrors(['schema_id' => 'Esta plantilla es única y ya está asignada a otra página.']);
+            }
+        }
+
         $item = CmsArticle::findOrFail($id);
 		$item->fill($request->all());
 		$item->save();

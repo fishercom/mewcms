@@ -14,7 +14,7 @@ class CmsSchema extends Model {
 	use \Rutorika\Sortable\SortableTrait;
 
 	protected $table = 'cms_schemas';
-	protected $fillable = ['group_id', 'name', 'fields', 'iterations', 'front_view', 'active'];
+	protected $fillable = ['group_id', 'name', 'fields', 'front_view', 'active'];
 
 	protected static $sortableField = 'position';
 	protected static $sortableGroupField = 'group_id';
@@ -64,15 +64,43 @@ class CmsSchema extends Model {
                 $templateName = ucfirst(basename($file, '.tsx'));
             }
 
+            $unique = false;
+            if (preg_match('/Unique:\s*([^\r\n\*]+)/i', $content, $matches)) {
+                $unique = filter_var(trim($matches[1]), FILTER_VALIDATE_BOOLEAN);
+            }
+
             $value = 'front/templates/' . basename($file, '.tsx');
 
             $templates[] = [
                 'name' => $templateName,
                 'value' => $value,
                 'file' => $file,
+                'unique' => $unique,
             ];
         }
 
         return $templates;
+    }
+
+    public function isUnique(): bool
+    {
+        if (!$this->front_view) {
+            return false;
+        }
+
+        $filename = basename($this->front_view) . '.tsx';
+        $directory = resource_path('js/pages/front/templates');
+        $filePath = $directory . '/' . $filename;
+
+        if (!file_exists($filePath)) {
+            return false;
+        }
+
+        $content = file_get_contents($filePath);
+        if (preg_match('/Unique:\s*([^\r\n\*]+)/i', $content, $matches)) {
+            return filter_var(trim($matches[1]), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return false;
     }
 }

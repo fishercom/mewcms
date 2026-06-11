@@ -11,7 +11,7 @@ import { CmsArticleForm } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
 
 export default function Create() {
-    const { schema, taxonomies } = usePage<{ schema?: CmsSchema, taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const { schema, schemas = [], taxonomies } = usePage<{ schema?: CmsSchema, schemas?: CmsSchema[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
 
     const initial: CmsArticleForm = {
         id: null,
@@ -25,9 +25,15 @@ export default function Create() {
         term_ids: [],
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
+    const [activeSchema, setActiveSchema] = useState<CmsSchema | undefined>(schema);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [mediaOpen, setMediaOpen] = useState(false);
+
+    const handleChangeSchema = (schemaId: number) => {
+        const found = schemas.find(s => s.id === schemaId);
+        setActiveSchema(found);
+    };
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -38,6 +44,7 @@ export default function Create() {
             onSuccess: () => {
                 setProcessing(false);
                 setData(initial);
+                setActiveSchema(schema);
             },
             onError: (err: Record<string, string>) => {
                 setErrors(err);
@@ -66,8 +73,10 @@ export default function Create() {
                         setData={setData}
                         errors={errors}
                         processing={processing}
-                        schema={schema}
+                        schema={activeSchema}
+                        schemas={schemas}
                         taxonomies={taxonomies}
+                        onChangeSchema={handleChangeSchema}
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>

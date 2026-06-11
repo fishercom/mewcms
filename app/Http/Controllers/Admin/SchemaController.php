@@ -88,7 +88,6 @@ class SchemaController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'group_id' => 'required|integer|exists:cms_schema_groups,id',
-            'iterations' => 'nullable|integer|min:1',
             'front_view' => 'nullable|string',
             'fields' => 'nullable|array',
             'active' => 'boolean',
@@ -124,7 +123,6 @@ class SchemaController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'group_id' => 'required|integer|exists:cms_schema_groups,id',
-            'iterations' => 'nullable|integer|min:1',
             'front_view' => 'nullable|string',
             'fields' => 'nullable|array',
             'active' => 'boolean',

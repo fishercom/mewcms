@@ -16,7 +16,6 @@ export default function Edit() {
         group_id: item.group_id,
         name: item.name,
         fields: item.fields,
-        iterations: item.iterations ?? null,
         front_view: item.front_view || '',
         active: Boolean(item.active),
     };

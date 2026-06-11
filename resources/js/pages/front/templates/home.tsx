@@ -1,5 +1,6 @@
 /**
  * Template Name: Home Page
+ * Unique: true
  */
 import React from 'react';
 import FrontLayout from '../layout';

@@ -83,22 +83,6 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                 <InputError message={errors.front_view} />
             </div>
 
-            <div className="grid gap-2">
-                <Label htmlFor="iterations">Iterations</Label>
-                <Input
-                    id="iterations"
-                    type="number"
-                    autoComplete="iterations"
-                    value={data.iterations === null || data.iterations === undefined || isNaN(data.iterations) ? '' : data.iterations}
-                    onChange={(e) => {
-                        const val = e.target.value;
-                        setData({ ...data, iterations: val === '' ? null : parseInt(val) });
-                    }}
-                    disabled={processing}
-                />
-                <InputError message={errors.iterations} />
-            </div>
-
             <div className="flex items-center space-x-3">
                 <Checkbox
                     id="active"
