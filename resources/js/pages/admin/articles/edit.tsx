@@ -11,7 +11,7 @@ import { CmsArticle, CmsArticleForm, FormDataConvertible } from '@/types/models/
 import { CmsSchema } from '@/types/models/cms-schema';
 
 export default function Edit() {
-    const { item, schema, schemas = [], taxonomies } = usePage<{ item: CmsArticle, schema?: CmsSchema, schemas?: CmsSchema[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const { item, schema, schemas = [], parents = [], taxonomies } = usePage<{ item: CmsArticle, schema?: CmsSchema, schemas?: CmsSchema[], parents?: CmsArticle[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
 
     const initial: CmsArticleForm = {
         id: item.id,
@@ -71,6 +71,7 @@ export default function Edit() {
                         processing={processing}
                         schema={activeSchema}
                         schemas={schemas}
+                        parents={parents}
                         taxonomies={taxonomies}
                         onChangeSchema={handleChangeSchema}
                     />

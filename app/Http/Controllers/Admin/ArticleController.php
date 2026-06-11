@@ -40,32 +40,49 @@ class ArticleController extends Controller
     public function index(Request $request): Response
     {
         $lang_id = $this->lang_id;
-        $parent_id = $this->parent_id;
         $s = $request->get('s');
 
-        $items = CmsArticle::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->where('lang_id', $lang_id)
-        ->where('parent_id', $parent_id)
-        ->orderBy('position');
+        $query = CmsArticle::with('schema')
+            ->where('lang_id', $lang_id);
 
-        $parent = CmsSchema::find($parent_id);
+        if (!empty($s)) {
+            $query->where('title', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+        }
+
+        $allArticles = $query->orderBy('position')->get();
+
+        if (empty($s)) {
+            $sortedArticles = [];
+            $this->buildTree($allArticles, null, $sortedArticles);
+            $items = collect($sortedArticles);
+        } else {
+            $items = $allArticles;
+        }
+
+        $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 15;
+        $currentItems = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentItems,
+            $items->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return Inertia::render('admin/articles/index', [
-            'items' => $items->get(),
-            'paging' => $items->paginate(15),
-            'parent' => $parent,
+            'items' => $items->values(),
+            'paging' => $paginated,
         ]);
     }
 
     public function create(Request $request)
     {
-      $schemas = CmsSchema::where('active', 1)->get()->filter(function ($schema) {
-          if ($schema->isUnique()) {
+      $schemas = CmsSchema::where('active', 1)->get()->map(function ($s) {
+          $s->unique = $s->isUnique();
+          return $s;
+      })->filter(function ($schema) {
+          if ($schema->unique) {
               return !CmsArticle::where('schema_id', $schema->id)->exists();
           }
           return true;
@@ -80,13 +97,21 @@ class ArticleController extends Controller
       $args = [
         'id' => null,
         'lang_id' => $this->lang_id,
-        'parent_id' => $this->parent_id,
+        'parent_id' => null,
         'schema_id' => $schemaId,
         'title' => '',
         'metadata' => new \stdClass(),
         'slug' => '',
         'active' => true,
       ];
+
+      $parents = CmsArticle::where('lang_id', $this->lang_id)
+          ->where('active', 1)
+          ->get()
+          ->filter(function ($article) {
+              return !$article->schema?->isUnique();
+          })
+          ->values();
 
       $taxonomies = \App\Models\CmsTaxonomy::with(['terms' => function ($query) {
           $query->where('active', true)->orderBy('position');
@@ -96,6 +121,7 @@ class ArticleController extends Controller
         'item' => $args,
         'schema' => $schema,
         'schemas' => $schemas,
+        'parents' => $parents,
         'taxonomies' => $taxonomies,
       ]);
     }
@@ -105,13 +131,26 @@ class ArticleController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'schema_id' => 'required|integer|exists:cms_schemas,id',
+            'parent_id' => 'nullable|integer|exists:cms_articles,id',
         ]);
 
         $schemaId = $request->input('schema_id');
         $schema = CmsSchema::find($schemaId);
+        $parentId = $request->input('parent_id');
+
         if ($schema && $schema->isUnique()) {
             if (CmsArticle::where('schema_id', $schema->id)->exists()) {
                 return back()->withErrors(['schema_id' => 'Esta plantilla es única y ya está asignada a otra página.']);
+            }
+            if ($parentId !== null) {
+                return back()->withErrors(['parent_id' => 'Una plantilla única no puede tener una página superior.']);
+            }
+        }
+
+        if ($parentId !== null) {
+            $parent = CmsArticle::find($parentId);
+            if ($parent && $parent->schema && $parent->schema->isUnique()) {
+                return back()->withErrors(['parent_id' => 'No se pueden crear subpáginas bajo una plantilla única.']);
             }
         }
 
@@ -125,7 +164,7 @@ class ArticleController extends Controller
 
         $args = [
             'lang_id' => $this->lang_id,
-            'parent_id' => $this->parent_id
+            'parent_id' => null
         ];
 
         return redirect()->route('articles.index', $args);
@@ -137,14 +176,32 @@ class ArticleController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsArticle::with(['schema', 'terms'])->findOrFail($id);
-        $schemas = CmsSchema::where('active', 1)->get()->filter(function ($schema) use ($id) {
-            if ($schema->isUnique()) {
+        $descendantIds = $item->getAllDescendantIds();
+
+        $schemas = CmsSchema::where('active', 1)->get()->map(function ($s) {
+            $s->unique = $s->isUnique();
+            return $s;
+        })->filter(function ($schema) use ($id) {
+            if ($schema->unique) {
                 return !CmsArticle::where('schema_id', $schema->id)
                     ->where('id', '!=', $id)
                     ->exists();
             }
             return true;
         })->values();
+
+        $parents = CmsArticle::where('lang_id', $this->lang_id)
+            ->where('id', '!=', $id)
+            ->where('active', 1)
+            ->get()
+            ->filter(function ($article) use ($descendantIds) {
+                if (in_array($article->id, $descendantIds)) {
+                    return false;
+                }
+                return !$article->schema?->isUnique();
+            })
+            ->values();
+
         $taxonomies = \App\Models\CmsTaxonomy::with(['terms' => function ($query) {
             $query->where('active', true)->orderBy('position');
         }])->where('active', true)->get();
@@ -153,6 +210,7 @@ class ArticleController extends Controller
             'item' => $item,
             'schema' => $item?->schema,
             'schemas' => $schemas,
+            'parents' => $parents,
             'taxonomies' => $taxonomies,
         ]);
     }
@@ -165,18 +223,38 @@ class ArticleController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'schema_id' => 'required|integer|exists:cms_schemas,id',
+            'parent_id' => 'nullable|integer|exists:cms_articles,id',
         ]);
 
         $schemaId = $request->input('schema_id');
         $schema = CmsSchema::find($schemaId);
+        $parentId = $request->input('parent_id');
+        $item = CmsArticle::findOrFail($id);
+
         if ($schema && $schema->isUnique()) {
             if (CmsArticle::where('schema_id', $schema->id)->where('id', '!=', $id)->exists()) {
                 return back()->withErrors(['schema_id' => 'Esta plantilla es única y ya está asignada a otra página.']);
             }
+            if ($parentId !== null) {
+                return back()->withErrors(['parent_id' => 'Una plantilla única no puede tener una página superior.']);
+            }
         }
 
-        $item = CmsArticle::findOrFail($id);
-		$item->fill($request->all());
+        if ($parentId !== null) {
+            $parent = CmsArticle::find($parentId);
+            if ($parent && $parent->schema && $parent->schema->isUnique()) {
+                return back()->withErrors(['parent_id' => 'No se pueden crear subpáginas bajo una plantilla única.']);
+            }
+            if ($parentId == $id) {
+                return back()->withErrors(['parent_id' => 'Una página no puede ser su propio padre.']);
+            }
+            $descendantIds = $item->getAllDescendantIds();
+            if (in_array($parentId, $descendantIds)) {
+                return back()->withErrors(['parent_id' => 'No se puede seleccionar una subpágina como página superior.']);
+            }
+        }
+
+        $item->fill($request->all());
 		$item->save();
 
         if ($request->has('term_ids')) {
@@ -188,7 +266,7 @@ class ArticleController extends Controller
 
         $args = [
             'lang_id' => $this->lang_id,
-            'parent_id' => $this->parent_id
+            'parent_id' => null
         ];
 
         return redirect()->route('articles.index', $args);
@@ -213,5 +291,15 @@ class ArticleController extends Controller
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    protected function buildTree($elements, $parentId, &$sorted, $depth = 0)
+    {
+        $children = $elements->where('parent_id', $parentId)->sortBy('position');
+        foreach ($children as $child) {
+            $child->depth = $depth;
+            $sorted[] = $child;
+            $this->buildTree($elements, $child->id, $sorted, $depth + 1);
+        }
     }
 }

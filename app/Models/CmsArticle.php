@@ -107,4 +107,15 @@ class CmsArticle extends Model {
         return $this->belongsToMany('App\Models\CmsTaxonomyTerm', 'cms_article_term', 'article_id', 'term_id');
     }
 
+    public function getAllDescendantIds(): array
+    {
+        $ids = [];
+        $children = self::where('parent_id', $this->id)->get();
+        foreach ($children as $child) {
+            $ids[] = $child->id;
+            $ids = array_merge($ids, $child->getAllDescendantIds());
+        }
+        return $ids;
+    }
+
 }

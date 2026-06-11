@@ -14,6 +14,7 @@ export interface CmsArticle {
     metadata: Record<string, unknown>,
     slug: string,
     active: boolean,
+    depth?: number,
     updated_at: Date,
     created_at: Date,
     schema?: import('./cms-schema').CmsSchema,

@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CmsArticleForm, JsonValue } from '@/types/models/cms-article';
+import { CmsArticle, CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,13 +14,19 @@ interface Props {
     setData: (data: CmsArticleForm) => void;
     errors: Record<string, string>;
     processing: boolean;
-    schema?: CmsSchema;
-    schemas?: CmsSchema[];
+    schema?: CmsSchema & { unique?: boolean };
+    schemas?: (CmsSchema & { unique?: boolean })[];
+    parents?: CmsArticle[];
     taxonomies?: CmsTaxonomy[];
     onChangeSchema?: (schemaId: number) => void;
 }
 
-export default function ArticleFields({ data, setData, errors, processing, schema, schemas, taxonomies, onChangeSchema }: Props) {
+export default function ArticleFields({ data, setData, errors, processing, schema, schemas, parents = [], taxonomies, onChangeSchema }: Props) {
+    useEffect(() => {
+        if (schema?.unique && data.parent_id !== null) {
+            setData({ ...data, parent_id: null });
+        }
+    }, [schema, data.parent_id]);
     return (
         <>
             <div className="grid gap-2">
@@ -66,6 +73,40 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                     </Select>
                     <InputError message={errors.schema_id} />
                 </div>
+            )}
+
+            {schema?.unique ? (
+                <div className="grid gap-2 border border-amber-200 bg-amber-50 dark:border-amber-900/30 dark:bg-amber-950/10 rounded-md p-3">
+                    <span className="text-xs text-amber-800 dark:text-amber-200">
+                        🔒 **Plantilla Única:** Las plantillas únicas (como la página de inicio) no pueden tener páginas superiores.
+                    </span>
+                </div>
+            ) : (
+                parents && parents.length > 0 && (
+                    <div className="grid gap-2">
+                        <Label htmlFor="parent_id">Página Superior (Padre)</Label>
+                        <Select
+                            value={data.parent_id?.toString() || 'root'}
+                            onValueChange={(value) => {
+                                setData({ ...data, parent_id: value === 'root' ? null : Number(value) });
+                            }}
+                            disabled={processing}
+                        >
+                            <SelectTrigger id="parent_id">
+                                <SelectValue placeholder="Página Raíz (Ninguna)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="root">Página Raíz (Ninguna)</SelectItem>
+                                {parents.map((p) => (
+                                    <SelectItem key={p.id} value={p.id.toString()}>
+                                        {p.depth && p.depth > 0 ? "—".repeat(p.depth) + " " : ""}{p.title}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.parent_id} />
+                    </div>
+                )
             )}
 
             {schema?.fields?.length ? (

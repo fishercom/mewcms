@@ -184,3 +184,148 @@ it('prevents updating an article to use a unique template page already used else
 
     $response->assertSessionHasErrors(['schema_id']);
 });
+
+it('blocks unique schema pages from selecting a parent page', function () {
+    // 1. Create a parent standard page
+    $parentArticle = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Parent Standard Page',
+        'slug' => 'parent-standard-page',
+        'active' => 1,
+    ]);
+
+    // 2. Try to create a home unique page with parent_id set to the standard page
+    $response = $this->actingAs($this->user)->post('/admin/articles', [
+        'schema_id' => $this->homeSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Home Page Page',
+        'slug' => 'home-page-page',
+        'active' => 1,
+        'parent_id' => $parentArticle->id,
+    ]);
+
+    $response->assertSessionHasErrors(['parent_id']);
+});
+
+it('blocks selecting a unique schema page as a parent of another page', function () {
+    // 1. Create the unique home page at root
+    $homeArticle = CmsArticle::create([
+        'schema_id' => $this->homeSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Home Page Page',
+        'slug' => 'home-page-page',
+        'active' => 1,
+    ]);
+
+    // 2. Try to create a standard page nested under the home unique page
+    $response = $this->actingAs($this->user)->post('/admin/articles', [
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Standard Child Page',
+        'slug' => 'standard-child-page',
+        'active' => 1,
+        'parent_id' => $homeArticle->id,
+    ]);
+
+    $response->assertSessionHasErrors(['parent_id']);
+});
+
+it('blocks circular parent nesting on update', function () {
+    // 1. Create standard page A
+    $articleA = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Page A',
+        'slug' => 'page-a',
+        'active' => 1,
+    ]);
+
+    // 2. Create child standard page B under A
+    $articleB = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Page B',
+        'slug' => 'page-b',
+        'parent_id' => $articleA->id,
+        'active' => 1,
+    ]);
+
+    // 3. Try to update page A to have B as parent (circular reference)
+    $response = $this->actingAs($this->user)->put("/admin/articles/{$articleA->id}", [
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Page A',
+        'slug' => 'page-a',
+        'parent_id' => $articleB->id,
+        'active' => 1,
+    ]);
+
+    $response->assertSessionHasErrors(['parent_id']);
+});
+
+it('verifies articles listing is returned in hierarchical tree order with depth set', function () {
+    // 1. Create structure: Root Page -> Sub Page -> Sub-Sub Page
+    $root = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Root Page',
+        'slug' => 'root-page',
+        'active' => 1,
+        'position' => 1,
+    ]);
+
+    $sub = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Sub Page',
+        'slug' => 'sub-page',
+        'parent_id' => $root->id,
+        'active' => 1,
+        'position' => 0,
+    ]);
+
+    $subsub = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Sub Sub Page',
+        'slug' => 'sub-sub-page',
+        'parent_id' => $sub->id,
+        'active' => 1,
+        'position' => 0,
+    ]);
+
+    $anotherRoot = CmsArticle::create([
+        'schema_id' => $this->standardSchema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'Another Root',
+        'slug' => 'another-root',
+        'active' => 1,
+        'position' => 0,
+    ]);
+
+    $response = $this->actingAs($this->user)->get('/admin/articles');
+    $response->assertStatus(200);
+    $response->assertInertia(function ($page) use ($root, $sub, $subsub, $anotherRoot) {
+        $items = $page->toArray()['props']['items'];
+        $ids = collect($items)->pluck('id')->all();
+
+        // The order must be hierarchical:
+        // Root Page (position 1)
+        // -> Sub Page
+        // -> -> Sub Sub Page
+        // Another Root (position 2)
+        $this->assertEquals([
+            $root->id,
+            $sub->id,
+            $subsub->id,
+            $anotherRoot->id,
+        ], $ids);
+
+        // Check depth values
+        $this->assertEquals(0, $items[0]['depth']); // root
+        $this->assertEquals(1, $items[1]['depth']); // sub
+        $this->assertEquals(2, $items[2]['depth']); // subsub
+        $this->assertEquals(0, $items[3]['depth']); // anotherRoot
+    });
+});

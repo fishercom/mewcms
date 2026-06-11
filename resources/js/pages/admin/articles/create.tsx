@@ -7,11 +7,11 @@ import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createArticle } from '@/services/articles';
-import { CmsArticleForm } from '@/types/models/cms-article';
+import { CmsArticle, CmsArticleForm } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
 
 export default function Create() {
-    const { schema, schemas = [], taxonomies } = usePage<{ schema?: CmsSchema, schemas?: CmsSchema[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const { schema, schemas = [], parents = [], taxonomies } = usePage<{ schema?: CmsSchema, schemas?: CmsSchema[], parents?: CmsArticle[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
 
     const initial: CmsArticleForm = {
         id: null,
@@ -75,6 +75,7 @@ export default function Create() {
                         processing={processing}
                         schema={activeSchema}
                         schemas={schemas}
+                        parents={parents}
                         taxonomies={taxonomies}
                         onChangeSchema={handleChangeSchema}
                     />

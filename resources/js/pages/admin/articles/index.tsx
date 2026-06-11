@@ -92,7 +92,12 @@ export default function Index() {
                         {paging.data.map((item: CmsArticle)=>{
                             return(
                             <tr key={ item.id } className="border-b dark:border-gray-700">
-                                <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.title }</th>
+                                <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <span style={{ paddingLeft: `${(item.depth || 0) * 1.5}rem` }} className="flex items-center">
+                                        {(item.depth || 0) > 0 && <span className="text-gray-400 mr-1.5">{"—".repeat(item.depth || 0)}</span>}
+                                        { item.title }
+                                    </span>
+                                </th>
                                 <td className="px-4 py-3">{ item.active? <Check/>: <></> }</td>
                                 <td className="px-4 py-3">{ format(item.created_at, 'dd/MM/yyyy HH:mm') }</td>
                                 <td className="px-4 py-3">{ format(item.updated_at, 'dd/MM/yyyy HH:mm') }</td>
