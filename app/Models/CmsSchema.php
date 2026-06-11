@@ -33,6 +33,11 @@ class CmsSchema extends Model {
         return $this->hasMany(CmsSchema::class, 'parent_id');
     }
 
+    public function articles()
+    {
+        return $this->hasMany(CmsArticle::class, 'schema_id');
+    }
+
     public static function getAvailableTemplates()
     {
         $directory = resource_path('js/pages/front/templates');

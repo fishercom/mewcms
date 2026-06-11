@@ -16,7 +16,14 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 
 export default function Index() {
 
-    const { items, groups, parent, group_id, parent_id } = usePage<{ items: Pagination<CmsSchema>, groups: CmsSchemaGroup[], parent: CmsSchema, group_id: number, parent_id: number }>().props;
+    const { items, groups, parent, group_id, parent_id, errors } = usePage<{ 
+        items: Pagination<CmsSchema>, 
+        groups: CmsSchemaGroup[], 
+        parent: CmsSchema, 
+        group_id: number, 
+        parent_id: number,
+        errors: Record<string, string>
+    }>().props;
     const [ query, setQuery ] = useState({s: ''});
 
     useEffect(() => {
@@ -40,6 +47,11 @@ export default function Index() {
     return (
         <ModuleLayout>
             <div className="relative overflow-hidden">
+                {errors?.error && (
+                    <div className="p-3 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-red-950/40 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                        {errors.error}
+                    </div>
+                )}
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 pb-4">
                     <div className="w-full md:w-3/4">
                         <form className="flex items-center space-y-3 md:space-y-0 md:space-x-4">
@@ -113,17 +125,17 @@ export default function Index() {
                                         <span>Editar</span>
                                     </Button>
 
-                                    {item.type === 'PAGE' && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="flex items-center gap-1 h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20"
-                                            onClick={() => deleteSchemaHandler(item.id)}
-                                        >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                            <span>Eliminar</span>
-                                        </Button>
-                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        disabled={item.articles_count !== undefined && item.articles_count > 0}
+                                        className="flex items-center gap-1 h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:text-gray-400 dark:disabled:text-gray-600"
+                                        onClick={() => deleteSchemaHandler(item.id)}
+                                        title={item.articles_count !== undefined && item.articles_count > 0 ? "No se puede eliminar porque está asignado a uno o más artículos" : "Eliminar esquema"}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        <span>Eliminar</span>
+                                    </Button>
                                 </td>
                             </tr>
                             )}

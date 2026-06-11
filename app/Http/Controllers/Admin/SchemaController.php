@@ -47,7 +47,7 @@ class SchemaController extends Controller
         ->orderBy('name', 'desc')
         ->get();
 
-        $items = CmsSchema::select()
+        $items = CmsSchema::withCount('articles')
         ->where(function($query) use($s){
             if(!empty($s)){
                 $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
@@ -141,10 +141,15 @@ class SchemaController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsSchema::find($id);
-		$item->delete();
+        $item = CmsSchema::findOrFail($id);
 
-        return redirect('admin/schemas');
+        if ($item->articles()->exists()) {
+            return back()->withErrors(['error' => 'No se puede eliminar el esquema porque está asignado a uno o más artículos.']);
+        }
+
+        $item->delete();
+
+        return back();
     }
 
     public function root()
