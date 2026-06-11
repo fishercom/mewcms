@@ -3,10 +3,8 @@ import { router, usePage } from '@inertiajs/react';
 import ModuleLayout from '@/layouts/module/layout';
 import { format } from 'date-fns'
 import { User, Pagination } from '@/types';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Check, Search, Plus } from 'lucide-react';
-import { Icon } from '@/components/icon';
+import { Check, Search, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@headlessui/react';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import { getUsers, deleteUser } from '@/services/users';
@@ -46,11 +44,15 @@ export default function Index() {
                             </div>
                         </form>
                     </div>
-                    <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" className="flex items-center justify-center bg-primary-700 font-medium text-sm px-4 py-2" onClick={() => router.visit('/admin/users/create')}>
-                            <Plus/>
-                            Agrgar Usuario
-                        </button>                    </div>
+                    <div className="w-full md:w-auto flex justify-end">
+                        <Button
+                            onClick={() => router.visit('/admin/users/create')}
+                            className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span>Agregar Usuario</span>
+                        </Button>
+                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -71,25 +73,26 @@ export default function Index() {
                                 <td className="px-4 py-3">{ item.active? <Check/>: <></> }</td>
                                 <td className="px-4 py-3">{ format(item.created_at, 'dd/MM/yyyy HH:mm') }</td>
                                 <td className="px-4 py-3">{ format(item.updated_at, 'dd/MM/yyyy HH:mm') }</td>
-                                <td className="px-4 py-3 flex items-center justify-end">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="p-3">
-                                                Actions
-                                                <Icon iconNode={ChevronDown} className="h-5 w-5" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-56" align="end">
-                                            <DropdownMenuItem asChild>
-                                                <Button className="block w-full" onClick={() => router.visit(route('users.edit', item.id))} variant="ghost">
-                                                    Edit
-                                                </Button>
-                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
-                                                <Button className="block w-full" onClick={()=>deleteUserHandler(item.id)} variant="ghost">
-                                                    Delete
-                                                </Button>
-                                            </DropdownMenuItem>                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                <td className="px-4 py-3 flex items-center justify-end gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-8 px-2.5"
+                                        onClick={() => router.visit(route('users.edit', item.id))}
+                                    >
+                                        <Edit className="h-3.5 w-3.5" />
+                                        <span>Editar</span>
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20"
+                                        onClick={() => deleteUserHandler(item.id)}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        <span>Eliminar</span>
+                                    </Button>
                                 </td>
                             </tr>
                             )}

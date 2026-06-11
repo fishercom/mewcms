@@ -33,4 +33,41 @@ class CmsSchema extends Model {
         return $this->hasMany(CmsSchema::class, 'parent_id');
     }
 
+    public static function getAvailableTemplates()
+    {
+        $directory = resource_path('js/pages/front/templates');
+        if (!is_dir($directory)) {
+            return [];
+        }
+
+        $templates = [];
+        $files = scandir($directory);
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..' || !str_ends_with($file, '.tsx')) {
+                continue;
+            }
+
+            $filePath = $directory . '/' . $file;
+            $content = file_get_contents($filePath);
+            
+            $templateName = null;
+            if (preg_match('/Template\s+Name:\s*([^\r\n\*]+)/i', $content, $matches)) {
+                $templateName = trim($matches[1]);
+            }
+
+            if (!$templateName) {
+                $templateName = ucfirst(basename($file, '.tsx'));
+            }
+
+            $value = 'front/templates/' . basename($file, '.tsx');
+
+            $templates[] = [
+                'name' => $templateName,
+                'value' => $value,
+                'file' => $file,
+            ];
+        }
+
+        return $templates;
+    }
 }

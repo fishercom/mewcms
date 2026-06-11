@@ -89,6 +89,7 @@ class SchemaController extends Controller
             'item' => $args,
             'groups' => $groups,
             'parents' => $parents,
+            'templates' => CmsSchema::getAvailableTemplates(),
         ]);
     }
 
@@ -115,6 +116,7 @@ class SchemaController extends Controller
             'item' => $item,
             'groups' => $groups,
             'parents' => $parents,
+            'templates' => CmsSchema::getAvailableTemplates(),
         ]);
     }
 

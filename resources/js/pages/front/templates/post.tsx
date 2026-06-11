@@ -1,3 +1,6 @@
+/**
+ * Template Name: Blog Post Detail
+ */
 import React from 'react';
 import FrontLayout from '../layout';
 import { Head, Link } from '@inertiajs/react';

@@ -9,7 +9,7 @@ import { CmsSchemaForm, CmsSchema } from '@/types/models/cms-schema';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 
 export default function Edit() {
-    const { item, groups, parents } = usePage<{ item: CmsSchema, groups: CmsSchemaGroup[], parents: CmsSchema[] }>().props;
+    const { item, groups, parents, templates } = usePage<{ item: CmsSchema, groups: CmsSchemaGroup[], parents: CmsSchema[], templates: { name: string, value: string }[] }>().props;
 
     const initial: CmsSchemaForm = {
         id: item.id,
@@ -51,6 +51,7 @@ export default function Edit() {
                         processing={processing}
                         groups={groups}
                         parents={parents}
+                        templates={templates}
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>

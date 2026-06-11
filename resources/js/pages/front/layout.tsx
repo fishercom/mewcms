@@ -11,8 +11,11 @@ interface LayoutProps {
 
 export default function FrontLayout({ children, navigation }: LayoutProps) {
     const { menus = [] } = usePage<{ menus: CmsMenu[] }>().props;
-    const headerMenu = menus.find((m) => m.slug === 'header' || m.slug === 'navigation' || m.slug === 'site-principal');
+    const headerMenu = menus.find((m) => m.slug === 'main' || m.slug === 'header' || m.slug === 'navigation' || m.slug === 'site-principal');
     const menuItems = headerMenu?.items || [];
+
+    const footerMenu = menus.find((m) => m.slug === 'footer');
+    const footerItems = footerMenu?.items || [];
 
     // Helper to format underscores back to slashes for URLs
     const getUrl = (slug: string) => {
@@ -128,7 +131,21 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
             {/* Footer */}
             <footer className="border-t border-[#19140010] bg-[#FDFDFC] dark:border-[#3E3E3A]/20 dark:bg-[#0a0a0a] py-8 mt-16 transition-colors">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-xs text-[#706f6c] dark:text-[#A1A09A]">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-xs text-[#706f6c] dark:text-[#A1A09A] space-y-4">
+                    {footerItems.length > 0 && (
+                        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-medium">
+                            {footerItems.map((item) => (
+                                <Link
+                                    key={item.id}
+                                    href={item.resolved_url || '#'}
+                                    target={item.target}
+                                    className="hover:text-[#f53003] dark:hover:text-[#FF4433] transition-colors"
+                                >
+                                    {item.title}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                     <p>© {new Date().getFullYear()} MewCMS. Powered by Laravel, Inertia, and React.</p>
                 </div>
             </footer>

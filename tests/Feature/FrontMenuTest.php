@@ -110,6 +110,8 @@ it('allows managing individual menu items', function () {
 });
 
 it('eager resolves cms article slug in public layout shared menus', function () {
+    CmsMenu::query()->delete();
+
     $menu = CmsMenu::create([
         'name' => 'Header Menu',
         'slug' => 'header',

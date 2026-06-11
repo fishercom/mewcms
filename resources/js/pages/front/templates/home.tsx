@@ -1,3 +1,6 @@
+/**
+ * Template Name: Home Page
+ */
 import React from 'react';
 import FrontLayout from '../layout';
 import { Head } from '@inertiajs/react';

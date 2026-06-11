@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\TaxonomyController;
 use App\Http\Controllers\Admin\TaxonomyTermController;
 use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\TemplateController;
 use UniSharp\LaravelFilemanager\Lfm;
 
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('menus/{menu}/items/sort', [MenuController::class, 'sortItems'])->name('menus.items.sort');
     Route::delete('menus/items/{item}', [MenuController::class, 'destroyItem'])->name('menus.items.destroy');
 
+    Route::resource('templates', TemplateController::class)->except(['show']);
 });
 
 Route::get('dashboard', function () {

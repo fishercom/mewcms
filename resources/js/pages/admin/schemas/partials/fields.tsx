@@ -15,9 +15,10 @@ interface Props {
     processing: boolean;
     groups: CmsSchemaGroup[];
     parents: CmsSchema[];
+    templates?: { name: string; value: string }[];
 }
 
-export default function SchemaFields({ data, setData, errors, processing, groups, parents }: Props) {
+export default function SchemaFields({ data, setData, errors, processing, groups, parents, templates }: Props) {
     const schemaTypes = [
         { value: 'PAGE', label: 'Page' },
         { value: 'HOME', label: 'Home' },
@@ -112,14 +113,22 @@ export default function SchemaFields({ data, setData, errors, processing, groups
 
             <div className="grid gap-2">
                 <Label htmlFor="front_view">Plantilla Frontend (React View Path)</Label>
-                <Input
-                    id="front_view"
-                    type="text"
-                    placeholder="e.g. front/templates/page"
+                <Select
                     value={data.front_view || ''}
-                    onChange={(e) => setData({ ...data, front_view: e.target.value })}
+                    onValueChange={(value) => setData({ ...data, front_view: value })}
                     disabled={processing}
-                />
+                >
+                    <SelectTrigger id="front_view">
+                        <SelectValue placeholder="Seleccione una plantilla" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {templates && templates.map((template) => (
+                            <SelectItem key={template.value} value={template.value}>
+                                {template.name} ({template.value})
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <InputError message={errors.front_view} />
             </div>
 

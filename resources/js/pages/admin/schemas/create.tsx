@@ -10,7 +10,7 @@ import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { CustomField } from '@/types/models/custom-field';
 
 export default function Create() {
-    const { groups, parents } = usePage<{ groups: CmsSchemaGroup[], parents: CmsSchema[] }>().props;
+    const { groups, parents, templates } = usePage<{ groups: CmsSchemaGroup[], parents: CmsSchema[], templates: { name: string, value: string }[] }>().props;
 
     const initial: CmsSchemaForm = {
         id: null,
@@ -55,6 +55,7 @@ export default function Create() {
                         processing={processing}
                         groups={groups}
                         parents={parents}
+                        templates={templates}
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
