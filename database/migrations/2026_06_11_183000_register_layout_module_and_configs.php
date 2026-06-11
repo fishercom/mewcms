@@ -15,9 +15,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Register Administrative Module
+        // 1. Register Administrative Module (only if not already present)
         $contenidoWebMenu = AdmMenu::where('name', 'Contenido Web')->first();
-        if ($contenidoWebMenu) {
+        if ($contenidoWebMenu && !AdmModule::where('url', '/admin/layout')->exists()) {
             // Shift modules in "Contenido Web" with position >= 5 to make room at position 5
             AdmModule::where('menu_id', $contenidoWebMenu->id)
                 ->where('position', '>=', 5)
@@ -25,7 +25,7 @@ return new class extends Migration
 
             $module = new AdmModule();
             $module->menu_id = $contenidoWebMenu->id;
-            $module->name = 'Personalizar Layout';
+            $module->name = 'Configuración del Sitio';
             $module->url = '/admin/layout';
             $module->icon = 'palette';
             $module->position = 5;
@@ -44,7 +44,10 @@ return new class extends Migration
             $event2->save();
         }
 
-        // 2. Seed Layout Configuration Variables
+        // 2. Hide the old "Configuración" module (replaced by this one)
+        AdmModule::where('url', '/admin/configs')->update(['visible' => false]);
+
+        // 3. Seed Layout Configuration Variables
         $configs = [
             ['type' => 'string', 'name' => 'Logo de Cabecera (URL)', 'alias' => 'layout_header_logo', 'value' => null],
             ['type' => 'string', 'name' => 'Logo de Pie de Página (URL)', 'alias' => 'layout_footer_logo', 'value' => null],
@@ -77,7 +80,10 @@ return new class extends Migration
         // 1. Remove Layout Configurations
         CmsConfig::where('alias', 'like', 'layout_%')->delete();
 
-        // 2. Unregister Module
+        // 2. Restore old "Configuración" module visibility
+        AdmModule::where('url', '/admin/configs')->update(['visible' => true]);
+
+        // 3. Unregister Module
         $module = AdmModule::where('url', '/admin/layout')->first();
         if ($module) {
             $menuId = $module->menu_id;

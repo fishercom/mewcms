@@ -61,7 +61,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
 
     return (
         <ModuleLayout>
-            <Head title="Personalizar Layout" />
+            <Head title="Configuración del Sitio" />
             
             <FormLayout>
                 <div className="space-y-6">
