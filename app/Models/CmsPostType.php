@@ -45,7 +45,7 @@ class CmsPostType extends Model
                 $module->url = '/admin/posts?post_type='.$cpt->slug;
                 $module->icon = $cpt->icon ?: 'book-open';
                 $module->position = $nextPos;
-                $module->visible = true;
+                $module->setAttribute('visible', true);
                 $module->save();
 
                 foreach ([1, 2] as $actionId) {
