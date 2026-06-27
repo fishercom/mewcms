@@ -27,6 +27,10 @@ Route::get('/', [App\Http\Controllers\FrontController::class, 'show'])->name('ho
 Route::get('category/{slug}', [App\Http\Controllers\FrontController::class, 'category'])->name('front.category');
 Route::get('tag/{slug}', [App\Http\Controllers\FrontController::class, 'tag'])->name('front.tag');
 
+// Public blog post routes
+Route::get('blog', [App\Http\Controllers\FrontController::class, 'blogIndex'])->name('front.blog.index');
+Route::get('blog/{slug}', [App\Http\Controllers\FrontController::class, 'blogShow'])->name('front.blog.show');
+
 // Catch-all route to resolve dynamic CMS pages on the frontend
 Route::get('{any}', [App\Http\Controllers\FrontController::class, 'show'])
     ->where('any', '.*')

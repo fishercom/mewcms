@@ -19,6 +19,8 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\LayoutController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\PostTypeController;
+use App\Http\Controllers\Admin\PostController;
 use UniSharp\LaravelFilemanager\Lfm;
 
 use Illuminate\Support\Facades\Route;
@@ -56,6 +58,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     
     Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
     Route::resource('sliders', SliderController::class);
+    
+    Route::resource('post-types', PostTypeController::class);
+    Route::resource('posts', PostController::class);
     
     Route::get('layout', [LayoutController::class, 'index'])->name('layout.index');
     Route::post('layout', [LayoutController::class, 'update'])->name('layout.update');

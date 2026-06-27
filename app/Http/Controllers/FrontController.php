@@ -17,6 +17,21 @@ class FrontController extends Controller
      */
     public function show(Request $request, $slug = null): Response
     {
+        if (!empty($slug)) {
+            $parts = explode('/', $slug);
+            $firstSegment = $parts[0];
+            
+            $cpt = \App\Models\CmsPostType::where('slug', $firstSegment)->where('active', 1)->first();
+            if ($cpt) {
+                if (count($parts) === 1) {
+                    return $this->cptIndex($request, $cpt);
+                }
+                if (count($parts) === 2) {
+                    return $this->cptShow($request, $cpt, $parts[1]);
+                }
+            }
+        }
+
         $article = null;
 
         if (empty($slug)) {
@@ -192,6 +207,142 @@ class FrontController extends Controller
             'term' => $term,
             'taxonomy' => $taxonomy,
             'articles' => $articles,
+            'navigation' => $navigation,
+            'allTaxonomies' => $allTaxonomies,
+            'recentArticles' => $recentArticles,
+        ]);
+    }
+
+    public function blogIndex(Request $request): Response
+    {
+        $navigation = CmsArticle::whereNull('parent_id')
+            ->where('active', 1)
+            ->orderBy('position')
+            ->get(['id', 'title', 'slug']);
+
+        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+            $q->where('active', true)->orderBy('position')->withCount('articles');
+        }])->where('active', true)->get();
+
+        $recentArticles = CmsArticle::where('active', 1)
+            ->where('slug', '!=', 'home-page')
+            ->latest()
+            ->take(5)
+            ->get(['id', 'title', 'slug', 'created_at']);
+
+        // Load standard posts (post_type = 'post')
+        $posts = \App\Models\CmsPost::with(['user', 'terms.taxonomy'])
+            ->where('post_type', 'post')
+            ->where('status', 'published')
+            ->where('active', true)
+            ->latest('published_at')
+            ->paginate(6)
+            ->withQueryString();
+
+        return Inertia::render('front/blog/index', [
+            'posts' => $posts,
+            'cpt' => null,
+            'navigation' => $navigation,
+            'allTaxonomies' => $allTaxonomies,
+            'recentArticles' => $recentArticles,
+        ]);
+    }
+
+    public function blogShow(Request $request, $slug): Response
+    {
+        $navigation = CmsArticle::whereNull('parent_id')
+            ->where('active', 1)
+            ->orderBy('position')
+            ->get(['id', 'title', 'slug']);
+
+        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+            $q->where('active', true)->orderBy('position')->withCount('articles');
+        }])->where('active', true)->get();
+
+        $recentArticles = CmsArticle::where('active', 1)
+            ->where('slug', '!=', 'home-page')
+            ->latest()
+            ->take(5)
+            ->get(['id', 'title', 'slug', 'created_at']);
+
+        $post = \App\Models\CmsPost::with(['user', 'terms.taxonomy', 'schema'])
+            ->where('post_type', 'post')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->where('active', true)
+            ->firstOrFail();
+
+        return Inertia::render('front/blog/show', [
+            'post' => $post,
+            'cpt' => null,
+            'navigation' => $navigation,
+            'allTaxonomies' => $allTaxonomies,
+            'recentArticles' => $recentArticles,
+        ]);
+    }
+
+    protected function cptIndex(Request $request, $cpt): Response
+    {
+        $navigation = CmsArticle::whereNull('parent_id')
+            ->where('active', 1)
+            ->orderBy('position')
+            ->get(['id', 'title', 'slug']);
+
+        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+            $q->where('active', true)->orderBy('position')->withCount('articles');
+        }])->where('active', true)->get();
+
+        $recentArticles = CmsArticle::where('active', 1)
+            ->where('slug', '!=', 'home-page')
+            ->latest()
+            ->take(5)
+            ->get(['id', 'title', 'slug', 'created_at']);
+
+        // Load posts for this specific post type
+        $posts = \App\Models\CmsPost::with(['user', 'terms.taxonomy'])
+            ->where('post_type', $cpt->slug)
+            ->where('status', 'published')
+            ->where('active', true)
+            ->latest('published_at')
+            ->paginate(6)
+            ->withQueryString();
+
+        return Inertia::render('front/blog/index', [
+            'posts' => $posts,
+            'cpt' => $cpt,
+            'navigation' => $navigation,
+            'allTaxonomies' => $allTaxonomies,
+            'recentArticles' => $recentArticles,
+        ]);
+    }
+
+    protected function cptShow(Request $request, $cpt, $postSlug): Response
+    {
+        $navigation = CmsArticle::whereNull('parent_id')
+            ->where('active', 1)
+            ->orderBy('position')
+            ->get(['id', 'title', 'slug']);
+
+        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+            $q->where('active', true)->orderBy('position')->withCount('articles');
+        }])->where('active', true)->get();
+
+        $recentArticles = CmsArticle::where('active', 1)
+            ->where('slug', '!=', 'home-page')
+            ->latest()
+            ->take(5)
+            ->get(['id', 'title', 'slug', 'created_at']);
+
+        $post = \App\Models\CmsPost::with(['user', 'terms.taxonomy', 'schema'])
+            ->where('post_type', $cpt->slug)
+            ->where('slug', $postSlug)
+            ->where('status', 'published')
+            ->where('active', true)
+            ->firstOrFail();
+
+        return Inertia::render('front/blog/show', [
+            'post' => $post,
+            'cpt' => $cpt,
             'navigation' => $navigation,
             'allTaxonomies' => $allTaxonomies,
             'recentArticles' => $recentArticles,
