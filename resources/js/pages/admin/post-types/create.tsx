@@ -41,7 +41,7 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear Tipo de Contenido">
+        <ModuleLayout view="Crear">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <PostTypeFormFields

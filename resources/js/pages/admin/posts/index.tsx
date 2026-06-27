@@ -56,7 +56,7 @@ export default function Index() {
     const pluralName = cpt ? cpt.name : 'Entradas (Blog)';
 
     return (
-        <ModuleLayout view={pluralName}>
+        <ModuleLayout>
             <div className="relative overflow-hidden">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 pb-4">
                     <div className="w-full md:w-3/4 flex flex-col sm:flex-row gap-3">

@@ -40,7 +40,7 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view={`Editar Tipo de Contenido: ${item.name}`}>
+        <ModuleLayout view="Editar">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <PostTypeFormFields

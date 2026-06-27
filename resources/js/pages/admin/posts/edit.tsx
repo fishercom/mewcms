@@ -73,7 +73,7 @@ export default function Edit() {
     const singularName = cpt ? cpt.singular_name : 'Entrada';
 
     return (
-        <ModuleLayout view={`Editar ${singularName}: ${item.title}`}>
+        <ModuleLayout view="Editar">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <PostFields

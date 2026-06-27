@@ -60,7 +60,7 @@ export default function Create() {
     const singularName = cpt ? cpt.singular_name : 'Entrada';
 
     return (
-        <ModuleLayout view={`Crear ${singularName}`}>
+        <ModuleLayout view="Crear">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <PostFields
