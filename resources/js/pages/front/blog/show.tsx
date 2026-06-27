@@ -7,6 +7,7 @@ import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
 import { format } from 'date-fns';
 import FrontSidebar from '../components/sidebar';
 import { Calendar, User, ArrowLeft, Tag, Settings } from 'lucide-react';
+import ContentRenderer from '@/components/content-renderer';
 
 interface Props {
     post: CmsPost;
@@ -108,9 +109,9 @@ export default function Show({ post, cpt, navigation, allTaxonomies = [], recent
                     {/* Content body */}
                     <div className="pt-2">
                         {post.content ? (
-                            <div
-                                className="prose dark:prose-invert max-w-none leading-relaxed text-zinc-800 dark:text-[#EDEDEC] prose-red prose-sm sm:prose-base"
-                                dangerouslySetInnerHTML={{ __html: post.content }}
+                            <ContentRenderer
+                                html={post.content}
+                                className="leading-relaxed text-zinc-800 dark:text-[#EDEDEC] prose-red prose-sm sm:prose-base"
                             />
                         ) : (
                             <p className="italic text-center text-xs text-zinc-400 py-6">

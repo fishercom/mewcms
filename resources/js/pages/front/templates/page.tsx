@@ -5,6 +5,7 @@ import React from 'react';
 import FrontLayout from '../layout';
 import { Head, Link } from '@inertiajs/react';
 import { CmsArticle } from '@/types/models/cms-article';
+import ContentRenderer from '@/components/content-renderer';
 
 interface PageProps {
     article: CmsArticle;
@@ -83,10 +84,7 @@ export default function Page({ article, navigation }: PageProps) {
                 )}
 
                 {article.content && (
-                    <div
-                        className="prose dark:prose-invert max-w-none text-sm leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: article.content }}
-                    />
+                    <ContentRenderer html={article.content} className="text-sm leading-relaxed" />
                 )}
 
                 {/* Custom Metadata Render */}

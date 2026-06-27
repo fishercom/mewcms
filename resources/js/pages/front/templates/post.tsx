@@ -4,6 +4,7 @@
 import React from 'react';
 import FrontLayout from '../layout';
 import { Head, Link } from '@inertiajs/react';
+import ContentRenderer from '@/components/content-renderer';
 import { CmsArticle } from '@/types/models/cms-article';
 import { format } from 'date-fns';
 import FrontSidebar from '../components/sidebar';
@@ -91,9 +92,9 @@ export default function Post({ article, navigation, allTaxonomies = [], recentAr
                     <div className="pt-4 border-t border-[#19140010] dark:border-[#3E3E3A]/20">
                         {bodyContent ? (
                             bodyContent.startsWith('<') && bodyContent.endsWith('>') ? (
-                                <div
-                                    className="prose dark:prose-invert max-w-none leading-relaxed text-[#1b1b18] dark:text-[#EDEDEC]"
-                                    dangerouslySetInnerHTML={{ __html: bodyContent }}
+                                <ContentRenderer
+                                    html={bodyContent}
+                                    className="leading-relaxed text-[#1b1b18] dark:text-[#EDEDEC]"
                                 />
                             ) : (
                                 <p className="whitespace-pre-line leading-relaxed text-sm text-[#1b1b18] dark:text-[#EDEDEC]">
