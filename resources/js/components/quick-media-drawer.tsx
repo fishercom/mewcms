@@ -66,11 +66,16 @@ export default function QuickMediaDrawer({
             const response = await axios.get('/laravel-filemanager/jsonitems', {
                 params: {
                     type: type,
-                    working_dir: workingDir || '/'
+                    working_dir: workingDir
                 }
             });
-            if (response.data && response.data.items) {
-                setItems(response.data.items);
+            if (response.data) {
+                if (response.data.items) {
+                    setItems(response.data.items);
+                }
+                if (response.data.working_dir && !workingDir) {
+                    setWorkingDir(response.data.working_dir);
+                }
             }
         } catch (error) {
             console.error('Error fetching file manager items:', error);
@@ -95,7 +100,7 @@ export default function QuickMediaDrawer({
             const response = await axios.get('/laravel-filemanager/newfolder', {
                 params: {
                     name: newFolderName,
-                    working_dir: workingDir || '/',
+                    working_dir: workingDir,
                     type: type
                 }
             });
@@ -105,9 +110,10 @@ export default function QuickMediaDrawer({
             } else {
                 alert(response.data.error || 'Error al crear carpeta');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Folder creation error:', error);
-            alert('Error al crear carpeta.');
+            const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al crear carpeta.';
+            alert(`Error: ${typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg}`);
         } finally {
             setCreatingFolder(false);
         }
@@ -126,7 +132,7 @@ export default function QuickMediaDrawer({
             const file = uploadQueue[i];
             const formData = new FormData();
             formData.append('upload', file);
-            formData.append('working_dir', workingDir || '/');
+            formData.append('working_dir', workingDir);
             formData.append('type', type);
             // Get CSRF token from Laravel meta tag or cookie if needed
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -147,8 +153,10 @@ export default function QuickMediaDrawer({
                         );
                     }
                 });
-            } catch (error) {
+            } catch (error: any) {
                 console.error(`Upload failed for ${file.name}:`, error);
+                const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al subir el archivo.';
+                alert(`Error al subir ${file.name}: ${typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg}`);
             }
         }
 
@@ -192,7 +200,7 @@ export default function QuickMediaDrawer({
             const response = await axios.get('/laravel-filemanager/delete', {
                 params: {
                     type: type,
-                    working_dir: workingDir || '/',
+                    working_dir: workingDir,
                     items: [itemName]
                 }
             });
@@ -201,9 +209,10 @@ export default function QuickMediaDrawer({
             } else {
                 alert('Error al eliminar el elemento');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Delete item error:', error);
-            alert('Error al eliminar el elemento.');
+            const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al eliminar el elemento.';
+            alert(`Error: ${typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg}`);
         }
     };
 
@@ -356,6 +365,7 @@ export default function QuickMediaDrawer({
                                 {filteredItems.map((item, idx) => {
                                     if (!item.is_file) {
                                         // Directory view
+                                        const isSystemFolder = !workingDir || workingDir === '/' || ['1', 'shares'].includes(item.name);
                                         return (
                                             <div key={idx} className="relative group/folder">
                                                 <button
@@ -368,16 +378,18 @@ export default function QuickMediaDrawer({
                                                         {item.name}
                                                     </span>
                                                 </button>
-                                                <Button
-                                                    size="icon"
-                                                    variant="ghost"
-                                                    type="button"
-                                                    className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 opacity-0 group-hover/folder:opacity-100 transition-opacity"
-                                                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.name); }}
-                                                    title="Eliminar carpeta"
-                                                >
-                                                    <Trash2 className="h-3 w-3" />
-                                                </Button>
+                                                {!isSystemFolder && (
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        type="button"
+                                                        className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 opacity-0 group-hover/folder:opacity-100 transition-opacity"
+                                                        onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.name); }}
+                                                        title="Eliminar carpeta"
+                                                    >
+                                                        <Trash2 className="h-3 w-3" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         );
                                     }
