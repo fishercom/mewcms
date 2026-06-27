@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, Head } from '@inertiajs/react';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
 import { ChevronDown, Facebook, Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
@@ -10,10 +10,20 @@ interface LayoutProps {
 }
 
 export default function FrontLayout({ children, navigation }: LayoutProps) {
-    const { menus = [], layout_settings = {} } = usePage<{ 
-        menus: CmsMenu[]; 
+    const { menus = [], layout_settings = {} } = usePage<{
+        menus: CmsMenu[];
         layout_settings?: Record<string, string>;
     }>().props;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pageProps = usePage().props as any;
+    const activeItem = pageProps.article || pageProps.post || null;
+    const seo = activeItem?.metadata || {};
+
+    const seoTitle = seo.seo_title || activeItem?.title || '';
+    const seoDescription = seo.seo_description || activeItem?.excerpt || '';
+    const seoKeywords = seo.seo_keywords || '';
+    const seoOgImage = seo.seo_og_image || activeItem?.featured_image || '';
     const headerMenu = menus.find((m) => m.slug === 'main' || m.slug === 'header' || m.slug === 'navigation' || m.slug === 'site-principal');
     const menuItems = headerMenu?.items || [];
 
@@ -98,6 +108,15 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
     return (
         <div className="min-h-screen bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC] transition-colors duration-200">
+            <Head>
+                {seoTitle && <title>{seoTitle}</title>}
+                {seoDescription && <meta name="description" content={seoDescription} />}
+                {seoKeywords && <meta name="keywords" content={seoKeywords} />}
+                {seoTitle && <meta property="og:title" content={seoTitle} />}
+                {seoDescription && <meta property="og:description" content={seoDescription} />}
+                {seoOgImage && <meta property="og:image" content={seoOgImage} />}
+                <meta property="og:type" content="website" />
+            </Head>
             {/* Navigation Header */}
             <header className="sticky top-0 z-40 w-full border-b border-[#19140015] bg-[#FDFDFC]/80 backdrop-blur-md dark:border-[#3E3E3A]/40 dark:bg-[#0a0a0a]/80">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">

@@ -3,6 +3,7 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CmsArticle, CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
+import SeoFields from '../../partials/seo-fields';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CmsSchema } from '@/types/models/cms-schema';
@@ -167,6 +168,16 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                     </div>
                 </div>
             )}
+
+            <div className="border-t pt-4 border-gray-200">
+                <SeoFields
+                    values={(data.metadata as { seo_title?: string; seo_description?: string; seo_keywords?: string; seo_og_image?: string }) || {}}
+                    onChange={(key: string, value: string) => {
+                        const next = { ...data.metadata, [key]: value };
+                        setData({ ...data, metadata: next as Record<string, JsonValue> });
+                    }}
+                />
+            </div>
 
             <div className="flex items-center space-x-3">
                 <Checkbox

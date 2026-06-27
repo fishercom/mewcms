@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\CmsArticle;
+use App\Models\CmsForm;
 use App\Models\CmsPost;
 use App\Models\CmsPostType;
+use App\Models\CmsRegister;
+use App\Models\CmsRegisterField;
 use App\Models\CmsSlider;
 use App\Models\CmsTaxonomy;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -354,6 +359,269 @@ class FrontController extends Controller
             'navigation' => $navigation,
             'allTaxonomies' => $allTaxonomies,
             'recentArticles' => $recentArticles,
+        ]);
+    }
+
+    public function publicFormSubmit(Request $request): JsonResponse
+    {
+        $form = CmsForm::with('fields')
+            ->where('alias', $request->input('form_alias'))
+            ->where('active', 1)
+            ->firstOrFail();
+
+        $validationRules = [];
+        foreach ($form->fields as $field) {
+            if (! $field->active) {
+                continue;
+            }
+            $rule = ['required'];
+            if ($field->type === 'email') {
+                $rule[] = 'email';
+            }
+            $validationRules[$field->alias] = $rule;
+        }
+
+        $request->validate($validationRules);
+
+        $nameVal = '';
+        $emailVal = '';
+        $phoneVal = '';
+        $msgVal = '';
+
+        foreach ($form->fields as $field) {
+            if (! $field->active) {
+                continue;
+            }
+            $val = $request->input($field->alias);
+            if ($field->alias === 'name' || $field->alias === 'nombre') {
+                $nameVal = $val;
+            } elseif ($field->alias === 'email' || $field->alias === 'correo') {
+                $emailVal = $val;
+            } elseif ($field->alias === 'phone' || $field->alias === 'telefono' || $field->alias === 'celular') {
+                $phoneVal = $val;
+            } elseif ($field->alias === 'message' || $field->alias === 'mensaje') {
+                $msgVal = $val;
+            }
+        }
+
+        if (empty($nameVal)) {
+            $nameVal = $request->input('name', 'Anónimo');
+        }
+        if (empty($emailVal)) {
+            $emailVal = $request->input('email', '');
+        }
+        if (empty($phoneVal)) {
+            $phoneVal = $request->input('phone', '');
+        }
+        if (empty($msgVal)) {
+            $msgVal = $request->input('message', '');
+        }
+
+        $register = CmsRegister::create([
+            'form_id' => $form->id,
+            'name' => $nameVal,
+            'email' => $emailVal,
+            'phone' => $phoneVal,
+            'message' => $msgVal,
+            'acceptance' => true,
+        ]);
+
+        foreach ($form->fields as $field) {
+            if (! $field->active) {
+                continue;
+            }
+            $val = $request->input($field->alias);
+            $valStr = is_array($val) ? implode(', ', $val) : strval($val);
+
+            CmsRegisterField::create([
+                'register_id' => $register->id,
+                'field_id' => $field->id,
+                'value' => substr($valStr, 0, 255),
+                'txt_value' => strlen($valStr) > 255 ? $valStr : null,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => '¡Formulario enviado con éxito!',
+        ]);
+    }
+
+    public function getFormConfig(string $alias): JsonResponse
+    {
+        $form = CmsForm::with(['fields' => function ($q) {
+            $q->where('active', 1)->orderBy('id');
+        }])->where('alias', $alias)->where('active', 1)->firstOrFail();
+
+        return response()->json($form);
+    }
+
+    public function search(Request $request): Response
+    {
+        $query = $request->get('q', '');
+        $cleanQuery = str_replace(' ', '%', trim($query));
+
+        $navigation = CmsArticle::whereNull('parent_id')
+            ->where('active', 1)
+            ->orderBy('position')
+            ->get(['id', 'title', 'slug']);
+
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+            $q->where('active', true)->orderBy('position')->withCount('articles');
+        }])->where('active', true)->get();
+
+        $recentArticles = CmsArticle::where('active', 1)
+            ->where('slug', '!=', 'home-page')
+            ->latest()
+            ->take(5)
+            ->get(['id', 'title', 'slug', 'created_at']);
+
+        $results = [];
+
+        if (! empty($query)) {
+            // 1. Search in Articles (Pages)
+            $articles = CmsArticle::where('active', 1)
+                ->where('slug', '!=', 'home-page')
+                ->where(function ($q) use ($cleanQuery) {
+                    $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
+                        ->orWhere('content', 'LIKE', '%'.$cleanQuery.'%');
+                })
+                ->get();
+
+            foreach ($articles as $art) {
+                $results[] = [
+                    'id' => $art->id,
+                    'title' => $art->title,
+                    'excerpt' => $art->excerpt ?: strip_tags(substr($art->content ?? '', 0, 200)),
+                    'url' => '/'.$art->slug,
+                    'type' => 'Página',
+                    'date' => $art->created_at ? $art->created_at->format('d/m/Y') : '',
+                ];
+            }
+
+            // 2. Search in Posts & CPTs
+            $posts = CmsPost::with('user')
+                ->where('active', 1)
+                ->where('status', 'published')
+                ->where(function ($q) use ($cleanQuery) {
+                    $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
+                        ->orWhere('content', 'LIKE', '%'.$cleanQuery.'%');
+                })
+                ->get();
+
+            $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
+
+            foreach ($posts as $post) {
+                $cpt = $cpts->get($post->post_type);
+                $typeLabel = $cpt ? $cpt->singular_name : 'Entrada';
+                $url = $cpt ? '/'.$cpt->slug.'/'.$post->slug : '/blog/'.$post->slug;
+
+                $results[] = [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'excerpt' => $post->excerpt ?: strip_tags(substr($post->content ?? '', 0, 200)),
+                    'url' => $url,
+                    'type' => $typeLabel,
+                    'date' => $post->published_at ? Carbon::parse($post->published_at)->format('d/m/Y') : ($post->created_at ? $post->created_at->format('d/m/Y') : ''),
+                ];
+            }
+        }
+
+        return Inertia::render('front/search', [
+            'results' => $results,
+            'query' => $query,
+            'navigation' => $navigation,
+            'allTaxonomies' => $allTaxonomies,
+            'recentArticles' => $recentArticles,
+        ]);
+    }
+
+    public function sitemap(): \Illuminate\Http\Response
+    {
+        $urls = [];
+        $baseUrl = url('/');
+
+        // 1. Add Homepage
+        $urls[] = [
+            'loc' => $baseUrl,
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ];
+
+        // 2. Add Pages (Articles)
+        $articles = CmsArticle::where('active', 1)->where('slug', '!=', 'home-page')->get();
+        foreach ($articles as $art) {
+            $urls[] = [
+                'loc' => $baseUrl.'/'.$art->slug,
+                'lastmod' => $art->updated_at ? $art->updated_at->toAtomString() : now()->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ];
+        }
+
+        // 3. Add Blog Index
+        $urls[] = [
+            'loc' => $baseUrl.'/blog',
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '0.9',
+        ];
+
+        // 4. Add Posts & dynamic CPTs
+        $posts = CmsPost::where('active', 1)->where('status', 'published')->get();
+        $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
+
+        foreach ($posts as $post) {
+            $cpt = $cpts->get($post->post_type);
+            $path = $cpt ? '/'.$cpt->slug.'/'.$post->slug : '/blog/'.$post->slug;
+
+            $urls[] = [
+                'loc' => $baseUrl.$path,
+                'lastmod' => $post->updated_at ? $post->updated_at->toAtomString() : now()->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.7',
+            ];
+        }
+
+        // 5. Add dynamic CPT archive pages
+        foreach ($cpts as $cpt) {
+            $urls[] = [
+                'loc' => $baseUrl.'/'.$cpt->slug,
+                'lastmod' => now()->toAtomString(),
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ];
+        }
+
+        // Render XML sitemap
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        foreach ($urls as $url) {
+            $xml .= '<url>';
+            $xml .= '<loc>'.htmlspecialchars($url['loc']).'</loc>';
+            $xml .= '<lastmod>'.$url['lastmod'].'</lastmod>';
+            $xml .= '<changefreq>'.$url['changefreq'].'</changefreq>';
+            $xml .= '<priority>'.$url['priority'].'</priority>';
+            $xml .= '</url>';
+        }
+        $xml .= '</urlset>';
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml',
+        ]);
+    }
+
+    public function robots(): \Illuminate\Http\Response
+    {
+        $baseUrl = url('/');
+        $robots = "User-agent: *\n";
+        $robots .= "Allow: /\n";
+        $robots .= "Disallow: /admin/\n";
+        $robots .= "Sitemap: {$baseUrl}/sitemap.xml\n";
+
+        return response($robots, 200, [
+            'Content-Type' => 'text/plain',
         ]);
     }
 }

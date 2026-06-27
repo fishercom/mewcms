@@ -9,6 +9,7 @@ import { CmsPost } from '@/types/models/cms-post';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import TiptapEditor from '@/components/tiptap-editor';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import SeoFields from '../../partials/seo-fields';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon, Trash2, Calendar, User, Eye, Settings } from 'lucide-react';
 
@@ -156,6 +157,16 @@ export default function PostFields({
                         </div>
                     </div>
                 )}
+
+                <div className="border-t pt-5 border-zinc-100 dark:border-zinc-800">
+                    <SeoFields
+                        values={(data.metadata as { seo_title?: string; seo_description?: string; seo_keywords?: string; seo_og_image?: string }) || {}}
+                        onChange={(key: string, value: string) => {
+                            const next = { ...data.metadata, [key]: value };
+                            setData({ ...data, metadata: next as Record<string, import('@/types/models/cms-article').JsonValue> });
+                        }}
+                    />
+                </div>
             </div>
 
             {/* Right Column: Settings, Images & Metadata */}

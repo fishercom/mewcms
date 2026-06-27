@@ -14,4 +14,9 @@ class CmsForm extends Model
     protected $table = 'cms_forms';
 
     protected $fillable = ['name', 'alias', 'info', 'color', 'active'];
+
+    public function fields()
+    {
+        return $this->hasMany(CmsFormField::class, 'form_id')->orderBy('id');
+    }
 }

@@ -29,6 +29,17 @@ Route::get('tag/{slug}', [FrontController::class, 'tag'])->name('front.tag');
 Route::get('blog', [FrontController::class, 'blogIndex'])->name('front.blog.index');
 Route::get('blog/{slug}', [FrontController::class, 'blogShow'])->name('front.blog.show');
 
+// Public form submission API
+Route::get('api/forms/{alias}', [FrontController::class, 'getFormConfig'])->name('front.forms.config');
+Route::post('api/forms/submit', [FrontController::class, 'publicFormSubmit'])->name('front.forms.submit');
+
+// Public search route
+Route::get('search', [FrontController::class, 'search'])->name('front.search');
+
+// Dynamic SEO Sitemap and Robots
+Route::get('sitemap.xml', [FrontController::class, 'sitemap'])->name('front.sitemap');
+Route::get('robots.txt', [FrontController::class, 'robots'])->name('front.robots');
+
 // Catch-all route to resolve dynamic CMS pages on the frontend
 Route::get('{any}', [FrontController::class, 'show'])
     ->where('any', '.*')

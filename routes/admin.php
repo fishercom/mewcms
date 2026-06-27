@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ConfigController;
+use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\LangController;
 use App\Http\Controllers\Admin\LayoutController;
 use App\Http\Controllers\Admin\LogController;
@@ -38,6 +39,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('sites', SiteController::class);
     Route::resource('schemas', SchemaController::class);
     Route::resource('parameters', ParameterController::class);
+    Route::resource('forms', FormController::class);
     Route::resource('registers', RegisterController::class);
     Route::resource('notifies', NotifyController::class);
     Route::resource('articles', ArticleController::class);

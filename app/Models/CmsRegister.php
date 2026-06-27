@@ -24,4 +24,9 @@ class CmsRegister extends Model
     {
         return $this->hasOne('App\Models\CmsParameter', 'id', 'contact_id');
     }
+
+    public function fields()
+    {
+        return $this->hasMany(CmsRegisterField::class, 'register_id');
+    }
 }
