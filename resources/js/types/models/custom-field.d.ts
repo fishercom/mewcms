@@ -1,4 +1,5 @@
 export interface CustomField {
+    id?: string | number;
     key: string;
     label: string;
     type: string;

@@ -83,11 +83,34 @@ class FrontController extends Controller
             ->take(5)
             ->get(['id', 'title', 'slug', 'created_at']);
 
+        // Resolve slider if present in article metadata (recursively searches root and nested structures)
+        $slider = null;
+        if ($article->metadata && is_array($article->metadata)) {
+            $findSlider = function($data) use (&$findSlider) {
+                if (is_string($data) && !empty($data) && strlen($data) < 100) {
+                    $potentialSlider = \App\Models\CmsSlider::getSlider($data);
+                    if ($potentialSlider) {
+                        return $potentialSlider;
+                    }
+                } elseif (is_array($data)) {
+                    foreach ($data as $item) {
+                        $res = $findSlider($item);
+                        if ($res) {
+                            return $res;
+                        }
+                    }
+                }
+                return null;
+            };
+            $slider = $findSlider($article->metadata);
+        }
+
         return Inertia::render($template, [
             'article' => $article,
             'navigation' => $navigation,
             'allTaxonomies' => $allTaxonomies,
             'recentArticles' => $recentArticles,
+            'slider' => $slider,
         ]);
     }
 

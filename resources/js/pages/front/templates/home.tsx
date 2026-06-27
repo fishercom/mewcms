@@ -6,10 +6,13 @@ import React from 'react';
 import FrontLayout from '../layout';
 import { Head } from '@inertiajs/react';
 import { CmsArticle } from '@/types/models/cms-article';
+import { CmsSlider } from '@/types/models/cms-slider';
+import FrontSlider from '@/components/front-slider';
 
 interface HomeProps {
     article: CmsArticle;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
+    slider?: CmsSlider;
 }
 
 interface HomeMetadata {
@@ -19,7 +22,7 @@ interface HomeMetadata {
     [key: string]: unknown;
 }
 
-export default function Home({ article, navigation }: HomeProps) {
+export default function Home({ article, navigation, slider }: HomeProps) {
     const meta = (article.metadata || {}) as HomeMetadata;
 
     // Dynamically retrieve hero content from custom fields or fallback
@@ -32,20 +35,24 @@ export default function Home({ article, navigation }: HomeProps) {
             <Head title={article.title} />
 
             <div className="space-y-16 py-8">
-                {/* Hero Section */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-tr from-[#fff2f2] to-[#fffaf0] dark:from-[#1D0002] dark:to-[#1a0f00] px-6 py-24 sm:px-12 sm:py-32 lg:px-16 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.05)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed15]">
-                    <div className="mx-auto max-w-2xl text-center space-y-6">
-                        <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-transparent dark:from-red-400 dark:to-amber-400">
-                            {heroTitle}
-                        </h1>
-                        <p className="text-lg font-medium text-[#706f6c] dark:text-[#c5c4c0]">
-                            {heroSubtitle}
-                        </p>
-                        <p className="text-sm text-[#706f6c] dark:text-[#a1a09a] max-w-xl mx-auto leading-relaxed">
-                            {heroDescription}
-                        </p>
+                {/* Hero / Slider Section */}
+                {slider && slider.slides && slider.slides.length > 0 ? (
+                    <FrontSlider slider={slider} />
+                ) : (
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-tr from-[#fff2f2] to-[#fffaf0] dark:from-[#1D0002] dark:to-[#1a0f00] px-6 py-24 sm:px-12 sm:py-32 lg:px-16 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.05)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed15]">
+                        <div className="mx-auto max-w-2xl text-center space-y-6">
+                            <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-transparent dark:from-red-400 dark:to-amber-400">
+                                {heroTitle}
+                            </h1>
+                            <p className="text-lg font-medium text-[#706f6c] dark:text-[#c5c4c0]">
+                                {heroSubtitle}
+                            </p>
+                            <p className="text-sm text-[#706f6c] dark:text-[#a1a09a] max-w-xl mx-auto leading-relaxed">
+                                {heroDescription}
+                            </p>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Custom Content blocks if metadata contains other fields */}
                 {Object.keys(meta).length > 3 && (

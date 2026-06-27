@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\TaxonomyTermController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\LayoutController;
+use App\Http\Controllers\Admin\SliderController;
 use UniSharp\LaravelFilemanager\Lfm;
 
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     Route::resource('templates', TemplateController::class)->except(['show']);
     Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    
+    Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
+    Route::resource('sliders', SliderController::class);
     
     Route::get('layout', [LayoutController::class, 'index'])->name('layout.index');
     Route::post('layout', [LayoutController::class, 'update'])->name('layout.update');

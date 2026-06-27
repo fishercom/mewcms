@@ -10,6 +10,8 @@ import { CalendarIcon, UploadCloud, Trash2, FileText, Plus } from 'lucide-react'
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import axios from 'axios';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // react-day-picker base styles. If Tailwind purges them, consider importing via CSS entry.
 import 'react-day-picker/style.css';
 // Using the core widget to avoid React peer dependency issues
@@ -246,6 +248,51 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
   );
 }
 
+interface SliderFieldRendererProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function SliderFieldRenderer({ value, onChange }: SliderFieldRendererProps) {
+  const [sliders, setSliders] = React.useState<Array<{ id: number; name: string; key: string }>>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoading(true);
+    axios.get('/admin/api/sliders')
+      .then(res => {
+        setSliders(res.data);
+      })
+      .catch(err => {
+        console.error('Error loading sliders list:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <Select value={value || ''} onValueChange={onChange}>
+      <SelectTrigger className="w-full bg-white dark:bg-[#161615]">
+        <SelectValue placeholder={loading ? "Cargando sliders..." : "Selecciona un slider"} />
+      </SelectTrigger>
+      <SelectContent>
+        {sliders.length > 0 ? (
+          sliders.map(s => (
+            <SelectItem key={s.id} value={s.key}>
+              {s.name} ({s.key})
+            </SelectItem>
+          ))
+        ) : (
+          <SelectItem value="_none" disabled>
+            No hay sliders creados
+          </SelectItem>
+        )}
+      </SelectContent>
+    </Select>
+  );
+}
+
 interface CustomFieldRendererProps {
   fields: CustomField[];
   values: Record<string, JsonValue>;
@@ -437,6 +484,13 @@ export default function CustomFieldRenderer({ fields, values, onChange }: Custom
       case 'document':
         return (
           <DocumentFieldRenderer
+            value={typeof value === 'string' ? value : ''}
+            onChange={(val) => onChange(field.key, val)}
+          />
+        );
+      case 'slider':
+        return (
+          <SliderFieldRenderer
             value={typeof value === 'string' ? value : ''}
             onChange={(val) => onChange(field.key, val)}
           />
