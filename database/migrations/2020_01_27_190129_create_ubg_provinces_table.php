@@ -21,8 +21,8 @@ class CreateUbgProvincesTable extends Migration
             $table->primary('id');
 
             $table->foreign('department_id')
-                  ->references('id')
-                  ->on('ubg_departments');
+                ->references('id')
+                ->on('ubg_departments');
 
         });
     }

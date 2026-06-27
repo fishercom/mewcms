@@ -27,6 +27,7 @@ export default function Edit() {
         setProcessing(true);
         setErrors({});
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         router.put(route('post-types.update', item.id), data as any, {
             onSuccess: () => {
                 setProcessing(false);

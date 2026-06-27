@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\User;
 use App\Models\Profile;
-use App\Models\CmsSchema;
-use Illuminate\Support\Facades\File;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->profile = Profile::create([
@@ -55,7 +54,7 @@ it('allows authenticated admin users to create, update, and delete a custom temp
     $response = $this->actingAs($this->user)->post('/admin/templates', [
         'name' => 'Test Page Template',
         'filename' => 'test-page-template',
-        'content' => 'import React from "react";'
+        'content' => 'import React from "react";',
     ]);
 
     $response->assertRedirect('/admin/templates');
@@ -68,7 +67,7 @@ it('allows authenticated admin users to create, update, and delete a custom temp
     // 2. Update template name and content
     $responseUpdate = $this->actingAs($this->user)->put('/admin/templates/test-page-template', [
         'name' => 'Updated Test Page Template',
-        'content' => 'import React from "react"; // updated comment'
+        'content' => 'import React from "react"; // updated comment',
     ]);
 
     $responseUpdate->assertRedirect('/admin/templates');

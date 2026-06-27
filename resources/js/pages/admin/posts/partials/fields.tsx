@@ -14,6 +14,7 @@ import { Image as ImageIcon, Trash2, Calendar, User, Eye, Settings } from 'lucid
 
 interface Props {
     data: Partial<CmsPost> & { term_ids?: number[] };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setData: (data: any) => void;
     errors: Record<string, string>;
     processing: boolean;
@@ -146,8 +147,8 @@ export default function PostFields({
                         <div className="bg-zinc-50/20 dark:bg-[#161615]/30 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 space-y-4">
                             <CustomFieldRenderer
                                 fields={schema.fields}
-                                values={data.metadata as Record<string, any>}
-                                onChange={(key: string, value: any) => {
+                                values={data.metadata as Record<string, import('@/types/models/cms-article').JsonValue>}
+                                onChange={(key: string, value: import('@/types/models/cms-article').JsonValue) => {
                                     const next = { ...data.metadata, [key]: value };
                                     setData({ ...data, metadata: next });
                                 }}

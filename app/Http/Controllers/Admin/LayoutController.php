@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CmsConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\CmsConfig;
 
 class LayoutController extends Controller
 {
@@ -17,7 +17,7 @@ class LayoutController extends Controller
     public function index(): Response
     {
         $configs = CmsConfig::where('alias', 'like', 'layout_%')->get();
-        
+
         // Map alias keys directly to their values
         $settings = [];
         foreach ($configs as $config) {

@@ -41,16 +41,16 @@ class CreateEmployeesTable extends Migration
             $table->timestamps();
 
             $table->foreign('departamento_id')
-                  ->references('id')
-                  ->on('ubg_departments');
+                ->references('id')
+                ->on('ubg_departments');
 
             $table->foreign('provincia_id')
-                  ->references('id')
-                  ->on('ubg_provinces');
+                ->references('id')
+                ->on('ubg_provinces');
 
             $table->foreign('distrito_id')
-                  ->references('id')
-                  ->on('ubg_districts');
+                ->references('id')
+                ->on('ubg_districts');
 
         });
     }

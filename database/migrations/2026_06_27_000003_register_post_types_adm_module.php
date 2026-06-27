@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
-use App\Models\AdmEvent;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -14,8 +14,8 @@ return new class extends Migration
     {
         // 1. Register "Tipos de Contenido" under CMS menu
         $cmsMenu = AdmMenu::where('name', 'CMS')->first();
-        if ($cmsMenu && !AdmModule::where('url', '/admin/post-types')->exists()) {
-            $cptModule = new AdmModule();
+        if ($cmsMenu && ! AdmModule::where('url', '/admin/post-types')->exists()) {
+            $cptModule = new AdmModule;
             $cptModule->menu_id = $cmsMenu->id;
             $cptModule->name = 'Tipos de Contenido';
             $cptModule->url = '/admin/post-types';
@@ -26,7 +26,7 @@ return new class extends Migration
 
             // Register standard Listar (1) & Administrar (2) actions
             foreach ([1, 2] as $actionId) {
-                $event = new AdmEvent();
+                $event = new AdmEvent;
                 $event->module_id = $cptModule->id;
                 $event->action_id = $actionId;
                 $event->save();
@@ -35,13 +35,13 @@ return new class extends Migration
 
         // 2. Register "Entradas (Blog)" under Contenido Web menu
         $webMenu = AdmMenu::where('name', 'Contenido Web')->first();
-        if ($webMenu && !AdmModule::where('url', '/admin/posts')->exists()) {
+        if ($webMenu && ! AdmModule::where('url', '/admin/posts')->exists()) {
             // Shift modules in "Contenido Web" with position >= 2
             AdmModule::where('menu_id', $webMenu->id)
                 ->where('position', '>=', 2)
                 ->increment('position');
 
-            $blogModule = new AdmModule();
+            $blogModule = new AdmModule;
             $blogModule->menu_id = $webMenu->id;
             $blogModule->name = 'Entradas (Blog)';
             $blogModule->url = '/admin/posts';
@@ -52,7 +52,7 @@ return new class extends Migration
 
             // Register standard Listar (1) & Administrar (2) actions
             foreach ([1, 2] as $actionId) {
-                $event = new AdmEvent();
+                $event = new AdmEvent;
                 $event->module_id = $blogModule->id;
                 $event->action_id = $actionId;
                 $event->save();

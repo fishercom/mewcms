@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CmsSchema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\CmsSchema;
 
 class TemplateController extends Controller
 {
@@ -30,26 +30,26 @@ class TemplateController extends Controller
     {
         // Default React boilerplate code for a new MewCMS template
         $defaultBoilerplate = "import React from 'react';\n"
-            . "import FrontLayout from '../layout';\n"
-            . "import { Head } from '@inertiajs/react';\n"
-            . "import { CmsArticle } from '@/types/models/cms-article';\n\n"
-            . "interface Props {\n"
-            . "    article: CmsArticle;\n"
-            . "    navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];\n"
-            . "}\n\n"
-            . "export default function CustomTemplate({ article, navigation }: Props) {\n"
-            . "    return (\n"
-            . "        <FrontLayout navigation={navigation}>\n"
-            . "            <Head title={article.title} />\n"
-            . "            <div className=\"max-w-4xl mx-auto py-12 px-4 space-y-6\">\n"
-            . "                <h1 className=\"text-3xl font-extrabold tracking-tight sm:text-4xl capitalize\">{article.title}</h1>\n"
-            . "                <div className=\"prose dark:prose-invert max-w-none text-sm leading-relaxed\">\n"
-            . "                    <p>Welcome to your new custom template!</p>\n"
-            . "                </div>\n"
-            . "            </div>\n"
-            . "        </FrontLayout>\n"
-            . "    );\n"
-            . "}\n";
+            ."import FrontLayout from '../layout';\n"
+            ."import { Head } from '@inertiajs/react';\n"
+            ."import { CmsArticle } from '@/types/models/cms-article';\n\n"
+            ."interface Props {\n"
+            ."    article: CmsArticle;\n"
+            ."    navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];\n"
+            ."}\n\n"
+            ."export default function CustomTemplate({ article, navigation }: Props) {\n"
+            ."    return (\n"
+            ."        <FrontLayout navigation={navigation}>\n"
+            ."            <Head title={article.title} />\n"
+            ."            <div className=\"max-w-4xl mx-auto py-12 px-4 space-y-6\">\n"
+            ."                <h1 className=\"text-3xl font-extrabold tracking-tight sm:text-4xl capitalize\">{article.title}</h1>\n"
+            ."                <div className=\"prose dark:prose-invert max-w-none text-sm leading-relaxed\">\n"
+            ."                    <p>Welcome to your new custom template!</p>\n"
+            ."                </div>\n"
+            ."            </div>\n"
+            ."        </FrontLayout>\n"
+            ."    );\n"
+            ."}\n";
 
         return Inertia::render('admin/templates/create', [
             'defaultBoilerplate' => $defaultBoilerplate,
@@ -67,17 +67,17 @@ class TemplateController extends Controller
             'content' => 'required|string',
         ]);
 
-        $filename = $request->input('filename') . '.tsx';
+        $filename = $request->input('filename').'.tsx';
         $directory = resource_path('js/pages/front/templates');
-        $filePath = $directory . '/' . $filename;
+        $filePath = $directory.'/'.$filename;
 
         // Ensure directory exists
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
         // Security check
-        if (realpath($filePath) !== false && !str_starts_with(realpath($filePath), realpath($directory))) {
+        if (realpath($filePath) !== false && ! str_starts_with(realpath($filePath), realpath($directory))) {
             abort(403, 'Unauthorized path traversal.');
         }
 
@@ -88,9 +88,9 @@ class TemplateController extends Controller
         // Inject template name directive if not present
         $content = $request->input('content');
         $name = $request->input('name');
-        if (!str_contains($content, 'Template Name:')) {
-            $directive = "/**\n * Template Name: " . $name . "\n */\n";
-            $content = $directive . $content;
+        if (! str_contains($content, 'Template Name:')) {
+            $directive = "/**\n * Template Name: ".$name."\n */\n";
+            $content = $directive.$content;
         }
 
         file_put_contents($filePath, $content);
@@ -105,7 +105,7 @@ class TemplateController extends Controller
     {
         [$filePath, $filename] = $this->getSafeFilePath($filename);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             abort(404, 'Template not found.');
         }
 
@@ -116,7 +116,7 @@ class TemplateController extends Controller
         if (preg_match('/Template\s+Name:\s*([^\r\n\*]+)/i', $content, $matches)) {
             $templateName = trim($matches[1]);
         }
-        if (!$templateName) {
+        if (! $templateName) {
             $templateName = ucfirst(basename($filename, '.tsx'));
         }
 
@@ -134,7 +134,7 @@ class TemplateController extends Controller
     {
         [$filePath, $filename] = $this->getSafeFilePath($filename);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             abort(404, 'Template not found.');
         }
 
@@ -148,10 +148,10 @@ class TemplateController extends Controller
 
         // Clean template name directive if it changed, or ensure it's in the content
         if (preg_match('/(Template\s+Name:\s*)([^\r\n\*]+)/i', $content)) {
-            $content = preg_replace('/(Template\s+Name:\s*)([^\r\n\*]+)/i', '${1}' . $name, $content);
+            $content = preg_replace('/(Template\s+Name:\s*)([^\r\n\*]+)/i', '${1}'.$name, $content);
         } else {
-            $directive = "/**\n * Template Name: " . $name . "\n */\n";
-            $content = $directive . $content;
+            $directive = "/**\n * Template Name: ".$name."\n */\n";
+            $content = $directive.$content;
         }
 
         file_put_contents($filePath, $content);
@@ -166,7 +166,7 @@ class TemplateController extends Controller
     {
         [$filePath, $filename] = $this->getSafeFilePath($filename);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             abort(404, 'Template not found.');
         }
 
@@ -177,7 +177,7 @@ class TemplateController extends Controller
         }
 
         // Check if any schema uses it
-        $frontViewPath = 'front/templates/' . $baseName;
+        $frontViewPath = 'front/templates/'.$baseName;
         $inUse = CmsSchema::where('front_view', $frontViewPath)->exists();
         if ($inUse) {
             return back()->withErrors(['error' => 'Esta plantilla está en uso por un esquema y no se puede eliminar.']);
@@ -193,21 +193,21 @@ class TemplateController extends Controller
      */
     protected function getSafeFilePath(string $filename): array
     {
-        if (!str_ends_with($filename, '.tsx')) {
+        if (! str_ends_with($filename, '.tsx')) {
             $filename .= '.tsx';
         }
 
-        if (!preg_match('/^[a-zA-Z0-9_-]+\.tsx$/', $filename)) {
+        if (! preg_match('/^[a-zA-Z0-9_-]+\.tsx$/', $filename)) {
             abort(400, 'Invalid template filename.');
         }
 
         $directory = resource_path('js/pages/front/templates');
-        $filePath = $directory . '/' . $filename;
+        $filePath = $directory.'/'.$filename;
 
         // Double check traversal
         $realDirectory = realpath($directory);
         $realFilePath = realpath($filePath);
-        if ($realFilePath !== false && !str_starts_with($realFilePath, $realDirectory)) {
+        if ($realFilePath !== false && ! str_starts_with($realFilePath, $realDirectory)) {
             abort(403, 'Path traversal detected.');
         }
 

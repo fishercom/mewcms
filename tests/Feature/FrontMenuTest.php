@@ -1,16 +1,17 @@
 <?php
 
 use App\Models\CmsArticle;
-use App\Models\CmsSchema;
-use App\Models\CmsSchemaGroup;
 use App\Models\CmsLang;
 use App\Models\CmsMenu;
 use App\Models\CmsMenuItem;
-use App\Models\User;
+use App\Models\CmsSchema;
+use App\Models\CmsSchemaGroup;
 use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->profile = Profile::create([
@@ -47,7 +48,7 @@ beforeEach(function () {
         'type' => 'HOME',
         'active' => 1,
         'fields' => [],
-        'front_view' => 'front/templates/home'
+        'front_view' => 'front/templates/home',
     ]);
 });
 
@@ -61,13 +62,13 @@ it('allows authenticated users to create a menu', function () {
         'name' => 'Main Navigation',
         'slug' => 'main-nav',
         'description' => 'Top header links',
-        'active' => 1
+        'active' => 1,
     ]);
 
     $response->assertRedirect('/admin/menus');
     $this->assertDatabaseHas('cms_menus', [
         'name' => 'Main Navigation',
-        'slug' => 'main-nav'
+        'slug' => 'main-nav',
     ]);
 });
 
@@ -90,7 +91,7 @@ it('allows managing individual menu items', function () {
     $this->assertDatabaseHas('cms_menu_items', [
         'menu_id' => $menu->id,
         'title' => 'Services',
-        'url' => '/services'
+        'url' => '/services',
     ]);
 
     $item = CmsMenuItem::where('menu_id', $menu->id)->first();
@@ -98,8 +99,8 @@ it('allows managing individual menu items', function () {
     // Sort items
     $response2 = $this->actingAs($this->user)->post("/admin/menus/{$menu->id}/items/sort", [
         'items' => [
-            ['id' => $item->id, 'parent_id' => null, 'position' => 0]
-        ]
+            ['id' => $item->id, 'parent_id' => null, 'position' => 0],
+        ],
     ]);
     $response2->assertStatus(200);
 

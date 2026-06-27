@@ -1,11 +1,12 @@
 <?php
 
-use App\Models\User;
-use App\Models\Profile;
 use App\Models\CmsConfig;
+use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->profile = Profile::create([
@@ -48,7 +49,7 @@ it('prevents guests from accessing layout settings customizer', function () {
 
 it('allows authenticated admin to view layout customizer dashboard page', function () {
     $response = $this->actingAs($this->user)->get('/admin/layout');
-    
+
     $response->assertStatus(200);
     $response->assertInertia(fn (Assert $page) => $page
         ->component('admin/layout/index')
@@ -62,29 +63,29 @@ it('allows updating layout settings and changes configs in db', function () {
         'layout_header_logo' => 'https://site.com/header.png',
         'layout_copyright' => 'Updated Copyright 2026',
         'layout_facebook' => 'https://facebook.com/mewcms',
-        'layout_custom_css' => 'body { background: #000; }'
+        'layout_custom_css' => 'body { background: #000; }',
     ]);
 
     $response->assertRedirect('/admin/layout');
-    
+
     $this->assertDatabaseHas('cms_configs', [
         'alias' => 'layout_header_logo',
-        'value' => 'https://site.com/header.png'
+        'value' => 'https://site.com/header.png',
     ]);
 
     $this->assertDatabaseHas('cms_configs', [
         'alias' => 'layout_copyright',
-        'value' => 'Updated Copyright 2026'
+        'value' => 'Updated Copyright 2026',
     ]);
 
     $this->assertDatabaseHas('cms_configs', [
         'alias' => 'layout_facebook',
-        'value' => 'https://facebook.com/mewcms'
+        'value' => 'https://facebook.com/mewcms',
     ]);
 
     $this->assertDatabaseHas('cms_configs', [
         'alias' => 'layout_custom_css',
-        'value' => 'body { background: #000; }'
+        'value' => 'body { background: #000; }',
     ]);
 });
 
@@ -93,7 +94,7 @@ it('shares layout configurations globally in Inertia', function () {
     CmsConfig::where('alias', 'layout_copyright')->update(['value' => 'Testing Global Inertia Share']);
 
     $response = $this->actingAs($this->user)->get('/admin/layout');
-    
+
     $response->assertStatus(200);
     $response->assertInertia(fn (Assert $page) => $page
         ->has('layout_settings')

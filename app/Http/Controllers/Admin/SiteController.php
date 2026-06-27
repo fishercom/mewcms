@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\CmsSchemaGroup;
+use App\Models\CmsSite;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Models\CmsSite;
-use App\Models\CmsSchemaGroup;
 
 class SiteController extends Controller
 {
@@ -23,12 +20,13 @@ class SiteController extends Controller
         $s = $request->get('s');
 
         $items = CmsSite::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/sites/index', [
             'items' => $items,
         ]);
@@ -37,6 +35,7 @@ class SiteController extends Controller
     public function create()
     {
         $schemaGroups = CmsSchemaGroup::all();
+
         return Inertia::render('admin/sites/create', [
             'schemaGroups' => $schemaGroups,
         ]);
@@ -46,6 +45,7 @@ class SiteController extends Controller
     {
         $site = new CmsSite($request->all());
         $site->save();
+
         return redirect('admin/sites');
     }
 
@@ -56,6 +56,7 @@ class SiteController extends Controller
     {
         $item = CmsSite::find($id);
         $schemaGroups = CmsSchemaGroup::all();
+
         return Inertia::render('admin/sites/edit', [
             'item' => $item,
             'schemaGroups' => $schemaGroups,
@@ -68,8 +69,8 @@ class SiteController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = CmsSite::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         return redirect('admin/sites');
     }
@@ -80,7 +81,7 @@ class SiteController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = CmsSite::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/sites');
     }

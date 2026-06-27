@@ -1,14 +1,15 @@
 <?php
 
 use App\Models\CmsArticle;
+use App\Models\CmsLang;
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
-use App\Models\CmsLang;
 use App\Models\CmsTaxonomy;
 use App\Models\CmsTaxonomyTerm;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->group = CmsSchemaGroup::create([
@@ -30,7 +31,7 @@ beforeEach(function () {
         'type' => 'PAGE',
         'active' => 1,
         'fields' => [],
-        'front_view' => 'front/templates/page'
+        'front_view' => 'front/templates/page',
     ]);
 });
 

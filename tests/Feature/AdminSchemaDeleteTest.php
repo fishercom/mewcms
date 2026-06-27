@@ -1,13 +1,14 @@
 <?php
 
-use App\Models\User;
-use App\Models\Profile;
-use App\Models\CmsSchema;
-use App\Models\CmsSchemaGroup;
 use App\Models\CmsArticle;
 use App\Models\CmsLang;
+use App\Models\CmsSchema;
+use App\Models\CmsSchemaGroup;
+use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->profile = Profile::create([

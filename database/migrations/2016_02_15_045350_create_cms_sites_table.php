@@ -18,7 +18,7 @@ class CreateCmsSitesTable extends Migration
             $table->string('name');
             $table->string('segment', 25)->nullable();
             $table->string('site_url')->unique();
-            $table->text('metadata')->nullable(); //assets, upload, customs
+            $table->text('metadata')->nullable(); // assets, upload, customs
             $table->integer('schema_group_id')->unsigned();
             $table->boolean('default')->nullable();
             $table->boolean('active')->nullable();
@@ -26,9 +26,9 @@ class CreateCmsSitesTable extends Migration
 
             $table->unique('segment');
             $table->foreign('schema_group_id')
-                  ->references('id')
-                  ->on('cms_schema_groups')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('cms_schema_groups')
+                ->onDelete('cascade');
         });
     }
 

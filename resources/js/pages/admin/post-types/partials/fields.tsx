@@ -7,6 +7,7 @@ import * as LucideIcons from "lucide-react";
 
 interface Props {
     data: Partial<CmsPostType>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setData: (data: any) => void;
     errors: Record<string, string>;
     processing: boolean;
@@ -46,6 +47,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
     };
 
     const renderIconPreview = (iconName: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const IconComponent = (LucideIcons as any)[iconName || 'book-open'];
         if (IconComponent) {
             return <IconComponent className="h-5 w-5 text-red-600 dark:text-red-500" />;

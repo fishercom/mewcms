@@ -3,15 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Rutorika\Sortable\SortableTrait;
 
 class CmsParameter extends Model
 {
-    use \Rutorika\Sortable\SortableTrait;
+    use SortableTrait;
 
-	protected $table = 'cms_parameters';
-	protected $fillable = ['group_id', 'parent_id', 'name', 'value', 'metadata', 'active'];
+    protected $table = 'cms_parameters';
+
+    protected $fillable = ['group_id', 'parent_id', 'name', 'value', 'metadata', 'active'];
+
     protected static $sortableField = 'position';
+
     protected static $sortableGroupField = 'group_id';
+
     protected $casts = [
         'metadata' => 'array',
     ];
@@ -19,9 +24,9 @@ class CmsParameter extends Model
     public function from_group($alias)
     {
         return $this->hasMany('App\Models\CmsParameter', 'group_id', 'id')
-            ->whereIn('group_id', \App\Models\CmsParameterGroup::select('id')
+            ->whereIn('group_id', CmsParameterGroup::select('id')
                 ->where('alias', $alias)->get()->toArray()
-                )
+            )
             ->where('active', '1')
             ->orderBy('position');
     }
@@ -42,5 +47,4 @@ class CmsParameter extends Model
             ->where('active', '1')
             ->orderBy('position');
     }
-
 }

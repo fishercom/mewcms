@@ -45,6 +45,7 @@ export default function Create() {
             ...data,
             post_type,
             lang_id
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any, {
             onSuccess: () => {
                 setProcessing(false);

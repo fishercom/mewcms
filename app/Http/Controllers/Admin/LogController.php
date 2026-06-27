@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\AdmEvent;
+use App\Models\AdmLog;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Models\AdmLog;
-use App\Models\AdmEvent;
-use App\Models\User;
 
 class LogController extends Controller
 {
@@ -24,12 +21,13 @@ class LogController extends Controller
         $s = $request->get('s');
 
         $items = AdmLog::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/logs/index', [
             'items' => $items,
         ]);
@@ -39,6 +37,7 @@ class LogController extends Controller
     {
         $events = AdmEvent::with('action')->get();
         $users = User::all();
+
         return Inertia::render('admin/logs/create', [
             'events' => $events,
             'users' => $users,
@@ -49,6 +48,7 @@ class LogController extends Controller
     {
         $log = new AdmLog($request->all());
         $log->save();
+
         return redirect('admin/logs');
     }
 
@@ -60,6 +60,7 @@ class LogController extends Controller
         $item = AdmLog::find($id);
         $events = AdmEvent::with('action')->get();
         $users = User::all();
+
         return Inertia::render('admin/logs/edit', [
             'item' => $item,
             'events' => $events,
@@ -73,8 +74,8 @@ class LogController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = AdmLog::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         return redirect('admin/logs');
     }
@@ -85,7 +86,7 @@ class LogController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = AdmLog::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/logs');
     }

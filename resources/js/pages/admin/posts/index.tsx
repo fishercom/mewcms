@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Pagination } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Check, Search, Plus, Edit, Trash2, Calendar, FileText } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Calendar } from 'lucide-react';
 import { Input } from '@headlessui/react';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 
@@ -32,7 +32,7 @@ export default function Index() {
             preserveState: true,
             replace: true,
         });
-    }, [filters]);
+    }, [filters, post_type, lang_id]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFilters(prev => ({ ...prev, s: e.target.value }));

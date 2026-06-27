@@ -3,18 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\CmsParameter;
+use App\Models\CmsParameterGroup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
-use App\Models\CmsLang;
-use App\Models\CmsParameter;
-use App\Models\CmsParameterLang;
-use App\Models\CmsParameterGroup;
-use App\Models\CmsParameter as CmsParameterAlias; // For parents
+// For parents
 
 class ParameterController extends Controller
 {
@@ -26,12 +22,13 @@ class ParameterController extends Controller
         $s = $request->get('s');
 
         $items = CmsParameter::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/parameters/index', [
             'items' => $items,
         ]);
@@ -41,6 +38,7 @@ class ParameterController extends Controller
     {
         $groups = CmsParameterGroup::all();
         $parents = CmsParameter::whereNull('parent_id')->get(); // Only top-level parameters can be parents
+
         return Inertia::render('admin/parameters/create', [
             'groups' => $groups,
             'parents' => $parents,
@@ -51,6 +49,7 @@ class ParameterController extends Controller
     {
         $profile = new CmsParameter($request->all());
         $profile->save();
+
         return redirect('admin/parameters');
     }
 
@@ -62,6 +61,7 @@ class ParameterController extends Controller
         $item = CmsParameter::find($id);
         $groups = CmsParameterGroup::all();
         $parents = CmsParameter::whereNull('parent_id')->get(); // Only top-level parameters can be parents
+
         return Inertia::render('admin/parameters/edit', [
             'item' => $item,
             'groups' => $groups,
@@ -75,8 +75,8 @@ class ParameterController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = CmsParameter::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         return redirect('admin/parameters');
     }
@@ -87,7 +87,7 @@ class ParameterController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = CmsParameter::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/parameters');
     }

@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\AdmAction;
+use App\Models\AdmEvent;
+use App\Models\AdmMenu;
+use App\Models\AdmModule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -30,10 +34,10 @@ return new class extends Migration
 
         // Insert Admin Module to populate admin sidebar menu
         try {
-            $menuCms = \App\Models\AdmMenu::where('name', 'CMS')->first();
+            $menuCms = AdmMenu::where('name', 'CMS')->first();
             if ($menuCms) {
-                $module = \App\Models\AdmModule::firstOrCreate([
-                    'url' => '/admin/menus'
+                $module = AdmModule::firstOrCreate([
+                    'url' => '/admin/menus',
                 ], [
                     'menu_id' => $menuCms->id,
                     'name' => 'Menús',
@@ -43,23 +47,23 @@ return new class extends Migration
                     'visible' => true,
                 ]);
 
-                $actionLista = \App\Models\AdmAction::where('alias', 'listar')->first();
-                $actionAdmin = \App\Models\AdmAction::where('alias', 'administrar')->first();
+                $actionLista = AdmAction::where('alias', 'listar')->first();
+                $actionAdmin = AdmAction::where('alias', 'administrar')->first();
 
                 if ($actionLista) {
-                    \App\Models\AdmEvent::firstOrCreate([
+                    AdmEvent::firstOrCreate([
                         'module_id' => $module->id,
-                        'action_id' => $actionLista->id
+                        'action_id' => $actionLista->id,
                     ]);
                 }
                 if ($actionAdmin) {
-                    \App\Models\AdmEvent::firstOrCreate([
+                    AdmEvent::firstOrCreate([
                         'module_id' => $module->id,
-                        'action_id' => $actionAdmin->id
+                        'action_id' => $actionAdmin->id,
                     ]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log or ignore if db is not seeded yet during migration
         }
     }
@@ -71,12 +75,12 @@ return new class extends Migration
     {
         // Remove Admin Module
         try {
-            $module = \App\Models\AdmModule::where('url', '/admin/menus')->first();
+            $module = AdmModule::where('url', '/admin/menus')->first();
             if ($module) {
-                \App\Models\AdmEvent::where('module_id', $module->id)->delete();
+                AdmEvent::where('module_id', $module->id)->delete();
                 $module->delete();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Ignore
         }
 

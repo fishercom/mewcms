@@ -1,11 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use App\Models\CmsArticle;
 use App\Models\CmsMenu;
 use App\Models\CmsMenuItem;
-use App\Models\CmsArticle;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -16,21 +14,21 @@ return new class extends Migration
     {
         // 1. Create Main menu
         $mainMenu = CmsMenu::firstOrCreate([
-            'slug' => 'main'
+            'slug' => 'main',
         ], [
             'name' => 'Main',
             'description' => 'Main navigation menu displayed in the header.',
-            'active' => true
+            'active' => true,
         ]);
 
         // Add "Inicio" (Custom URL: /)
         CmsMenuItem::firstOrCreate([
             'menu_id' => $mainMenu->id,
-            'title' => 'Inicio'
+            'title' => 'Inicio',
         ], [
             'url' => '/',
             'position' => 1,
-            'active' => true
+            'active' => true,
         ]);
 
         // Find existing articles (except home)
@@ -39,49 +37,49 @@ return new class extends Migration
         foreach ($articles as $art) {
             CmsMenuItem::firstOrCreate([
                 'menu_id' => $mainMenu->id,
-                'article_id' => $art->id
+                'article_id' => $art->id,
             ], [
                 'title' => $art->title,
                 'position' => $pos++,
-                'active' => true
+                'active' => true,
             ]);
         }
 
         // 2. Create Footer menu
         $footerMenu = CmsMenu::firstOrCreate([
-            'slug' => 'footer'
+            'slug' => 'footer',
         ], [
             'name' => 'Footer',
             'description' => 'Footer navigation menu with policy and contact links.',
-            'active' => true
+            'active' => true,
         ]);
 
         // Add dummy pages as custom links
         CmsMenuItem::firstOrCreate([
             'menu_id' => $footerMenu->id,
-            'title' => 'Políticas de Privacidad'
+            'title' => 'Políticas de Privacidad',
         ], [
             'url' => '/politicas-de-privacidad',
             'position' => 1,
-            'active' => true
+            'active' => true,
         ]);
 
         CmsMenuItem::firstOrCreate([
             'menu_id' => $footerMenu->id,
-            'title' => 'Términos y Condiciones'
+            'title' => 'Términos y Condiciones',
         ], [
             'url' => '/terminos-y-condiciones',
             'position' => 2,
-            'active' => true
+            'active' => true,
         ]);
 
         CmsMenuItem::firstOrCreate([
             'menu_id' => $footerMenu->id,
-            'title' => 'Contáctenos'
+            'title' => 'Contáctenos',
         ], [
             'url' => '/contactenos',
             'position' => 3,
-            'active' => true
+            'active' => true,
         ]);
     }
 

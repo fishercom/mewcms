@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\CmsConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Models\CmsConfig;
 
 class ConfigController extends Controller
 {
@@ -22,12 +19,13 @@ class ConfigController extends Controller
         $s = $request->get('s');
 
         $items = CmsConfig::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/configs/index', [
             'items' => $items,
         ]);
@@ -35,13 +33,14 @@ class ConfigController extends Controller
 
     public function create()
     {
-      return Inertia::render('admin/configs/create');
+        return Inertia::render('admin/configs/create');
     }
 
     public function store(Request $request)
     {
         $config = new CmsConfig($request->all());
         $config->save();
+
         return redirect('admin/configs');
     }
 
@@ -51,6 +50,7 @@ class ConfigController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsConfig::find($id);
+
         return Inertia::render('admin/configs/edit', [
             'item' => $item,
         ]);
@@ -62,8 +62,8 @@ class ConfigController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = CmsConfig::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         return redirect('admin/configs');
     }
@@ -74,7 +74,7 @@ class ConfigController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = CmsConfig::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/configs');
     }

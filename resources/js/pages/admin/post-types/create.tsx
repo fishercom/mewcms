@@ -28,6 +28,7 @@ export default function Create() {
         setProcessing(true);
         setErrors({});
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         router.post(route('post-types.store'), data as any, {
             onSuccess: () => {
                 setProcessing(false);

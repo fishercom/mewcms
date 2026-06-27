@@ -20,15 +20,15 @@ return new class extends Migration
             $table->string('password');
             $table->string('name');
             $table->string('lastname')->nullable();
-            $table->json('metadata')->nullable(); //photos, documents, fields
+            $table->json('metadata')->nullable(); // photos, documents, fields
             $table->boolean('active')->nullable();
             $table->boolean('default')->nullable();
             $table->rememberToken();
             $table->timestamps();
 
             $table->foreign('profile_id')
-                  ->references('id')
-                  ->on('profiles'); //->onDelete('cascade');
+                ->references('id')
+                ->on('profiles'); // ->onDelete('cascade');
 
         });
 

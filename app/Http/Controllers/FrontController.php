@@ -3,25 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\CmsArticle;
+use App\Models\CmsPost;
+use App\Models\CmsPostType;
+use App\Models\CmsSlider;
+use App\Models\CmsTaxonomy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FrontController extends Controller
 {
     /**
      * Resolve and display a public CMS page.
      *
-     * @param string|null $slug
-     * @return Response
+     * @param  string|null  $slug
      */
     public function show(Request $request, $slug = null): Response
     {
-        if (!empty($slug)) {
+        if (! empty($slug)) {
             $parts = explode('/', $slug);
             $firstSegment = $parts[0];
-            
-            $cpt = \App\Models\CmsPostType::where('slug', $firstSegment)->where('active', 1)->first();
+
+            $cpt = CmsPostType::where('slug', $firstSegment)->where('active', 1)->first();
             if ($cpt) {
                 if (count($parts) === 1) {
                     return $this->cptIndex($request, $cpt);
@@ -40,14 +45,14 @@ class FrontController extends Controller
                 $query->whereIn('type', ['HOME', 'PAGE']);
             })->where('slug', 'home')->where('active', 1)->first();
 
-            if (!$article) {
+            if (! $article) {
                 $article = CmsArticle::whereHas('schema', function ($query) {
                     $query->where('type', 'HOME');
                 })->where('active', 1)->first();
             }
 
             // Fallback to first active article if still not found
-            if (!$article) {
+            if (! $article) {
                 $article = CmsArticle::where('active', 1)->orderBy('position')->first();
             }
         } else {
@@ -56,7 +61,7 @@ class FrontController extends Controller
             $article = CmsArticle::where('slug', $dbSlug)->where('active', 1)->first();
         }
 
-        if (!$article) {
+        if (! $article) {
             abort(404);
         }
 
@@ -87,7 +92,7 @@ class FrontController extends Controller
             ->get(['id', 'title', 'slug']);
 
         // Fetch active taxonomies with active terms and their articles count
-        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -101,9 +106,9 @@ class FrontController extends Controller
         // Resolve slider if present in article metadata (recursively searches root and nested structures)
         $slider = null;
         if ($article->metadata && is_array($article->metadata)) {
-            $findSlider = function($data) use (&$findSlider) {
-                if (is_string($data) && !empty($data) && strlen($data) < 100) {
-                    $potentialSlider = \App\Models\CmsSlider::getSlider($data);
+            $findSlider = function ($data) use (&$findSlider) {
+                if (is_string($data) && ! empty($data) && strlen($data) < 100) {
+                    $potentialSlider = CmsSlider::getSlider($data);
                     if ($potentialSlider) {
                         return $potentialSlider;
                     }
@@ -115,6 +120,7 @@ class FrontController extends Controller
                         }
                     }
                 }
+
                 return null;
             };
             $slider = $findSlider($article->metadata);
@@ -135,6 +141,7 @@ class FrontController extends Controller
     public function category(Request $request, $slug): Response
     {
         [$term, $articles, $taxonomy] = $this->getArticlesByTerm('categorias', $slug);
+
         return $this->renderTermList($term, $articles, $taxonomy);
     }
 
@@ -145,9 +152,10 @@ class FrontController extends Controller
     {
         try {
             [$term, $articles, $taxonomy] = $this->getArticlesByTerm('tags', $slug);
-        } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
+        } catch (NotFoundHttpException $e) {
             [$term, $articles, $taxonomy] = $this->getArticlesByTerm('etiquetas', $slug);
         }
+
         return $this->renderTermList($term, $articles, $taxonomy);
     }
 
@@ -156,21 +164,21 @@ class FrontController extends Controller
      */
     protected function getArticlesByTerm(string $taxonomySlug, string $termSlug): array
     {
-        $taxonomy = \App\Models\CmsTaxonomy::where('slug', $taxonomySlug)
-            ->orWhere('slug', \Illuminate\Support\Str::plural($taxonomySlug))
-            ->orWhere('slug', \Illuminate\Support\Str::singular($taxonomySlug))
+        $taxonomy = CmsTaxonomy::where('slug', $taxonomySlug)
+            ->orWhere('slug', Str::plural($taxonomySlug))
+            ->orWhere('slug', Str::singular($taxonomySlug))
             ->first();
 
-        if (!$taxonomy) {
-            $taxonomy = \App\Models\CmsTaxonomy::where('name', 'like', '%' . $taxonomySlug . '%')->first();
+        if (! $taxonomy) {
+            $taxonomy = CmsTaxonomy::where('name', 'like', '%'.$taxonomySlug.'%')->first();
         }
 
-        if (!$taxonomy) {
+        if (! $taxonomy) {
             abort(404, 'Taxonomy not found');
         }
 
         $term = $taxonomy->terms()->where('slug', $termSlug)->where('active', true)->first();
-        if (!$term) {
+        if (! $term) {
             abort(404, 'Term not found');
         }
 
@@ -193,7 +201,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -220,7 +228,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -231,7 +239,7 @@ class FrontController extends Controller
             ->get(['id', 'title', 'slug', 'created_at']);
 
         // Load standard posts (post_type = 'post')
-        $posts = \App\Models\CmsPost::with(['user', 'terms.taxonomy'])
+        $posts = CmsPost::with(['user', 'terms.taxonomy'])
             ->where('post_type', 'post')
             ->where('status', 'published')
             ->where('active', true)
@@ -255,7 +263,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -265,7 +273,7 @@ class FrontController extends Controller
             ->take(5)
             ->get(['id', 'title', 'slug', 'created_at']);
 
-        $post = \App\Models\CmsPost::with(['user', 'terms.taxonomy', 'schema'])
+        $post = CmsPost::with(['user', 'terms.taxonomy', 'schema'])
             ->where('post_type', 'post')
             ->where('slug', $slug)
             ->where('status', 'published')
@@ -288,7 +296,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -299,7 +307,7 @@ class FrontController extends Controller
             ->get(['id', 'title', 'slug', 'created_at']);
 
         // Load posts for this specific post type
-        $posts = \App\Models\CmsPost::with(['user', 'terms.taxonomy'])
+        $posts = CmsPost::with(['user', 'terms.taxonomy'])
             ->where('post_type', $cpt->slug)
             ->where('status', 'published')
             ->where('active', true)
@@ -323,7 +331,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = \App\Models\CmsTaxonomy::with(['terms' => function($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -333,7 +341,7 @@ class FrontController extends Controller
             ->take(5)
             ->get(['id', 'title', 'slug', 'created_at']);
 
-        $post = \App\Models\CmsPost::with(['user', 'terms.taxonomy', 'schema'])
+        $post = CmsPost::with(['user', 'terms.taxonomy', 'schema'])
             ->where('post_type', $cpt->slug)
             ->where('slug', $postSlug)
             ->where('status', 'published')

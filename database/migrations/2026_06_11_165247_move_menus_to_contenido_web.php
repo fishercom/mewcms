@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use App\Models\AdmAction;
+use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
-use App\Models\AdmEvent;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -22,9 +21,9 @@ return new class extends Migration
                 ->increment('position');
 
             $module = AdmModule::where('url', '/admin/menus')->first();
-            if (!$module) {
+            if (! $module) {
                 // Create module from scratch if it didn't exist
-                $module = new AdmModule();
+                $module = new AdmModule;
                 $module->menu_id = $contenidoWebMenu->id;
                 $module->name = 'Menús';
                 $module->url = '/admin/menus';
@@ -35,15 +34,15 @@ return new class extends Migration
                 $module->save();
 
                 // Register action events (Listar = 1, Administrar = 2)
-                $actionLista = \App\Models\AdmAction::where('alias', 'listar')->first();
-                $actionAdmin = \App\Models\AdmAction::where('alias', 'administrar')->first();
+                $actionLista = AdmAction::where('alias', 'listar')->first();
+                $actionAdmin = AdmAction::where('alias', 'administrar')->first();
 
                 if ($actionLista) {
                     $eventExists = AdmEvent::where('module_id', $module->id)
                         ->where('action_id', $actionLista->id)
                         ->exists();
-                    if (!$eventExists) {
-                        $event = new AdmEvent();
+                    if (! $eventExists) {
+                        $event = new AdmEvent;
                         $event->module_id = $module->id;
                         $event->action_id = $actionLista->id;
                         $event->save();
@@ -53,8 +52,8 @@ return new class extends Migration
                     $eventExists = AdmEvent::where('module_id', $module->id)
                         ->where('action_id', $actionAdmin->id)
                         ->exists();
-                    if (!$eventExists) {
-                        $event = new AdmEvent();
+                    if (! $eventExists) {
+                        $event = new AdmEvent;
                         $event->module_id = $module->id;
                         $event->action_id = $actionAdmin->id;
                         $event->save();

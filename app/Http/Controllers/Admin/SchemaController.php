@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
-
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class SchemaController extends Controller
 {
@@ -20,12 +17,14 @@ class SchemaController extends Controller
     public function __construct(Request $request)
     {
         $this->group_id = $request->get('group_id');
-        if(!$this->group_id){
+        if (! $this->group_id) {
             $group = CmsSchemaGroup::select()
-            ->where('active', true)
-            ->orderBy('name', 'desc')
-            ->first();
-            if($group) $this->group_id = $group->id;
+                ->where('active', true)
+                ->orderBy('name', 'desc')
+                ->first();
+            if ($group) {
+                $this->group_id = $group->id;
+            }
         }
 
         Inertia::share('group_id', $this->group_id);
@@ -40,18 +39,18 @@ class SchemaController extends Controller
         $group_id = $this->group_id;
 
         $groups = CmsSchemaGroup::select()
-        ->where('active', true)
-        ->orderBy('name', 'desc')
-        ->get();
+            ->where('active', true)
+            ->orderBy('name', 'desc')
+            ->get();
 
         $items = CmsSchema::withCount('articles')
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->where('group_id', $group_id)
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->where('group_id', $group_id)
+            ->paginate(15);
 
         return Inertia::render('admin/schemas/index', [
             'items' => $items,
@@ -65,6 +64,7 @@ class SchemaController extends Controller
     public function show($id, Request $request): Response
     {
         $item = CmsSchema::find($id);
+
         return Inertia::render('admin/schemas/view', [
             'item' => $item,
         ]);
@@ -76,6 +76,7 @@ class SchemaController extends Controller
         $args = [
             'group_id' => $this->group_id,
         ];
+
         return Inertia::render('admin/schemas/create', [
             'item' => $args,
             'groups' => $groups,
@@ -98,6 +99,7 @@ class SchemaController extends Controller
         $args = [
             'group_id' => $this->group_id,
         ];
+
         return redirect()->route('schemas.index', $args);
     }
 
@@ -108,6 +110,7 @@ class SchemaController extends Controller
     {
         $item = CmsSchema::find($id);
         $groups = CmsSchemaGroup::all();
+
         return Inertia::render('admin/schemas/edit', [
             'item' => $item,
             'groups' => $groups,
@@ -135,6 +138,7 @@ class SchemaController extends Controller
         $args = [
             'group_id' => $this->group_id,
         ];
+
         return redirect()->route('schemas.index', $args);
     }
 
@@ -157,6 +161,7 @@ class SchemaController extends Controller
     public function root()
     {
         $list = CmsSchema::whereNull('parent_id')->get();
+
         return response()->json($list);
     }
 

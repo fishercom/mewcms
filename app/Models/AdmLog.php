@@ -1,16 +1,18 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AdmLog extends Model {
-
+class AdmLog extends Model
+{
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-	protected $table = 'adm_logs';
+    protected $table = 'adm_logs';
+
     protected $fillable = ['event_id', 'user_id', 'comment'];
 
     public function user()
@@ -22,5 +24,4 @@ class AdmLog extends Model {
     {
         return $this->hasOne('App\Models\AdmEvent', 'id', 'event_id');
     }
-
 }

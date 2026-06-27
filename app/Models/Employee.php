@@ -15,7 +15,7 @@ class Employee extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        "tipo_documento", "nro_documento", "nombre", "apellido_paterno", "apellido_materno", "direccion", "departamento_id", "provincia_id", "distrito_id", "telefono", "celular", "email", "username", "password", "acepto_terminos", "estado",
+        'tipo_documento', 'nro_documento', 'nombre', 'apellido_paterno', 'apellido_materno', 'direccion', 'departamento_id', 'provincia_id', 'distrito_id', 'telefono', 'celular', 'email', 'username', 'password', 'acepto_terminos', 'estado',
     ];
 
     protected $casts = [
@@ -48,15 +48,15 @@ class Employee extends Authenticatable
 
     public function setPasswordAttribute($value)
     {
-        if(!empty($value)){
+        if (! empty($value)) {
             $this->attributes['password'] = \Hash::make($value);
         }
 
         return $this->attributes['password'];
     }
 
-    public function findForPassport($identifier) {
+    public function findForPassport($identifier)
+    {
         return $this->where('email', $identifier)->first();
     }
-
 }

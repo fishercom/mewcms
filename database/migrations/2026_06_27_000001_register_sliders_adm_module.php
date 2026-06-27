@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
-use App\Models\AdmEvent;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -13,13 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         $contenidoWebMenu = AdmMenu::where('name', 'Contenido Web')->first();
-        if ($contenidoWebMenu && !AdmModule::where('url', '/admin/sliders')->exists()) {
+        if ($contenidoWebMenu && ! AdmModule::where('url', '/admin/sliders')->exists()) {
             // Shift modules in "Contenido Web" with position >= 6 to make room at position 6
             AdmModule::where('menu_id', $contenidoWebMenu->id)
                 ->where('position', '>=', 6)
                 ->increment('position');
 
-            $module = new AdmModule();
+            $module = new AdmModule;
             $module->menu_id = $contenidoWebMenu->id;
             $module->name = 'Sliders (Carruseles)';
             $module->url = '/admin/sliders';
@@ -29,12 +29,12 @@ return new class extends Migration
             $module->save();
 
             // Register actions: Listar (1) & Administrar (2)
-            $event1 = new AdmEvent();
+            $event1 = new AdmEvent;
             $event1->module_id = $module->id;
             $event1->action_id = 1;
             $event1->save();
 
-            $event2 = new AdmEvent();
+            $event2 = new AdmEvent;
             $event2->module_id = $module->id;
             $event2->action_id = 2;
             $event2->save();

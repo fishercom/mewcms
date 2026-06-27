@@ -1,12 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
-use App\Models\AdmEvent;
 use App\Models\CmsConfig;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -17,13 +15,13 @@ return new class extends Migration
     {
         // 1. Register Administrative Module (only if not already present)
         $contenidoWebMenu = AdmMenu::where('name', 'Contenido Web')->first();
-        if ($contenidoWebMenu && !AdmModule::where('url', '/admin/layout')->exists()) {
+        if ($contenidoWebMenu && ! AdmModule::where('url', '/admin/layout')->exists()) {
             // Shift modules in "Contenido Web" with position >= 5 to make room at position 5
             AdmModule::where('menu_id', $contenidoWebMenu->id)
                 ->where('position', '>=', 5)
                 ->increment('position');
 
-            $module = new AdmModule();
+            $module = new AdmModule;
             $module->menu_id = $contenidoWebMenu->id;
             $module->name = 'Configuración del Sitio';
             $module->url = '/admin/layout';
@@ -33,12 +31,12 @@ return new class extends Migration
             $module->save();
 
             // Register actions: Listar (1) & Administrar (2)
-            $event1 = new AdmEvent();
+            $event1 = new AdmEvent;
             $event1->module_id = $module->id;
             $event1->action_id = 1;
             $event1->save();
 
-            $event2 = new AdmEvent();
+            $event2 = new AdmEvent;
             $event2->module_id = $module->id;
             $event2->action_id = 2;
             $event2->save();
@@ -51,7 +49,7 @@ return new class extends Migration
         $configs = [
             ['type' => 'string', 'name' => 'Logo de Cabecera (URL)', 'alias' => 'layout_header_logo', 'value' => null],
             ['type' => 'string', 'name' => 'Logo de Pie de Página (URL)', 'alias' => 'layout_footer_logo', 'value' => null],
-            ['type' => 'string', 'name' => 'Texto Copyright', 'alias' => 'layout_copyright', 'value' => '© ' . date('Y') . ' MewCMS. Powered by Laravel, Inertia, and React.'],
+            ['type' => 'string', 'name' => 'Texto Copyright', 'alias' => 'layout_copyright', 'value' => '© '.date('Y').' MewCMS. Powered by Laravel, Inertia, and React.'],
             ['type' => 'string', 'name' => 'Facebook Link', 'alias' => 'layout_facebook', 'value' => ''],
             ['type' => 'string', 'name' => 'Instagram Link', 'alias' => 'layout_instagram', 'value' => ''],
             ['type' => 'string', 'name' => 'Twitter/X Link', 'alias' => 'layout_twitter', 'value' => ''],
@@ -66,7 +64,7 @@ return new class extends Migration
                 [
                     'type' => $config['type'],
                     'name' => $config['name'],
-                    'value' => $config['value']
+                    'value' => $config['value'],
                 ]
             );
         }

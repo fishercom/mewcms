@@ -39,17 +39,17 @@ class CmsPostType extends Model
             if ($webMenu) {
                 $nextPos = AdmModule::where('menu_id', $webMenu->id)->max('position') + 1;
 
-                $module = new AdmModule();
+                $module = new AdmModule;
                 $module->menu_id = $webMenu->id;
                 $module->name = $cpt->name;
-                $module->url = '/admin/posts?post_type=' . $cpt->slug;
+                $module->url = '/admin/posts?post_type='.$cpt->slug;
                 $module->icon = $cpt->icon ?: 'book-open';
                 $module->position = $nextPos;
                 $module->visible = true;
                 $module->save();
 
                 foreach ([1, 2] as $actionId) {
-                    $event = new AdmEvent();
+                    $event = new AdmEvent;
                     $event->module_id = $module->id;
                     $event->action_id = $actionId;
                     $event->save();
@@ -58,17 +58,17 @@ class CmsPostType extends Model
         });
 
         static::updated(function ($cpt) {
-            $module = AdmModule::where('url', '/admin/posts?post_type=' . $cpt->getOriginal('slug'))->first();
+            $module = AdmModule::where('url', '/admin/posts?post_type='.$cpt->getOriginal('slug'))->first();
             if ($module) {
                 $module->name = $cpt->name;
-                $module->url = '/admin/posts?post_type=' . $cpt->slug;
+                $module->url = '/admin/posts?post_type='.$cpt->slug;
                 $module->icon = $cpt->icon ?: 'book-open';
                 $module->save();
             }
         });
 
         static::deleted(function ($cpt) {
-            $module = AdmModule::where('url', '/admin/posts?post_type=' . $cpt->slug)->first();
+            $module = AdmModule::where('url', '/admin/posts?post_type='.$cpt->slug)->first();
             if ($module) {
                 AdmEvent::where('module_id', $module->id)->delete();
                 $module->delete();

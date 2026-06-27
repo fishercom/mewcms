@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -47,7 +47,7 @@ class User extends Authenticatable
 
     public function setPasswordAttribute($value)
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             $info = \Hash::info($value);
             $this->attributes['password'] = ($info['algo'] === null) ? \Hash::make($value) : $value;
         }
@@ -55,8 +55,8 @@ class User extends Authenticatable
         return $this->attributes['password'];
     }
 
-    public function findForPassport($identifier) {
+    public function findForPassport($identifier)
+    {
         return $this->where('email', $identifier)->first();
     }
-
 }

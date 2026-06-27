@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateCmsParametersTable extends Migration
 {
@@ -25,9 +25,9 @@ class CreateCmsParametersTable extends Migration
             $table->timestamps();
 
             $table->foreign('group_id')
-                  ->references('id')
-                  ->on('cms_parameters_group')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('cms_parameters_group')
+                ->onDelete('cascade');
 
         });
     }

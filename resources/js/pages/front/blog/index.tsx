@@ -6,7 +6,7 @@ import { CmsArticle } from '@/types/models/cms-article';
 import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
 import { Pagination } from '@/types';
 import { format } from 'date-fns';
-import { Calendar, User, ArrowRight, Search, Tag, BookOpen } from 'lucide-react';
+import { Calendar, User, ArrowRight, Search, BookOpen } from 'lucide-react';
 import FrontSidebar from '../components/sidebar';
 
 interface Props {

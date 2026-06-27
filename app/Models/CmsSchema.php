@@ -1,23 +1,26 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Rutorika\Sortable\SortableTrait;
 
-class CmsSchema extends Model {
+class CmsSchema extends Model
+{
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    use SortableTrait;
 
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array
-	 */
+    protected $table = 'cms_schemas';
 
-	use \Rutorika\Sortable\SortableTrait;
+    protected $fillable = ['group_id', 'name', 'fields', 'front_view', 'active'];
 
-	protected $table = 'cms_schemas';
-	protected $fillable = ['group_id', 'name', 'fields', 'front_view', 'active'];
+    protected static $sortableField = 'position';
 
-	protected static $sortableField = 'position';
-	protected static $sortableGroupField = 'group_id';
+    protected static $sortableGroupField = 'group_id';
 
     protected $casts = [
         'fields' => 'array',
@@ -41,26 +44,26 @@ class CmsSchema extends Model {
     public static function getAvailableTemplates()
     {
         $directory = resource_path('js/pages/front/templates');
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             return [];
         }
 
         $templates = [];
         $files = scandir($directory);
         foreach ($files as $file) {
-            if ($file === '.' || $file === '..' || !str_ends_with($file, '.tsx')) {
+            if ($file === '.' || $file === '..' || ! str_ends_with($file, '.tsx')) {
                 continue;
             }
 
-            $filePath = $directory . '/' . $file;
+            $filePath = $directory.'/'.$file;
             $content = file_get_contents($filePath);
-            
+
             $templateName = null;
             if (preg_match('/Template\s+Name:\s*([^\r\n\*]+)/i', $content, $matches)) {
                 $templateName = trim($matches[1]);
             }
 
-            if (!$templateName) {
+            if (! $templateName) {
                 $templateName = ucfirst(basename($file, '.tsx'));
             }
 
@@ -69,7 +72,7 @@ class CmsSchema extends Model {
                 $unique = filter_var(trim($matches[1]), FILTER_VALIDATE_BOOLEAN);
             }
 
-            $value = 'front/templates/' . basename($file, '.tsx');
+            $value = 'front/templates/'.basename($file, '.tsx');
 
             $templates[] = [
                 'name' => $templateName,
@@ -84,15 +87,15 @@ class CmsSchema extends Model {
 
     public function isUnique(): bool
     {
-        if (!$this->front_view) {
+        if (! $this->front_view) {
             return false;
         }
 
-        $filename = basename($this->front_view) . '.tsx';
+        $filename = basename($this->front_view).'.tsx';
         $directory = resource_path('js/pages/front/templates');
-        $filePath = $directory . '/' . $filename;
+        $filePath = $directory.'/'.$filename;
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return false;
         }
 

@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
-
 use App\Models\CmsForm;
 use App\Models\CmsNotify;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class NotifyController extends Controller
 {
@@ -24,12 +21,13 @@ class NotifyController extends Controller
         $s = $request->get('s');
 
         $items = CmsNotify::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/notifies/index', [
             'items' => $items,
         ]);
@@ -39,6 +37,7 @@ class NotifyController extends Controller
     {
         $forms = CmsForm::all();
         $users = User::all();
+
         return Inertia::render('admin/notifies/create', [
             'forms' => $forms,
             'users' => $users,
@@ -49,6 +48,7 @@ class NotifyController extends Controller
     {
         $profile = new CmsNotify($request->all());
         $profile->save();
+
         return redirect('admin/notifies');
     }
 
@@ -60,6 +60,7 @@ class NotifyController extends Controller
         $item = CmsNotify::find($id);
         $forms = CmsForm::all();
         $users = User::all();
+
         return Inertia::render('admin/notifies/edit', [
             'item' => $item,
             'forms' => $forms,
@@ -73,8 +74,8 @@ class NotifyController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = CmsNotify::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         return redirect('admin/notifies');
     }
@@ -85,7 +86,7 @@ class NotifyController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = CmsNotify::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/notifies');
     }

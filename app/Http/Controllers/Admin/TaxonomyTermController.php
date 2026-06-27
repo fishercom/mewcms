@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CmsTaxonomy;
+use App\Models\CmsTaxonomyTerm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\CmsTaxonomy;
-use App\Models\CmsTaxonomyTerm;
 
 class TaxonomyTermController extends Controller
 {
@@ -19,8 +19,8 @@ class TaxonomyTermController extends Controller
 
         $items = CmsTaxonomyTerm::with('parent')
             ->where('taxonomy_id', $taxonomyId)
-            ->where(function($query) use($s){
-                if(!empty($s)){
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
@@ -51,7 +51,7 @@ class TaxonomyTermController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_taxonomy_terms,slug,NULL,id,taxonomy_id,' . $taxonomyId,
+            'slug' => 'nullable|string|max:255|unique:cms_taxonomy_terms,slug,NULL,id,taxonomy_id,'.$taxonomyId,
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:cms_taxonomy_terms,id',
             'active' => 'boolean',
@@ -61,7 +61,7 @@ class TaxonomyTermController extends Controller
         $term->taxonomy_id = $taxonomyId;
         $term->save();
 
-        return redirect('admin/taxonomies/' . $taxonomyId . '/terms');
+        return redirect('admin/taxonomies/'.$taxonomyId.'/terms');
     }
 
     public function edit($id): Response
@@ -87,7 +87,7 @@ class TaxonomyTermController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_taxonomy_terms,slug,' . $id . ',id,taxonomy_id,' . $item->taxonomy_id,
+            'slug' => 'nullable|string|max:255|unique:cms_taxonomy_terms,slug,'.$id.',id,taxonomy_id,'.$item->taxonomy_id,
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:cms_taxonomy_terms,id|different:id',
             'active' => 'boolean',
@@ -98,12 +98,12 @@ class TaxonomyTermController extends Controller
         }
 
         $item->fill($request->except('slug'));
-        if (!empty($request->slug)) {
+        if (! empty($request->slug)) {
             $item->slug = $request->slug;
         }
         $item->save();
 
-        return redirect('admin/taxonomies/' . $item->taxonomy_id . '/terms');
+        return redirect('admin/taxonomies/'.$item->taxonomy_id.'/terms');
     }
 
     public function destroy($id): RedirectResponse
@@ -112,7 +112,7 @@ class TaxonomyTermController extends Controller
         $taxonomyId = $item->taxonomy_id;
         $item->delete();
 
-        return redirect('admin/taxonomies/' . $taxonomyId . '/terms');
+        return redirect('admin/taxonomies/'.$taxonomyId.'/terms');
     }
 
     public function sort(Request $request)

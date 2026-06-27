@@ -110,6 +110,7 @@ export default function QuickMediaDrawer({
             } else {
                 alert(response.data.error || 'Error al crear carpeta');
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Folder creation error:', error);
             const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al crear carpeta.';
@@ -153,6 +154,7 @@ export default function QuickMediaDrawer({
                         );
                     }
                 });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 console.error(`Upload failed for ${file.name}:`, error);
                 const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al subir el archivo.';
@@ -209,6 +211,7 @@ export default function QuickMediaDrawer({
             } else {
                 alert('Error al eliminar el elemento');
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Delete item error:', error);
             const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al eliminar el elemento.';

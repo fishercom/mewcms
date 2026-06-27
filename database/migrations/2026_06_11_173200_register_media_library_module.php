@@ -1,11 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
-use App\Models\AdmEvent;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -21,7 +19,7 @@ return new class extends Migration
                 ->where('position', '>=', 4)
                 ->increment('position');
 
-            $module = new AdmModule();
+            $module = new AdmModule;
             $module->menu_id = $contenidoWebMenu->id;
             $module->name = 'Biblioteca de Medios';
             $module->url = '/admin/media';
@@ -31,12 +29,12 @@ return new class extends Migration
             $module->save();
 
             // Register actions: Listar (1) & Administrar (2)
-            $event1 = new AdmEvent();
+            $event1 = new AdmEvent;
             $event1->module_id = $module->id;
             $event1->action_id = 1;
             $event1->save();
 
-            $event2 = new AdmEvent();
+            $event2 = new AdmEvent;
             $event2->module_id = $module->id;
             $event2->action_id = 2;
             $event2->save();

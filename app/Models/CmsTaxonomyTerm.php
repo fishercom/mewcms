@@ -1,19 +1,22 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
 
-class CmsTaxonomyTerm extends Model {
-
+class CmsTaxonomyTerm extends Model
+{
     use Sluggable;
     use SortableTrait;
 
     protected $table = 'cms_taxonomy_terms';
+
     protected $fillable = ['taxonomy_id', 'parent_id', 'name', 'slug', 'description', 'active', 'position'];
 
     protected static $sortableField = 'position';
+
     protected static $sortableGroupField = ['taxonomy_id', 'parent_id'];
 
     protected $casts = [
@@ -24,8 +27,8 @@ class CmsTaxonomyTerm extends Model {
     {
         return [
             'slug' => [
-                'source' => 'name'
-            ]
+                'source' => 'name',
+            ],
         ];
     }
 

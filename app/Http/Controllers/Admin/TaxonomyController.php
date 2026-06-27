@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CmsTaxonomy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\CmsTaxonomy;
 
 class TaxonomyController extends Controller
 {
@@ -16,8 +16,8 @@ class TaxonomyController extends Controller
         $s = $request->get('s');
 
         $items = CmsTaxonomy::select()
-            ->where(function($query) use($s){
-                if(!empty($s)){
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
@@ -52,6 +52,7 @@ class TaxonomyController extends Controller
     public function edit($id): Response
     {
         $item = CmsTaxonomy::findOrFail($id);
+
         return Inertia::render('admin/taxonomies/edit', [
             'item' => $item,
         ]);
@@ -63,7 +64,7 @@ class TaxonomyController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_taxonomies,slug,' . $id,
+            'slug' => 'nullable|string|max:255|unique:cms_taxonomies,slug,'.$id,
             'description' => 'nullable|string',
             'active' => 'boolean',
         ]);
@@ -74,7 +75,7 @@ class TaxonomyController extends Controller
         }
 
         $item->fill($request->except('slug'));
-        if (!empty($request->slug)) {
+        if (! empty($request->slug)) {
             $item->slug = $request->slug;
         }
         $item->save();

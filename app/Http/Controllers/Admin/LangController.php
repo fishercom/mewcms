@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\CmsLang;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Models\CmsLang;
 
 class LangController extends Controller
 {
@@ -22,12 +19,13 @@ class LangController extends Controller
         $s = $request->get('s');
 
         $items = CmsLang::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/langs/index', [
             'items' => $items,
         ]);
@@ -35,13 +33,14 @@ class LangController extends Controller
 
     public function create()
     {
-      return Inertia::render('admin/langs/create');
+        return Inertia::render('admin/langs/create');
     }
 
     public function store(Request $request)
     {
         $lang = new CmsLang($request->all());
         $lang->save();
+
         return redirect('admin/langs');
     }
 
@@ -51,6 +50,7 @@ class LangController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsLang::find($id);
+
         return Inertia::render('admin/langs/edit', [
             'item' => $item,
         ]);
@@ -62,8 +62,8 @@ class LangController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = CmsLang::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         return redirect('admin/langs');
     }
@@ -74,7 +74,7 @@ class LangController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = CmsLang::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/langs');
     }

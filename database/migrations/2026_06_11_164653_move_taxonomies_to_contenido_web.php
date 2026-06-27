@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -15,7 +13,7 @@ return new class extends Migration
     {
         $taxonomiesModule = AdmModule::where('url', '/admin/taxonomies')->first();
         $contenidoWebMenu = AdmMenu::where('name', 'Contenido Web')->first();
-        
+
         if ($taxonomiesModule && $contenidoWebMenu) {
             $oldMenuId = $taxonomiesModule->menu_id;
             $oldPosition = $taxonomiesModule->position;

@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
+use App\Models\CmsArticle;
+use App\Models\CmsMenu;
+use App\Models\CmsMenuItem;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\CmsMenu;
-use App\Models\CmsMenuItem;
 
 class MenuController extends Controller
 {
@@ -18,8 +19,8 @@ class MenuController extends Controller
         $s = $request->get('s');
 
         $items = CmsMenu::select()
-            ->where(function($query) use($s){
-                if(!empty($s)){
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
@@ -52,11 +53,11 @@ class MenuController extends Controller
 
     public function edit($id): Response
     {
-        $item = CmsMenu::with(['items' => function($q) {
+        $item = CmsMenu::with(['items' => function ($q) {
             $q->orderBy('position');
         }])->findOrFail($id);
 
-        $articles = \App\Models\CmsArticle::where('active', true)
+        $articles = CmsArticle::where('active', true)
             ->orderBy('title')
             ->get(['id', 'title', 'slug']);
 
@@ -72,7 +73,7 @@ class MenuController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_menus,slug,' . $id,
+            'slug' => 'nullable|string|max:255|unique:cms_menus,slug,'.$id,
             'description' => 'nullable|string',
             'active' => 'boolean',
         ]);
@@ -82,7 +83,7 @@ class MenuController extends Controller
         }
 
         $item->fill($request->except('slug'));
-        if (!empty($request->slug)) {
+        if (! empty($request->slug)) {
             $item->slug = $request->slug;
         }
         $item->save();
@@ -115,7 +116,7 @@ class MenuController extends Controller
             'active' => 'boolean',
         ]);
 
-        if (!empty($data['id'])) {
+        if (! empty($data['id'])) {
             $menuItem = CmsMenuItem::where('menu_id', $menu->id)->findOrFail($data['id']);
             $menuItem->update($data);
         } else {
@@ -141,7 +142,7 @@ class MenuController extends Controller
                 ->where('id', $itemData['id'])
                 ->update([
                     'position' => $index,
-                    'parent_id' => $itemData['parent_id'] ?? null
+                    'parent_id' => $itemData['parent_id'] ?? null,
                 ]);
         }
 

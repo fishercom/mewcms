@@ -18,9 +18,9 @@ class PostTypeController extends Controller
 
         $items = CmsPostType::with('default_schema')
             ->where(function ($query) use ($s) {
-                if (!empty($s)) {
-                    $query->where('name', 'LIKE', '%' . str_replace(' ', '%', $s) . '%')
-                        ->orWhere('slug', 'LIKE', '%' . str_replace(' ', '%', $s) . '%');
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%')
+                        ->orWhere('slug', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
             ->paginate(15);
@@ -33,6 +33,7 @@ class PostTypeController extends Controller
     public function create(): Response
     {
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
+
         return Inertia::render('admin/post-types/create', [
             'schemas' => $schemas,
         ]);
@@ -74,7 +75,7 @@ class PostTypeController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'singular_name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:cms_post_types,slug,' . $id,
+            'slug' => 'required|string|max:255|unique:cms_post_types,slug,'.$id,
             'icon' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'default_schema_id' => 'nullable|integer|exists:cms_schemas,id',

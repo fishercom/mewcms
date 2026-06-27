@@ -16,7 +16,7 @@ return new class extends Migration
         });
 
         // Migrate existing HOME and OPTIONS schema types to PAGE
-        \DB::table('cms_schemas')
+        DB::table('cms_schemas')
             ->whereIn('type', ['HOME', 'OPTIONS'])
             ->update(['type' => 'PAGE']);
     }

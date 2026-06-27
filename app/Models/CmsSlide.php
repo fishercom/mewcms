@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Rutorika\Sortable\SortableTrait;
 
 class CmsSlide extends Model
 {
-    use \Rutorika\Sortable\SortableTrait;
+    use SortableTrait;
 
     protected $table = 'cms_slides';
 
@@ -21,6 +22,7 @@ class CmsSlide extends Model
     ];
 
     protected static $sortableField = 'position';
+
     protected static $sortableGroupField = 'slider_id';
 
     protected $casts = [

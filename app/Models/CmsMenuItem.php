@@ -1,11 +1,13 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CmsMenuItem extends Model {
-
+class CmsMenuItem extends Model
+{
     protected $table = 'cms_menu_items';
+
     protected $fillable = ['menu_id', 'parent_id', 'title', 'url', 'article_id', 'target', 'position', 'active'];
 
     protected $casts = [
@@ -45,11 +47,13 @@ class CmsMenuItem extends Model {
     {
         if ($this->article_id && $this->article) {
             $slug = $this->article->slug;
-            if (!$slug || $slug === 'home' || $slug === 'home-page') {
+            if (! $slug || $slug === 'home' || $slug === 'home-page') {
                 return '/';
             }
-            return '/' . str_replace('_', '/', $slug);
+
+            return '/'.str_replace('_', '/', $slug);
         }
+
         return $this->url;
     }
 }

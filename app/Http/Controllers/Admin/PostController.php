@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CmsLang;
 use App\Models\CmsPost;
 use App\Models\CmsPostType;
-use App\Models\CmsLang;
 use App\Models\CmsSchema;
-use App\Models\User;
 use App\Models\CmsTaxonomy;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +17,14 @@ use Inertia\Response;
 
 class PostController extends Controller
 {
-    protected $lang_id, $post_type;
+    protected $lang_id;
+
+    protected $post_type;
 
     public function __construct(Request $request)
     {
         $this->lang_id = $request->get('lang_id');
-        if (!$this->lang_id) {
+        if (! $this->lang_id) {
             $lang = CmsLang::where('active', true)
                 ->orderBy('name', 'desc')
                 ->first();
@@ -46,11 +48,11 @@ class PostController extends Controller
             ->where('lang_id', $this->lang_id)
             ->where('post_type', $this->post_type);
 
-        if (!empty($s)) {
-            $query->where('title', 'LIKE', '%' . str_replace(' ', '%', $s) . '%');
+        if (! empty($s)) {
+            $query->where('title', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
         }
 
-        if (!empty($status)) {
+        if (! empty($status)) {
             $query->where('status', $status);
         }
 
@@ -102,7 +104,7 @@ class PostController extends Controller
             'content' => '',
             'excerpt' => '',
             'featured_image' => '',
-            'metadata' => new \stdClass(),
+            'metadata' => new \stdClass,
             'status' => 'draft',
             'published_at' => now()->format('Y-m-d\TH:i'),
             'active' => true,
@@ -136,7 +138,7 @@ class PostController extends Controller
         $post = new CmsPost($request->except('term_ids'));
         $post->post_type = $this->post_type;
         $post->lang_id = $this->lang_id;
-        
+
         if (empty($post->published_at)) {
             $post->published_at = now();
         }
@@ -157,7 +159,7 @@ class PostController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsPost::with(['terms'])->findOrFail($id);
-        
+
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
         $authors = User::where('active', 1)->get(['id', 'name', 'username']);
         $taxonomies = CmsTaxonomy::with(['terms' => function ($query) {
@@ -191,7 +193,7 @@ class PostController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:cms_posts,slug,' . $id,
+            'slug' => 'required|string|max:255|unique:cms_posts,slug,'.$id,
             'status' => 'required|string|in:draft,published',
             'published_at' => 'nullable|date',
             'schema_id' => 'nullable|integer|exists:cms_schemas,id',
@@ -206,15 +208,15 @@ class PostController extends Controller
         }
 
         $post->update($request->except('term_ids', 'slug'));
-        
-        if (!empty($request->slug)) {
+
+        if (! empty($request->slug)) {
             $post->slug = $request->slug;
         }
-        
+
         if (empty($post->published_at)) {
             $post->published_at = now();
         }
-        
+
         $post->save();
 
         if ($request->has('term_ids')) {

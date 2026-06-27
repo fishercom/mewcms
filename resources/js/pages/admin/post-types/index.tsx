@@ -38,6 +38,7 @@ export default function Index() {
 
     // Helper to render Lucide icon by name
     const renderIcon = (iconName: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const IconComponent = (LucideIcons as any)[iconName];
         if (IconComponent) {
             return <IconComponent className="h-4 w-4 text-zinc-500" />;

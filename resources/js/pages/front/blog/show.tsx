@@ -6,7 +6,7 @@ import { CmsArticle } from '@/types/models/cms-article';
 import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
 import { format } from 'date-fns';
 import FrontSidebar from '../components/sidebar';
-import { Calendar, User, ArrowLeft, Tag, BookOpen, Settings } from 'lucide-react';
+import { Calendar, User, ArrowLeft, Tag, Settings } from 'lucide-react';
 
 interface Props {
     post: CmsPost;

@@ -61,7 +61,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('cms_schemas')
                 ->nullOnDelete();
-                
+
             $table->index('post_type');
         });
 

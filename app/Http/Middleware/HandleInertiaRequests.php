@@ -2,12 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\AdmMenu;
+use App\Models\CmsConfig;
+use App\Models\CmsMenu;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
-use App\Models\AdmMenu;
-use App\Models\AdmModule;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -42,26 +43,26 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         $groups = AdmMenu::select()
-        ->where('visible', true)
-        ->orderBy('position', 'asc')
-        ->get();
+            ->where('visible', true)
+            ->orderBy('position', 'asc')
+            ->get();
 
         $adm_menu = [];
-        foreach($groups as $group){
+        foreach ($groups as $group) {
             $modules = $group->modules;
 
             $items = [];
-            foreach($modules as $module){
-                $items[] = ['id'=>$module->id, 'title'=>$module->name, 'description'=>$module->description, 'url'=>$module->url, 'icon'=>$module->icon];
+            foreach ($modules as $module) {
+                $items[] = ['id' => $module->id, 'title' => $module->name, 'description' => $module->description, 'url' => $module->url, 'icon' => $module->icon];
             }
-            $adm_menu[] = ['id'=>$group->id, 'title' => $group->name, 'items'=>$items];
+            $adm_menu[] = ['id' => $group->id, 'title' => $group->name, 'items' => $items];
         }
 
-        $menus = \App\Models\CmsMenu::with(['items' => function ($query) {
+        $menus = CmsMenu::with(['items' => function ($query) {
             $query->where('active', true)->orderBy('position')->with('article');
         }])->where('active', true)->get();
 
-        $layoutConfigs = \App\Models\CmsConfig::where('alias', 'like', 'layout_%')->get();
+        $layoutConfigs = CmsConfig::where('alias', 'like', 'layout_%')->get();
         $layoutSettings = [];
         foreach ($layoutConfigs as $config) {
             $layoutSettings[$config->alias] = $config->value;
@@ -80,7 +81,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'adm_menu' => $adm_menu,
             'menus' => $menus,
-            'layout_settings' => $layoutSettings
+            'layout_settings' => $layoutSettings,
         ];
     }
 }

@@ -2,20 +2,17 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { getSchemas } from '@/services/schemas';
-import { CmsArticle } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   parentSchemaId: number | undefined;
-  data: CmsArticle[]
 }
 
-export default function SchemaSelectorModal({ isOpen, onClose, parentSchemaId, data }: Props) {
+export default function SchemaSelectorModal({ isOpen, onClose, parentSchemaId }: Props) {
   const [schemas, setSchemas] = useState<CmsSchema[]>([]);
   const [loading, setLoading] = useState(false);
-  const items = data;
 
   useEffect(() => {
     if (isOpen) {

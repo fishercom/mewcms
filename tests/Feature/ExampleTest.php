@@ -1,19 +1,22 @@
 <?php
 
 use App\Models\CmsArticle;
+use App\Models\CmsLang;
 use App\Models\CmsSchema;
+use App\Models\CmsSchemaGroup;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 it('returns a successful response', function () {
-    $group = \App\Models\CmsSchemaGroup::create([
+    $group = CmsSchemaGroup::create([
         'name' => 'Default Group',
         'layout' => 'layout',
         'default' => 1,
         'active' => 1,
     ]);
 
-    $lang = \App\Models\CmsLang::create([
+    $lang = CmsLang::create([
         'name' => 'English',
         'iso' => 'en',
         'active' => 1,

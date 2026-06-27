@@ -25,7 +25,7 @@ class CmsSlider extends Model
     public static function getSlider($key)
     {
         return self::where('key', $key)
-            ->with(['slides' => function($query) {
+            ->with(['slides' => function ($query) {
                 $query->where('active', true)->orderBy('position');
             }])
             ->first();

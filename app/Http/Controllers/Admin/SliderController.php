@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CmsSlider;
 use App\Models\CmsSlide;
+use App\Models\CmsSlider;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\JsonResponse;
 
 class SliderController extends Controller
 {
@@ -21,9 +21,9 @@ class SliderController extends Controller
         $s = $request->get('s');
         $items = CmsSlider::withCount('slides')
             ->where(function ($query) use ($s) {
-                if (!empty($s)) {
-                    $query->where('name', 'LIKE', '%' . str_replace(' ', '%', $s) . '%')
-                        ->orWhere('key', 'LIKE', '%' . str_replace(' ', '%', $s) . '%');
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%')
+                        ->orWhere('key', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
             ->paginate(15);
@@ -79,7 +79,7 @@ class SliderController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'key' => 'required|string|max:255|unique:cms_sliders,key,' . $id,
+            'key' => 'required|string|max:255|unique:cms_sliders,key,'.$id,
             'description' => 'nullable|string',
             'settings' => 'array',
             'slides' => 'array',
@@ -99,7 +99,7 @@ class SliderController extends Controller
         $updatedSlideIds = [];
 
         foreach ($slidesData as $index => $slideData) {
-            if (!empty($slideData['id']) && is_numeric($slideData['id'])) {
+            if (! empty($slideData['id']) && is_numeric($slideData['id'])) {
                 // Update existing
                 $slide = CmsSlide::findOrFail($slideData['id']);
                 $slide->update([
@@ -150,6 +150,7 @@ class SliderController extends Controller
     public function apiList(): JsonResponse
     {
         $sliders = CmsSlider::select('id', 'name', 'key')->orderBy('name')->get();
+
         return response()->json($sliders);
     }
 }

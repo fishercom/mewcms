@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Model;
 
-class CmsTaxonomy extends Model {
-
+class CmsTaxonomy extends Model
+{
     use Sluggable;
 
     protected $table = 'cms_taxonomies';
+
     protected $fillable = ['name', 'slug', 'description', 'active'];
 
     protected $casts = [
@@ -19,8 +21,8 @@ class CmsTaxonomy extends Model {
     {
         return [
             'slug' => [
-                'source' => 'name'
-            ]
+                'source' => 'name',
+            ],
         ];
     }
 

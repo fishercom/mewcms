@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdmLog;
+use App\Models\CmsArticle;
+use App\Models\CmsRegister;
+use App\Models\CmsTaxonomyTerm;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\CmsArticle;
-use App\Models\CmsTaxonomyTerm;
-use App\Models\CmsRegister;
-use App\Models\AdmLog;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -26,7 +25,7 @@ class DashboardController extends Controller
         $activeArticles = CmsArticle::where('active', '1')->count();
         $totalTerms = CmsTaxonomyTerm::count();
         $totalMessages = CmsRegister::count();
-        $unreviewedMessages = CmsRegister::where(function($query) {
+        $unreviewedMessages = CmsRegister::where(function ($query) {
             $query->where('review', 0)->orWhereNull('review');
         })->count();
 
@@ -51,13 +50,13 @@ class DashboardController extends Controller
 
         // Format size
         if ($totalSize >= 1073741824) {
-            $formattedSize = round($totalSize / 1073741824, 2) . ' GB';
+            $formattedSize = round($totalSize / 1073741824, 2).' GB';
         } elseif ($totalSize >= 1048576) {
-            $formattedSize = round($totalSize / 1048576, 2) . ' MB';
+            $formattedSize = round($totalSize / 1048576, 2).' MB';
         } elseif ($totalSize >= 1024) {
-            $formattedSize = round($totalSize / 1024, 2) . ' KB';
+            $formattedSize = round($totalSize / 1024, 2).' KB';
         } else {
-            $formattedSize = $totalSize . ' B';
+            $formattedSize = $totalSize.' B';
         }
 
         // 3. Recent Activity logs

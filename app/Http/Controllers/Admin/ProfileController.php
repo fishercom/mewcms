@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\AdmModule;
+use App\Models\AdmPermission;
+use App\Models\Profile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Models\Profile;
-use App\Models\AdmPermission;
 
 class ProfileController extends Controller
 {
@@ -23,12 +21,13 @@ class ProfileController extends Controller
         $s = $request->get('s');
 
         $items = Profile::select()
-        ->where(function($query) use($s){
-            if(!empty($s)){
-                $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-            }
-        })
-        ->paginate(15);
+            ->where(function ($query) use ($s) {
+                if (! empty($s)) {
+                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
+                }
+            })
+            ->paginate(15);
+
         return Inertia::render('admin/profiles/index', [
             'items' => $items,
         ]);
@@ -36,7 +35,8 @@ class ProfileController extends Controller
 
     public function create()
     {
-        $modules = \App\Models\AdmModule::with('events.action')->where('visible', true)->orderBy('name')->get();
+        $modules = AdmModule::with('events.action')->where('visible', true)->orderBy('name')->get();
+
         return Inertia::render('admin/profiles/create', [
             'modules' => $modules,
         ]);
@@ -65,7 +65,7 @@ class ProfileController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = Profile::find($id);
-        $modules = \App\Models\AdmModule::with('events.action')->where('visible', true)->orderBy('name')->get();
+        $modules = AdmModule::with('events.action')->where('visible', true)->orderBy('name')->get();
         $item->permissions = AdmPermission::where('profile_id', $id)->pluck('event_id')->toArray();
 
         return Inertia::render('admin/profiles/edit', [
@@ -80,8 +80,8 @@ class ProfileController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = Profile::find($id);
-		$item->fill($request->all());
-		$item->save();
+        $item->fill($request->all());
+        $item->save();
 
         AdmPermission::where('profile_id', $id)->delete();
 
@@ -103,7 +103,7 @@ class ProfileController extends Controller
     public function destroy($id, Request $request): RedirectResponse
     {
         $item = Profile::find($id);
-		$item->delete();
+        $item->delete();
 
         return redirect('admin/profiles');
     }
