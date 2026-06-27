@@ -16,9 +16,13 @@ export default function Create() {
     const initial: CmsArticleForm = {
         id: null,
         parent_id: null,
-        schema_id: Number(schema?.id || 1),
+        schema_id: schema?.id || null,
         lang_id: 1, // Assuming default lang_id
         title: '',
+        content: '',
+        excerpt: '',
+        featured_image: '',
+        status: 'published',
         metadata: {},
         slug: '',
         active: true,

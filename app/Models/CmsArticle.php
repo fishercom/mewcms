@@ -19,7 +19,7 @@ class CmsArticle extends Model
 
     protected $table = 'cms_articles';
 
-    protected $fillable = ['schema_id', 'parent_id', 'lang_id', 'title', 'metadata', 'slug', 'active'];
+    protected $fillable = ['schema_id', 'parent_id', 'lang_id', 'title', 'content', 'excerpt', 'featured_image', 'status', 'metadata', 'slug', 'active'];
 
     protected static $sortableField = 'position';
 
@@ -87,9 +87,10 @@ class CmsArticle extends Model
     public function submenu()
     {
         return $this->hasMany('App\Models\CmsArticle', 'parent_id', 'id')
-            ->whereIn('schema_id', CmsSchema::select('id')
-                ->where('type', 'PAGE')->get()->toArray()
-            )
+            ->where(function ($query) {
+                $query->whereIn('schema_id', CmsSchema::select('id')->where('type', 'PAGE')->get()->toArray())
+                    ->orWhereNull('schema_id');
+            })
             ->where('active', '1')
             ->orderBy('position');
     }

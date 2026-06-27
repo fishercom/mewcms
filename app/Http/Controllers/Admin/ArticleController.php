@@ -94,9 +94,6 @@ class ArticleController extends Controller
         })->values();
 
         $schemaId = $request->get('schema_id');
-        if (! $schemaId && $schemas->isNotEmpty()) {
-            $schemaId = $schemas->first()->id;
-        }
         $schema = $schemaId ? CmsSchema::find($schemaId) : null;
 
         $args = [
@@ -105,6 +102,10 @@ class ArticleController extends Controller
             'parent_id' => null,
             'schema_id' => $schemaId,
             'title' => '',
+            'content' => '',
+            'excerpt' => '',
+            'featured_image' => '',
+            'status' => 'published',
             'metadata' => new \stdClass,
             'slug' => '',
             'active' => true,
@@ -135,12 +136,16 @@ class ArticleController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'schema_id' => 'required|integer|exists:cms_schemas,id',
+            'schema_id' => 'nullable|integer|exists:cms_schemas,id',
             'parent_id' => 'nullable|integer|exists:cms_articles,id',
+            'content' => 'nullable|string',
+            'excerpt' => 'nullable|string',
+            'featured_image' => 'nullable|string|max:2048',
+            'status' => 'nullable|string|max:20',
         ]);
 
         $schemaId = $request->input('schema_id');
-        $schema = CmsSchema::find($schemaId);
+        $schema = $schemaId ? CmsSchema::find($schemaId) : null;
         $parentId = $request->input('parent_id');
 
         if ($schema && $schema->isUnique()) {
@@ -230,12 +235,16 @@ class ArticleController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'schema_id' => 'required|integer|exists:cms_schemas,id',
+            'schema_id' => 'nullable|integer|exists:cms_schemas,id',
             'parent_id' => 'nullable|integer|exists:cms_articles,id',
+            'content' => 'nullable|string',
+            'excerpt' => 'nullable|string',
+            'featured_image' => 'nullable|string|max:2048',
+            'status' => 'nullable|string|max:20',
         ]);
 
         $schemaId = $request->input('schema_id');
-        $schema = CmsSchema::find($schemaId);
+        $schema = $schemaId ? CmsSchema::find($schemaId) : null;
         $parentId = $request->input('parent_id');
         $item = CmsArticle::findOrFail($id);
 

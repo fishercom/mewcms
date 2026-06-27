@@ -102,10 +102,11 @@ export default function Index() {
                         <thead className="text-sm text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="px-4 py-3 rounded-l-md">Nombre</th>
+                                <th scope="col" className="px-4 py-3">Plantilla</th>
                                 <th scope="col" className="px-4 py-3">Página Superior</th>
+                                <th scope="col" className="px-4 py-3">Estado</th>
                                 <th scope="col" className="px-4 py-3">Activo</th>
                                 <th scope="col" className="px-4 py-3">Fecha de Creación</th>
-                                <th scope="col" className="px-4 py-3">Fecha de Actualización</th>
                                 <th scope="col" className="px-4 py-3 rounded-r-md"></th>
                             </tr>
                         </thead>
@@ -143,11 +144,22 @@ export default function Index() {
                                     </span>
                                 </th>
                                 <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                    {item.schema ? item.schema.name : <span className="text-zinc-400 italic">Ninguna</span>}
+                                </td>
+                                <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
                                     {item.parent ? item.parent.title : <span className="text-gray-300 dark:text-gray-600">Ninguna</span>}
+                                </td>
+                                <td className="px-4 py-3">
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                        item.status === 'published' || !item.status
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-950/20 dark:text-green-400'
+                                            : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400'
+                                    }`}>
+                                        {item.status === 'published' || !item.status ? 'Publicado' : 'Borrador'}
+                                    </span>
                                 </td>
                                 <td className="px-4 py-3">{ item.active? <Check/>: <></> }</td>
                                 <td className="px-4 py-3">{ format(item.created_at, 'dd/MM/yyyy HH:mm') }</td>
-                                <td className="px-4 py-3">{ format(item.updated_at, 'dd/MM/yyyy HH:mm') }</td>
                                 <td className="px-4 py-3 flex items-center justify-end gap-2">
                                     <Button
                                         variant="outline"

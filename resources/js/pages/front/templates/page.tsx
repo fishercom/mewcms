@@ -69,6 +69,26 @@ export default function Page({ article, navigation }: PageProps) {
                     )}
                 </div>
 
+                {/* Main default page content (WordPress-style) */}
+                {article.featured_image && (
+                    <div className="w-full aspect-video md:aspect-[21/9] overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+                        <img src={article.featured_image} alt={article.title} className="w-full h-full object-cover" />
+                    </div>
+                )}
+
+                {article.excerpt && (
+                    <p className="text-sm font-medium text-zinc-650 dark:text-[#A1A09A] leading-relaxed italic border-l-2 border-red-500 dark:border-red-600 pl-4 py-1">
+                        {article.excerpt}
+                    </p>
+                )}
+
+                {article.content && (
+                    <div
+                        className="prose dark:prose-invert max-w-none text-sm leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: article.content }}
+                    />
+                )}
+
                 {/* Custom Metadata Render */}
                 <div className="space-y-6">
                     {Object.entries(meta)

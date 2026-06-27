@@ -76,11 +76,11 @@ class FrontController extends Controller
         }]);
 
         // Get template name from schema
-        $template = $article->schema->front_view;
+        $template = $article->schema?->front_view;
 
         if (empty($template)) {
             // Fallback to defaults based on schema type
-            $type = $article->schema->type ?? 'PAGE';
+            $type = $article->schema?->type ?? 'PAGE';
             if ($type === 'HOME') {
                 $template = 'front/templates/home';
             } elseif ($type === 'OPTIONS') {
