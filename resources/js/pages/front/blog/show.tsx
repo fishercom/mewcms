@@ -31,7 +31,7 @@ export default function Show({ post, cpt, navigation, allTaxonomies = [], recent
 
     // Filter out standard fields from custom metadata keys to print remaining fields cleanly
     const metadataEntries = Object.entries(post.metadata || {}).filter(
-        ([key]) => !['_id'].includes(key) && post.metadata[key] !== null && post.metadata[key] !== ''
+        ([key]) => !['_id'].includes(key) && !key.startsWith('seo_') && post.metadata[key] !== null && post.metadata[key] !== ''
     );
 
     return (

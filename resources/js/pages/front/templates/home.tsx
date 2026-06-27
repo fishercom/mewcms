@@ -58,7 +58,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 {Object.keys(meta).length > 3 && (
                     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                         {Object.entries(meta)
-                            .filter(([key]) => !['hero_title', 'hero_subtitle', 'hero_description', '_id'].includes(key))
+                            .filter(([key]) => !['hero_title', 'hero_subtitle', 'hero_description', '_id'].includes(key) && !key.startsWith('seo_'))
                             .map(([key, val]) => {
                                 if (typeof val !== 'object' && val) {
                                     return (

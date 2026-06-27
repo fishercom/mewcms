@@ -129,14 +129,14 @@ export default function Post({ article, navigation, allTaxonomies = [], recentAr
                     )}
 
                     {/* Additional custom metadata listing */}
-                    {Object.entries(meta).length > 2 && (
+                    {Object.entries(meta).filter(([key]) => !['body', 'content', 'descripcion', 'image', 'imagen', 'featured_image', '_id'].includes(key) && !key.startsWith('seo_')).length > 0 && (
                         <div className="pt-8 border-t border-[#19140010] dark:border-[#3E3E3A]/20 space-y-4">
                             <h4 className="text-xs uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A] font-semibold">
                                 Detalles del Post
                             </h4>
                             <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                                 {Object.entries(meta)
-                                    .filter(([key]) => !['body', 'content', 'descripcion', 'image', 'imagen', 'featured_image', '_id'].includes(key))
+                                    .filter(([key]) => !['body', 'content', 'descripcion', 'image', 'imagen', 'featured_image', '_id'].includes(key) && !key.startsWith('seo_'))
                                     .map(([key, val]) => (
                                         <div key={key} className="rounded-lg bg-gray-50 dark:bg-[#161615] p-3 text-xs">
                                             <dt className="font-semibold text-primary capitalize mb-1">

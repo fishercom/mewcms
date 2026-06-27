@@ -92,7 +92,7 @@ export default function Page({ article, navigation }: PageProps) {
                 {/* Custom Metadata Render */}
                 <div className="space-y-6">
                     {Object.entries(meta)
-                        .filter(([key]) => key !== '_id')
+                        .filter(([key]) => key !== '_id' && !key.startsWith('seo_'))
                         .map(([key, val]) => {
                             const readableKey = key.replace(/_/g, ' ');
 
