@@ -2,8 +2,8 @@
     "version": 2,
     "framework": null,
     "outputDirectory": "public",
-    "installCommand": "composer install --no-dev --optimize-autoloader && npm ci",
-    "buildCommand": "npm run build && php artisan config:cache && php artisan route:cache && php artisan migrate --force",
+    "installCommand": "curl -sS https://getcomposer.org/installer | php && php composer.phar install --no-dev --optimize-autoloader && npm ci",
+    "buildCommand": "npm run build && php composer.phar dump-autoload --optimize && php artisan config:cache && php artisan route:cache && php artisan migrate --force",
     "functions": {
         "api/index.php": {
             "runtime": "vercel-php@0.7.2"
