@@ -1,0 +1,17 @@
+# This file tells the Vercel CLI what to exclude from deployment uploads.
+# It intentionally does NOT exclude vendor/ or public/build/ so the
+# GitHub Action's pre-built artifact (with vendor + compiled assets) is
+# fully uploaded. All other standard ignores still apply.
+
+node_modules
+.git
+.github
+tests
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+.env
+.env.*
+!.env.example
+*.log
