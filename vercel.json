@@ -1,0 +1,27 @@
+{
+    "version": 2,
+    "framework": null,
+    "outputDirectory": "public",
+    "installCommand": "composer install --no-dev --optimize-autoloader && npm ci",
+    "buildCommand": "npm run build && php artisan config:cache && php artisan route:cache && php artisan migrate --force",
+    "functions": {
+        "api/index.php": {
+            "runtime": "vercel-php@0.7.2"
+        }
+    },
+    "routes": [
+        {
+            "src": "/build/(.*)",
+            "dest": "/build/$1"
+        },
+        {
+            "src": "/(.*\\.(ico|png|svg|jpg|jpeg|gif|webp|css|js|woff|woff2|ttf|otf|eot|map))",
+            "dest": "/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ]
+}
+
