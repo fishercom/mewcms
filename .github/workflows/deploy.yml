@@ -43,7 +43,6 @@ jobs:
         run: |
           touch /tmp/deploy.sqlite
           php artisan config:cache
-          php artisan route:cache
           php artisan event:cache
 
       - name: Deploy to Vercel
