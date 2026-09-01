@@ -42,11 +42,11 @@ $_SERVER['APP_STORAGE'] = '/tmp/storage';
 $dbConnection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? 'sqlite');
 if ($dbConnection === 'sqlite' && empty(getenv('DB_DATABASE'))) {
     $tmpDb = '/tmp/database.sqlite';
-    if (!file_exists($tmpDb)) {
-        $sourceDb = __DIR__ . '/../database/database.sqlite';
-        if (file_exists($sourceDb)) {
+    $sourceDb = __DIR__ . '/../database/database.sqlite';
+    if (!file_exists($tmpDb) || filesize($tmpDb) === 0) {
+        if (file_exists($sourceDb) && filesize($sourceDb) > 0) {
             @copy($sourceDb, $tmpDb);
-        } else {
+        } elseif (!file_exists($tmpDb)) {
             @touch($tmpDb);
         }
     }

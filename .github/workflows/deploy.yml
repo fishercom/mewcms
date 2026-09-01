@@ -18,7 +18,7 @@ jobs:
         with:
           php-version: '8.2'
           tools: composer:v2
-          extensions: pdo, mbstring, tokenizer, xml, ctype, json, bcmath
+          extensions: pdo, sqlite3, pdo_sqlite, mbstring, tokenizer, xml, ctype, json, bcmath
 
       - name: Setup Node
         uses: actions/setup-node@v4.4.0
@@ -28,6 +28,15 @@ jobs:
 
       - name: Install PHP dependencies (production only)
         run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Build SQLite database
+        run: |
+          touch database/database.sqlite
+          php artisan migrate --force --seed
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          APP_KEY: base64:c3TaVWZEr+q/sjxE6O9qNMU/W/qL4yFQZUDWniiQO9A=
 
       - name: Install Node dependencies
         run: npm ci
