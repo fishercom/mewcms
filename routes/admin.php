@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::middleware('auth')->prefix('admin')->group(function () {
 
@@ -67,5 +68,5 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 });
 
 Route::get('dashboard', function () {
-    return Inertia::render('dashboard');
+    return redirect()->route('admin');
 })->name('dashboard');

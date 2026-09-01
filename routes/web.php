@@ -12,6 +12,7 @@ use App\Http\Controllers\FrontController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin', [DashboardController::class, 'index'])->name('admin');
+    Route::get('admin/home', [DashboardController::class, 'index'])->name('admin.home');
 });
 
 require __DIR__.'/settings.php';
