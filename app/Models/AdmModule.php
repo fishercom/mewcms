@@ -13,7 +13,7 @@ class AdmModule extends Model
      */
     protected $table = 'adm_modules';
 
-    protected $fillable = ['name', 'title', 'description', 'url', 'route', 'icon', 'visible'];
+    protected $fillable = ['menu_id', 'name', 'title', 'description', 'url', 'route', 'params', 'icon', 'position', 'visible'];
 
     public function events()
     {

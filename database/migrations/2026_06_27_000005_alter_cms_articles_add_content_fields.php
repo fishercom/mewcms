@@ -11,29 +11,40 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_articles', function (Blueprint $table) {
-            // Drop foreign key first so MySQL allows modifying the column
-            $table->dropForeign(['schema_id']);
-        });
+        $isSqlite = DB::getDriverName() === 'sqlite' || strtolower(DB::getDriverName()) === 'libsql';
 
-        Schema::table('cms_articles', function (Blueprint $table) {
-            // Alter schema_id to be nullable
-            $table->integer('schema_id')->unsigned()->nullable()->change();
+        if (! $isSqlite) {
+            Schema::table('cms_articles', function (Blueprint $table) {
+                // Drop foreign key first so MySQL allows modifying the column
+                $table->dropForeign(['schema_id']);
+            });
 
-            // Add standard WordPress-like columns
-            $table->longText('content')->nullable()->after('title');
-            $table->text('excerpt')->nullable()->after('content');
-            $table->string('featured_image', 2048)->nullable()->after('excerpt');
-            $table->string('status', 20)->default('published')->after('featured_image');
-        });
+            Schema::table('cms_articles', function (Blueprint $table) {
+                // Alter schema_id to be nullable
+                $table->integer('schema_id')->unsigned()->nullable()->change();
 
-        Schema::table('cms_articles', function (Blueprint $table) {
-            // Restore foreign key constraint
-            $table->foreign('schema_id')
-                ->references('id')
-                ->on('cms_schemas')
-                ->onDelete('cascade');
-        });
+                // Add standard WordPress-like columns
+                $table->longText('content')->nullable()->after('title');
+                $table->text('excerpt')->nullable()->after('content');
+                $table->string('featured_image', 2048)->nullable()->after('excerpt');
+                $table->string('status', 20)->default('published')->after('featured_image');
+            });
+
+            Schema::table('cms_articles', function (Blueprint $table) {
+                // Restore foreign key constraint
+                $table->foreign('schema_id')
+                    ->references('id')
+                    ->on('cms_schemas')
+                    ->onDelete('cascade');
+            });
+        } else {
+            Schema::table('cms_articles', function (Blueprint $table) {
+                $table->longText('content')->nullable();
+                $table->text('excerpt')->nullable();
+                $table->string('featured_image', 2048)->nullable();
+                $table->string('status', 20)->default('published');
+            });
+        }
     }
 
     /**

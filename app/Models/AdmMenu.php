@@ -13,19 +13,19 @@ class AdmMenu extends Model
      */
     protected $table = 'adm_menus';
 
-    protected $fillable = ['name', 'visible'];
+    protected $fillable = ['name', 'position', 'parent_id', 'icon', 'visible'];
 
     public function children()
     {
-        return $this->hasMany('App\Models\AdmMenu', 'parent_id', 'id')
-            ->where('visible', '1')
+        return $this->hasMany(AdmMenu::class, 'parent_id', 'id')
+            ->where('visible', true)
             ->orderBy('position');
     }
 
     public function modules()
     {
-        return $this->hasMany('App\Models\AdmModule', 'menu_id', 'id')
-            ->where('visible', '1')
+        return $this->hasMany(AdmModule::class, 'menu_id', 'id')
+            ->where('visible', true)
             ->orderBy('position');
     }
 }

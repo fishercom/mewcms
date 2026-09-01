@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_schemas', function (Blueprint $table) {
-            $table->json('fields')->nullable()->change();
-        });
+        if (DB::getDriverName() !== 'sqlite' && strtolower(DB::getDriverName()) !== 'libsql') {
+            Schema::table('cms_schemas', function (Blueprint $table) {
+                $table->json('fields')->nullable()->change();
+            });
+        }
     }
 
     /**

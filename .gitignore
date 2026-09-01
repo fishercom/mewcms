@@ -24,3 +24,5 @@ yarn-error.log
 /.zed
 /.npm-cache
 
+.vercel
+/dashboard*
