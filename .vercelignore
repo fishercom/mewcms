@@ -21,7 +21,7 @@ public/storage
 .npm-cache
 .vscode
 .vercel
-dashboard*
+/dashboard*
 test_output.log
 .DS_Store
 !database/database.sqlite
