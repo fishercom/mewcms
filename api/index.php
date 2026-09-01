@@ -38,6 +38,23 @@ putenv('APP_STORAGE=/tmp/storage');
 $_ENV['APP_STORAGE'] = '/tmp/storage';
 $_SERVER['APP_STORAGE'] = '/tmp/storage';
 
+// Ensure SQLite database exists in writable /tmp directory on Vercel
+$dbConnection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? 'sqlite');
+if ($dbConnection === 'sqlite' && empty(getenv('DB_DATABASE'))) {
+    $tmpDb = '/tmp/database.sqlite';
+    if (!file_exists($tmpDb)) {
+        $sourceDb = __DIR__ . '/../database/database.sqlite';
+        if (file_exists($sourceDb)) {
+            @copy($sourceDb, $tmpDb);
+        } else {
+            @touch($tmpDb);
+        }
+    }
+    putenv("DB_DATABASE={$tmpDb}");
+    $_ENV['DB_DATABASE'] = $tmpDb;
+    $_SERVER['DB_DATABASE'] = $tmpDb;
+}
+
 putenv('APP_SERVICES_CACHE=/tmp/bootstrap/cache/services.php');
 $_ENV['APP_SERVICES_CACHE'] = '/tmp/bootstrap/cache/services.php';
 $_SERVER['APP_SERVICES_CACHE'] = '/tmp/bootstrap/cache/services.php';
