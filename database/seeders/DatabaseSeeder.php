@@ -7,6 +7,7 @@ use App\Models\AdmAction;
 use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
+use App\Models\CmsArticle;
 use App\Models\CmsForm;
 use App\Models\CmsLang;
 use App\Models\CmsParameterGroup;
@@ -130,8 +131,17 @@ class DatabaseSeeder extends Seeder
         AdmEvent::create(['module_id' => $module_article->id, 'action_id' => $action_admin->id]);
 
         // Seeding cms_schema
-        CmsSchema::create(['group_id' => $schg_default->id, 'name' => 'Home Page', 'fields' => [], 'iterations' => 1, 'type' => 'HOME', 'active' => 1]);
-        CmsSchema::create(['group_id' => $schg_default->id, 'name' => 'Options Page', 'fields' => [], 'iterations' => 1, 'type' => 'OPTIONS', 'active' => 1]);
+        $sch_home = CmsSchema::create(['group_id' => $schg_default->id, 'name' => 'Home Page', 'fields' => [], 'iterations' => 1, 'type' => 'HOME', 'active' => 1]);
+        $sch_options = CmsSchema::create(['group_id' => $schg_default->id, 'name' => 'Options Page', 'fields' => [], 'iterations' => 1, 'type' => 'OPTIONS', 'active' => 1]);
+
+        // Seeding default home page article
+        CmsArticle::create([
+            'schema_id' => $sch_home->id,
+            'lang_id' => $lang_default->id,
+            'title' => 'Inicio',
+            'slug' => 'home',
+            'active' => 1,
+        ]);
 
     }
 }
