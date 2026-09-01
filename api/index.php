@@ -43,7 +43,7 @@ $dbConnection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? 'sqlite');
 if ($dbConnection === 'sqlite' && empty(getenv('DB_DATABASE'))) {
     $tmpDb = '/tmp/database.sqlite';
     $sourceDb = __DIR__ . '/../database/database.sqlite';
-    if (!file_exists($tmpDb) || filesize($tmpDb) === 0) {
+    if (!file_exists($tmpDb) || (file_exists($sourceDb) && filesize($tmpDb) < filesize($sourceDb))) {
         if (file_exists($sourceDb) && filesize($sourceDb) > 0) {
             @copy($sourceDb, $tmpDb);
         } elseif (!file_exists($tmpDb)) {
