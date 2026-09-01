@@ -19,9 +19,44 @@ foreach ($tmpDirs as $dir) {
     }
 }
 
+// Copy pre-built bootstrap cache files if they exist in source directory
+$sourceBootstrapCache = __DIR__ . '/../bootstrap/cache';
+if (is_dir($sourceBootstrapCache)) {
+    $files = @scandir($sourceBootstrapCache) ?: [];
+    foreach ($files as $file) {
+        if ($file !== '.' && $file !== '..' && $file !== '.gitignore') {
+            $src = $sourceBootstrapCache . '/' . $file;
+            $dst = '/tmp/bootstrap/cache/' . $file;
+            if (is_file($src) && !file_exists($dst)) {
+                @copy($src, $dst);
+            }
+        }
+    }
+}
+
 putenv('APP_STORAGE=/tmp/storage');
 $_ENV['APP_STORAGE'] = '/tmp/storage';
 $_SERVER['APP_STORAGE'] = '/tmp/storage';
+
+putenv('APP_SERVICES_CACHE=/tmp/bootstrap/cache/services.php');
+$_ENV['APP_SERVICES_CACHE'] = '/tmp/bootstrap/cache/services.php';
+$_SERVER['APP_SERVICES_CACHE'] = '/tmp/bootstrap/cache/services.php';
+
+putenv('APP_PACKAGES_CACHE=/tmp/bootstrap/cache/packages.php');
+$_ENV['APP_PACKAGES_CACHE'] = '/tmp/bootstrap/cache/packages.php';
+$_SERVER['APP_PACKAGES_CACHE'] = '/tmp/bootstrap/cache/packages.php';
+
+putenv('APP_CONFIG_CACHE=/tmp/bootstrap/cache/config.php');
+$_ENV['APP_CONFIG_CACHE'] = '/tmp/bootstrap/cache/config.php';
+$_SERVER['APP_CONFIG_CACHE'] = '/tmp/bootstrap/cache/config.php';
+
+putenv('APP_ROUTES_CACHE=/tmp/bootstrap/cache/routes.php');
+$_ENV['APP_ROUTES_CACHE'] = '/tmp/bootstrap/cache/routes.php';
+$_SERVER['APP_ROUTES_CACHE'] = '/tmp/bootstrap/cache/routes.php';
+
+putenv('APP_EVENTS_CACHE=/tmp/bootstrap/cache/events.php');
+$_ENV['APP_EVENTS_CACHE'] = '/tmp/bootstrap/cache/events.php';
+$_SERVER['APP_EVENTS_CACHE'] = '/tmp/bootstrap/cache/events.php';
 
 putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
