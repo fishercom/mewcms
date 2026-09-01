@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_schemas', function (Blueprint $table) {
-            $table->string('front_view')->nullable()->after('type');
-        });
+        if (!Schema::hasColumn('cms_schemas', 'front_view')) {
+            Schema::table('cms_schemas', function (Blueprint $table) {
+                $table->string('front_view')->nullable()->after('type');
+            });
+        }
     }
 
     /**

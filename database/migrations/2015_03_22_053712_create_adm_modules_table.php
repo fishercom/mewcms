@@ -20,7 +20,7 @@ class CreateAdmModulesTable extends Migration
             $table->string('title')->nullable();
             $table->string('description', 1024)->nullable();
             $table->string('url', 50);
-            $table->string('route', 50);
+            $table->string('route', 50)->nullable();
             $table->string('params')->nullable();
             $table->string('icon', 50)->nullable();
             $table->integer('position')->unsigned();
