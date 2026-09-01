@@ -42,16 +42,6 @@ return [
             'synchronous' => null,
         ],
 
-        // Turso (libSQL) — serverless SQLite-compatible database for Vercel
-        // TURSO_DATABASE_URL and TURSO_AUTH_TOKEN are set automatically by Vercel's Turso integration
-        'libsql' => [
-            'driver' => 'libsql',
-            'url' => env('TURSO_DATABASE_URL'),
-            'authToken' => env('TURSO_AUTH_TOKEN'),
-            'database' => null,
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ],
 
         'mysql' => [
             'driver' => 'mysql',
