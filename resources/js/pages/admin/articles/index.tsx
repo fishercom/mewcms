@@ -62,149 +62,194 @@ export default function Index() {
 
     return (
         <ModuleLayout>
-            <div className="relative overflow-hidden">
-                <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
-                    <div className="w-full md:w-3/4">
-                        <form className="flex items-center">
-                            <label htmlFor="simple-search" className="sr-only">
-                                Buscar
-                            </label>
-                            <div className="relative w-full">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
-                                    <Search />
-                                </div>
-                                <Input
-                                    type="text"
-                                    autoFocus
-                                    value={query.s ?? ''}
-                                    onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm focus-within:outline-2 focus-within:outline-gray-400"
-                                    placeholder="Buscar"
-                                />
-                            </div>
-                        </form>
+            <div className="space-y-4">
+                {/* Search, Status Filter & Actions Toolbar */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            type="text"
+                            value={query.s ?? ''}
+                            onChange={handleSearch}
+                            className="h-10 w-full rounded-xl border border-border/70 bg-card pl-10 pr-4 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground shadow-2xs transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                            placeholder="Buscar por título o slug..."
+                        />
                     </div>
-                    <div className="flex w-full items-center justify-end gap-3 md:w-auto">
-                        <Button variant="outline" onClick={() => setSortableModalOpen(true)} className="flex h-10 items-center gap-1.5 px-4">
-                            <ListOrdered className="h-4 w-4" />
-                            <span>Ordenar Artículos</span>
+
+                    <div className="flex flex-wrap items-center gap-2.5">
+                        <Button
+                            variant="outline"
+                            onClick={() => setSortableModalOpen(true)}
+                            className="h-10 gap-1.5 rounded-xl border-border/70 text-xs font-medium text-foreground hover:bg-muted/60 shadow-2xs"
+                        >
+                            <ListOrdered className="h-4 w-4 text-muted-foreground" />
+                            <span>Reordenar</span>
                         </Button>
+
                         <Button
                             onClick={handleCreateClick}
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                            className="h-10 gap-1.5 rounded-xl bg-violet-600 px-4 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 transition-all hover:bg-violet-700 active:scale-95"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Crear Artículo</span>
+                            <span>Crear Página</span>
                         </Button>
                     </div>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
-                            <tr>
-                                <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre
-                                </th>
-                                <th scope="col" className="px-4 py-3">
-                                    Plantilla
-                                </th>
-                                <th scope="col" className="px-4 py-3">
-                                    Página Superior
-                                </th>
-                                <th scope="col" className="px-4 py-3">
-                                    Estado
-                                </th>
-                                <th scope="col" className="px-4 py-3">
-                                    Activo
-                                </th>
-                                <th scope="col" className="px-4 py-3">
-                                    Fecha de Creación
-                                </th>
-                                <th scope="col" className="rounded-r-md px-4 py-3"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paging.data.map((item: CmsArticle) => {
-                                if (!isRowVisible(item)) {
-                                    return null;
-                                }
-                                const hasChildren = items.some((p) => p.parent_id === item.id);
-                                const isCollapsed = collapsedPageIds.includes(item.id);
 
-                                return (
-                                    <tr key={item.id} className="border-b dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
-                                            <span style={{ paddingLeft: `${(item.depth || 0) * 1.5}rem` }} className="flex items-center gap-1.5">
-                                                {hasChildren ? (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            toggleCollapse(item.id);
-                                                        }}
-                                                        className="rounded p-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
-                                                    >
-                                                        {isCollapsed ? (
-                                                            <ChevronRight className="h-3.5 w-3.5" />
+                {/* Modern Data Table Card */}
+                <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xs">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs text-muted-foreground">
+                            <thead className="border-b border-border/60 bg-muted/40 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                <tr>
+                                    <th scope="col" className="px-5 py-3.5">
+                                        Nombre / Título
+                                    </th>
+                                    <th scope="col" className="px-4 py-3.5">
+                                        Plantilla
+                                    </th>
+                                    <th scope="col" className="px-4 py-3.5">
+                                        Página Superior
+                                    </th>
+                                    <th scope="col" className="px-4 py-3.5">
+                                        Estado
+                                    </th>
+                                    <th scope="col" className="px-4 py-3.5">
+                                        Activo
+                                    </th>
+                                    <th scope="col" className="px-4 py-3.5">
+                                        Fecha
+                                    </th>
+                                    <th scope="col" className="px-5 py-3.5 text-right">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/40">
+                                {paging.data.length > 0 ? (
+                                    paging.data.map((item: CmsArticle) => {
+                                        if (!isRowVisible(item)) {
+                                            return null;
+                                        }
+                                        const hasChildren = items.some((p) => p.parent_id === item.id);
+                                        const isCollapsed = collapsedPageIds.includes(item.id);
+
+                                        return (
+                                            <tr key={item.id} className="group transition-colors hover:bg-muted/30">
+                                                <th scope="row" className="px-5 py-3.5 font-medium whitespace-nowrap text-foreground">
+                                                    <div style={{ paddingLeft: `${(item.depth || 0) * 1.5}rem` }} className="flex items-center gap-2">
+                                                        {hasChildren ? (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    toggleCollapse(item.id);
+                                                                }}
+                                                                className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                                            >
+                                                                {isCollapsed ? (
+                                                                    <ChevronRight className="h-3.5 w-3.5" />
+                                                                ) : (
+                                                                    <ChevronDown className="h-3.5 w-3.5" />
+                                                                )}
+                                                            </button>
                                                         ) : (
-                                                            <ChevronDown className="h-3.5 w-3.5" />
+                                                            <div className="w-5" />
                                                         )}
-                                                    </button>
-                                                ) : (
-                                                    <div className="w-6" />
-                                                )}
-                                                {(item.depth || 0) > 0 && <span className="mr-1.5 text-gray-400">{'—'.repeat(item.depth || 0)}</span>}
-                                                {item.title}
-                                            </span>
-                                        </th>
-                                        <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                                            {item.schema ? item.schema.name : <span className="text-zinc-400 italic">Ninguna</span>}
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                                            {item.parent ? item.parent.title : <span className="text-gray-300 dark:text-gray-600">Ninguna</span>}
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <span
-                                                className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
-                                                    item.status === 'published' || !item.status
-                                                        ? 'bg-green-100 text-green-800 dark:bg-green-950/20 dark:text-green-400'
-                                                        : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400'
-                                                }`}
-                                            >
-                                                {item.status === 'published' || !item.status ? 'Publicado' : 'Borrador'}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3">{item.active ? <Check /> : <></>}</td>
-                                        <td className="px-4 py-3">{format(item.created_at, 'dd/MM/yyyy HH:mm')}</td>
-                                        <td className="flex items-center justify-end gap-2 px-4 py-3">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex h-8 items-center gap-1 px-2.5"
-                                                onClick={() => router.visit(route('articles.edit', item.id))}
-                                            >
-                                                <Edit className="h-3.5 w-3.5" />
-                                                <span>Editar</span>
-                                            </Button>
+                                                        {(item.depth || 0) > 0 && <span className="mr-1 text-muted-foreground/50">└</span>}
+                                                        <div className="flex flex-col">
+                                                            <span className="font-semibold text-foreground text-sm leading-snug group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                                                                {item.title}
+                                                            </span>
+                                                            <span className="text-[11px] font-mono text-muted-foreground/70">
+                                                                /{item.slug}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                                <td className="px-4 py-3.5">
+                                                    {item.schema ? (
+                                                        <span className="inline-flex items-center rounded-md border border-border/60 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                                                            {item.schema.name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-muted-foreground/60 italic">Por defecto</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3.5 text-muted-foreground">
+                                                    {item.parent ? item.parent.title : <span className="text-muted-foreground/40 italic">Raíz (Ninguna)</span>}
+                                                </td>
+                                                <td className="px-4 py-3.5">
+                                                    <span
+                                                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${
+                                                            item.status === 'published' || !item.status
+                                                                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                                : 'border-border/60 bg-muted text-muted-foreground'
+                                                        }`}
+                                                    >
+                                                        <span
+                                                            className={`h-1.5 w-1.5 rounded-full ${
+                                                                item.status === 'published' || !item.status ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'
+                                                            }`}
+                                                        />
+                                                        {item.status === 'published' || !item.status ? 'Publicado' : 'Borrador'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3.5">
+                                                    {item.active ? (
+                                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                                            <Check className="h-3 w-3" />
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground/60 text-[10px]">
+                                                            —
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3.5 text-muted-foreground text-[11px]">
+                                                    {item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy HH:mm') : '—'}
+                                                </td>
+                                                <td className="px-5 py-3.5 text-right">
+                                                    <div className="flex items-center justify-end gap-1.5">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-8 gap-1 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                            onClick={() => router.visit(route('articles.edit', item.id))}
+                                                        >
+                                                            <Edit className="h-3.5 w-3.5" />
+                                                            <span className="hidden sm:inline">Editar</span>
+                                                        </Button>
 
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
-                                                onClick={() => deleteArticleHandler(item.id)}
-                                            >
-                                                <Trash2 className="h-3.5 w-3.5" />
-                                                <span>Eliminar</span>
-                                            </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-8 gap-1 rounded-lg px-2 text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/20"
+                                                            onClick={() => deleteArticleHandler(item.id)}
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                            <span className="hidden sm:inline">Eliminar</span>
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan={7} className="py-12 text-center text-muted-foreground italic">
+                                            No se encontraron páginas que coincidan con la búsqueda.
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
                 {paging.links && <PaginationNav data={paging} />}
             </div>
             <SortableArticlesModal isOpen={isSortableModalOpen} onClose={handleCloseSortableModal} articles={items} />
         </ModuleLayout>
     );
 }
+

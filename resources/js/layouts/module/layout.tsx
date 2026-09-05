@@ -9,21 +9,21 @@ export default function ModuleLayout({ children, view = '' }: PropsWithChildren<
     const { adm_menu } = usePage<{ adm_menu: NavGroup[] }>().props;
     const page = usePage();
     const url = page.url;
+    const currentPath = url.split('?')[0];
     const module: NavItem = { id: 0, title: '', description: '', url: '', icon: null };
-    adm_menu.map((group) => {
-        group.items.map((item) => {
-            console.log(item.url, url, 'check');
-            if (url.includes(item.url)) {
+
+    for (const group of adm_menu) {
+        for (const item of group.items) {
+            if (item.url !== '/admin' && (currentPath === item.url || currentPath.startsWith(item.url + '/'))) {
                 module.id = item.id;
                 module.title = item.title;
                 module.description = item.description;
                 module.icon = item.icon;
                 module.url = item.url;
+                break;
             }
-        });
-    });
-
-    console.log(url, module, 'module');
+        }
+    }
 
     const breadcrumbs: BreadcrumbItem[] = generateBreadcrumb(module.title, view, module.url);
     const title = view ? `${view} ${module.title}` : module.title;
@@ -36,9 +36,11 @@ export default function ModuleLayout({ children, view = '' }: PropsWithChildren<
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head />
-            <section className="p-3 antialiased sm:p-5">
-                <Heading title={title} description={module.description} />
-                <div className="mx-auto overflow-hidden">{children}</div>
+            <section className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8 antialiased">
+                <div className="mb-6">
+                    <Heading title={title} description={module.description} />
+                </div>
+                <div className="mx-auto">{children}</div>
             </section>
         </AppLayout>
     );

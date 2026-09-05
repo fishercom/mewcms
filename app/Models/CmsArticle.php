@@ -129,4 +129,30 @@ class CmsArticle extends Model
 
         return $ids;
     }
+
+    /**
+     * Scope a query to apply search and status filters.
+     */
+    public function scopeFilter($query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search): void {
+            $query->where(function ($q) use ($search): void {
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('slug', 'like', '%'.$search.'%');
+            });
+        });
+
+        $query->when($filters['status'] ?? null, function ($query, $status): void {
+            if ($status === 'published') {
+                $query->where('active', '1');
+            } elseif ($status === 'draft') {
+                $query->where('active', '0');
+            }
+        });
+
+        $query->when($filters['schema_id'] ?? null, function ($query, $schemaId): void {
+            $query->where('schema_id', $schemaId);
+        });
+    }
 }
+

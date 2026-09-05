@@ -154,13 +154,17 @@ const MenuBar = ({ editor, onOpenMedia }: MenuBarProps) => {
     ];
 
     return (
-        <div className="border-input flex flex-wrap items-center gap-1 rounded-t-md border bg-transparent p-2">
+        <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-b-0 border-border/70 bg-muted/40 p-2 backdrop-blur-xs">
             {menuItems.map((item, index) => (
                 <button
                     key={index}
                     type="button"
                     onClick={item.onClick}
-                    className={`rounded-md p-2 ${item.isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-accent hover:text-accent-foreground'}`}
+                    className={`rounded-lg p-2 text-xs font-medium transition-all ${
+                        item.isActive
+                            ? 'bg-violet-600 text-white shadow-xs dark:bg-violet-500'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95'
+                    }`}
                 >
                     <item.icon className="h-4 w-4" />
                 </button>
@@ -181,7 +185,7 @@ const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
         editable: true,
         editorProps: {
             attributes: {
-                class: 'prose dark:prose-invert max-w-none p-4 border border-input rounded-b-md min-h-[300px] focus:outline-none',
+                class: 'prose dark:prose-invert max-w-none p-5 border border-border/70 rounded-b-xl min-h-[320px] bg-card focus:outline-hidden focus:ring-1 focus:ring-violet-500/30 transition-all text-sm leading-relaxed',
             },
         },
     });
@@ -200,7 +204,7 @@ const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
     };
 
     return (
-        <div>
+        <div className="overflow-hidden rounded-xl shadow-2xs">
             <MenuBar editor={editor} onOpenMedia={() => setMediaOpen(true)} />
             <EditorContent editor={editor} />
             <QuickMediaDrawer isOpen={mediaOpen} onClose={() => setMediaOpen(false)} onSelect={handleSelectImage} initialType="Images" />

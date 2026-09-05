@@ -67,14 +67,37 @@ export default function Edit() {
 
     return (
         <ModuleLayout view="Editar">
-            <div className="mb-4 flex justify-end">
-                <Button type="button" variant="outline" className="flex items-center gap-1.5" onClick={() => setMediaOpen(true)}>
-                    <ImageIcon className="h-4 w-4" />
-                    <span>Biblioteca de Medios Rápida</span>
-                </Button>
-            </div>
-            <FormLayout>
-                <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4">
+                    <Link
+                        href="/admin/articles"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        ← Volver a Páginas
+                    </Link>
+
+                    <div className="flex items-center gap-2.5">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="h-9 gap-1.5 rounded-xl border-border/70 text-xs font-medium shadow-2xs"
+                            onClick={() => setMediaOpen(true)}
+                        >
+                            <ImageIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                            <span>Biblioteca de Medios</span>
+                        </Button>
+
+                        <Button
+                            type="submit"
+                            disabled={processing}
+                            className="h-9 gap-1.5 rounded-xl bg-violet-600 px-4 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 hover:bg-violet-700 active:scale-95 transition-all"
+                        >
+                            <span>Guardar Cambios</span>
+                        </Button>
+                    </div>
+                </div>
+
+                <FormLayout>
                     <ArticleFields
                         data={data}
                         setData={setData}
@@ -86,12 +109,32 @@ export default function Edit() {
                         taxonomies={taxonomies}
                         onChangeSchema={handleChangeSchema}
                     />
-                    <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/articles">Cancelar</Link>
+                </FormLayout>
+
+                {/* Sticky publication action bar */}
+                <div className="sticky bottom-4 z-10 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 p-4 shadow-lg backdrop-blur-md">
+                    <span className="text-xs text-muted-foreground">
+                        {processing ? 'Actualizando página...' : `Editando: ${data.title || 'Sin título'}`}
+                    </span>
+                    <div className="flex items-center gap-2.5">
+                        <Button
+                            variant="outline"
+                            type="button"
+                            asChild
+                            className="h-9 rounded-xl border-border/70 text-xs font-medium"
+                        >
+                            <Link href="/admin/articles">Cancelar</Link>
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={processing}
+                            className="h-9 rounded-xl bg-violet-600 px-5 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 hover:bg-violet-700 active:scale-95"
+                        >
+                            {processing ? 'Guardando...' : 'Guardar Cambios'}
+                        </Button>
                     </div>
-                </form>
-            </FormLayout>
+                </div>
+            </form>
             <QuickMediaDrawer isOpen={mediaOpen} onClose={() => setMediaOpen(false)} />
         </ModuleLayout>
     );

@@ -115,6 +115,16 @@ class DashboardController extends Controller
             ];
         }
 
+        // 7. Calculate month-over-month growth for articles
+        $thisMonthCount = CmsArticle::where('created_at', '>=', Carbon::now()->startOfMonth())->count();
+        $lastMonthCount = CmsArticle::whereBetween('created_at', [
+            Carbon::now()->subMonth()->startOfMonth(),
+            Carbon::now()->subMonth()->endOfMonth(),
+        ])->count();
+        $articleGrowth = $lastMonthCount > 0
+            ? round((($thisMonthCount - $lastMonthCount) / $lastMonthCount) * 100, 1)
+            : ($thisMonthCount > 0 ? 100.0 : 0.0);
+
         return Inertia::render('admin', [
             'stats' => [
                 'total_articles' => $totalArticles,
@@ -124,6 +134,7 @@ class DashboardController extends Controller
                 'unreviewed_messages' => $unreviewedMessages,
                 'file_count' => $fileCount,
                 'disk_usage' => $formattedSize,
+                'article_growth' => $articleGrowth,
             ],
             'recentLogs' => $recentLogs,
             'articlesChart' => $articlesChart,

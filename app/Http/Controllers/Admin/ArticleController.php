@@ -76,6 +76,7 @@ class ArticleController extends Controller
         return Inertia::render('admin/articles/index', [
             'items' => $items->values(),
             'paging' => $paginated,
+            'filters' => $request->only(['s', 'status', 'schema_id']),
         ]);
     }
 
