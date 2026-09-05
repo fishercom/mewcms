@@ -1,12 +1,12 @@
-import { useState, useEffect, FormEventHandler } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import { createTemplate } from '@/services/templates';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
+import { createTemplate } from '@/services/templates';
+import { Link, usePage } from '@inertiajs/react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 export default function Create() {
     const { defaultBoilerplate = '' } = usePage<{ defaultBoilerplate?: string }>().props;
@@ -53,7 +53,7 @@ export default function Create() {
                     setErrors(err);
                     setProcessing(false);
                 },
-            }
+            },
         );
     };
 
@@ -91,18 +91,16 @@ export default function Create() {
                             />
                             <span className="text-sm font-semibold text-gray-400">.tsx</span>
                         </div>
-                        <p className="text-xs text-gray-400">
-                            Debe constar de caracteres alfanuméricos, guiones o guiones bajos.
-                        </p>
+                        <p className="text-xs text-gray-400">Debe constar de caracteres alfanuméricos, guiones o guiones bajos.</p>
                         {errors.filename && <span className="text-xs text-red-500">{errors.filename}</span>}
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="content">Código de la Plantilla (React / TypeScript)</Label>
-                        <div className="border rounded-md overflow-hidden bg-gray-900 border-gray-800">
-                            <div className="bg-gray-800/60 px-4 py-2 border-b border-gray-900 text-xs text-gray-400 font-mono flex items-center justify-between">
+                        <div className="overflow-hidden rounded-md border border-gray-800 bg-gray-900">
+                            <div className="flex items-center justify-between border-b border-gray-900 bg-gray-800/60 px-4 py-2 font-mono text-xs text-gray-400">
                                 <span>{filename ? `${filename}.tsx` : 'template.tsx'}</span>
-                                <span className="text-red-400 font-semibold">TSX</span>
+                                <span className="font-semibold text-red-400">TSX</span>
                             </div>
                             <Textarea
                                 id="content"
@@ -110,7 +108,7 @@ export default function Create() {
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 disabled={processing}
-                                className="font-mono text-sm leading-relaxed p-4 bg-gray-900 text-gray-100 border-0 focus-visible:ring-0 resize-y min-h-[400px]"
+                                className="min-h-[400px] resize-y border-0 bg-gray-900 p-4 font-mono text-sm leading-relaxed text-gray-100 focus-visible:ring-0"
                                 placeholder="// Escribe el código de tu componente React..."
                                 spellCheck={false}
                             />
@@ -119,7 +117,7 @@ export default function Create() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing} className="bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">
+                        <Button disabled={processing} className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600">
                             {processing ? 'Guardando...' : 'Guardar'}
                         </Button>
                         <Link href="/admin/templates" className="text-sm text-gray-500 hover:underline">

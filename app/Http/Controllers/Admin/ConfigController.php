@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CmsConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,7 +20,7 @@ class ConfigController extends Controller
         $s = $request->get('s');
 
         $items = CmsConfig::select()
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
@@ -36,7 +37,7 @@ class ConfigController extends Controller
         return Inertia::render('admin/configs/create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Redirector|RedirectResponse
     {
         $config = new CmsConfig($request->all());
         $config->save();

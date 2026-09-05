@@ -1,7 +1,6 @@
-
-import { router } from '@inertiajs/react';
-import { Page } from '@inertiajs/core';
 import objectToFormData from '@/lib/form-data';
+import { Page } from '@inertiajs/core';
+import { router } from '@inertiajs/react';
 
 interface Callbacks {
     onSuccess?: (page: Page) => void;
@@ -11,10 +10,14 @@ interface Callbacks {
 }
 
 export const sendVerificationEmail = (onStart: () => void, onFinish: () => void) => {
-    router.post(route('verification.send'), {}, {
-        onStart: onStart,
-        onFinish: onFinish,
-    });
+    router.post(
+        route('verification.send'),
+        {},
+        {
+            onStart: onStart,
+            onFinish: onFinish,
+        },
+    );
 };
 
 export const updatePassword = (data: Record<string, unknown>, callbacks: Callbacks) => {

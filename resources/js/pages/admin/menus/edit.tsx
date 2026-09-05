@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { usePage, Link } from '@inertiajs/react';
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { updateMenu, createMenuItem, deleteMenuItem } from '@/services/menus';
-import { CmsMenu, CmsMenuItem, CmsMenuItemForm } from '@/types/models/cms-menu';
+import { Label } from '@/components/ui/label';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
+import { createMenuItem, deleteMenuItem, updateMenu } from '@/services/menus';
 import { CmsArticle } from '@/types/models/cms-article';
-import MenuFormFields from './partials/fields';
-import { ReactSortable } from 'react-sortablejs';
+import { CmsMenu, CmsMenuItem, CmsMenuItemForm } from '@/types/models/cms-menu';
+import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Edit2, Trash2, GripVertical, Settings, Layers, PlusCircle, Check } from 'lucide-react';
+import { Check, Edit2, GripVertical, Layers, PlusCircle, Settings, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ReactSortable } from 'react-sortablejs';
+import MenuFormFields from './partials/fields';
 
 interface PageProps {
     item: CmsMenu;
@@ -64,15 +64,11 @@ export default function Edit() {
     const [sortNotice, setSortNotice] = useState<string | null>(null);
 
     // Filter Top Level menu items
-    const topLevelItems = menuItems
-        .filter((i) => i.parent_id === null)
-        .sort((a, b) => a.position - b.position);
+    const topLevelItems = menuItems.filter((i) => i.parent_id === null).sort((a, b) => a.position - b.position);
 
     // Get subitems group by parent ID
     const getSubItems = (parentId: number) => {
-        return menuItems
-            .filter((i) => i.parent_id === parentId)
-            .sort((a, b) => a.position - b.position);
+        return menuItems.filter((i) => i.parent_id === parentId).sort((a, b) => a.position - b.position);
     };
 
     const handleMenuSubmit = (e: React.FormEvent) => {
@@ -155,20 +151,14 @@ export default function Edit() {
     const handleSortTopLevel = (sorted: CmsMenuItem[]) => {
         // Re-align positions
         const otherItems = menuItems.filter((i) => i.parent_id !== null);
-        const nextList = [
-            ...sorted.map((item, idx) => ({ ...item, position: idx, parent_id: null })),
-            ...otherItems,
-        ];
+        const nextList = [...sorted.map((item, idx) => ({ ...item, position: idx, parent_id: null })), ...otherItems];
         setMenuItems(nextList);
         saveSortOrder(nextList);
     };
 
     const handleSortSubItems = (parentId: number, sortedSub: CmsMenuItem[]) => {
         const otherItems = menuItems.filter((i) => i.parent_id !== parentId);
-        const nextList = [
-            ...otherItems,
-            ...sortedSub.map((item, idx) => ({ ...item, position: idx, parent_id: parentId })),
-        ];
+        const nextList = [...otherItems, ...sortedSub.map((item, idx) => ({ ...item, position: idx, parent_id: parentId }))];
         setMenuItems(nextList);
         saveSortOrder(nextList);
     };
@@ -176,13 +166,11 @@ export default function Edit() {
     return (
         <ModuleLayout view={`Editar Menú: ${item.name}`}>
             {/* Tab Navigation */}
-            <div className="flex border-b border-gray-200 dark:border-gray-800 mb-6 gap-6">
+            <div className="mb-6 flex gap-6 border-b border-gray-200 dark:border-gray-800">
                 <button
                     onClick={() => setActiveTab('builder')}
-                    className={`flex items-center gap-1.5 pb-3 text-sm font-semibold border-b-2 transition-colors ${
-                        activeTab === 'builder'
-                            ? 'border-primary-700 text-primary-700'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                    className={`flex items-center gap-1.5 border-b-2 pb-3 text-sm font-semibold transition-colors ${
+                        activeTab === 'builder' ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
                 >
                     <Layers className="h-4 w-4" />
@@ -190,10 +178,8 @@ export default function Edit() {
                 </button>
                 <button
                     onClick={() => setActiveTab('details')}
-                    className={`flex items-center gap-1.5 pb-3 text-sm font-semibold border-b-2 transition-colors ${
-                        activeTab === 'details'
-                            ? 'border-primary-700 text-primary-700'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                    className={`flex items-center gap-1.5 border-b-2 pb-3 text-sm font-semibold transition-colors ${
+                        activeTab === 'details' ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
                 >
                     <Settings className="h-4 w-4" />
@@ -204,12 +190,7 @@ export default function Edit() {
             {activeTab === 'details' && (
                 <FormLayout>
                     <form onSubmit={handleMenuSubmit} className="space-y-6">
-                        <MenuFormFields
-                            data={menuData}
-                            setData={setMenuData}
-                            errors={menuErrors}
-                            processing={menuProcessing}
-                        />
+                        <MenuFormFields data={menuData} setData={setMenuData} errors={menuErrors} processing={menuProcessing} />
                         <div className="flex items-center gap-4">
                             <Button disabled={menuProcessing}>Guardar Detalles</Button>
                             <Link href="/admin/menus" className="text-sm text-gray-600 hover:underline">
@@ -221,18 +202,16 @@ export default function Edit() {
             )}
 
             {activeTab === 'builder' && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                     {/* Left side: Drag-and-Drop Structure */}
-                    <div className="lg:col-span-7 space-y-4">
-                        <div className="flex justify-between items-center bg-gray-50 dark:bg-[#161615] p-4 rounded-xl border border-gray-200 dark:border-gray-800">
+                    <div className="space-y-4 lg:col-span-7">
+                        <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-[#161615]">
                             <div>
-                                <h3 className="font-semibold text-sm">Estructura del Menú</h3>
-                                <p className="text-xs text-gray-500">
-                                    Arrastra y suelta los ítems para ordenarlos.
-                                </p>
+                                <h3 className="text-sm font-semibold">Estructura del Menú</h3>
+                                <p className="text-xs text-gray-500">Arrastra y suelta los ítems para ordenarlos.</p>
                             </div>
                             {sortNotice && (
-                                <span className="text-xs bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400 px-2.5 py-1 rounded-md border border-primary-200/50 flex items-center gap-1">
+                                <span className="bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400 border-primary-200/50 flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs">
                                     <Check className="h-3 w-3" />
                                     {sortNotice}
                                 </span>
@@ -253,23 +232,20 @@ export default function Edit() {
                                         return (
                                             <div
                                                 key={parent.id}
-                                                className="bg-white dark:bg-[#161615] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm"
+                                                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#161615]"
                                             >
                                                 {/* Top Level Item Bar */}
-                                                <div className="flex items-center justify-between p-3.5 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+                                                <div className="flex items-center justify-between p-3.5 transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
                                                     <div className="flex items-center gap-3">
-                                                        <button
-                                                            type="button"
-                                                            className="handle cursor-grab hover:text-gray-700 text-gray-400"
-                                                        >
+                                                        <button type="button" className="handle cursor-grab text-gray-400 hover:text-gray-700">
                                                             <GripVertical className="h-4.5 w-4.5" />
                                                         </button>
                                                         <div>
-                                                            <span className="font-medium text-sm">{parent.title}</span>
-                                                            <span className="ml-2.5 text-[10px] text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                                                            <span className="text-sm font-medium">{parent.title}</span>
+                                                            <span className="ml-2.5 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] tracking-wider text-gray-400 uppercase dark:bg-gray-800">
                                                                 {parent.article_id ? 'Artículo' : 'Enlace'}
                                                             </span>
-                                                            <span className="ml-1.5 text-xs text-gray-400 max-w-[200px] truncate block sm:inline">
+                                                            <span className="ml-1.5 block max-w-[200px] truncate text-xs text-gray-400 sm:inline">
                                                                 {parent.resolved_url}
                                                             </span>
                                                         </div>
@@ -295,12 +271,10 @@ export default function Edit() {
                                                 </div>
 
                                                 {/* Nested Sub-Items Area */}
-                                                <div className="pl-8 pr-4 pb-3 bg-gray-50/30 dark:bg-black/5 border-t border-gray-100 dark:border-gray-900/50 space-y-2">
+                                                <div className="space-y-2 border-t border-gray-100 bg-gray-50/30 pr-4 pb-3 pl-8 dark:border-gray-900/50 dark:bg-black/5">
                                                     <ReactSortable
                                                         list={subItems}
-                                                        setList={(sortedSub) =>
-                                                            handleSortSubItems(parent.id, sortedSub)
-                                                        }
+                                                        setList={(sortedSub) => handleSortSubItems(parent.id, sortedSub)}
                                                         handle=".subhandle"
                                                         animation={150}
                                                         className="space-y-2 pt-3"
@@ -308,20 +282,18 @@ export default function Edit() {
                                                         {subItems.map((sub) => (
                                                             <div
                                                                 key={sub.id}
-                                                                className="flex items-center justify-between p-2.5 bg-white dark:bg-[#1f1f1e] rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 shadow-sm"
+                                                                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-2.5 shadow-sm hover:border-gray-300 dark:border-gray-800 dark:bg-[#1f1f1e] dark:hover:border-gray-700"
                                                             >
                                                                 <div className="flex items-center gap-2.5">
                                                                     <button
                                                                         type="button"
-                                                                        className="subhandle cursor-grab hover:text-gray-700 text-gray-400"
+                                                                        className="subhandle cursor-grab text-gray-400 hover:text-gray-700"
                                                                     >
                                                                         <GripVertical className="h-4 w-4" />
                                                                     </button>
                                                                     <div className="flex items-center gap-1.5">
-                                                                        <span className="text-xs font-medium">
-                                                                            {sub.title}
-                                                                        </span>
-                                                                        <span className="text-[9px] text-gray-400 bg-gray-50 dark:bg-gray-800 px-1 py-0.2 rounded border">
+                                                                        <span className="text-xs font-medium">{sub.title}</span>
+                                                                        <span className="py-0.2 rounded border bg-gray-50 px-1 text-[9px] text-gray-400 dark:bg-gray-800">
                                                                             {sub.resolved_url}
                                                                         </span>
                                                                     </div>
@@ -348,7 +320,7 @@ export default function Edit() {
                                                         ))}
                                                     </ReactSortable>
                                                     {subItems.length === 0 && (
-                                                        <div className="text-[11px] text-gray-400 italic pt-2">
+                                                        <div className="pt-2 text-[11px] text-gray-400 italic">
                                                             No hay sub-elementos. Arrastra aquí para anidar o cambia su ítem padre.
                                                         </div>
                                                     )}
@@ -359,7 +331,7 @@ export default function Edit() {
                                 </ReactSortable>
                             </div>
                         ) : (
-                            <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/20">
+                            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/20 py-16 text-center dark:border-gray-800">
                                 <p className="text-sm text-gray-400 italic">No hay ítems en este menú.</p>
                             </div>
                         )}
@@ -367,9 +339,9 @@ export default function Edit() {
 
                     {/* Right side: Add / Edit Link Form */}
                     <div className="lg:col-span-5">
-                        <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6 bg-white dark:bg-[#161615] space-y-5 shadow-sm">
-                            <h3 className="flex items-center gap-1.5 text-sm font-semibold border-b border-gray-100 dark:border-gray-900 pb-3">
-                                <PlusCircle className="h-4.5 w-4.5 text-primary-700" />
+                        <div className="space-y-5 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#161615]">
+                            <h3 className="flex items-center gap-1.5 border-b border-gray-100 pb-3 text-sm font-semibold dark:border-gray-900">
+                                <PlusCircle className="text-primary-700 h-4.5 w-4.5" />
                                 <span>{itemData.id ? 'Editar Ítem de Menú' : 'Agregar Ítem de Menú'}</span>
                             </h3>
 
@@ -381,7 +353,7 @@ export default function Edit() {
                                         <button
                                             type="button"
                                             onClick={() => setLinkType('custom')}
-                                            className={`px-3 py-2 rounded-lg text-xs font-semibold border text-center transition-colors ${
+                                            className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-colors ${
                                                 linkType === 'custom'
                                                     ? 'border-primary-700 bg-primary-50/30 text-primary-700 dark:bg-primary-950/20'
                                                     : 'border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-800'
@@ -392,7 +364,7 @@ export default function Edit() {
                                         <button
                                             type="button"
                                             onClick={() => setLinkType('article')}
-                                            className={`px-3 py-2 rounded-lg text-xs font-semibold border text-center transition-colors ${
+                                            className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-colors ${
                                                 linkType === 'article'
                                                     ? 'border-primary-700 bg-primary-50/30 text-primary-700 dark:bg-primary-950/20'
                                                     : 'border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-800'
@@ -440,7 +412,7 @@ export default function Edit() {
                                         <Label htmlFor="item-article">Selecciona Artículo</Label>
                                         <select
                                             id="item-article"
-                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 dark:text-white bg-white dark:bg-[#1f1f1e]"
+                                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1f1f1e] dark:text-white"
                                             value={itemData.article_id ?? ''}
                                             onChange={(e) =>
                                                 setItemData({
@@ -457,9 +429,7 @@ export default function Edit() {
                                                 </option>
                                             ))}
                                         </select>
-                                        {itemErrors.article_id && (
-                                            <span className="text-xs text-red-500">{itemErrors.article_id}</span>
-                                        )}
+                                        {itemErrors.article_id && <span className="text-xs text-red-500">{itemErrors.article_id}</span>}
                                     </div>
                                 )}
 
@@ -468,7 +438,7 @@ export default function Edit() {
                                     <Label htmlFor="item-parent">Nivel Padre (Opcional)</Label>
                                     <select
                                         id="item-parent"
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 dark:text-white bg-white dark:bg-[#1f1f1e]"
+                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1f1f1e] dark:text-white"
                                         value={itemData.parent_id ?? ''}
                                         onChange={(e) =>
                                             setItemData({
@@ -495,7 +465,7 @@ export default function Edit() {
                                     <Label htmlFor="item-target">Destino / Target</Label>
                                     <select
                                         id="item-target"
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 dark:text-white bg-white dark:bg-[#1f1f1e]"
+                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1f1f1e] dark:text-white"
                                         value={itemData.target}
                                         onChange={(e) =>
                                             setItemData({
@@ -526,11 +496,7 @@ export default function Edit() {
                                         {itemData.id ? 'Guardar Cambios' : 'Agregar al Menú'}
                                     </Button>
                                     {itemData.id && (
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => setItemData(initialItemForm)}
-                                        >
+                                        <Button type="button" variant="outline" onClick={() => setItemData(initialItemForm)}>
                                             Cancelar
                                         </Button>
                                     )}

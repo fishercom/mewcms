@@ -1,9 +1,9 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import InputError from "@/components/input-error";
-import { CmsConfigForm } from "@/types/models/cms-config";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import InputError from '@/components/input-error';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { CmsConfigForm } from '@/types/models/cms-config';
 
 interface Props {
     data: CmsConfigForm;
@@ -56,11 +56,7 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
 
             <div className="grid gap-2">
                 <Label htmlFor="type">Type</Label>
-                <Select
-                    value={data.type as string}
-                    onValueChange={(value) => setData({ ...data, type: value })}
-                    disabled={processing}
-                >
+                <Select value={data.type as string} onValueChange={(value) => setData({ ...data, type: value })} disabled={processing}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
@@ -78,17 +74,9 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
             <div className="grid gap-2">
                 <Label htmlFor="value">Value</Label>
                 {data.type === 'text' ? (
-                    <Textarea
-                        value={data.value as string}
-                        onChange={(e) => setData({ ...data, value: e.target.value })}
-                        disabled={processing}
-                    />
+                    <Textarea value={data.value as string} onChange={(e) => setData({ ...data, value: e.target.value })} disabled={processing} />
                 ) : data.type === 'boolean' ? (
-                    <Select
-                        value={data.value as string}
-                        onValueChange={(value) => setData({ ...data, value: value })}
-                        disabled={processing}
-                    >
+                    <Select value={data.value as string} onValueChange={(value) => setData({ ...data, value: value })} disabled={processing}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a value" />
                         </SelectTrigger>

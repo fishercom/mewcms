@@ -16,7 +16,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
         sendVerificationEmail(
             () => setProcessing(true),
-            () => setProcessing(false)
+            () => setProcessing(false),
         );
     };
 

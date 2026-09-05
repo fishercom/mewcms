@@ -1,16 +1,16 @@
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { updateParameter } from '@/services/parameters';
-import ParameterFormFields from './partials/fields';
 import { CmsParameter, CmsParameterForm } from '@/types/models/cms-parameter';
 import { CmsParameterGroup } from '@/types/models/cms-parameter-group';
+import ParameterFormFields from './partials/fields';
 
 export default function Edit() {
-    const { item, groups, parents } = usePage<{ item: CmsParameter, groups: CmsParameterGroup[], parents: CmsParameter[] }>().props;
+    const { item, groups, parents } = usePage<{ item: CmsParameter; groups: CmsParameterGroup[]; parents: CmsParameter[] }>().props;
 
     const [data, setData] = useState<CmsParameterForm>({
         id: item.id,
@@ -43,21 +43,14 @@ export default function Edit() {
     return (
         <ModuleLayout view="Editar">
             <FormLayout>
-            <form onSubmit={updateParameterHandler} className="space-y-6">
-                <ParameterFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    groups={groups}
-                    parents={parents}
-                />
+                <form onSubmit={updateParameterHandler} className="space-y-6">
+                    <ParameterFormFields data={data} setData={setData} errors={errors} processing={processing} groups={groups} parents={parents} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/parameters'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/parameters">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );

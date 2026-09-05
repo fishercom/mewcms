@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_sliders', function (Blueprint $table) {
+        Schema::create('cms_sliders', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
             $table->string('key')->unique();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('cms_slides', function (Blueprint $table) {
+        Schema::create('cms_slides', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('slider_id')->unsigned();
             $table->string('title')->nullable();

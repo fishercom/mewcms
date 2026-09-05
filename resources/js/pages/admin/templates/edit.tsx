@@ -1,12 +1,12 @@
-import { useState, FormEventHandler } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import { updateTemplate } from '@/services/templates';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
+import { updateTemplate } from '@/services/templates';
+import { Link, usePage } from '@inertiajs/react';
+import { FormEventHandler, useState } from 'react';
 
 interface EditProps {
     filename: string;
@@ -36,18 +36,22 @@ export default function Edit() {
             finalContent = `/**\n * Template Name: ${name}\n */\n${content}`;
         }
 
-        updateTemplate(filename, {
-            name,
-            content: finalContent
-        }, {
-            onSuccess: () => {
-                setProcessing(false);
+        updateTemplate(
+            filename,
+            {
+                name,
+                content: finalContent,
             },
-            onError: (err: Record<string, string>) => {
-                setErrors(err);
-                setProcessing(false);
-            }
-        });
+            {
+                onSuccess: () => {
+                    setProcessing(false);
+                },
+                onError: (err: Record<string, string>) => {
+                    setErrors(err);
+                    setProcessing(false);
+                },
+            },
+        );
     };
 
     return (
@@ -75,19 +79,17 @@ export default function Edit() {
                             type="text"
                             disabled
                             value={`${filename}.tsx`}
-                            className="font-mono text-sm bg-gray-50 text-gray-500 cursor-not-allowed dark:bg-[#1c1c1a]"
+                            className="cursor-not-allowed bg-gray-50 font-mono text-sm text-gray-500 dark:bg-[#1c1c1a]"
                         />
-                        <p className="text-xs text-gray-400">
-                            Para cambiar el nombre del archivo, cámbielo en el sistema de archivos del servidor.
-                        </p>
+                        <p className="text-xs text-gray-400">Para cambiar el nombre del archivo, cámbielo en el sistema de archivos del servidor.</p>
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="content">Código de la Plantilla (React / TypeScript)</Label>
-                        <div className="border rounded-md overflow-hidden bg-gray-900 border-gray-800">
-                            <div className="bg-gray-800/60 px-4 py-2 border-b border-gray-900 text-xs text-gray-400 font-mono flex items-center justify-between">
+                        <div className="overflow-hidden rounded-md border border-gray-800 bg-gray-900">
+                            <div className="flex items-center justify-between border-b border-gray-900 bg-gray-800/60 px-4 py-2 font-mono text-xs text-gray-400">
                                 <span>{`${filename}.tsx`}</span>
-                                <span className="text-red-400 font-semibold">TSX</span>
+                                <span className="font-semibold text-red-400">TSX</span>
                             </div>
                             <Textarea
                                 id="content"
@@ -95,7 +97,7 @@ export default function Edit() {
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 disabled={processing}
-                                className="font-mono text-sm leading-relaxed p-4 bg-gray-900 text-gray-100 border-0 focus-visible:ring-0 resize-y min-h-[400px]"
+                                className="min-h-[400px] resize-y border-0 bg-gray-900 p-4 font-mono text-sm leading-relaxed text-gray-100 focus-visible:ring-0"
                                 placeholder="// Escribe el código de tu componente React..."
                                 spellCheck={false}
                             />
@@ -104,7 +106,7 @@ export default function Edit() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing} className="bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">
+                        <Button disabled={processing} className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600">
                             {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
                         <Link href="/admin/templates" className="text-sm text-gray-500 hover:underline">

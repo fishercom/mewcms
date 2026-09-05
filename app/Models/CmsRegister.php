@@ -17,12 +17,12 @@ class CmsRegister extends Model
 
     public function form()
     {
-        return $this->hasOne('App\Models\CmsForm', 'id', 'form_id');
+        return $this->hasOne(CmsForm::class, 'id', 'form_id');
     }
 
     public function contact()
     {
-        return $this->hasOne('App\Models\CmsParameter', 'id', 'contact_id');
+        return $this->hasOne(CmsParameter::class, 'id', 'contact_id');
     }
 
     public function fields()

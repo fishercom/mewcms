@@ -29,9 +29,9 @@ class CmsArticle extends Model
         'metadata' => 'array',
     ];
 
-    public $front_view = null;
+    public $front_view;
 
-    public $route_view = null;
+    public $route_view;
 
     public function sluggable(): array
     {
@@ -42,7 +42,7 @@ class CmsArticle extends Model
         ];
     }
 
-    public function getParentSlugAttribute()
+    public function getParentSlugAttribute(): string
     {
         $pslug = $this->parent != null ? $this->parent->slug.'_' : '';
 
@@ -51,27 +51,27 @@ class CmsArticle extends Model
 
     public function parent()
     {
-        return $this->belongsTo('App\Models\CmsArticle', 'parent_id');
+        return $this->belongsTo(CmsArticle::class, 'parent_id');
     }
 
     public function lang()
     {
-        return $this->belongsTo('App\Models\CmsLang', 'lang_id');
+        return $this->belongsTo(CmsLang::class, 'lang_id');
     }
 
     public function schema()
     {
-        return $this->belongsTo('App\Models\CmsSchema', 'schema_id');
+        return $this->belongsTo(CmsSchema::class, 'schema_id');
     }
 
     public function schemas()
     {
-        return $this->hasMany('App\Models\CmsSchema', 'id', 'schema_id');
+        return $this->hasMany(CmsSchema::class, 'id', 'schema_id');
     }
 
     public function page_schemas()
     {
-        return $this->hasMany('App\Models\CmsSchema', 'id', 'schema_id')
+        return $this->hasMany(CmsSchema::class, 'id', 'schema_id')
             ->where('type', 'PAGE')
             ->where('active', '1')
             ->orderBy('position');
@@ -79,15 +79,15 @@ class CmsArticle extends Model
 
     public function children()
     {
-        return $this->hasMany('App\Models\CmsArticle', 'parent_id', 'id')
+        return $this->hasMany(CmsArticle::class, 'parent_id', 'id')
             ->where('active', '1')
             ->orderBy('position');
     }
 
     public function submenu()
     {
-        return $this->hasMany('App\Models\CmsArticle', 'parent_id', 'id')
-            ->where(function ($query) {
+        return $this->hasMany(CmsArticle::class, 'parent_id', 'id')
+            ->where(function ($query): void {
                 $query->whereIn('schema_id', CmsSchema::select('id')->where('type', 'PAGE')->get()->toArray())
                     ->orWhereNull('schema_id');
             })
@@ -97,16 +97,16 @@ class CmsArticle extends Model
 
     public function find_template($front_view)
     {
-        return $this->hasOne('App\Models\CmsArticle', 'parent_id', 'id')
-            ->whereHas('schemas', function ($query) use ($front_view) {
+        return $this->hasOne(CmsArticle::class, 'parent_id', 'id')
+            ->whereHas('schemas', function ($query) use ($front_view): void {
                 $query->where('front_view', $front_view);
             });
     }
 
     public function child_template($front_view)
     {
-        return $this->hasMany('App\Models\CmsArticle', 'parent_id', 'id')
-            ->whereHas('schemas', function ($query) use ($front_view) {
+        return $this->hasMany(CmsArticle::class, 'parent_id', 'id')
+            ->whereHas('schemas', function ($query) use ($front_view): void {
                 $query->where('front_view', $front_view);
             })
             ->where('active', '1')
@@ -115,7 +115,7 @@ class CmsArticle extends Model
 
     public function terms()
     {
-        return $this->belongsToMany('App\Models\CmsTaxonomyTerm', 'cms_article_term', 'article_id', 'term_id');
+        return $this->belongsToMany(CmsTaxonomyTerm::class, 'cms_article_term', 'article_id', 'term_id');
     }
 
     public function getAllDescendantIds(): array

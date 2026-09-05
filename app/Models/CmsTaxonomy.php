@@ -28,6 +28,6 @@ class CmsTaxonomy extends Model
 
     public function terms()
     {
-        return $this->hasMany('App\Models\CmsTaxonomyTerm', 'taxonomy_id')->orderBy('position');
+        return $this->hasMany(CmsTaxonomyTerm::class, 'taxonomy_id')->orderBy('position');
     }
 }

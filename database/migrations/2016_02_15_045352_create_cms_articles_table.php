@@ -8,12 +8,10 @@ class CreateCmsArticlesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('cms_articles', function (Blueprint $table) {
+        Schema::create('cms_articles', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('parent_id')->unsigned()->nullable();
             $table->integer('schema_id')->unsigned();
@@ -45,10 +43,8 @@ class CreateCmsArticlesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('cms_articles');
     }

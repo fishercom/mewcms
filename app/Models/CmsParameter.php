@@ -23,7 +23,7 @@ class CmsParameter extends Model
 
     public function from_group($alias)
     {
-        return $this->hasMany('App\Models\CmsParameter', 'group_id', 'id')
+        return $this->hasMany(CmsParameter::class, 'group_id', 'id')
             ->whereIn('group_id', CmsParameterGroup::select('id')
                 ->where('alias', $alias)->get()->toArray()
             )
@@ -38,7 +38,7 @@ class CmsParameter extends Model
 
     public function group()
     {
-        return $this->belongsTo('App\Models\CmsParameterGroup', 'group_id');
+        return $this->belongsTo(CmsParameterGroup::class, 'group_id');
     }
 
     public function children()

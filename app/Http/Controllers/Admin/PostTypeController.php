@@ -17,7 +17,7 @@ class PostTypeController extends Controller
         $s = $request->get('s');
 
         $items = CmsPostType::with('default_schema')
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%')
                         ->orWhere('slug', 'LIKE', '%'.str_replace(' ', '%', $s).'%');

@@ -1,16 +1,16 @@
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { createParameter } from '@/services/parameters';
-import ParameterFormFields from './partials/fields';
-import { CmsParameterForm, CmsParameter } from '@/types/models/cms-parameter';
+import { CmsParameter, CmsParameterForm } from '@/types/models/cms-parameter';
 import { CmsParameterGroup } from '@/types/models/cms-parameter-group';
+import ParameterFormFields from './partials/fields';
 
 export default function Create() {
-    const { groups, parents } = usePage<{ groups: CmsParameterGroup[], parents: CmsParameter[] }>().props;
+    const { groups, parents } = usePage<{ groups: CmsParameterGroup[]; parents: CmsParameter[] }>().props;
 
     const item: CmsParameterForm = {
         group_id: groups[0]?.id || 0,
@@ -19,7 +19,7 @@ export default function Create() {
         value: '',
         metadata: {},
         active: false,
-    }
+    };
     const [data, setData] = useState<CmsParameterForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -44,21 +44,14 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <FormLayout>
-            <form onSubmit={createParameterHandler} className="space-y-6">
-                <ParameterFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    groups={groups}
-                    parents={parents}
-                />
+                <form onSubmit={createParameterHandler} className="space-y-6">
+                    <ParameterFormFields data={data} setData={setData} errors={errors} processing={processing} groups={groups} parents={parents} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/parameters'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/parameters">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );

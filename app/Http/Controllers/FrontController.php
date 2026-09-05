@@ -46,12 +46,12 @@ class FrontController extends Controller
 
         if (empty($slug)) {
             // Find the Home page article
-            $article = CmsArticle::whereHas('schema', function ($query) {
+            $article = CmsArticle::whereHas('schema', function ($query): void {
                 $query->whereIn('type', ['HOME', 'PAGE']);
             })->where('slug', 'home')->where('active', 1)->first();
 
             if (! $article) {
-                $article = CmsArticle::whereHas('schema', function ($query) {
+                $article = CmsArticle::whereHas('schema', function ($query): void {
                     $query->where('type', 'HOME');
                 })->where('active', 1)->first();
             }
@@ -71,7 +71,7 @@ class FrontController extends Controller
         }
 
         // Eager load schema to extract rendering templates
-        $article->load(['schema', 'terms.taxonomy', 'children' => function ($query) {
+        $article->load(['schema', 'terms.taxonomy', 'children' => function ($query): void {
             $query->where('active', 1)->orderBy('position');
         }]);
 
@@ -97,7 +97,7 @@ class FrontController extends Controller
             ->get(['id', 'title', 'slug']);
 
         // Fetch active taxonomies with active terms and their articles count
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -143,7 +143,7 @@ class FrontController extends Controller
     /**
      * Display posts associated with a specific category term.
      */
-    public function category(Request $request, $slug): Response
+    public function category(Request $request, string $slug): Response
     {
         [$term, $articles, $taxonomy] = $this->getArticlesByTerm('categorias', $slug);
 
@@ -153,11 +153,11 @@ class FrontController extends Controller
     /**
      * Display posts associated with a specific tag term.
      */
-    public function tag(Request $request, $slug): Response
+    public function tag(Request $request, string $slug): Response
     {
         try {
             [$term, $articles, $taxonomy] = $this->getArticlesByTerm('tags', $slug);
-        } catch (NotFoundHttpException $e) {
+        } catch (NotFoundHttpException) {
             [$term, $articles, $taxonomy] = $this->getArticlesByTerm('etiquetas', $slug);
         }
 
@@ -206,7 +206,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -233,7 +233,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -268,7 +268,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -301,7 +301,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -336,7 +336,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -397,7 +397,7 @@ class FrontController extends Controller
                 $nameVal = $val;
             } elseif ($field->alias === 'email' || $field->alias === 'correo') {
                 $emailVal = $val;
-            } elseif ($field->alias === 'phone' || $field->alias === 'telefono' || $field->alias === 'celular') {
+            } elseif (in_array($field->alias, ['phone', 'telefono', 'celular'], true)) {
                 $phoneVal = $val;
             } elseif ($field->alias === 'message' || $field->alias === 'mensaje') {
                 $msgVal = $val;
@@ -449,7 +449,7 @@ class FrontController extends Controller
 
     public function getFormConfig(string $alias): JsonResponse
     {
-        $form = CmsForm::with(['fields' => function ($q) {
+        $form = CmsForm::with(['fields' => function ($q): void {
             $q->where('active', 1)->orderBy('id');
         }])->where('alias', $alias)->where('active', 1)->firstOrFail();
 
@@ -466,7 +466,7 @@ class FrontController extends Controller
             ->orderBy('position')
             ->get(['id', 'title', 'slug']);
 
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q) {
+        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
             $q->where('active', true)->orderBy('position')->withCount('articles');
         }])->where('active', true)->get();
 
@@ -482,7 +482,7 @@ class FrontController extends Controller
             // 1. Search in Articles (Pages)
             $articles = CmsArticle::where('active', 1)
                 ->where('slug', '!=', 'home-page')
-                ->where(function ($q) use ($cleanQuery) {
+                ->where(function ($q) use ($cleanQuery): void {
                     $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
                         ->orWhere('content', 'LIKE', '%'.$cleanQuery.'%');
                 })
@@ -503,7 +503,7 @@ class FrontController extends Controller
             $posts = CmsPost::with('user')
                 ->where('active', 1)
                 ->where('status', 'published')
-                ->where(function ($q) use ($cleanQuery) {
+                ->where(function ($q) use ($cleanQuery): void {
                     $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
                         ->orWhere('content', 'LIKE', '%'.$cleanQuery.'%');
                 })

@@ -4,11 +4,12 @@ use App\Models\CmsConfig;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->profile = Profile::create([
         'name' => 'Super Admin',
         'sa' => 1,
@@ -42,23 +43,23 @@ beforeEach(function () {
     }
 });
 
-it('prevents guests from accessing layout settings customizer', function () {
+it('prevents guests from accessing layout settings customizer', function (): void {
     $response = $this->get('/admin/layout');
     $response->assertRedirect('/login');
 });
 
-it('allows authenticated admin to view layout customizer dashboard page', function () {
+it('allows authenticated admin to view layout customizer dashboard page', function (): void {
     $response = $this->actingAs($this->user)->get('/admin/layout');
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->component('admin/layout/index')
         ->has('settings')
         ->where('settings.layout_copyright', '© MewCMS')
     );
 });
 
-it('allows updating layout settings and changes configs in db', function () {
+it('allows updating layout settings and changes configs in db', function (): void {
     $response = $this->actingAs($this->user)->post('/admin/layout', [
         'layout_header_logo' => 'https://site.com/header.png',
         'layout_copyright' => 'Updated Copyright 2026',
@@ -89,14 +90,14 @@ it('allows updating layout settings and changes configs in db', function () {
     ]);
 });
 
-it('shares layout configurations globally in Inertia', function () {
+it('shares layout configurations globally in Inertia', function (): void {
     // Modify one config first
     CmsConfig::where('alias', 'layout_copyright')->update(['value' => 'Testing Global Inertia Share']);
 
     $response = $this->actingAs($this->user)->get('/admin/layout');
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->has('layout_settings')
         ->where('layout_settings.layout_copyright', 'Testing Global Inertia Share')
     );

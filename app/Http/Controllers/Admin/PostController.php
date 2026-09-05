@@ -77,7 +77,7 @@ class PostController extends Controller
     {
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
         $authors = User::where('active', 1)->get(['id', 'name', 'username']);
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query) {
+        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
             $query->where('active', true)->orderBy('position');
         }])->where('active', true)->get();
 
@@ -162,7 +162,7 @@ class PostController extends Controller
 
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
         $authors = User::where('active', 1)->get(['id', 'name', 'username']);
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query) {
+        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
             $query->where('active', true)->orderBy('position');
         }])->where('active', true)->get();
 

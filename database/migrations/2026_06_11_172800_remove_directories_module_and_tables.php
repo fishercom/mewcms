@@ -30,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         // Recreate filetypes table
-        Schema::create('cms_filetypes', function (Blueprint $table) {
+        Schema::create('cms_filetypes', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
             $table->string('extensions');
@@ -39,7 +39,7 @@ return new class extends Migration
         });
 
         // Recreate directories table
-        Schema::create('cms_directories', function (Blueprint $table) {
+        Schema::create('cms_directories', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('type_id')->unsigned();
             $table->string('name');

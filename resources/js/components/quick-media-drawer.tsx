@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { 
-    X, FolderPlus, UploadCloud, Folder, 
-    FileText, ChevronRight, 
-    ArrowLeft, Copy, Check, Loader2, Trash2 
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import axios from 'axios';
+import { ArrowLeft, Check, ChevronRight, Copy, FileText, Folder, FolderPlus, Loader2, Trash2, UploadCloud, X } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface QuickMediaDrawerProps {
     isOpen: boolean;
@@ -31,17 +27,12 @@ const isImageFile = (filename: string) => {
     return ext ? ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(ext) : false;
 };
 
-export default function QuickMediaDrawer({ 
-    isOpen, 
-    onClose, 
-    onSelect,
-    initialType = 'Images' 
-}: QuickMediaDrawerProps) {
+export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialType = 'Images' }: QuickMediaDrawerProps) {
     const [type, setType] = useState<'Images' | 'Files'>(initialType);
     const [workingDir, setWorkingDir] = useState<string>('');
     const [items, setItems] = useState<LfmItem[]>([]);
 
-    const filteredItems = items.filter(item => {
+    const filteredItems = items.filter((item) => {
         if (!item.is_file) return true;
         const isImg = isImageFile(item.name);
         return type === 'Images' ? isImg : !isImg;
@@ -54,7 +45,7 @@ export default function QuickMediaDrawer({
 
     // Upload state
     const [uploadingFiles, setUploadingFiles] = useState<{ name: string; progress: number }[]>([]);
-    
+
     // Copy state feedback
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
@@ -66,8 +57,8 @@ export default function QuickMediaDrawer({
             const response = await axios.get('/laravel-filemanager/jsonitems', {
                 params: {
                     type: type,
-                    working_dir: workingDir
-                }
+                    working_dir: workingDir,
+                },
             });
             if (response.data) {
                 if (response.data.items) {
@@ -101,8 +92,8 @@ export default function QuickMediaDrawer({
                 params: {
                     name: newFolderName,
                     working_dir: workingDir,
-                    type: type
-                }
+                    type: type,
+                },
             });
             if (response.data === 'OK') {
                 setNewFolderName('');
@@ -110,7 +101,7 @@ export default function QuickMediaDrawer({
             } else {
                 alert(response.data.error || 'Error al crear carpeta');
             }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Folder creation error:', error);
             const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al crear carpeta.';
@@ -126,7 +117,7 @@ export default function QuickMediaDrawer({
         if (!files || files.length === 0) return;
 
         const uploadQueue = Array.from(files);
-        const progressList = uploadQueue.map(f => ({ name: f.name, progress: 0 }));
+        const progressList = uploadQueue.map((f) => ({ name: f.name, progress: 0 }));
         setUploadingFiles(progressList);
 
         for (let i = 0; i < uploadQueue.length; i++) {
@@ -144,17 +135,15 @@ export default function QuickMediaDrawer({
             try {
                 await axios.post('/laravel-filemanager/upload', formData, {
                     headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'multipart/form-data'
+                        Accept: 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                     onUploadProgress: (progressEvent) => {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
-                        setUploadingFiles(prev => 
-                            prev.map((item, idx) => idx === i ? { ...item, progress: percentCompleted } : item)
-                        );
-                    }
+                        setUploadingFiles((prev) => prev.map((item, idx) => (idx === i ? { ...item, progress: percentCompleted } : item)));
+                    },
                 });
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 console.error(`Upload failed for ${file.name}:`, error);
                 const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al subir el archivo.';
@@ -197,21 +186,21 @@ export default function QuickMediaDrawer({
         if (!window.confirm(`¿Estás seguro de que deseas eliminar "${itemName}"?`)) {
             return;
         }
-        
+
         try {
             const response = await axios.get('/laravel-filemanager/delete', {
                 params: {
                     type: type,
                     working_dir: workingDir,
-                    items: [itemName]
-                }
+                    items: [itemName],
+                },
             });
             if (response.data === 'OK') {
                 fetchItems();
             } else {
                 alert('Error al eliminar el elemento');
             }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Delete item error:', error);
             const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al eliminar el elemento.';
@@ -220,18 +209,14 @@ export default function QuickMediaDrawer({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-200">
+        <div className="animate-in fade-in fixed inset-0 z-50 flex justify-end duration-200">
             {/* Backdrop */}
-            <div 
-                className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity" 
-                onClick={onClose} 
-            />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
             {/* Sidebar drawer content */}
-            <div className="relative w-full max-w-md bg-white dark:bg-[#161615] border-l border-gray-200 dark:border-gray-800 shadow-2xl h-full flex flex-col z-10 animate-in slide-in-from-right duration-300">
-                
+            <div className="animate-in slide-in-from-right relative z-10 flex h-full w-full max-w-md flex-col border-l border-gray-200 bg-white shadow-2xl duration-300 dark:border-gray-800 dark:bg-[#161615]">
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-900">
+                <div className="flex items-center justify-between border-b border-gray-100 p-5 dark:border-gray-900">
                     <div>
                         <h2 className="text-base font-bold text-gray-900 dark:text-white">Gestor de Medios Rápido</h2>
                         <p className="text-xs text-gray-400">Sube, crea carpetas e inserta archivos</p>
@@ -242,13 +227,16 @@ export default function QuickMediaDrawer({
                 </div>
 
                 {/* Tab selector Images / Files */}
-                <div className="grid grid-cols-2 border-b border-gray-100 dark:border-gray-900 bg-gray-50/50 dark:bg-black/10">
+                <div className="grid grid-cols-2 border-b border-gray-100 bg-gray-50/50 dark:border-gray-900 dark:bg-black/10">
                     <button
                         type="button"
-                        onClick={() => { setType('Images'); setWorkingDir(''); }}
-                        className={`py-3 text-center text-xs font-semibold border-b-2 transition-colors ${
-                            type === 'Images' 
-                                ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500' 
+                        onClick={() => {
+                            setType('Images');
+                            setWorkingDir('');
+                        }}
+                        className={`border-b-2 py-3 text-center text-xs font-semibold transition-colors ${
+                            type === 'Images'
+                                ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -256,10 +244,13 @@ export default function QuickMediaDrawer({
                     </button>
                     <button
                         type="button"
-                        onClick={() => { setType('Files'); setWorkingDir(''); }}
-                        className={`py-3 text-center text-xs font-semibold border-b-2 transition-colors ${
-                            type === 'Files' 
-                                ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500' 
+                        onClick={() => {
+                            setType('Files');
+                            setWorkingDir('');
+                        }}
+                        className={`border-b-2 py-3 text-center text-xs font-semibold transition-colors ${
+                            type === 'Files'
+                                ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -268,10 +259,13 @@ export default function QuickMediaDrawer({
                 </div>
 
                 {/* Main Scrollable Area */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                <div className="flex-1 space-y-6 overflow-y-auto p-5">
                     {/* Action Block 1: Folder Creation */}
-                    <form onSubmit={handleCreateFolder} className="bg-gray-50 dark:bg-black/15 p-4 rounded-xl border border-gray-200/50 dark:border-gray-900/50 space-y-3">
-                        <Label htmlFor="drawer-folder-name" className="text-xs font-semibold flex items-center gap-1">
+                    <form
+                        onSubmit={handleCreateFolder}
+                        className="space-y-3 rounded-xl border border-gray-200/50 bg-gray-50 p-4 dark:border-gray-900/50 dark:bg-black/15"
+                    >
+                        <Label htmlFor="drawer-folder-name" className="flex items-center gap-1 text-xs font-semibold">
                             <FolderPlus className="h-4 w-4 text-red-600 dark:text-red-500" />
                             <span>Crear Carpeta en: {workingDir || '/'}</span>
                         </Label>
@@ -285,46 +279,44 @@ export default function QuickMediaDrawer({
                                 className="h-9 text-xs"
                                 disabled={creatingFolder}
                             />
-                            <Button size="sm" className="h-9 px-4 shrink-0" disabled={creatingFolder}>
+                            <Button size="sm" className="h-9 shrink-0 px-4" disabled={creatingFolder}>
                                 {creatingFolder ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Crear'}
                             </Button>
                         </div>
                     </form>
 
                     {/* Action Block 2: Bulk Upload */}
-                    <div className="bg-gray-50 dark:bg-black/15 p-4 rounded-xl border border-gray-200/50 dark:border-gray-900/50 space-y-3">
-                        <Label className="text-xs font-semibold flex items-center gap-1">
+                    <div className="space-y-3 rounded-xl border border-gray-200/50 bg-gray-50 p-4 dark:border-gray-900/50 dark:bg-black/15">
+                        <Label className="flex items-center gap-1 text-xs font-semibold">
                             <UploadCloud className="h-4 w-4 text-red-600 dark:text-red-500" />
                             <span>Subida Múltiple de Archivos</span>
                         </Label>
-                        <div className="relative border border-dashed border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-900/20 transition-colors py-5 text-center cursor-pointer">
+                        <div className="relative cursor-pointer rounded-lg border border-dashed border-gray-300 py-5 text-center transition-colors hover:bg-gray-100/50 dark:border-gray-700 dark:hover:bg-gray-900/20">
                             <input
                                 type="file"
                                 multiple
                                 onChange={handleFileUpload}
-                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                             />
-                            <UploadCloud className="mx-auto h-8 w-8 text-gray-400 mb-1" />
-                            <span className="text-xs text-gray-500 font-medium block">
-                                Clic aquí o arrastra archivos para subir
-                            </span>
-                            <span className="text-[10px] text-gray-400 mt-1 block">
+                            <UploadCloud className="mx-auto mb-1 h-8 w-8 text-gray-400" />
+                            <span className="block text-xs font-medium text-gray-500">Clic aquí o arrastra archivos para subir</span>
+                            <span className="mt-1 block text-[10px] text-gray-400">
                                 {type === 'Images' ? 'JPG, PNG, GIF, WEBP' : 'PDF, DOC, XLS, PPT, MP3, MP4'}
                             </span>
                         </div>
 
                         {/* Uploading list */}
                         {uploadingFiles.length > 0 && (
-                            <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-900">
+                            <div className="space-y-2 border-t border-gray-100 pt-2 dark:border-gray-900">
                                 {uploadingFiles.map((file, idx) => (
                                     <div key={idx} className="space-y-1">
                                         <div className="flex justify-between text-[10px]">
-                                            <span className="truncate max-w-[200px]">{file.name}</span>
+                                            <span className="max-w-[200px] truncate">{file.name}</span>
                                             <span className="font-semibold">{file.progress}%</span>
                                         </div>
-                                        <div className="w-full bg-gray-200 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                                            <div 
-                                                className="bg-red-600 dark:bg-red-500 h-full transition-all duration-300"
+                                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                                            <div
+                                                className="h-full bg-red-600 transition-all duration-300 dark:bg-red-500"
                                                 style={{ width: `${file.progress}%` }}
                                             />
                                         </div>
@@ -337,29 +329,22 @@ export default function QuickMediaDrawer({
                     {/* Action Block 3: Browser List */}
                     <div className="space-y-3">
                         {/* Navigation Breadcrumb */}
-                        <div className="flex items-center gap-2 text-xs py-1.5 border-b border-gray-100 dark:border-gray-900">
+                        <div className="flex items-center gap-2 border-b border-gray-100 py-1.5 text-xs dark:border-gray-900">
                             {workingDir && (
-                                <Button 
-                                    size="icon" 
-                                    variant="ghost" 
-                                    className="h-7 w-7" 
-                                    onClick={handleGoBack}
-                                >
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleGoBack}>
                                     <ArrowLeft className="h-4 w-4" />
                                 </Button>
                             )}
-                            <div className="flex items-center gap-1 text-gray-500 font-medium truncate">
+                            <div className="flex items-center gap-1 truncate font-medium text-gray-500">
                                 <span>{type === 'Images' ? 'photos' : 'files'}</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
-                                <span className="text-gray-900 dark:text-white truncate font-semibold">
-                                    {workingDir || '/'}
-                                </span>
+                                <span className="truncate font-semibold text-gray-900 dark:text-white">{workingDir || '/'}</span>
                             </div>
                         </div>
 
                         {/* Files and Folders list */}
                         {loading ? (
-                            <div className="flex items-center justify-center py-16 gap-2 text-xs text-gray-500">
+                            <div className="flex items-center justify-center gap-2 py-16 text-xs text-gray-500">
                                 <Loader2 className="h-4 w-4 animate-spin text-red-600 dark:text-red-500" />
                                 <span>Cargando archivos...</span>
                             </div>
@@ -370,14 +355,14 @@ export default function QuickMediaDrawer({
                                         // Directory view
                                         const isSystemFolder = !workingDir || workingDir === '/' || ['1', 'shares'].includes(item.name);
                                         return (
-                                            <div key={idx} className="relative group/folder">
+                                            <div key={idx} className="group/folder relative">
                                                 <button
                                                     type="button"
                                                     onClick={() => handleFolderClick(item.name)}
-                                                    className="w-full flex flex-col items-center justify-center p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white hover:border-red-500/40 dark:bg-[#1f1f1e] hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-all text-center gap-2 group cursor-pointer"
+                                                    className="group flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white p-3 text-center transition-all hover:border-red-500/40 hover:bg-gray-50 dark:border-gray-800 dark:bg-[#1f1f1e] dark:hover:bg-gray-800/20"
                                                 >
-                                                    <Folder className="h-8 w-8 text-amber-500 group-hover:scale-105 transition-transform duration-200" />
-                                                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate w-full capitalize">
+                                                    <Folder className="h-8 w-8 text-amber-500 transition-transform duration-200 group-hover:scale-105" />
+                                                    <span className="w-full truncate text-xs font-semibold text-gray-700 capitalize dark:text-gray-300">
                                                         {item.name}
                                                     </span>
                                                 </button>
@@ -386,8 +371,11 @@ export default function QuickMediaDrawer({
                                                         size="icon"
                                                         variant="ghost"
                                                         type="button"
-                                                        className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 opacity-0 group-hover/folder:opacity-100 transition-opacity"
-                                                        onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.name); }}
+                                                        className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full text-zinc-400 opacity-0 transition-opacity group-hover/folder:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteItem(item.name);
+                                                        }}
                                                         title="Eliminar carpeta"
                                                     >
                                                         <Trash2 className="h-3 w-3" />
@@ -402,15 +390,15 @@ export default function QuickMediaDrawer({
                                     return (
                                         <div
                                             key={idx}
-                                            className="relative rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1f1f1e] overflow-hidden group shadow-sm flex flex-col"
+                                            className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#1f1f1e]"
                                         >
                                             {/* Preview/Icon */}
-                                            <div className="aspect-[4/3] bg-gray-50 dark:bg-black/10 flex items-center justify-center overflow-hidden border-b border-gray-100 dark:border-gray-900">
+                                            <div className="flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-gray-100 bg-gray-50 dark:border-gray-900 dark:bg-black/10">
                                                 {isImg ? (
-                                                    <img 
-                                                        src={item.url} 
-                                                        alt={item.name} 
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    <img
+                                                        src={item.url}
+                                                        alt={item.name}
+                                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                     />
                                                 ) : (
                                                     <FileText className="h-8 w-8 text-blue-500" />
@@ -418,17 +406,17 @@ export default function QuickMediaDrawer({
                                             </div>
 
                                             {/* Info & Copy button */}
-                                            <div className="p-2 space-y-1 flex-1 flex flex-col justify-between">
-                                                <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 truncate block">
+                                            <div className="flex flex-1 flex-col justify-between space-y-1 p-2">
+                                                <span className="block truncate text-[10px] font-medium text-gray-700 dark:text-gray-300">
                                                     {item.name}
                                                 </span>
-                                                
-                                                <div className="flex gap-1 pt-1.5 border-t border-gray-100 dark:border-gray-900/50">
+
+                                                <div className="flex gap-1 border-t border-gray-100 pt-1.5 dark:border-gray-900/50">
                                                     {onSelect && (
                                                         <Button
                                                             size="sm"
                                                             type="button"
-                                                            className="w-full text-[9px] h-6 px-1"
+                                                            className="h-6 w-full px-1 text-[9px]"
                                                             onClick={() => onSelect(item.url)}
                                                         >
                                                             Seleccionar
@@ -452,7 +440,7 @@ export default function QuickMediaDrawer({
                                                         size="icon"
                                                         variant="ghost"
                                                         type="button"
-                                                        className="h-6 w-6 shrink-0 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                                        className="h-6 w-6 shrink-0 text-zinc-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
                                                         onClick={() => handleDeleteItem(item.name)}
                                                         title="Eliminar elemento"
                                                     >
@@ -465,7 +453,7 @@ export default function QuickMediaDrawer({
                                 })}
                             </div>
                         ) : (
-                            <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/20">
+                            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/20 py-16 text-center dark:border-gray-800">
                                 <p className="text-xs text-gray-400 italic">Esta carpeta está vacía.</p>
                             </div>
                         )}

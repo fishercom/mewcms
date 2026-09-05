@@ -1,15 +1,12 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
-import { NavItem, type BreadcrumbItem } from '@/types';
-import { type PropsWithChildren } from 'react';
 import { generateBreadcrumb } from '@/lib/breadcrumbs';
-import { usePage } from '@inertiajs/react';
-import { NavGroup } from '@/types';
+import { NavGroup, NavItem, type BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import { type PropsWithChildren } from 'react';
 
-export default function ModuleLayout({ children, view=''}: PropsWithChildren<{view?: string | null}>) {
-
-    const { adm_menu } = usePage<{ adm_menu: NavGroup[] }>().props
+export default function ModuleLayout({ children, view = '' }: PropsWithChildren<{ view?: string | null }>) {
+    const { adm_menu } = usePage<{ adm_menu: NavGroup[] }>().props;
     const page = usePage();
     const url = page.url;
     const module: NavItem = { id: 0, title: '', description: '', url: '', icon: null };
@@ -23,8 +20,8 @@ export default function ModuleLayout({ children, view=''}: PropsWithChildren<{vi
                 module.icon = item.icon;
                 module.url = item.url;
             }
-        })
-    })
+        });
+    });
 
     console.log(url, module, 'module');
 
@@ -38,13 +35,11 @@ export default function ModuleLayout({ children, view=''}: PropsWithChildren<{vi
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-        <Head/>
-            <section className="p-3 sm:p-5 antialiased">
+            <Head />
+            <section className="p-3 antialiased sm:p-5">
                 <Heading title={title} description={module.description} />
-                <div className="mx-auto overflow-hidden">
-                    {children}
-                </div>
+                <div className="mx-auto overflow-hidden">{children}</div>
             </section>
         </AppLayout>
-    )
+    );
 }

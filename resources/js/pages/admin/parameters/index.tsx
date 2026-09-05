@@ -1,54 +1,62 @@
-import { useState, useEffect } from 'react';
-import { router, usePage } from '@inertiajs/react';
-import ModuleLayout from '@/layouts/module/layout';
-import { format } from 'date-fns'
-import { CmsParameter } from '@/types/models/cms-parameter';
-import { Pagination } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Check, Search, Plus, Edit, Trash2 } from 'lucide-react';
-import { Input } from '@headlessui/react';
 import { PaginationNav } from '@/components/ui/pagination-nav';
-import { getParameters, deleteParameter } from '@/services/parameters';
+import ModuleLayout from '@/layouts/module/layout';
+import { deleteParameter, getParameters } from '@/services/parameters';
+import { Pagination } from '@/types';
+import { CmsParameter } from '@/types/models/cms-parameter';
+import { Input } from '@headlessui/react';
+import { router, usePage } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { Check, Edit, Plus, Search, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function Index() {
-
     const { items } = usePage<{ items: Pagination<CmsParameter> }>().props;
-    const [ query, setQuery ] = useState({s: ''});
+    const [query, setQuery] = useState({ s: '' });
 
     useEffect(() => {
-        if(query.s){
+        if (query.s) {
             getParameters(query);
         }
     }, [query]);
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>)=>{
-        const {value} = e.target;
-        setQuery({s: value});
-    }
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setQuery({ s: value });
+    };
 
     const deleteParameterHandler = (id: number) => {
         deleteParameter(id);
-    }
+    };
 
     return (
         <ModuleLayout>
             <div className="relative overflow-hidden">
-                <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 pb-4">
+                <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
                     <div className="w-full md:w-3/4">
                         <form className="flex items-center">
-                            <label htmlFor="simple-search" className="sr-only">Search</label>
+                            <label htmlFor="simple-search" className="sr-only">
+                                Search
+                            </label>
                             <div className="relative w-full">
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-                                    <Search/>
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
+                                    <Search />
                                 </div>
-                                <Input type='text' autoFocus value={query.s??''} onChange={handleSearch} className="focus-within:outline-2 focus-within:outline-gray-400 border border-gray-500 text-sm rounded-md block w-full pl-10 p-2" placeholder="Buscar" />
+                                <Input
+                                    type="text"
+                                    autoFocus
+                                    value={query.s ?? ''}
+                                    onChange={handleSearch}
+                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm focus-within:outline-2 focus-within:outline-gray-400"
+                                    placeholder="Buscar"
+                                />
                             </div>
                         </form>
                     </div>
-                    <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+                    <div className="flex w-full flex-shrink-0 flex-col items-stretch justify-end space-y-2 md:w-auto md:flex-row md:items-center md:space-y-0 md:space-x-3">
                         <button
                             type="button"
-                            className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 font-medium text-sm px-4 py-2 rounded-md transition-colors gap-1.5"
+                            className="flex items-center justify-center gap-1.5 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                             onClick={() => router.visit('/admin/parameters/create')}
                         >
                             <Plus className="h-4 w-4" />
@@ -57,53 +65,61 @@ export default function Index() {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-sm text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
+                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
                             <tr>
-                                <th scope="col" className="px-4 py-3 rounded-l-md">Name</th>
-                                <th scope="col" className="px-4 py-3">Active</th>
-                                <th scope="col" className="px-4 py-3">Created Date</th>
-                                <th scope="col" className="px-4 py-3">Updated Date</th>
-                                <th scope="col" className="px-4 py-3 rounded-r-md"></th>
+                                <th scope="col" className="rounded-l-md px-4 py-3">
+                                    Name
+                                </th>
+                                <th scope="col" className="px-4 py-3">
+                                    Active
+                                </th>
+                                <th scope="col" className="px-4 py-3">
+                                    Created Date
+                                </th>
+                                <th scope="col" className="px-4 py-3">
+                                    Updated Date
+                                </th>
+                                <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: CmsParameter)=>{
-                            return(
-                            <tr key={ item.id } className="border-b dark:border-gray-700">
-                                <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.name }</th>
-                                <td className="px-4 py-3">{ item.active? <Check className="h-4 w-4 text-green-500" /> : <></> }</td>
-                                <td className="px-4 py-3">{ format(new Date(item.created_at), 'dd/MM/yyyy HH:mm') }</td>
-                                <td className="px-4 py-3">{ format(new Date(item.updated_at), 'dd/MM/yyyy HH:mm') }</td>
-                                <td className="px-4 py-3 flex items-center justify-end gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="flex items-center gap-1 h-8 px-2.5"
-                                        onClick={() => router.visit(route('parameters.edit', item.id))}
-                                    >
-                                        <Edit className="h-3.5 w-3.5" />
-                                        <span>Editar</span>
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="flex items-center gap-1 h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20"
-                                        onClick={() => deleteParameterHandler(item.id)}
-                                    >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                        <span>Eliminar</span>
-                                    </Button>
-                                </td>
-                            </tr>
-                            )}
-                        )}
+                            {items.data.map((item: CmsParameter) => {
+                                return (
+                                    <tr key={item.id} className="border-b dark:border-gray-700">
+                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                            {item.name}
+                                        </th>
+                                        <td className="px-4 py-3">{item.active ? <Check className="h-4 w-4 text-green-500" /> : <></>}</td>
+                                        <td className="px-4 py-3">{format(new Date(item.created_at), 'dd/MM/yyyy HH:mm')}</td>
+                                        <td className="px-4 py-3">{format(new Date(item.updated_at), 'dd/MM/yyyy HH:mm')}</td>
+                                        <td className="flex items-center justify-end gap-2 px-4 py-3">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex h-8 items-center gap-1 px-2.5"
+                                                onClick={() => router.visit(route('parameters.edit', item.id))}
+                                            >
+                                                <Edit className="h-3.5 w-3.5" />
+                                                <span>Editar</span>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                                                onClick={() => deleteParameterHandler(item.id)}
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                <span>Eliminar</span>
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
-                {items.links &&
-                <PaginationNav data={items}/>
-                }
+                {items.links && <PaginationNav data={items} />}
             </div>
         </ModuleLayout>
     );

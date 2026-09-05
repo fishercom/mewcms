@@ -8,12 +8,10 @@ class CreateCmsParametersTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('cms_parameters', function (Blueprint $table) {
+        Schema::create('cms_parameters', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('group_id')->unsigned();
             $table->integer('parent_id')->unsigned()->nullable();
@@ -34,10 +32,8 @@ class CreateCmsParametersTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('cms_parameters');
     }

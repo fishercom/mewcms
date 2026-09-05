@@ -24,7 +24,7 @@ use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->prefix('admin')->group(function () {
+Route::middleware('auth')->prefix('admin')->group(function (): void {
 
     Route::get('schemas/root', [SchemaController::class, 'root'])->name('schemas.root');
     Route::get('schemas/{schema}/children', [SchemaController::class, 'children'])->name('schemas.children');
@@ -66,6 +66,4 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('layout', [LayoutController::class, 'update'])->name('layout.update');
 });
 
-Route::get('dashboard', function () {
-    return Inertia::render('dashboard');
-})->name('dashboard');
+Route::get('dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');

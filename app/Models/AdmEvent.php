@@ -17,22 +17,22 @@ class AdmEvent extends Model
 
     public function action()
     {
-        return $this->belongsTo('App\Models\AdmAction', 'action_id');
+        return $this->belongsTo(AdmAction::class, 'action_id');
     }
 
     public function module()
     {
-        return $this->belongsTo('App\Models\AdmModule', 'module_id');
+        return $this->belongsTo(AdmModule::class, 'module_id');
     }
 
     public function permissions()
     {
-        return $this->belongsTo('App\Models\AdmPermission', 'event_id', 'id');
+        return $this->belongsTo(AdmPermission::class, 'event_id', 'id');
     }
 
     public function profile_permissions($profile_id)
     {
-        return $this->hasMany('App\Models\AdmPermission', 'event_id', 'id')
+        return $this->hasMany(AdmPermission::class, 'event_id', 'id')
             ->where('profile_id', $profile_id);
     }
 }

@@ -16,7 +16,7 @@ class TaxonomyController extends Controller
         $s = $request->get('s');
 
         $items = CmsTaxonomy::select()
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }

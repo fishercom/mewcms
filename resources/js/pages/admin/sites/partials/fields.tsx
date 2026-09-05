@@ -1,11 +1,11 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
-import { CmsSiteForm } from "@/types/models/cms-site";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CmsSchemaGroup } from "@/types/models/cms-schema-group";
-import { Textarea } from "@/components/ui/textarea";
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
+import { CmsSiteForm } from '@/types/models/cms-site';
 
 interface Props {
     data: CmsSiteForm;
@@ -96,7 +96,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
                             setData({ ...data, metadata: JSON.parse(e.target.value) });
                         } catch (error) {
                             // Handle invalid JSON input
-                            console.error("Invalid JSON for metadata:", error);
+                            console.error('Invalid JSON for metadata:', error);
                         }
                     }}
                     disabled={processing}

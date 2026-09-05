@@ -28,6 +28,6 @@ class CmsMenu extends Model
 
     public function items()
     {
-        return $this->hasMany('App\Models\CmsMenuItem', 'menu_id')->orderBy('position');
+        return $this->hasMany(CmsMenuItem::class, 'menu_id')->orderBy('position');
     }
 }

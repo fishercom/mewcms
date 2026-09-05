@@ -85,7 +85,7 @@ class ArticleController extends Controller
             $s->unique = $s->isUnique();
 
             return $s;
-        })->filter(function ($schema) {
+        })->filter(function ($schema): bool {
             if ($schema->unique) {
                 return ! CmsArticle::where('schema_id', $schema->id)->exists();
             }
@@ -114,12 +114,10 @@ class ArticleController extends Controller
         $parents = CmsArticle::where('lang_id', $this->lang_id)
             ->where('active', 1)
             ->get()
-            ->filter(function ($article) {
-                return ! $article->schema?->isUnique();
-            })
+            ->filter(fn ($article): bool => ! $article->schema?->isUnique())
             ->values();
 
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query) {
+        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
             $query->where('active', true)->orderBy('position');
         }])->where('active', true)->get();
 
@@ -192,7 +190,7 @@ class ArticleController extends Controller
             $s->unique = $s->isUnique();
 
             return $s;
-        })->filter(function ($schema) use ($id) {
+        })->filter(function ($schema) use ($id): bool {
             if ($schema->unique) {
                 return ! CmsArticle::where('schema_id', $schema->id)
                     ->where('id', '!=', $id)
@@ -206,7 +204,7 @@ class ArticleController extends Controller
             ->where('id', '!=', $id)
             ->where('active', 1)
             ->get()
-            ->filter(function ($article) use ($descendantIds) {
+            ->filter(function ($article) use ($descendantIds): bool {
                 if (in_array($article->id, $descendantIds)) {
                     return false;
                 }
@@ -215,7 +213,7 @@ class ArticleController extends Controller
             })
             ->values();
 
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query) {
+        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
             $query->where('active', true)->orderBy('position');
         }])->where('active', true)->get();
 

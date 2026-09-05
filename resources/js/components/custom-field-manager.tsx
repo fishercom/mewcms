@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { CustomField } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash, GripVertical } from 'lucide-react';
+import { CustomField } from '@/types';
+import { GripVertical, Plus, Trash } from 'lucide-react';
+import React, { useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
-
 
 interface CustomFieldManagerProps {
     fields: CustomField[];
@@ -18,22 +17,18 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
 
     const addField = () => {
         if (newField.label && newField.key && newField.type) {
-            setFields([...fields, { ...newField, fields: (newField.type === 'repeater' || newField.type === 'container') ? [] : undefined }]);
+            setFields([...fields, { ...newField, fields: newField.type === 'repeater' || newField.type === 'container' ? [] : undefined }]);
             setNewField({ label: '', key: '', type: '' });
         }
     };
 
     const updateField = (index: number, updatedField: CustomField) => {
-        const updatedFields = fields.map((field, i) =>
-            i === index ? updatedField : field
-        );
+        const updatedFields = fields.map((field, i) => (i === index ? updatedField : field));
         setFields(updatedFields);
     };
 
     const updateRepeaterFields = (index: number, newRepeaterFields: CustomField[]) => {
-        const updatedFields = fields.map((field, i) =>
-            i === index ? { ...field, fields: newRepeaterFields } : field
-        );
+        const updatedFields = fields.map((field, i) => (i === index ? { ...field, fields: newRepeaterFields } : field));
         setFields(updatedFields);
     };
 
@@ -48,7 +43,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
 
     return (
         <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/50 pb-2">
+            <div className="flex items-center justify-between border-b border-zinc-200/50 pb-2 dark:border-zinc-800/50">
                 <h3 className="text-base font-bold text-zinc-800 dark:text-zinc-200">Configuración de Campos Personalizados</h3>
             </div>
 
@@ -62,18 +57,18 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                     className="space-y-4"
                 >
                     {sortableFields.map((field, index) => (
-                        <div 
-                            key={field.id} 
-                            className="bg-zinc-50/40 dark:bg-zinc-900/15 border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 flex gap-4 items-start relative hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shadow-xs animate-in fade-in-50 duration-200"
+                        <div
+                            key={field.id}
+                            className="animate-in fade-in-50 relative flex items-start gap-4 rounded-xl border border-zinc-200 bg-zinc-50/40 p-4 shadow-xs transition-colors duration-200 hover:border-zinc-300 dark:border-zinc-800/80 dark:bg-zinc-900/15 dark:hover:border-zinc-700"
                         >
                             {/* Drag handle */}
-                            <div className="drag-handle cursor-grab active:cursor-grabbing text-zinc-400 hover:text-zinc-650 p-1.5 self-center shrink-0">
+                            <div className="drag-handle hover:text-zinc-650 shrink-0 cursor-grab self-center p-1.5 text-zinc-400 active:cursor-grabbing">
                                 <GripVertical className="h-5 w-5" />
                             </div>
 
                             {/* Field Editor Contents */}
-                            <div className="flex-1 space-y-3 min-w-0">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div className="min-w-0 flex-1 space-y-3">
+                                <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Etiqueta</Label>
                                         <Input
@@ -95,11 +90,8 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Tipo de Campo</Label>
                                         <div className="flex items-center gap-2">
-                                            <Select 
-                                                onValueChange={(value) => updateField(index, { ...field, type: value })} 
-                                                value={field.type}
-                                            >
-                                                <SelectTrigger className="h-9 bg-white dark:bg-[#161615] flex-1">
+                                            <Select onValueChange={(value) => updateField(index, { ...field, type: value })} value={field.type}>
+                                                <SelectTrigger className="h-9 flex-1 bg-white dark:bg-[#161615]">
                                                     <SelectValue placeholder="Tipo" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -117,12 +109,12 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                                     <SelectItem value="container">Contenedor (Grupo)</SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <Button 
-                                                variant="ghost" 
-                                                type="button" 
-                                                onClick={() => removeField(index)} 
-                                                size="icon" 
-                                                className="h-9 w-9 shrink-0 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md"
+                                            <Button
+                                                variant="ghost"
+                                                type="button"
+                                                onClick={() => removeField(index)}
+                                                size="icon"
+                                                className="h-9 w-9 shrink-0 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
                                             >
                                                 <Trash className="h-4 w-4" />
                                                 <span className="sr-only">Eliminar</span>
@@ -132,7 +124,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                 </div>
 
                                 {(field.type === 'repeater' || field.type === 'container') && field.fields && (
-                                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-4 mt-3 pt-1">
+                                    <div className="mt-3 ml-4 border-l border-zinc-200 pt-1 pl-4 dark:border-zinc-800">
                                         <CustomFieldManager
                                             fields={field.fields || []}
                                             setFields={(newRepeaterFields) => updateRepeaterFields(index, newRepeaterFields)}
@@ -145,11 +137,9 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                 </ReactSortable>
             </div>
 
-            <div className="bg-zinc-100/30 dark:bg-zinc-950/20 border border-dashed border-zinc-200 dark:border-zinc-850 rounded-xl p-4 space-y-3">
-                <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                    Nuevo Campo
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="dark:border-zinc-850 space-y-3 rounded-xl border border-dashed border-zinc-200 bg-zinc-100/30 p-4 dark:bg-zinc-950/20">
+                <div className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Nuevo Campo</div>
+                <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
                     <div className="space-y-1.5">
                         <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Etiqueta</Label>
                         <Input
@@ -171,11 +161,8 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                     <div className="space-y-1.5">
                         <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Tipo de Campo</Label>
                         <div className="flex items-center gap-2">
-                            <Select 
-                                onValueChange={(value) => setNewField({ ...newField, type: value })} 
-                                value={newField.type}
-                            >
-                                <SelectTrigger className="h-9 bg-white dark:bg-[#161615] flex-1">
+                            <Select onValueChange={(value) => setNewField({ ...newField, type: value })} value={newField.type}>
+                                <SelectTrigger className="h-9 flex-1 bg-white dark:bg-[#161615]">
                                     <SelectValue placeholder="Tipo" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -193,10 +180,10 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                     <SelectItem value="container">Contenedor (Grupo)</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Button 
-                                type="button" 
-                                onClick={addField} 
-                                className="h-9 px-4 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 shrink-0 flex items-center gap-1.5"
+                            <Button
+                                type="button"
+                                onClick={addField}
+                                className="flex h-9 shrink-0 items-center gap-1.5 bg-red-600 px-4 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                             >
                                 <Plus className="h-4 w-4" />
                                 <span>Agregar</span>

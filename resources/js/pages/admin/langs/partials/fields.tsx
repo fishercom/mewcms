@@ -1,8 +1,8 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
-import { CmsLangForm } from "@/types/models/cms-lang";
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CmsLangForm } from '@/types/models/cms-lang';
 
 interface Props {
     data: CmsLangForm;

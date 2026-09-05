@@ -1,9 +1,9 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import InputError from "@/components/input-error";
-import { CmsTranslateForm } from "@/types/models/cms-translate";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import InputError from '@/components/input-error';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { CmsTranslateForm } from '@/types/models/cms-translate';
 
 interface Props {
     data: CmsTranslateForm;
@@ -69,7 +69,7 @@ export default function TranslateFormFields({ data, setData, errors, processing 
                         try {
                             setData({ ...data, metadata: JSON.parse(e.target.value) });
                         } catch (error) {
-                            console.error("Invalid JSON for metadata:", error);
+                            console.error('Invalid JSON for metadata:', error);
                         }
                     }}
                     disabled={processing}

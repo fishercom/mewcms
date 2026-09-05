@@ -1,12 +1,12 @@
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
-import { usePage, Link } from '@inertiajs/react';
+import ModuleLayout from '@/layouts/module/layout';
+import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { createUser } from '@/services/users';
-import UserFormFields, { UserForm } from './partials/fields';
 import { Profile } from '@/types/models/profile';
+import UserFormFields, { UserForm } from './partials/fields';
 
 export default function Create() {
     const { profiles } = usePage<{ profiles: Profile[] }>().props;
@@ -21,7 +21,7 @@ export default function Create() {
         metadata: {},
         active: false,
         default: false,
-    }
+    };
     const [data, setData] = useState<UserForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -46,20 +46,14 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <FormLayout>
-            <form onSubmit={createUserHandler} className="space-y-6">
-                <UserFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    profiles={profiles}
-                />
+                <form onSubmit={createUserHandler} className="space-y-6">
+                    <UserFormFields data={data} setData={setData} errors={errors} processing={processing} profiles={profiles} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/users'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/users">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );

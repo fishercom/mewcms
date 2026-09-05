@@ -44,7 +44,7 @@ class SchemaController extends Controller
             ->get();
 
         $items = CmsSchema::withCount('articles')
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }

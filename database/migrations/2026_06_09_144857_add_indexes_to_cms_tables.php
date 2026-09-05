@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             $table->index('slug');
             $table->index('active');
         });
 
-        Schema::table('cms_translates', function (Blueprint $table) {
+        Schema::table('cms_translates', function (Blueprint $table): void {
             $table->index('alias');
         });
 
-        Schema::table('cms_schemas', function (Blueprint $table) {
+        Schema::table('cms_schemas', function (Blueprint $table): void {
             $table->index('active');
         });
     }
@@ -30,16 +30,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             $table->dropIndex(['slug']);
             $table->dropIndex(['active']);
         });
 
-        Schema::table('cms_translates', function (Blueprint $table) {
+        Schema::table('cms_translates', function (Blueprint $table): void {
             $table->dropIndex(['alias']);
         });
 
-        Schema::table('cms_schemas', function (Blueprint $table) {
+        Schema::table('cms_schemas', function (Blueprint $table): void {
             $table->dropIndex(['active']);
         });
     }

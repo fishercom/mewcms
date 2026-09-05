@@ -12,9 +12,9 @@ import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, Search } from 'lucide-react';
+import { DynamicIcon } from 'lucide-react/dynamic';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-import { DynamicIcon } from 'lucide-react/dynamic';
 
 const mainNavItems: NavItem[] = [
     {
@@ -148,7 +148,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     className="group text-accent-foreground ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                                                 >
                                                     <span className="sr-only">{item.title}</span>
-                                                    {item.icon && <DynamicIcon name={item.icon} className="size-5 opacity-80 group-hover:opacity-100" />}
+                                                    {item.icon && (
+                                                        <DynamicIcon name={item.icon} className="size-5 opacity-80 group-hover:opacity-100" />
+                                                    )}
                                                 </a>
                                             </TooltipTrigger>
                                             <TooltipContent>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { CmsForm, CmsFormField } from '@/types/models/cms-form';
 import { Button } from '@/components/ui/button';
+import { CmsForm, CmsFormField } from '@/types/models/cms-form';
+import axios from 'axios';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
     alias: string;
@@ -19,8 +19,9 @@ export default function FrontForm({ alias }: Props) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get(`/api/forms/${alias}`)
-            .then(res => {
+        axios
+            .get(`/api/forms/${alias}`)
+            .then((res) => {
                 setForm(res.data);
                 // Initialize form values
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,7 +35,7 @@ export default function FrontForm({ alias }: Props) {
                 });
                 setValues(initValues);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error('Error fetching form config:', err);
                 setErrorMessage('No se pudo cargar el formulario.');
             })
@@ -48,13 +49,13 @@ export default function FrontForm({ alias }: Props) {
         if (type === 'checkbox') {
             const current = values[fieldAlias] || [];
             if (checked) {
-                setValues(prev => ({ ...prev, [fieldAlias]: [...current, value] }));
+                setValues((prev) => ({ ...prev, [fieldAlias]: [...current, value] }));
             } else {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                setValues(prev => ({ ...prev, [fieldAlias]: current.filter((v: any) => v !== value) }));
+                setValues((prev) => ({ ...prev, [fieldAlias]: current.filter((v: any) => v !== value) }));
             }
         } else {
-            setValues(prev => ({ ...prev, [fieldAlias]: value }));
+            setValues((prev) => ({ ...prev, [fieldAlias]: value }));
         }
     };
 
@@ -65,48 +66,49 @@ export default function FrontForm({ alias }: Props) {
         setSuccessMessage(null);
         setErrorMessage(null);
 
-        axios.post('/api/forms/submit', {
-            ...values,
-            form_alias: alias
-        })
-        .then(res => {
-            if (res.data.success) {
-                setSuccessMessage(res.data.message || 'Formulario enviado con éxito.');
-                // Reset form values
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const resetValues: Record<string, any> = {};
-                form?.fields?.forEach((field: CmsFormField) => {
-                    if (field.type === 'checkbox') {
-                        resetValues[field.alias] = [];
-                    } else {
-                        resetValues[field.alias] = '';
-                    }
-                });
-                setValues(resetValues);
-            }
-        })
-        .catch(err => {
-            console.error('Submission error:', err);
-            if (err.response?.status === 422) {
-                // Validation errors from Laravel
-                const validationErrors: Record<string, string> = {};
-                Object.keys(err.response.data.errors).forEach(key => {
-                    validationErrors[key] = err.response.data.errors[key][0];
-                });
-                setErrors(validationErrors);
-            } else {
-                setErrorMessage(err.response?.data?.message || 'Ocurrió un error al enviar el formulario.');
-            }
-        })
-        .finally(() => {
-            setSubmitting(false);
-        });
+        axios
+            .post('/api/forms/submit', {
+                ...values,
+                form_alias: alias,
+            })
+            .then((res) => {
+                if (res.data.success) {
+                    setSuccessMessage(res.data.message || 'Formulario enviado con éxito.');
+                    // Reset form values
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const resetValues: Record<string, any> = {};
+                    form?.fields?.forEach((field: CmsFormField) => {
+                        if (field.type === 'checkbox') {
+                            resetValues[field.alias] = [];
+                        } else {
+                            resetValues[field.alias] = '';
+                        }
+                    });
+                    setValues(resetValues);
+                }
+            })
+            .catch((err) => {
+                console.error('Submission error:', err);
+                if (err.response?.status === 422) {
+                    // Validation errors from Laravel
+                    const validationErrors: Record<string, string> = {};
+                    Object.keys(err.response.data.errors).forEach((key) => {
+                        validationErrors[key] = err.response.data.errors[key][0];
+                    });
+                    setErrors(validationErrors);
+                } else {
+                    setErrorMessage(err.response?.data?.message || 'Ocurrió un error al enviar el formulario.');
+                }
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
     };
 
     if (loading) {
         return (
             <div className="flex items-center justify-center py-10 text-zinc-500">
-                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                <Loader2 className="mr-2 h-6 w-6 animate-spin" />
                 <span>Cargando formulario...</span>
             </div>
         );
@@ -114,7 +116,7 @@ export default function FrontForm({ alias }: Props) {
 
     if (!form) {
         return (
-            <div className="flex items-center gap-2 py-4 px-5 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-xl text-sm font-medium">
+            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
                 <AlertCircle className="h-5 w-5 shrink-0" />
                 <span>{errorMessage || 'Formulario no disponible.'}</span>
             </div>
@@ -122,27 +124,21 @@ export default function FrontForm({ alias }: Props) {
     }
 
     return (
-        <div className="bg-white dark:bg-[#161615]/20 border border-[#19140010] dark:border-[#3E3E3A]/40 rounded-2xl p-6 md:p-8 space-y-6 shadow-xs max-w-lg">
+        <div className="max-w-lg space-y-6 rounded-2xl border border-[#19140010] bg-white p-6 shadow-xs md:p-8 dark:border-[#3E3E3A]/40 dark:bg-[#161615]/20">
             <div>
-                <h3 className="text-xl font-bold text-zinc-950 dark:text-white capitalize">
-                    {form.name}
-                </h3>
-                {form.info && (
-                    <p className="mt-1 text-sm text-zinc-500 dark:text-[#A1A09A]">
-                        {form.info}
-                    </p>
-                )}
+                <h3 className="text-xl font-bold text-zinc-950 capitalize dark:text-white">{form.name}</h3>
+                {form.info && <p className="mt-1 text-sm text-zinc-500 dark:text-[#A1A09A]">{form.info}</p>}
             </div>
 
             {successMessage && (
-                <div className="flex items-center gap-2 py-3.5 px-4 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/50 rounded-xl text-xs font-semibold">
+                <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3.5 text-xs font-semibold text-green-700 dark:border-green-900/50 dark:bg-green-950/20 dark:text-green-400">
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600 dark:text-green-500" />
                     <span>{successMessage}</span>
                 </div>
             )}
 
             {errorMessage && (
-                <div className="flex items-center gap-2 py-3.5 px-4 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-xl text-xs font-semibold">
+                <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-xs font-semibold text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
                     <AlertCircle className="h-5 w-5 shrink-0 text-red-600 dark:text-red-500" />
                     <span>{errorMessage}</span>
                 </div>
@@ -153,16 +149,14 @@ export default function FrontForm({ alias }: Props) {
                     const isInvalid = !!errors[field.alias];
                     return (
                         <div key={field.alias} className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 capitalize">
-                                {field.name}
-                            </label>
+                            <label className="text-xs font-bold text-zinc-700 capitalize dark:text-zinc-300">{field.name}</label>
 
                             {field.type === 'textarea' ? (
                                 <textarea
                                     value={values[field.alias] || ''}
                                     onChange={(e) => handleInputChange(field.alias, field.type, e.target.value)}
                                     rows={4}
-                                    className={`w-full px-3.5 py-2.5 border rounded-xl text-sm bg-white dark:bg-transparent text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${
+                                    className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-zinc-800 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-transparent dark:text-zinc-200 ${
                                         isInvalid ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'
                                     }`}
                                 />
@@ -170,13 +164,15 @@ export default function FrontForm({ alias }: Props) {
                                 <select
                                     value={values[field.alias] || ''}
                                     onChange={(e) => handleInputChange(field.alias, field.type, e.target.value)}
-                                    className={`w-full h-11 px-3 border rounded-xl text-sm bg-white dark:bg-[#161615]/40 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${
+                                    className={`h-11 w-full rounded-xl border bg-white px-3 text-sm text-zinc-800 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-[#161615]/40 dark:text-zinc-200 ${
                                         isInvalid ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'
                                     }`}
                                 >
                                     <option value="">Selecciona una opción</option>
                                     {field.options?.map((opt, oIdx) => (
-                                        <option key={oIdx} value={opt}>{opt}</option>
+                                        <option key={oIdx} value={opt}>
+                                            {opt}
+                                        </option>
                                     ))}
                                 </select>
                             ) : ['checkbox', 'radio'].includes(field.type) ? (
@@ -194,9 +190,12 @@ export default function FrontForm({ alias }: Props) {
                                                         : values[field.alias] === opt
                                                 }
                                                 onChange={(e) => handleInputChange(field.alias, field.type, e.target.value, e.target.checked)}
-                                                className="h-4 w-4 text-red-600 border-zinc-300 dark:border-zinc-800 bg-transparent rounded-sm focus:ring-red-500 focus:ring-2"
+                                                className="h-4 w-4 rounded-sm border-zinc-300 bg-transparent text-red-600 focus:ring-2 focus:ring-red-500 dark:border-zinc-800"
                                             />
-                                            <label htmlFor={`field_${field.alias}_${oIdx}`} className="text-xs text-zinc-600 dark:text-zinc-400 cursor-pointer">
+                                            <label
+                                                htmlFor={`field_${field.alias}_${oIdx}`}
+                                                className="cursor-pointer text-xs text-zinc-600 dark:text-zinc-400"
+                                            >
                                                 {opt}
                                             </label>
                                         </div>
@@ -207,15 +206,13 @@ export default function FrontForm({ alias }: Props) {
                                     type={field.type}
                                     value={values[field.alias] || ''}
                                     onChange={(e) => handleInputChange(field.alias, field.type, e.target.value)}
-                                    className={`w-full h-11 px-3.5 border rounded-xl text-sm bg-white dark:bg-transparent text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${
+                                    className={`h-11 w-full rounded-xl border bg-white px-3.5 text-sm text-zinc-800 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-transparent dark:text-zinc-200 ${
                                         isInvalid ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'
                                     }`}
                                 />
                             )}
 
-                            {isInvalid && (
-                                <p className="text-[11px] text-red-500 font-semibold">{errors[field.alias]}</p>
-                            )}
+                            {isInvalid && <p className="text-[11px] font-semibold text-red-500">{errors[field.alias]}</p>}
                         </div>
                     );
                 })}
@@ -224,7 +221,7 @@ export default function FrontForm({ alias }: Props) {
                     <Button
                         type="submit"
                         disabled={submitting}
-                        className="w-full flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 h-11 rounded-xl text-sm font-semibold"
+                        className="flex h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-red-600 text-sm font-semibold text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                     >
                         {submitting ? (
                             <>

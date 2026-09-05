@@ -7,11 +7,12 @@ use App\Models\CmsSchemaGroup;
 use App\Models\CmsTaxonomy;
 use App\Models\CmsTaxonomyTerm;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->group = CmsSchemaGroup::create([
         'name' => 'Default Group',
         'layout' => 'layout',
@@ -35,7 +36,7 @@ beforeEach(function () {
     ]);
 });
 
-it('can render a category listing page with associated articles', function () {
+it('can render a category listing page with associated articles', function (): void {
     $taxonomy = CmsTaxonomy::create([
         'name' => 'Categorías',
         'slug' => 'categorias',
@@ -63,7 +64,7 @@ it('can render a category listing page with associated articles', function () {
     $response = $this->get('/category/tecnologia');
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->component('front/templates/term-list')
         ->has('term')
         ->where('term.name', 'Tecnología')
@@ -72,7 +73,7 @@ it('can render a category listing page with associated articles', function () {
     );
 });
 
-it('can render a tag listing page with associated articles', function () {
+it('can render a tag listing page with associated articles', function (): void {
     $taxonomy = CmsTaxonomy::create([
         'name' => 'Tags',
         'slug' => 'tags',
@@ -100,7 +101,7 @@ it('can render a tag listing page with associated articles', function () {
     $response = $this->get('/tag/laravel');
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->component('front/templates/term-list')
         ->has('term')
         ->where('term.name', 'Laravel')
@@ -109,7 +110,7 @@ it('can render a tag listing page with associated articles', function () {
     );
 });
 
-it('eager loads taxonomy terms on post/page view', function () {
+it('eager loads taxonomy terms on post/page view', function (): void {
     $taxonomy = CmsTaxonomy::create([
         'name' => 'Categorías',
         'slug' => 'categorias',
@@ -137,7 +138,7 @@ it('eager loads taxonomy terms on post/page view', function () {
     $response = $this->get('/article-3');
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->has('article.terms')
         ->where('article.terms.0.name', 'Tecnología')
     );

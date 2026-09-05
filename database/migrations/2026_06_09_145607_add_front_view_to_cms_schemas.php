@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_schemas', function (Blueprint $table) {
+        Schema::table('cms_schemas', function (Blueprint $table): void {
             $table->string('front_view')->nullable()->after('type');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cms_schemas', function (Blueprint $table) {
+        Schema::table('cms_schemas', function (Blueprint $table): void {
             $table->dropColumn('front_view');
         });
     }

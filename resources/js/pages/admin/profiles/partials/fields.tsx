@@ -1,11 +1,10 @@
-
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
-import { ProfileForm } from "@/types";
-import { AdmModule } from "@/types/models/adm-module";
-import { AdmEvent } from "@/types/models/adm-event";
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ProfileForm } from '@/types';
+import { AdmEvent } from '@/types/models/adm-event';
+import { AdmModule } from '@/types/models/adm-module';
 
 interface Props {
     data: ProfileForm;
@@ -16,10 +15,9 @@ interface Props {
 }
 
 export default function ProfileFormFields({ data, setData, errors, processing, modules }: Props) {
-
     const handleCheckboxChange = (eventId: number) => {
         const newPermissions = [...(data.permissions || [])];
-        const permissionIndex = newPermissions.findIndex(p => p === eventId);
+        const permissionIndex = newPermissions.findIndex((p) => p === eventId);
 
         if (permissionIndex > -1) {
             newPermissions.splice(permissionIndex, 1);
@@ -51,9 +49,9 @@ export default function ProfileFormFields({ data, setData, errors, processing, m
             <div className="grid gap-4">
                 <h3 className="text-lg font-medium">Permisos</h3>
                 {modules.map((module) => (
-                    <div key={module.id} className="p-2 border rounded-md">
-                        <h4 className="font-medium mb-2">{module.name}</h4>
-                        <div className="flex items-center space-x-4 mt-2">
+                    <div key={module.id} className="rounded-md border p-2">
+                        <h4 className="mb-2 font-medium">{module.name}</h4>
+                        <div className="mt-2 flex items-center space-x-4">
                             {module.events.map((event: AdmEvent) => (
                                 <div key={event.id} className="flex items-center space-x-2">
                                     <Checkbox

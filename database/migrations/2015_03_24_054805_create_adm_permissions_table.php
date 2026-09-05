@@ -8,12 +8,10 @@ class CreateAdmPermissionsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('adm_permissions', function (Blueprint $table) {
+        Schema::create('adm_permissions', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('profile_id')->unsigned();
             $table->integer('event_id')->unsigned();
@@ -34,10 +32,8 @@ class CreateAdmPermissionsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('adm_permissions');
     }

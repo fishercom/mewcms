@@ -20,7 +20,7 @@ class SliderController extends Controller
     {
         $s = $request->get('s');
         $items = CmsSlider::withCount('slides')
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%')
                         ->orWhere('key', 'LIKE', '%'.str_replace(' ', '%', $s).'%');

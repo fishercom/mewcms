@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $activeArticles = CmsArticle::where('active', '1')->count();
         $totalTerms = CmsTaxonomyTerm::count();
         $totalMessages = CmsRegister::count();
-        $unreviewedMessages = CmsRegister::where(function ($query) {
+        $unreviewedMessages = CmsRegister::where(function ($query): void {
             $query->where('review', 0)->orWhereNull('review');
         })->count();
 
@@ -40,11 +40,11 @@ class DashboardController extends Controller
             foreach ($files as $file) {
                 try {
                     $totalSize += $disk->size($file);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // Ignore individual file size check failures
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Fallback if public disk storage issues exist
         }
 
@@ -64,21 +64,17 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get()
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'comment' => $log->comment,
-                    'user_name' => $log->user ? $log->user->name : 'System',
-                    'created_at' => $log->created_at ? $log->created_at->toISOString() : null,
-                ];
-            });
+            ->map(fn ($log): array => [
+                'id' => $log->id,
+                'comment' => $log->comment,
+                'user_name' => $log->user ? $log->user->name : 'System',
+                'created_at' => $log->created_at ? $log->created_at->toISOString() : null,
+            ]);
 
         // 4. Monthly Articles created (last 6 months) - Computed in PHP for SQLite/Pest safety
         $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
         $articles = CmsArticle::where('created_at', '>=', $sixMonthsAgo)->get();
-        $articlesByMonth = $articles->groupBy(function ($item) {
-            return $item->created_at ? $item->created_at->format('Y-m') : '';
-        });
+        $articlesByMonth = $articles->groupBy(fn ($item) => $item->created_at ? $item->created_at->format('Y-m') : '');
 
         $articlesChart = [];
         for ($i = 5; $i >= 0; $i--) {
@@ -92,9 +88,7 @@ class DashboardController extends Controller
 
         // 5. Monthly Contact submissions (last 6 months)
         $messages = CmsRegister::where('created_at', '>=', $sixMonthsAgo)->get();
-        $messagesByMonth = $messages->groupBy(function ($item) {
-            return $item->created_at ? $item->created_at->format('Y-m') : '';
-        });
+        $messagesByMonth = $messages->groupBy(fn ($item) => $item->created_at ? $item->created_at->format('Y-m') : '');
 
         $messagesChart = [];
         for ($i = 5; $i >= 0; $i--) {
@@ -109,9 +103,7 @@ class DashboardController extends Controller
         // 6. System Activity trends (daily log entries last 15 days)
         $fifteenDaysAgo = Carbon::now()->subDays(14)->startOfDay();
         $logs = AdmLog::where('created_at', '>=', $fifteenDaysAgo)->get();
-        $logsByDay = $logs->groupBy(function ($item) {
-            return $item->created_at ? $item->created_at->format('Y-m-d') : '';
-        });
+        $logsByDay = $logs->groupBy(fn ($item) => $item->created_at ? $item->created_at->format('Y-m-d') : '');
 
         $activityChart = [];
         for ($i = 14; $i >= 0; $i--) {

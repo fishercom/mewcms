@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Create Custom Post Types table
-        Schema::create('cms_post_types', function (Blueprint $table) {
+        Schema::create('cms_post_types', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('singular_name');
@@ -30,7 +30,7 @@ return new class extends Migration
         });
 
         // 2. Create Unified Posts table (handles standard blog posts and custom CPT posts)
-        Schema::create('cms_posts', function (Blueprint $table) {
+        Schema::create('cms_posts', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id'); // Author
             $table->unsignedInteger('lang_id');
@@ -66,7 +66,7 @@ return new class extends Migration
         });
 
         // 3. Create Pivot table linking posts to taxonomy terms
-        Schema::create('cms_post_term', function (Blueprint $table) {
+        Schema::create('cms_post_term', function (Blueprint $table): void {
             $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('term_id');
 

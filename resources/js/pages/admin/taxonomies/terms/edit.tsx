@@ -1,15 +1,15 @@
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { updateTerm } from '@/services/taxonomies';
-import TaxonomyTermFormFields from './partials/fields';
 import { CmsTaxonomy, CmsTaxonomyTerm, CmsTaxonomyTermForm } from '@/types/models/cms-taxonomy';
+import TaxonomyTermFormFields from './partials/fields';
 
 export default function Edit() {
-    const { item, taxonomy, parents } = usePage<{ item: CmsTaxonomyTerm, taxonomy: CmsTaxonomy, parents: CmsTaxonomyTerm[] }>().props;
+    const { item, taxonomy, parents } = usePage<{ item: CmsTaxonomyTerm; taxonomy: CmsTaxonomy; parents: CmsTaxonomyTerm[] }>().props;
 
     const [data, setData] = useState<CmsTaxonomyTermForm>({
         id: item.id,
@@ -43,13 +43,7 @@ export default function Edit() {
         <ModuleLayout view={`Editar Término en ${taxonomy.name}`}>
             <FormLayout>
                 <form onSubmit={updateTermHandler} className="space-y-6">
-                    <TaxonomyTermFormFields
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        parents={parents}
-                        processing={processing}
-                    />
+                    <TaxonomyTermFormFields data={data} setData={setData} errors={errors} parents={parents} processing={processing} />
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>

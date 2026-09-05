@@ -8,12 +8,10 @@ class CreateCmsRegistersTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('cms_registers', function (Blueprint $table) {
+        Schema::create('cms_registers', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('form_id')->unsigned();
             $table->integer('contact_id')->nullable();
@@ -35,10 +33,8 @@ class CreateCmsRegistersTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('cms_registers');
     }

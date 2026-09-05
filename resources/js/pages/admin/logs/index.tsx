@@ -1,99 +1,116 @@
-import { useState, useEffect } from 'react';
+import { deleteLog, getLogs } from '@/services/logs';
 import { router, usePage } from '@inertiajs/react';
-import { getLogs, deleteLog } from '@/services/logs';
+import { useEffect, useState } from 'react';
 
-import ModuleLayout from '@/layouts/module/layout';
-import { format } from 'date-fns'
-import { AdmLog, Pagination } from '@/types';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, Search } from 'lucide-react';
 import { Icon } from '@/components/icon';
-import { Input } from '@headlessui/react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { PaginationNav } from '@/components/ui/pagination-nav';
+import ModuleLayout from '@/layouts/module/layout';
+import { AdmLog, Pagination } from '@/types';
+import { Input } from '@headlessui/react';
+import { format } from 'date-fns';
+import { ChevronDown, Search } from 'lucide-react';
 
 export default function Index() {
-
     const { items } = usePage<{ items: Pagination<AdmLog> }>().props;
-    const [ query, setQuery ] = useState({s: ''});
+    const [query, setQuery] = useState({ s: '' });
 
     useEffect(() => {
-        if(query.s){
+        if (query.s) {
             getLogs(query);
         }
     }, [query]);
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>)=>{
-        const {value} = e.target;
-        setQuery({s: value});
-    }
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setQuery({ s: value });
+    };
 
     const deleteLogHandler = (id: number) => {
         deleteLog(id);
-    }
+    };
 
     return (
         <ModuleLayout>
             <div className="relative overflow-hidden">
-                <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 pb-4">
+                <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
                     <div className="w-full">
                         <form className="flex items-center">
                             <div className="relative w-full">
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-                                    <Search/>
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
+                                    <Search />
                                 </div>
-                                <Input type='text' autoFocus value={query.s??''} onChange={handleSearch} className="focus-within:outline-2 focus-within:outline-gray-400 border border-gray-500 text-sm rounded-md block w-full pl-10 p-2" placeholder="Buscar" />
+                                <Input
+                                    type="text"
+                                    autoFocus
+                                    value={query.s ?? ''}
+                                    onChange={handleSearch}
+                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm focus-within:outline-2 focus-within:outline-gray-400"
+                                    placeholder="Buscar"
+                                />
                             </div>
                         </form>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-sm text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
+                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
                             <tr>
-                                <th scope="col" className="px-4 py-3 rounded-l-md">Comment</th>
-                                <th scope="col" className="px-4 py-3">Created Date</th>
-                                <th scope="col" className="px-4 py-3">Updated Date</th>
-                                <th scope="col" className="px-4 py-3 rounded-r-md"></th>
+                                <th scope="col" className="rounded-l-md px-4 py-3">
+                                    Comment
+                                </th>
+                                <th scope="col" className="px-4 py-3">
+                                    Created Date
+                                </th>
+                                <th scope="col" className="px-4 py-3">
+                                    Updated Date
+                                </th>
+                                <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
                         </thead>
                         <tbody>
-                        {items.data.map((item: AdmLog)=>{
-                            return(
-                            <tr key={ item.id } className="border-b dark:border-gray-700">
-                                <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ item.comment }</th>
-                                <td className="px-4 py-3">{ format(item.created_at, 'dd/MM/yyyy HH:mm') }</td>
-                                <td className="px-4 py-3">{ format(item.updated_at, 'dd/MM/yyyy HH:mm') }</td>
-                                <td className="px-4 py-3 flex items-center justify-end">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="p-3">
-                                                Actions
-                                                <Icon iconNode={ChevronDown} className="h-5 w-5" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-56" align="end">
-                                            <DropdownMenuItem asChild>
-                                                <Button className="block w-full" onClick={() => router.visit(route('logs.edit', item.id))} variant="ghost">
-                                                    Edit
-                                                </Button>
-                                            </DropdownMenuItem>                                            <DropdownMenuItem asChild>
-                                                <Button className="block w-full" onClick={()=>deleteLogHandler(item.id)} variant="ghost">
-                                                    Delete
-                                                </Button>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </td>
-                            </tr>
-                            )}
-                        )}
+                            {items.data.map((item: AdmLog) => {
+                                return (
+                                    <tr key={item.id} className="border-b dark:border-gray-700">
+                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                            {item.comment}
+                                        </th>
+                                        <td className="px-4 py-3">{format(item.created_at, 'dd/MM/yyyy HH:mm')}</td>
+                                        <td className="px-4 py-3">{format(item.updated_at, 'dd/MM/yyyy HH:mm')}</td>
+                                        <td className="flex items-center justify-end px-4 py-3">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="p-3">
+                                                        Actions
+                                                        <Icon iconNode={ChevronDown} className="h-5 w-5" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-56" align="end">
+                                                    <DropdownMenuItem asChild>
+                                                        <Button
+                                                            className="block w-full"
+                                                            onClick={() => router.visit(route('logs.edit', item.id))}
+                                                            variant="ghost"
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                    </DropdownMenuItem>{' '}
+                                                    <DropdownMenuItem asChild>
+                                                        <Button className="block w-full" onClick={() => deleteLogHandler(item.id)} variant="ghost">
+                                                            Delete
+                                                        </Button>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
-                {items.links &&
-                <PaginationNav data={items}/>
-                }
+                {items.links && <PaginationNav data={items} />}
             </div>
         </ModuleLayout>
     );

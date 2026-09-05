@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->profile = Profile::create([
         'name' => 'Super Admin',
         'sa' => 1,
@@ -23,19 +23,19 @@ beforeEach(function () {
     ]);
 });
 
-afterEach(function () {
+afterEach(function (): void {
     $filePath = resource_path('js/pages/front/templates/test-page-template.tsx');
     if (file_exists($filePath)) {
         unlink($filePath);
     }
 });
 
-it('prevents guests from accessing templates management', function () {
+it('prevents guests from accessing templates management', function (): void {
     $response = $this->get('/admin/templates');
     $response->assertRedirect('/login');
 });
 
-it('allows authenticated admin users to list templates', function () {
+it('allows authenticated admin users to list templates', function (): void {
     $response = $this->actingAs($this->user)->get('/admin/templates');
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page
@@ -44,7 +44,7 @@ it('allows authenticated admin users to list templates', function () {
     );
 });
 
-it('allows authenticated admin users to create, update, and delete a custom template', function () {
+it('allows authenticated admin users to create, update, and delete a custom template', function (): void {
     $filePath = resource_path('js/pages/front/templates/test-page-template.tsx');
     if (file_exists($filePath)) {
         unlink($filePath);
@@ -81,7 +81,7 @@ it('allows authenticated admin users to create, update, and delete a custom temp
     $this->assertFalse(file_exists($filePath));
 });
 
-it('prevents deletion of core system templates', function () {
+it('prevents deletion of core system templates', function (): void {
     $response = $this->actingAs($this->user)->delete('/admin/templates/home');
     $response->assertSessionHasErrors(['error']);
 });

@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const apiClient = axios.create({
@@ -7,11 +6,11 @@ const apiClient = axios.create({
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
     },
 });
 
-apiClient.interceptors.request.use(config => {
+apiClient.interceptors.request.use((config) => {
     const csrfToken = document.head.querySelector('meta[name="csrf-token"]');
     if (csrfToken) {
         config.headers['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');

@@ -22,7 +22,7 @@ class RegisterController extends Controller
         $reviewed = $request->get('reviewed');
 
         $items = CmsRegister::with(['form', 'fields.field'])
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%')
                         ->orWhere('email', 'LIKE', '%'.str_replace(' ', '%', $s).'%');

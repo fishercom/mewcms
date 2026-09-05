@@ -33,17 +33,17 @@ class Employee extends Authenticatable
 
     public function departamento()
     {
-        return $this->hasOne('App\Models\UbgDepartment', 'id', 'departamento_id');
+        return $this->hasOne(UbgDepartment::class, 'id', 'departamento_id');
     }
 
     public function provincia()
     {
-        return $this->hasOne('App\Models\UbgProvince', 'id', 'provincia_id');
+        return $this->hasOne(UbgProvince::class, 'id', 'provincia_id');
     }
 
     public function distrito()
     {
-        return $this->hasOne('App\Models\UbgDistrict', 'id', 'distrito_id');
+        return $this->hasOne(UbgDistrict::class, 'id', 'distrito_id');
     }
 
     public function setPasswordAttribute($value)

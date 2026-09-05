@@ -8,12 +8,10 @@ class CreateUbgDepartmentsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('ubg_departments', function (Blueprint $table) {
+        Schema::create('ubg_departments', function (Blueprint $table): void {
             $table->string('id', 2);
             $table->string('name', 45);
             $table->timestamps();
@@ -23,10 +21,8 @@ class CreateUbgDepartmentsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('ubg_departments');
     }

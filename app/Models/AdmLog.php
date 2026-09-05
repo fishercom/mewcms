@@ -17,11 +17,11 @@ class AdmLog extends Model
 
     public function user()
     {
-        return $this->hasOne('App\Models\User', 'id', 'user_id');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 
     public function event()
     {
-        return $this->hasOne('App\Models\AdmEvent', 'id', 'event_id');
+        return $this->hasOne(AdmEvent::class, 'id', 'event_id');
     }
 }

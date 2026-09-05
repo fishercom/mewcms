@@ -1,21 +1,19 @@
-
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { createTranslate } from '@/services/translates';
-import TranslateFormFields from './partials/fields';
 import { CmsTranslateForm } from '@/types/models/cms-translate';
+import TranslateFormFields from './partials/fields';
 
 export default function Create() {
-
     const item: CmsTranslateForm = {
         alias: '',
         input_type: 1, // Default to text input
-        metadata: [] as { iso: string, value: string }[],
-    }
+        metadata: [] as { iso: string; value: string }[],
+    };
     const [data, setData] = useState<CmsTranslateForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -40,21 +38,15 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <FormLayout>
-            <form onSubmit={createTranslateHandler} className="space-y-6">
-                <TranslateFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                />
+                <form onSubmit={createTranslateHandler} className="space-y-6">
+                    <TranslateFormFields data={data} setData={setData} errors={errors} processing={processing} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/translates'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/translates">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );
 }
-

@@ -8,6 +8,7 @@ use App\Models\AdmPermission;
 use App\Models\Profile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +22,7 @@ class ProfileController extends Controller
         $s = $request->get('s');
 
         $items = Profile::select()
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
@@ -42,7 +43,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Redirector|RedirectResponse
     {
         $profile = new Profile($request->all());
         $profile->save();

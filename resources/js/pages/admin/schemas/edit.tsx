@@ -1,15 +1,15 @@
-import ModuleLayout from '@/layouts/module/layout';
+import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
-import SchemaFields from './partials/fields';
+import ModuleLayout from '@/layouts/module/layout';
+import { updateSchema } from '@/services/schemas';
+import { CmsSchema, CmsSchemaForm } from '@/types/models/cms-schema';
+import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { updateSchema } from '@/services/schemas';
-import { CmsSchemaForm, CmsSchema } from '@/types/models/cms-schema';
-import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
+import SchemaFields from './partials/fields';
 
 export default function Edit() {
-    const { item, groups, templates } = usePage<{ item: CmsSchema, groups: CmsSchemaGroup[], templates: { name: string, value: string }[] }>().props;
+    const { item, groups, templates } = usePage<{ item: CmsSchema; groups: CmsSchemaGroup[]; templates: { name: string; value: string }[] }>().props;
 
     const initial: CmsSchemaForm = {
         id: item.id,
@@ -41,17 +41,10 @@ export default function Edit() {
         <ModuleLayout view="Editar">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <SchemaFields
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        processing={processing}
-                        groups={groups}
-                        templates={templates}
-                    />
+                    <SchemaFields data={data} setData={setData} errors={errors} processing={processing} groups={groups} templates={templates} />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/schemas'>Cancelar</Link>
+                        <Link href="/admin/schemas">Cancelar</Link>
                     </div>
                 </form>
             </FormLayout>

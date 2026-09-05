@@ -1,7 +1,6 @@
-
-import { router } from '@inertiajs/react';
-import { Page } from '@inertiajs/core';
 import objectToFormData from '@/lib/form-data';
+import { Page } from '@inertiajs/core';
+import { router } from '@inertiajs/react';
 
 interface Callbacks {
     onSuccess?: (page: Page) => void;

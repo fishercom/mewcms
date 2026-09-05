@@ -1,13 +1,13 @@
-import React, { useState, useEffect, FormEventHandler } from 'react';
-import { Link } from '@inertiajs/react';
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { createSlider } from '@/services/sliders';
+import { Link } from '@inertiajs/react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 export default function Create() {
     const [name, setName] = useState('');
@@ -71,9 +71,7 @@ export default function Create() {
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                            Información General
-                        </h3>
+                        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Información General</h3>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nombre del Slider</Label>
@@ -101,7 +99,7 @@ export default function Create() {
                                     onChange={(e) => setKey(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
                                     disabled={processing}
                                     placeholder="e.g. carrusel_inicio"
-                                    className="font-mono text-sm bg-white dark:bg-[#161615]"
+                                    className="bg-white font-mono text-sm dark:bg-[#161615]"
                                 />
                                 <span className="text-[10px] text-zinc-400">
                                     Usada para cargar este slider en el código/plantillas. Caracteres alfanuméricos y guiones.
@@ -128,18 +126,12 @@ export default function Create() {
                     <hr className="border-zinc-200 dark:border-zinc-800" />
 
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                            Configuración del Slider
-                        </h3>
+                        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Configuración del Slider</h3>
 
                         <div className="grid gap-4 md:grid-cols-3">
                             <div className="grid gap-2">
                                 <Label htmlFor="effect">Efecto de Transición</Label>
-                                <Select
-                                    value={effect}
-                                    onValueChange={(val: 'slide' | 'fade') => setEffect(val)}
-                                    disabled={processing}
-                                >
+                                <Select value={effect} onValueChange={(val: 'slide' | 'fade') => setEffect(val)} disabled={processing}>
                                     <SelectTrigger className="bg-white dark:bg-[#161615]">
                                         <SelectValue placeholder="Efecto" />
                                     </SelectTrigger>
@@ -179,8 +171,8 @@ export default function Create() {
                             </div>
                         </div>
 
-                        <div className="grid gap-4 md:grid-cols-2 pt-2">
-                            <div className="flex items-center space-x-3 bg-zinc-50/50 dark:bg-zinc-900/10 p-3 rounded-lg border border-zinc-200/50 dark:border-zinc-800/50">
+                        <div className="grid gap-4 pt-2 md:grid-cols-2">
+                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
                                 <Checkbox
                                     id="autoplay"
                                     checked={autoplay}
@@ -188,44 +180,34 @@ export default function Create() {
                                     disabled={processing}
                                 />
                                 <div className="grid gap-0.5 leading-none">
-                                    <Label htmlFor="autoplay" className="cursor-pointer">Autoplay (Reproducción Automática)</Label>
-                                    <span className="text-[10px] text-zinc-400">
-                                        Las diapositivas avanzarán automáticamente.
-                                    </span>
+                                    <Label htmlFor="autoplay" className="cursor-pointer">
+                                        Autoplay (Reproducción Automática)
+                                    </Label>
+                                    <span className="text-[10px] text-zinc-400">Las diapositivas avanzarán automáticamente.</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-3 bg-zinc-50/50 dark:bg-zinc-900/10 p-3 rounded-lg border border-zinc-200/50 dark:border-zinc-800/50">
-                                <Checkbox
-                                    id="loop"
-                                    checked={loop}
-                                    onCheckedChange={(checked) => setLoop(Boolean(checked))}
-                                    disabled={processing}
-                                />
+                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
+                                <Checkbox id="loop" checked={loop} onCheckedChange={(checked) => setLoop(Boolean(checked))} disabled={processing} />
                                 <div className="grid gap-0.5 leading-none">
-                                    <Label htmlFor="loop" className="cursor-pointer">Loop Infinito</Label>
-                                    <span className="text-[10px] text-zinc-400">
-                                        El slider volverá a empezar al llegar al final.
-                                    </span>
+                                    <Label htmlFor="loop" className="cursor-pointer">
+                                        Loop Infinito
+                                    </Label>
+                                    <span className="text-[10px] text-zinc-400">El slider volverá a empezar al llegar al final.</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-3 bg-zinc-50/50 dark:bg-zinc-900/10 p-3 rounded-lg border border-zinc-200/50 dark:border-zinc-800/50">
-                                <Checkbox
-                                    id="dots"
-                                    checked={dots}
-                                    onCheckedChange={(checked) => setDots(Boolean(checked))}
-                                    disabled={processing}
-                                />
+                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
+                                <Checkbox id="dots" checked={dots} onCheckedChange={(checked) => setDots(Boolean(checked))} disabled={processing} />
                                 <div className="grid gap-0.5 leading-none">
-                                    <Label htmlFor="dots" className="cursor-pointer">Mostrar Paginación (Puntos)</Label>
-                                    <span className="text-[10px] text-zinc-400">
-                                        Muestra pequeños puntos indicadores en la parte inferior.
-                                    </span>
+                                    <Label htmlFor="dots" className="cursor-pointer">
+                                        Mostrar Paginación (Puntos)
+                                    </Label>
+                                    <span className="text-[10px] text-zinc-400">Muestra pequeños puntos indicadores en la parte inferior.</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-3 bg-zinc-50/50 dark:bg-zinc-900/10 p-3 rounded-lg border border-zinc-200/50 dark:border-zinc-800/50">
+                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
                                 <Checkbox
                                     id="arrows"
                                     checked={arrows}
@@ -233,10 +215,10 @@ export default function Create() {
                                     disabled={processing}
                                 />
                                 <div className="grid gap-0.5 leading-none">
-                                    <Label htmlFor="arrows" className="cursor-pointer">Mostrar Flechas de Navegación</Label>
-                                    <span className="text-[10px] text-zinc-400">
-                                        Muestra flechas laterales para avanzar o retroceder.
-                                    </span>
+                                    <Label htmlFor="arrows" className="cursor-pointer">
+                                        Mostrar Flechas de Navegación
+                                    </Label>
+                                    <span className="text-[10px] text-zinc-400">Muestra flechas laterales para avanzar o retroceder.</span>
                                 </div>
                             </div>
                         </div>
@@ -246,7 +228,7 @@ export default function Create() {
                         <Button
                             type="submit"
                             disabled={processing}
-                            className="bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 px-6 h-10"
+                            className="h-10 bg-red-600 px-6 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                         >
                             {processing ? 'Guardando...' : 'Crear Slider'}
                         </Button>

@@ -1,17 +1,9 @@
-
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { CmsArticle } from "@/types/models/cms-article";
-import { ReactSortable } from "react-sortablejs";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CmsArticle } from '@/types/models/cms-article';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { ReactSortable } from 'react-sortablejs';
 
 interface SortableArticlesModalProps {
     isOpen: boolean;
@@ -31,11 +23,12 @@ export default function SortableArticlesModal({ isOpen, onClose, articles }: Sor
     };
 
     const handleSave = () => {
-        axios.post(route('articles.sort'), { articles: sortedArticles })
+        axios
+            .post(route('articles.sort'), { articles: sortedArticles })
             .then(() => {
                 onClose();
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error saving sorted articles:', error);
             });
     };
@@ -45,21 +38,21 @@ export default function SortableArticlesModal({ isOpen, onClose, articles }: Sor
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Ordenar Artículos</DialogTitle>
-                    <DialogDescription>
-                        Arrastra y suelta los artículos para cambiar su orden.
-                    </DialogDescription>
+                    <DialogDescription>Arrastra y suelta los artículos para cambiar su orden.</DialogDescription>
                 </DialogHeader>
                 <div className="p-4">
                     <ReactSortable list={sortedArticles} setList={handleSort}>
                         {sortedArticles.map((article) => (
-                            <div key={article.id} className="p-2 my-1 border rounded cursor-move">
+                            <div key={article.id} className="my-1 cursor-move rounded border p-2">
                                 {article.title}
                             </div>
                         ))}
                     </ReactSortable>
                 </div>
                 <DialogFooter>
-                    <Button onClick={onClose} variant="outline">Cancelar</Button>
+                    <Button onClick={onClose} variant="outline">
+                        Cancelar
+                    </Button>
                     <Button onClick={handleSave}>Guardar</Button>
                 </DialogFooter>
             </DialogContent>

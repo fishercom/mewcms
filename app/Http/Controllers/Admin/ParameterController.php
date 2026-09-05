@@ -7,6 +7,7 @@ use App\Models\CmsParameter;
 use App\Models\CmsParameterGroup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +23,7 @@ class ParameterController extends Controller
         $s = $request->get('s');
 
         $items = CmsParameter::select()
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
@@ -45,7 +46,7 @@ class ParameterController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Redirector|RedirectResponse
     {
         $profile = new CmsParameter($request->all());
         $profile->save();

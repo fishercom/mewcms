@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->profile = Profile::create([
         'name' => 'Super Admin',
         'sa' => 1,
@@ -40,7 +40,7 @@ beforeEach(function () {
     ]);
 });
 
-it('allows deleting an unassigned schema', function () {
+it('allows deleting an unassigned schema', function (): void {
     $schema = CmsSchema::create([
         'name' => 'Unassigned Schema',
         'group_id' => $this->group->id,
@@ -53,7 +53,7 @@ it('allows deleting an unassigned schema', function () {
     $this->assertDatabaseMissing('cms_schemas', ['id' => $schema->id]);
 });
 
-it('prevents deleting an assigned schema', function () {
+it('prevents deleting an assigned schema', function (): void {
     $schema = CmsSchema::create([
         'name' => 'Assigned Schema',
         'group_id' => $this->group->id,

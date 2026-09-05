@@ -8,12 +8,10 @@ class CreateCmsRegisterFieldsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('cms_register_fields', function (Blueprint $table) {
+        Schema::create('cms_register_fields', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('register_id')->unsigned();
             $table->integer('field_id')->unsigned();
@@ -35,10 +33,8 @@ class CreateCmsRegisterFieldsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('cms_register_fields');
     }

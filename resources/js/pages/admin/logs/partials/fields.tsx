@@ -1,10 +1,10 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import InputError from "@/components/input-error";
-import { AdmLogForm } from "@/types/models/adm-log";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AdmEvent } from "@/types/models/adm-event";
-import { User } from "@/types/models/user";
+import InputError from '@/components/input-error';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AdmEvent } from '@/types/models/adm-event';
+import { AdmLogForm } from '@/types/models/adm-log';
+import { User } from '@/types/models/user';
 
 interface Props {
     data: AdmLogForm;
@@ -41,11 +41,7 @@ export default function LogFormFields({ data, setData, errors, processing, event
 
             <div className="grid gap-2">
                 <Label htmlFor="user_id">User</Label>
-                <Select
-                    value={data.user_id.toString()}
-                    onValueChange={(value) => setData({ ...data, user_id: Number(value) })}
-                    disabled={processing}
-                >
+                <Select value={data.user_id.toString()} onValueChange={(value) => setData({ ...data, user_id: Number(value) })} disabled={processing}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select a user" />
                     </SelectTrigger>

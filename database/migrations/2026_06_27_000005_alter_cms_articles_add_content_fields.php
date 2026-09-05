@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             // Drop foreign key first so MySQL allows modifying the column
             $table->dropForeign(['schema_id']);
         });
 
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             // Alter schema_id to be nullable
             $table->integer('schema_id')->unsigned()->nullable()->change();
 
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('status', 20)->default('published')->after('featured_image');
         });
 
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             // Restore foreign key constraint
             $table->foreign('schema_id')
                 ->references('id')
@@ -41,11 +41,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             $table->dropForeign(['schema_id']);
         });
 
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             // Change schema_id back to NOT nullable
             $table->integer('schema_id')->unsigned()->nullable(false)->change();
 
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->dropColumn(['content', 'excerpt', 'featured_image', 'status']);
         });
 
-        Schema::table('cms_articles', function (Blueprint $table) {
+        Schema::table('cms_articles', function (Blueprint $table): void {
             $table->foreign('schema_id')
                 ->references('id')
                 ->on('cms_schemas')

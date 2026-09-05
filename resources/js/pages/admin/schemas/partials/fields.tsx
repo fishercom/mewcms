@@ -2,9 +2,9 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CmsSchemaForm } from '@/types/models/cms-schema';
 
+import CustomFieldManager from '@/components/custom-field-manager';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import CustomFieldManager from '@/components/custom-field-manager';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 
@@ -57,27 +57,21 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                 <InputError message={errors.group_id} />
             </div>
 
-            <CustomFieldManager
-                fields={data.fields || []}
-                setFields={(newFields) => setData({ ...data, fields: newFields })}
-            />
+            <CustomFieldManager fields={data.fields || []} setFields={(newFields) => setData({ ...data, fields: newFields })} />
 
             <div className="grid gap-2">
                 <Label htmlFor="front_view">Plantilla Frontend (React View Path)</Label>
-                <Select
-                    value={data.front_view || ''}
-                    onValueChange={(value) => setData({ ...data, front_view: value })}
-                    disabled={processing}
-                >
+                <Select value={data.front_view || ''} onValueChange={(value) => setData({ ...data, front_view: value })} disabled={processing}>
                     <SelectTrigger id="front_view">
                         <SelectValue placeholder="Seleccione una plantilla" />
                     </SelectTrigger>
                     <SelectContent>
-                        {templates && templates.map((template) => (
-                            <SelectItem key={template.value} value={template.value}>
-                                {template.name} ({template.value})
-                            </SelectItem>
-                        ))}
+                        {templates &&
+                            templates.map((template) => (
+                                <SelectItem key={template.value} value={template.value}>
+                                    {template.name} ({template.value})
+                                </SelectItem>
+                            ))}
                     </SelectContent>
                 </Select>
                 <InputError message={errors.front_view} />
@@ -94,5 +88,5 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                 <Label htmlFor="active">Active</Label>
             </div>
         </>
-    )
+    );
 }

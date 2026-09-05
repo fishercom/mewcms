@@ -1,12 +1,11 @@
-
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
-import { CmsNotifyForm } from "@/types/models/cms-notify";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CmsForm } from "@/types/models/cms-form";
-import { User } from "@/types/models/user";
-import { Textarea } from "@/components/ui/textarea";
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { CmsForm } from '@/types/models/cms-form';
+import { CmsNotifyForm } from '@/types/models/cms-notify';
+import { User } from '@/types/models/user';
 
 interface Props {
     data: CmsNotifyForm;
@@ -22,11 +21,7 @@ export default function NotifyFormFields({ data, setData, errors, processing, fo
         <>
             <div className="grid gap-2">
                 <Label htmlFor="form_id">Form</Label>
-                <Select
-                    value={data.form_id.toString()}
-                    onValueChange={(value) => setData({ ...data, form_id: Number(value) })}
-                    disabled={processing}
-                >
+                <Select value={data.form_id.toString()} onValueChange={(value) => setData({ ...data, form_id: Number(value) })} disabled={processing}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select a form" />
                     </SelectTrigger>
@@ -43,11 +38,7 @@ export default function NotifyFormFields({ data, setData, errors, processing, fo
 
             <div className="grid gap-2">
                 <Label htmlFor="user_id">User</Label>
-                <Select
-                    value={data.user_id.toString()}
-                    onValueChange={(value) => setData({ ...data, user_id: Number(value) })}
-                    disabled={processing}
-                >
+                <Select value={data.user_id.toString()} onValueChange={(value) => setData({ ...data, user_id: Number(value) })} disabled={processing}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select a user" />
                     </SelectTrigger>

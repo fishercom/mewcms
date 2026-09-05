@@ -1,16 +1,16 @@
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import SchemaFields from './partials/fields';
-import { Link, usePage } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { createSchema } from '@/services/schemas';
 import { CmsSchemaForm } from '@/types/models/cms-schema';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { CustomField } from '@/types/models/custom-field';
+import { Link, usePage } from '@inertiajs/react';
+import { FormEventHandler, useState } from 'react';
+import SchemaFields from './partials/fields';
 
 export default function Create() {
-    const { groups, templates } = usePage<{ groups: CmsSchemaGroup[], templates: { name: string, value: string }[] }>().props;
+    const { groups, templates } = usePage<{ groups: CmsSchemaGroup[]; templates: { name: string; value: string }[] }>().props;
 
     const initial: CmsSchemaForm = {
         id: null,
@@ -45,17 +45,10 @@ export default function Create() {
         <ModuleLayout view="Crear">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <SchemaFields
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        processing={processing}
-                        groups={groups}
-                        templates={templates}
-                    />
+                    <SchemaFields data={data} setData={setData} errors={errors} processing={processing} groups={groups} templates={templates} />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/schemas'>Cancelar</Link>
+                        <Link href="/admin/schemas">Cancelar</Link>
                     </div>
                 </form>
             </FormLayout>

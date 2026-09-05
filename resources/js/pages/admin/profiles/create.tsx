@@ -1,13 +1,12 @@
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import { Link } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
-import { ProfileForm } from '@/types';
 import { Button } from '@/components/ui/button';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { createProfile } from '@/services/profiles';
-import ProfileFormFields from './partials/fields';
-import { usePage } from '@inertiajs/react';
+import { ProfileForm } from '@/types';
 import { AdmModule } from '@/types/models/adm-module';
+import { Link, usePage } from '@inertiajs/react';
+import { FormEventHandler, useState } from 'react';
+import ProfileFormFields from './partials/fields';
 
 export default function Create() {
     const { modules } = usePage<{ modules: AdmModule[] }>().props;
@@ -17,7 +16,7 @@ export default function Create() {
         name: '',
         active: false,
         permissions: [],
-    }
+    };
     const [data, setData] = useState<Required<ProfileForm>>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -42,20 +41,14 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <FormLayout>
-            <form onSubmit={createProfileHandler} className="space-y-6">
-                <ProfileFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    modules={modules}
-                />
+                <form onSubmit={createProfileHandler} className="space-y-6">
+                    <ProfileFormFields data={data} setData={setData} errors={errors} processing={processing} modules={modules} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/profiles'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/profiles">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );

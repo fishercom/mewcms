@@ -2,7 +2,7 @@
 
 @plugin 'tailwindcss-animate';
 
-@source "../views";
+@source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @custom-variant dark (&:is(.dark *));
@@ -161,87 +161,87 @@
 /* Tiptap Editor Base Styles */
 /* These are minimal styles often needed for Tiptap to render correctly */
 .ProseMirror {
-  min-height: 300px; /* Ensure a visible editing area */
-  outline: none; /* Remove default focus outline */
+    min-height: 300px; /* Ensure a visible editing area */
+    outline: none; /* Remove default focus outline */
 }
 
 .ProseMirror p {
-  margin: 0 0 1em; /* Basic paragraph spacing */
+    margin: 0 0 1em; /* Basic paragraph spacing */
 }
 
 .ProseMirror ul,
 .ProseMirror ol {
-  padding: 0 1em; /* Indent lists */
-  margin: 1em 0;
+    padding: 0 1em; /* Indent lists */
+    margin: 1em 0;
 }
 
 .ProseMirror ul li {
-  list-style: disc; /* Ensure bullets are visible */
+    list-style: disc; /* Ensure bullets are visible */
 }
 
 .ProseMirror ol li {
-  list-style: decimal; /* Ensure numbers are visible */
+    list-style: decimal; /* Ensure numbers are visible */
 }
 
 /* Explicit heading styles for Tiptap */
 .ProseMirror h1 {
-  font-size: 2em;
-  font-weight: bold;
-  margin: 0.67em 0;
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
 }
 
 .ProseMirror h2 {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin: 0.83em 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.83em 0;
 }
 
 .ProseMirror h3 {
-  font-size: 1.17em;
-  font-weight: bold;
-  margin: 1em 0;
+    font-size: 1.17em;
+    font-weight: bold;
+    margin: 1em 0;
 }
 
 .ProseMirror h4,
 .ProseMirror h5,
 .ProseMirror h6 {
-  margin: 1em 0 0.5em;
-  font-weight: bold;
+    margin: 1em 0 0.5em;
+    font-weight: bold;
 }
 
 .ProseMirror blockquote {
-  border-left: 3px solid #ccc;
-  padding-left: 1em;
-  margin: 1em 0;
+    border-left: 3px solid #ccc;
+    padding-left: 1em;
+    margin: 1em 0;
 }
 
 .ProseMirror code {
-  background-color: rgba(97, 97, 97, .1);
-  color: #616161;
-  padding: .2em .4em;
-  border-radius: 5px;
+    background-color: rgba(97, 97, 97, 0.1);
+    color: #616161;
+    padding: 0.2em 0.4em;
+    border-radius: 5px;
 }
 
 .ProseMirror pre {
-  background: #0D0D0D;
-  color: #FFF;
-  font-family: 'JetBrainsMono', monospace;
-  padding: .75rem 1rem;
-  border-radius: 0.5rem;
+    background: #0d0d0d;
+    color: #fff;
+    font-family: 'JetBrainsMono', monospace;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
 }
 
 .ProseMirror pre code {
-  color: inherit;
-  padding: 0;
-  background: none;
-  font-size: .8em;
+    color: inherit;
+    padding: 0;
+    background: none;
+    font-size: 0.8em;
 }
 
 /* Placeholder (if you use it) */
 .ProseMirror .is-empty::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: #adb5bd;
-  pointer-events: none;
-  height: 0;
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
 }

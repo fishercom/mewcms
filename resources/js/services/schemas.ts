@@ -1,8 +1,7 @@
-
-import apiClient from './api';
-import { router } from '@inertiajs/react';
-import { Page } from '@inertiajs/core';
 import objectToFormData from '@/lib/form-data';
+import { Page } from '@inertiajs/core';
+import { router } from '@inertiajs/react';
+import apiClient from './api';
 
 interface Callbacks {
     onSuccess?: (page: Page) => void;
@@ -12,9 +11,7 @@ interface Callbacks {
 }
 
 export const getSchemas = (parentSchemaId: number | null = null) => {
-    const endpoint = parentSchemaId
-        ? route('schemas.children', parentSchemaId)
-        : route('schemas.root');
+    const endpoint = parentSchemaId ? route('schemas.children', parentSchemaId) : route('schemas.root');
     return apiClient.get(endpoint);
 };
 

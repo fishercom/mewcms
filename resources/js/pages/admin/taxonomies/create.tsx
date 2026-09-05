@@ -1,12 +1,12 @@
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { createTaxonomy } from '@/services/taxonomies';
-import TaxonomyFormFields from './partials/fields';
 import { CmsTaxonomyForm } from '@/types/models/cms-taxonomy';
+import TaxonomyFormFields from './partials/fields';
 
 export default function Create() {
     const item: CmsTaxonomyForm = {
@@ -40,16 +40,11 @@ export default function Create() {
         <ModuleLayout view="Crear Taxonomía">
             <FormLayout>
                 <form onSubmit={createTaxonomyHandler} className="space-y-6">
-                    <TaxonomyFormFields
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        processing={processing}
-                    />
+                    <TaxonomyFormFields data={data} setData={setData} errors={errors} processing={processing} />
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/taxonomies'>Cancelar</Link>
+                        <Link href="/admin/taxonomies">Cancelar</Link>
                     </div>
                 </form>
             </FormLayout>

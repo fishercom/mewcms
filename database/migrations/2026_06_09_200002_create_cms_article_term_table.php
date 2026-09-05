@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_article_term', function (Blueprint $table) {
+        Schema::create('cms_article_term', function (Blueprint $table): void {
             // article_id must be unsignedInteger to match cms_articles.id (legacy increments column)
             $table->unsignedInteger('article_id');
             $table->unsignedBigInteger('term_id');

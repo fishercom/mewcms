@@ -12,8 +12,8 @@ class CmsParameterGroup extends Model
 
     public function parameters($lang_id = null, $parent_id = null)
     {
-        return $this->hasMany('App\Models\CmsParameter', 'group_id', 'id')
-            ->where(function ($query) use ($parent_id) {
+        return $this->hasMany(CmsParameter::class, 'group_id', 'id')
+            ->where(function ($query) use ($parent_id): void {
                 if (! empty($parent_id)) {
                     $query->where('parent_id', $parent_id);
                 } else {

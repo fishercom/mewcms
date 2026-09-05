@@ -8,6 +8,7 @@ use App\Models\CmsNotify;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +22,7 @@ class NotifyController extends Controller
         $s = $request->get('s');
 
         $items = CmsNotify::select()
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
@@ -44,7 +45,7 @@ class NotifyController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Redirector|RedirectResponse
     {
         $profile = new CmsNotify($request->all());
         $profile->save();

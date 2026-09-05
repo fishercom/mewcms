@@ -2,12 +2,11 @@
  * Template Name: Home Page
  * Unique: true
  */
-import React from 'react';
-import FrontLayout from '../layout';
-import { Head } from '@inertiajs/react';
+import FrontSlider from '@/components/front-slider';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsSlider } from '@/types/models/cms-slider';
-import FrontSlider from '@/components/front-slider';
+import { Head } from '@inertiajs/react';
+import FrontLayout from '../layout';
 
 interface HomeProps {
     article: CmsArticle;
@@ -28,7 +27,8 @@ export default function Home({ article, navigation, slider }: HomeProps) {
     // Dynamically retrieve hero content from custom fields or fallback
     const heroTitle = meta.hero_title || article.title;
     const heroSubtitle = meta.hero_subtitle || 'Welcome to our dynamic website powered by MewCMS.';
-    const heroDescription = meta.hero_description || 'You can manage all page sections, custom fields, and repeaters directly from the administrator dashboard.';
+    const heroDescription =
+        meta.hero_description || 'You can manage all page sections, custom fields, and repeaters directly from the administrator dashboard.';
 
     return (
         <FrontLayout navigation={navigation}>
@@ -39,17 +39,13 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 {slider && slider.slides && slider.slides.length > 0 ? (
                     <FrontSlider slider={slider} />
                 ) : (
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-tr from-[#fff2f2] to-[#fffaf0] dark:from-[#1D0002] dark:to-[#1a0f00] px-6 py-24 sm:px-12 sm:py-32 lg:px-16 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.05)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed15]">
-                        <div className="mx-auto max-w-2xl text-center space-y-6">
-                            <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-transparent dark:from-red-400 dark:to-amber-400">
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-tr from-[#fff2f2] to-[#fffaf0] px-6 py-24 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.05)] sm:px-12 sm:py-32 lg:px-16 dark:from-[#1D0002] dark:to-[#1a0f00] dark:shadow-[inset_0px_0px_0px_1px_#fffaed15]">
+                        <div className="mx-auto max-w-2xl space-y-6 text-center">
+                            <h1 className="bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-6xl dark:from-red-400 dark:to-amber-400">
                                 {heroTitle}
                             </h1>
-                            <p className="text-lg font-medium text-[#706f6c] dark:text-[#c5c4c0]">
-                                {heroSubtitle}
-                            </p>
-                            <p className="text-sm text-[#706f6c] dark:text-[#a1a09a] max-w-xl mx-auto leading-relaxed">
-                                {heroDescription}
-                            </p>
+                            <p className="text-lg font-medium text-[#706f6c] dark:text-[#c5c4c0]">{heroSubtitle}</p>
+                            <p className="mx-auto max-w-xl text-sm leading-relaxed text-[#706f6c] dark:text-[#a1a09a]">{heroDescription}</p>
                         </div>
                     </div>
                 )}
@@ -62,13 +58,14 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                             .map(([key, val]) => {
                                 if (typeof val !== 'object' && val) {
                                     return (
-                                        <div key={key} className="rounded-xl border border-[#19140015] bg-white p-6 shadow-sm dark:border-[#3E3E3A]/40 dark:bg-[#161615]">
-                                            <h3 className="text-sm font-semibold capitalize text-[#f53003] dark:text-[#FF4433] mb-2">
+                                        <div
+                                            key={key}
+                                            className="rounded-xl border border-[#19140015] bg-white p-6 shadow-sm dark:border-[#3E3E3A]/40 dark:bg-[#161615]"
+                                        >
+                                            <h3 className="mb-2 text-sm font-semibold text-[#f53003] capitalize dark:text-[#FF4433]">
                                                 {key.replace(/_/g, ' ')}
                                             </h3>
-                                            <p className="text-sm text-[#706f6c] dark:text-[#c5c4c0] break-words">
-                                                {String(val)}
-                                            </p>
+                                            <p className="text-sm break-words text-[#706f6c] dark:text-[#c5c4c0]">{String(val)}</p>
                                         </div>
                                     );
                                 }

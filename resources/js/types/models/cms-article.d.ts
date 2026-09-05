@@ -1,7 +1,9 @@
 // import type { CustomField } from './custom-field';
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-interface JsonObject { [key: string]: JsonValue }
+interface JsonObject {
+    [key: string]: JsonValue;
+}
 type JsonArray = JsonValue[];
 type FormDataConvertible = string | number | boolean | null | File | Blob | Date | FormDataConvertible[] | { [key: string]: FormDataConvertible };
 

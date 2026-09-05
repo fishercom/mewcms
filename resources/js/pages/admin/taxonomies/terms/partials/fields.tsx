@@ -1,8 +1,8 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
-import { CmsTaxonomyTerm, CmsTaxonomyTermForm } from "@/types/models/cms-taxonomy";
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CmsTaxonomyTerm, CmsTaxonomyTermForm } from '@/types/models/cms-taxonomy';
 
 interface Props {
     data: CmsTaxonomyTermForm;
@@ -49,7 +49,7 @@ export default function TaxonomyTermFormFields({ data, setData, errors, parents,
                 <select
                     id="parent_id"
                     tabIndex={3}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     value={data.parent_id ?? ''}
                     onChange={(e) => {
                         const val = e.target.value;
@@ -72,7 +72,7 @@ export default function TaxonomyTermFormFields({ data, setData, errors, parents,
                 <textarea
                     id="description"
                     tabIndex={4}
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     value={data.description ?? ''}
                     onChange={(e) => setData({ ...data, description: e.target.value })}
                     disabled={processing}

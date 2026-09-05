@@ -19,7 +19,7 @@ class TaxonomyTermController extends Controller
 
         $items = CmsTaxonomyTerm::with('parent')
             ->where('taxonomy_id', $taxonomyId)
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }

@@ -1,11 +1,11 @@
-import ModuleLayout from '@/layouts/module/layout';
+import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
+import { createMenu } from '@/services/menus';
+import { CmsMenuForm } from '@/types/models/cms-menu';
 import { Link } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { createMenu } from '@/services/menus';
 import MenuFormFields from './partials/fields';
-import { CmsMenuForm } from '@/types/models/cms-menu';
 
 export default function Create() {
     const item: CmsMenuForm = {
@@ -39,16 +39,13 @@ export default function Create() {
         <ModuleLayout view="Crear Menú">
             <FormLayout>
                 <form onSubmit={createMenuHandler} className="space-y-6">
-                    <MenuFormFields
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        processing={processing}
-                    />
+                    <MenuFormFields data={data} setData={setData} errors={errors} processing={processing} />
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/menus' className="text-sm text-gray-600 hover:underline">Cancelar</Link>
+                        <Link href="/admin/menus" className="text-sm text-gray-600 hover:underline">
+                            Cancelar
+                        </Link>
                     </div>
                 </form>
             </FormLayout>

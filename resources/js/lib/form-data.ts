@@ -1,8 +1,4 @@
-function objectToFormData(
-    obj: Record<string, unknown>,
-    form?: FormData,
-    namespace?: string,
-): FormData {
+function objectToFormData(obj: Record<string, unknown>, form?: FormData, namespace?: string): FormData {
     const fd = form || new FormData();
     let formKey: string;
 
@@ -22,7 +18,8 @@ function objectToFormData(
 
             if (typeof value === 'boolean') {
                 fd.append(formKey, value ? '1' : '0');
-            } else if (Array.isArray(value)) { // Handle arrays
+            } else if (Array.isArray(value)) {
+                // Handle arrays
                 value.forEach((element, index) => {
                     const arrayKey = `${formKey}[${index}]`;
                     if (typeof element === 'object' && !(element instanceof File)) {

@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_menu_items', function (Blueprint $table) {
+        Schema::create('cms_menu_items', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('menu_id')->constrained('cms_menus')->cascadeOnDelete();
             $table->unsignedBigInteger('parent_id')->nullable();
@@ -63,7 +63,7 @@ return new class extends Migration
                     ]);
                 }
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Log or ignore if db is not seeded yet during migration
         }
     }
@@ -80,7 +80,7 @@ return new class extends Migration
                 AdmEvent::where('module_id', $module->id)->delete();
                 $module->delete();
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Ignore
         }
 

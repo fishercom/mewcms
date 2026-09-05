@@ -32,30 +32,30 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // Seeding cms_langs
-        $lang_default = CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true]);
-        $lang_english = CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => true]);
+        CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true]);
+        CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => true]);
 
         // Seeding cms_schema_groups
         $schg_default = CmsSchemaGroup::create(['name' => 'Site Principal', 'layout' => 'front', 'default' => '1', 'active' => true]);
 
         // Seeding cms_sites
-        $site_root = CmsSite::create(['name' => 'Site Principal', 'site_url' => 'http://localhost/lasbambas-reconocimientos', 'schema_group_id' => $schg_default->id, 'default' => '1', 'active' => true]);
+        CmsSite::create(['name' => 'Site Principal', 'site_url' => 'http://localhost/lasbambas-reconocimientos', 'schema_group_id' => $schg_default->id, 'default' => '1', 'active' => true]);
 
         // Seeding cms_translates_alias
 
         // Seeding cms_parameters_group
-        $pgroup_asunto = CmsParameterGroup::create(['name' => 'Asunto de Contacto', 'alias' => 'asunto', 'active' => true]);
+        CmsParameterGroup::create(['name' => 'Asunto de Contacto', 'alias' => 'asunto', 'active' => true]);
 
         // Seeding cms_forms
-        $form_contact = CmsForm::create(['name' => 'Formulario de Contacto', 'alias' => 'contacto', 'active' => true]);
+        CmsForm::create(['name' => 'Formulario de Contacto', 'alias' => 'contacto', 'active' => true]);
 
         // Seeding profiles
         $perfil_sa = Profile::create(['name' => 'Super', 'active' => true, 'sa' => '1']);
-        $perfil_admin = Profile::create(['name' => 'Admin', 'active' => true]);
-        $perfil_webmaster = Profile::create(['name' => 'Webmaster', 'active' => true]);
+        Profile::create(['name' => 'Admin', 'active' => true]);
+        Profile::create(['name' => 'Webmaster', 'active' => true]);
 
         // Seeding users
-        $user_admin = User::create(['username' => 'fischer', 'email' => 'fishdev@gmail.com', 'password' => 'admin$2277', 'name' => 'Administrador', 'profile_id' => $perfil_sa->id, 'active' => '1', 'default' => '1']);
+        User::create(['username' => 'fischer', 'email' => 'fishdev@gmail.com', 'password' => 'admin$2277', 'name' => 'Administrador', 'profile_id' => $perfil_sa->id, 'active' => '1', 'default' => '1']);
 
         // Seeding menus
         $menu_home = AdmMenu::create(['name' => 'Inicio', 'position' => '0', 'visible' => false]);
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
         $module_contenido = AdmMenu::create(['name' => 'Contenido Web', 'position' => '6', 'visible' => true]);
 
         // Seeding adm_modules
-        $module_inicio = AdmModule::create(['menu_id' => $menu_home->id, 'name' => 'admin', 'url' => '/admin/home', 'icon' => 'layout-dashboard', 'position' => '0', 'visible' => true]);
+        AdmModule::create(['menu_id' => $menu_home->id, 'name' => 'admin', 'url' => '/admin/home', 'icon' => 'layout-dashboard', 'position' => '0', 'visible' => true]);
         $module_acceso = AdmModule::create(['menu_id' => $menu_home->id, 'name' => 'Acceso', 'url' => '/admin/login', 'position' => '0', 'visible' => false]);
         $module_usradm = AdmModule::create(['menu_id' => $menu_admin->id, 'name' => 'Usuarios', 'title' => 'usuario', 'url' => '/admin/users', 'icon' => 'users', 'position' => '1', 'visible' => true]);
         $module_perfil = AdmModule::create(['menu_id' => $menu_admin->id, 'name' => 'Perfiles', 'title' => 'perfil', 'url' => '/admin/profiles', 'icon' => 'flask-conical', 'position' => '2', 'visible' => true]);

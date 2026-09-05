@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_taxonomy_terms', function (Blueprint $table) {
+        Schema::create('cms_taxonomy_terms', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('taxonomy_id')->constrained('cms_taxonomies')->cascadeOnDelete();
             $table->unsignedBigInteger('parent_id')->nullable();

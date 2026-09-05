@@ -8,12 +8,10 @@ class CreateCmsTranslatesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('cms_translates', function (Blueprint $table) {
+        Schema::create('cms_translates', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('alias');
             $table->tinyInteger('input_type')->unsigned();
@@ -25,10 +23,8 @@ class CreateCmsTranslatesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('cms_translates');
     }

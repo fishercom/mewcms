@@ -1,7 +1,6 @@
-import React from 'react';
-import { CmsForm, CmsFormField } from '@/types/models/cms-form';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Settings, List, CircleDot } from 'lucide-react';
+import { CmsForm, CmsFormField } from '@/types/models/cms-form';
+import { CircleDot, List, Plus, Settings, Trash2 } from 'lucide-react';
 
 interface Props {
     data: Partial<CmsForm> & { fields: CmsFormField[] };
@@ -20,7 +19,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                 type: 'text',
                 options: null,
                 active: true,
-            }
+            },
         ];
         setData({ ...data, fields: nextFields });
     };
@@ -56,11 +55,11 @@ export default function FormFields({ data, setData, errors }: Props) {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             {/* Left Column: Form Settings */}
-            <div className="lg:col-span-4 space-y-4">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4 shadow-xs">
-                    <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 border-b pb-3 border-zinc-100 dark:border-zinc-850">
+            <div className="space-y-4 lg:col-span-4">
+                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+                    <h3 className="dark:border-zinc-850 flex items-center gap-1.5 border-b border-zinc-100 pb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">
                         <Settings className="h-4 w-4 text-red-600" />
                         <span>Ajustes del Formulario</span>
                     </h3>
@@ -72,7 +71,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             required
                             value={data.name || ''}
                             onChange={(e) => handleFormChange('name', e.target.value)}
-                            className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-850 bg-transparent rounded-lg text-sm text-zinc-800 dark:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            className="dark:border-zinc-850 w-full rounded-lg border border-zinc-200 bg-transparent px-3 py-2 text-sm text-zinc-800 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none dark:text-zinc-200"
                             placeholder="Ej. Formulario de Contacto"
                         />
                         {errors.name && <p className="text-[11px] text-red-500">{errors.name}</p>}
@@ -85,7 +84,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             required
                             value={data.alias || ''}
                             onChange={(e) => handleFormChange('alias', e.target.value)}
-                            className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-850 bg-transparent rounded-lg text-sm font-mono text-zinc-800 dark:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            className="dark:border-zinc-850 w-full rounded-lg border border-zinc-200 bg-transparent px-3 py-2 font-mono text-sm text-zinc-800 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none dark:text-zinc-200"
                             placeholder="Ej. contacto_general"
                         />
                         {errors.alias && <p className="text-[11px] text-red-500">{errors.alias}</p>}
@@ -97,7 +96,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             value={data.info || ''}
                             onChange={(e) => handleFormChange('info', e.target.value)}
                             rows={3}
-                            className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-850 bg-transparent rounded-lg text-sm text-zinc-800 dark:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            className="dark:border-zinc-850 w-full rounded-lg border border-zinc-200 bg-transparent px-3 py-2 text-sm text-zinc-800 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none dark:text-zinc-200"
                             placeholder="Info de ayuda o descripción del propósito del formulario"
                         />
                         {errors.info && <p className="text-[11px] text-red-500">{errors.info}</p>}
@@ -109,9 +108,9 @@ export default function FormFields({ data, setData, errors }: Props) {
                             id="form_active"
                             checked={data.active ?? true}
                             onChange={(e) => handleFormChange('active', e.target.checked)}
-                            className="h-4 w-4 text-red-600 border-zinc-200 dark:border-zinc-850 bg-transparent rounded-sm focus:ring-red-500 focus:ring-2"
+                            className="dark:border-zinc-850 h-4 w-4 rounded-sm border-zinc-200 bg-transparent text-red-600 focus:ring-2 focus:ring-red-500"
                         />
-                        <label htmlFor="form_active" className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 cursor-pointer">
+                        <label htmlFor="form_active" className="cursor-pointer text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                             Formulario Activo
                         </label>
                     </div>
@@ -119,10 +118,10 @@ export default function FormFields({ data, setData, errors }: Props) {
             </div>
 
             {/* Right Column: Dynamic Form Fields Schema Builder */}
-            <div className="lg:col-span-8 space-y-4">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4 shadow-xs">
-                    <div className="flex items-center justify-between border-b pb-3 border-zinc-100 dark:border-zinc-850">
-                        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+            <div className="space-y-4 lg:col-span-8">
+                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+                    <div className="dark:border-zinc-850 flex items-center justify-between border-b border-zinc-100 pb-3">
+                        <h3 className="flex items-center gap-1.5 text-sm font-bold text-zinc-800 dark:text-zinc-200">
                             <List className="h-4 w-4 text-red-600" />
                             <span>Campos del Formulario</span>
                         </h3>
@@ -131,7 +130,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             onClick={handleAddField}
                             variant="outline"
                             size="sm"
-                            className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg"
+                            className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs"
                         >
                             <Plus className="h-3.5 w-3.5" />
                             <span>Añadir Campo</span>
@@ -139,43 +138,45 @@ export default function FormFields({ data, setData, errors }: Props) {
                     </div>
 
                     {data.fields.length > 0 ? (
-                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                        <div className="max-h-[500px] space-y-4 overflow-y-auto pr-1">
                             {data.fields.map((field, idx) => (
                                 <div
                                     key={idx}
-                                    className="p-4 border border-zinc-100 dark:border-zinc-850 rounded-xl bg-zinc-50/30 dark:bg-zinc-900/40 relative space-y-3"
+                                    className="dark:border-zinc-850 relative space-y-3 rounded-xl border border-zinc-100 bg-zinc-50/30 p-4 dark:bg-zinc-900/40"
                                 >
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Etiqueta</label>
+                                            <label className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Etiqueta</label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={field.name}
                                                 onChange={(e) => handleFieldChange(idx, 'name', e.target.value)}
-                                                className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-transparent rounded-lg text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-red-500"
+                                                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
                                                 placeholder="Ej. Correo Electrónico"
                                             />
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Clave</label>
+                                            <label className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Clave</label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={field.alias}
                                                 onChange={(e) => handleFieldChange(idx, 'alias', e.target.value)}
-                                                className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-transparent rounded-lg text-xs font-mono text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-red-500"
+                                                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 font-mono text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
                                                 placeholder="Ej. email"
                                             />
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tipo de Entrada</label>
+                                            <label className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                                                Tipo de Entrada
+                                            </label>
                                             <select
                                                 value={field.type}
                                                 onChange={(e) => handleFieldChange(idx, 'type', e.target.value as CmsFormField['type'])}
-                                                className="w-full h-8 px-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-transparent rounded-lg text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-red-500"
+                                                className="h-8 w-full rounded-lg border border-zinc-200 bg-white px-2 text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
                                             >
                                                 <option value="text">Texto simple</option>
                                                 <option value="email">Email</option>
@@ -191,19 +192,22 @@ export default function FormFields({ data, setData, errors }: Props) {
                                     {/* Render options list if type is select/checkbox/radio */}
                                     {['select', 'checkbox', 'radio'].includes(field.type) && (
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1">
+                                            <label className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
                                                 <CircleDot className="h-3 w-3 text-red-500" />
                                                 <span>Opciones (Valores separados por coma)</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 required
-                                                value={Array.isArray(field.options) ? field.options.join(', ') : (field.options || '')}
+                                                value={Array.isArray(field.options) ? field.options.join(', ') : field.options || ''}
                                                 onChange={(e) => {
-                                                    const arr = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                                                    const arr = e.target.value
+                                                        .split(',')
+                                                        .map((s) => s.trim())
+                                                        .filter(Boolean);
                                                     handleFieldChange(idx, 'options', arr);
                                                 }}
-                                                className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-transparent rounded-lg text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-red-500"
+                                                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
                                                 placeholder="Opción 1, Opción 2, Opción 3"
                                             />
                                         </div>
@@ -216,15 +220,17 @@ export default function FormFields({ data, setData, errors }: Props) {
                                                 id={`field_active_${idx}`}
                                                 checked={field.active}
                                                 onChange={(e) => handleFieldChange(idx, 'active', e.target.checked)}
-                                                className="h-3.5 w-3.5 text-red-600 border-zinc-200 dark:border-zinc-800 bg-transparent rounded-sm"
+                                                className="h-3.5 w-3.5 rounded-sm border-zinc-200 bg-transparent text-red-600 dark:border-zinc-800"
                                             />
-                                            <label htmlFor={`field_active_${idx}`} className="cursor-pointer font-medium">Campo Activo</label>
+                                            <label htmlFor={`field_active_${idx}`} className="cursor-pointer font-medium">
+                                                Campo Activo
+                                            </label>
                                         </div>
 
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveField(idx)}
-                                            className="text-red-500 hover:text-red-600 transition-colors inline-flex items-center gap-1"
+                                            className="inline-flex items-center gap-1 text-red-500 transition-colors hover:text-red-600"
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
                                             <span>Eliminar Campo</span>
@@ -234,8 +240,8 @@ export default function FormFields({ data, setData, errors }: Props) {
                             ))}
                         </div>
                     ) : (
-                        <div className="py-12 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-400">
-                            <List className="h-8 w-8 mx-auto text-zinc-300 mb-2" />
+                        <div className="rounded-xl border border-dashed border-zinc-200 py-12 text-center text-zinc-400 dark:border-zinc-800">
+                            <List className="mx-auto mb-2 h-8 w-8 text-zinc-300" />
                             <p className="text-xs">No hay campos añadidos a este formulario. Haz clic en "Añadir Campo" para empezar.</p>
                         </div>
                     )}

@@ -3,14 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use UniSharp\LaravelFilemanager\Lfm;
 
-Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
+Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function (): void {
     Lfm::routes();
 });
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FrontController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('admin', [DashboardController::class, 'index'])->name('admin');
 });
 

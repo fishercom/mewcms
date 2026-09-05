@@ -8,12 +8,10 @@ class CreateCmsConfigsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('cms_configs', function (Blueprint $table) {
+        Schema::create('cms_configs', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('type', 10);  // string, int, text, date
             $table->string('name');
@@ -25,10 +23,8 @@ class CreateCmsConfigsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('cms_configs');
     }

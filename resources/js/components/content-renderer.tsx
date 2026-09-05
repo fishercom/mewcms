@@ -1,4 +1,3 @@
-import React from 'react';
 import FrontForm from '@/components/front-form';
 
 interface Props {
@@ -43,12 +42,7 @@ export default function ContentRenderer({ html, className = '' }: Props) {
 
     // If there were no shortcodes at all, fall back to a single dangerouslySetInnerHTML block
     if (segments.length === 0) {
-        return (
-            <div
-                className={`prose dark:prose-invert max-w-none ${className}`}
-                dangerouslySetInnerHTML={{ __html: html }}
-            />
-        );
+        return <div className={`prose dark:prose-invert max-w-none ${className}`} dangerouslySetInnerHTML={{ __html: html }} />;
     }
 
     return (
@@ -56,11 +50,7 @@ export default function ContentRenderer({ html, className = '' }: Props) {
             {segments.map((seg, i) => {
                 if (seg.type === 'html') {
                     return seg.content.trim() ? (
-                        <div
-                            key={i}
-                            className="prose dark:prose-invert max-w-none"
-                            dangerouslySetInnerHTML={{ __html: seg.content }}
-                        />
+                        <div key={i} className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: seg.content }} />
                     ) : null;
                 }
 

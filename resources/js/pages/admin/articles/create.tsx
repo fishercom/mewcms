@@ -1,17 +1,22 @@
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import ArticleFields from './partials/fields';
-import { Link, usePage } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
-import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { createArticle } from '@/services/articles';
 import { CmsArticle, CmsArticleForm } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
+import { Link, usePage } from '@inertiajs/react';
+import { Image as ImageIcon } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
+import ArticleFields from './partials/fields';
 
 export default function Create() {
-    const { schema, schemas = [], parents = [], taxonomies } = usePage<{ schema?: CmsSchema, schemas?: CmsSchema[], parents?: CmsArticle[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const {
+        schema,
+        schemas = [],
+        parents = [],
+        taxonomies,
+    } = usePage<{ schema?: CmsSchema; schemas?: CmsSchema[]; parents?: CmsArticle[]; taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
 
     const initial: CmsArticleForm = {
         id: null,
@@ -35,7 +40,7 @@ export default function Create() {
     const [mediaOpen, setMediaOpen] = useState(false);
 
     const handleChangeSchema = (schemaId: number) => {
-        const found = schemas.find(s => s.id === schemaId);
+        const found = schemas.find((s) => s.id === schemaId);
         setActiveSchema(found);
     };
 
@@ -59,13 +64,8 @@ export default function Create() {
 
     return (
         <ModuleLayout view="Crear">
-            <div className="flex justify-end mb-4">
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center gap-1.5"
-                    onClick={() => setMediaOpen(true)}
-                >
+            <div className="mb-4 flex justify-end">
+                <Button type="button" variant="outline" className="flex items-center gap-1.5" onClick={() => setMediaOpen(true)}>
                     <ImageIcon className="h-4 w-4" />
                     <span>Biblioteca de Medios Rápida</span>
                 </Button>
@@ -85,14 +85,11 @@ export default function Create() {
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/articles'>Cancelar</Link>
+                        <Link href="/admin/articles">Cancelar</Link>
                     </div>
                 </form>
             </FormLayout>
-            <QuickMediaDrawer
-                isOpen={mediaOpen}
-                onClose={() => setMediaOpen(false)}
-            />
+            <QuickMediaDrawer isOpen={mediaOpen} onClose={() => setMediaOpen(false)} />
         </ModuleLayout>
     );
 }

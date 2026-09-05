@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_menus', function (Blueprint $table) {
+        Schema::create('cms_menus', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();

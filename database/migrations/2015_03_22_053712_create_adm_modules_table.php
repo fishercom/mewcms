@@ -8,12 +8,10 @@ class CreateAdmModulesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('adm_modules', function (Blueprint $table) {
+        Schema::create('adm_modules', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('menu_id')->unsigned();
             $table->string('name');
@@ -36,10 +34,8 @@ class CreateAdmModulesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('adm_modules');
     }

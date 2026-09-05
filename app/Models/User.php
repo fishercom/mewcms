@@ -42,7 +42,7 @@ class User extends Authenticatable
 
     public function profile()
     {
-        return $this->hasOne('App\Models\Profile', 'id', 'profile_id');
+        return $this->hasOne(Profile::class, 'id', 'profile_id');
     }
 
     public function setPasswordAttribute($value)

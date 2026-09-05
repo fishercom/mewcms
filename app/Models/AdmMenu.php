@@ -17,14 +17,14 @@ class AdmMenu extends Model
 
     public function children()
     {
-        return $this->hasMany('App\Models\AdmMenu', 'parent_id', 'id')
+        return $this->hasMany(AdmMenu::class, 'parent_id', 'id')
             ->where('visible', '1')
             ->orderBy('position');
     }
 
     public function modules()
     {
-        return $this->hasMany('App\Models\AdmModule', 'menu_id', 'id')
+        return $this->hasMany(AdmModule::class, 'menu_id', 'id')
             ->where('visible', '1')
             ->orderBy('position');
     }

@@ -9,11 +9,12 @@ use App\Models\CmsSchemaGroup;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->profile = Profile::create([
         'name' => 'Super Admin',
         'sa' => 1,
@@ -52,12 +53,12 @@ beforeEach(function () {
     ]);
 });
 
-it('allows authenticated users to view menus list', function () {
+it('allows authenticated users to view menus list', function (): void {
     $response = $this->actingAs($this->user)->get('/admin/menus');
     $response->assertStatus(200);
 });
 
-it('allows authenticated users to create a menu', function () {
+it('allows authenticated users to create a menu', function (): void {
     $response = $this->actingAs($this->user)->post('/admin/menus', [
         'name' => 'Main Navigation',
         'slug' => 'main-nav',
@@ -72,7 +73,7 @@ it('allows authenticated users to create a menu', function () {
     ]);
 });
 
-it('allows managing individual menu items', function () {
+it('allows managing individual menu items', function (): void {
     $menu = CmsMenu::create([
         'name' => 'Header Menu',
         'slug' => 'header',
@@ -110,7 +111,7 @@ it('allows managing individual menu items', function () {
     $this->assertDatabaseMissing('cms_menu_items', ['id' => $item->id]);
 });
 
-it('eager resolves cms article slug in public layout shared menus', function () {
+it('eager resolves cms article slug in public layout shared menus', function (): void {
     CmsMenu::query()->delete();
 
     $menu = CmsMenu::create([
@@ -139,7 +140,7 @@ it('eager resolves cms article slug in public layout shared menus', function () 
     // Visit home page and verify menu resolved_url is shared
     $response = $this->get('/');
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->has('menus')
         ->where('menus.0.slug', 'header')
         ->where('menus.0.items.0.resolved_url', '/about/us/page')

@@ -17,7 +17,7 @@ class FormController extends Controller
         $s = $request->get('s');
 
         $items = CmsForm::withCount('fields')
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%')
                         ->orWhere('alias', 'LIKE', '%'.str_replace(' ', '%', $s).'%');

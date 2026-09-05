@@ -1,17 +1,29 @@
-import ModuleLayout from '@/layouts/module/layout';
-import FormLayout from '@/layouts/module/Form';
-import ArticleFields from './partials/fields';
-import { Link, usePage } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
-import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { updateArticle } from '@/services/articles';
 import { CmsArticle, CmsArticleForm, FormDataConvertible } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
+import { Link, usePage } from '@inertiajs/react';
+import { Image as ImageIcon } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
+import ArticleFields from './partials/fields';
 
 export default function Edit() {
-    const { item, schema, schemas = [], parents = [], taxonomies } = usePage<{ item: CmsArticle, schema?: CmsSchema, schemas?: CmsSchema[], parents?: CmsArticle[], taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+    const {
+        item,
+        schema,
+        schemas = [],
+        parents = [],
+        taxonomies,
+    } = usePage<{
+        item: CmsArticle;
+        schema?: CmsSchema;
+        schemas?: CmsSchema[];
+        parents?: CmsArticle[];
+        taxonomies?: import('@/types').CmsTaxonomy[];
+    }>().props;
 
     const initial: CmsArticleForm = {
         id: item.id,
@@ -26,7 +38,7 @@ export default function Edit() {
         metadata: item.metadata as { [key: string]: FormDataConvertible },
         slug: item.slug,
         active: item.active,
-        term_ids: item.terms?.map(t => t.id) || [],
+        term_ids: item.terms?.map((t) => t.id) || [],
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
     const [activeSchema, setActiveSchema] = useState<CmsSchema | undefined>(schema);
@@ -35,7 +47,7 @@ export default function Edit() {
     const [mediaOpen, setMediaOpen] = useState(false);
 
     const handleChangeSchema = (schemaId: number) => {
-        const found = schemas.find(s => s.id === schemaId);
+        const found = schemas.find((s) => s.id === schemaId);
         setActiveSchema(found);
     };
 
@@ -55,13 +67,8 @@ export default function Edit() {
 
     return (
         <ModuleLayout view="Editar">
-            <div className="flex justify-end mb-4">
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center gap-1.5"
-                    onClick={() => setMediaOpen(true)}
-                >
+            <div className="mb-4 flex justify-end">
+                <Button type="button" variant="outline" className="flex items-center gap-1.5" onClick={() => setMediaOpen(true)}>
                     <ImageIcon className="h-4 w-4" />
                     <span>Biblioteca de Medios Rápida</span>
                 </Button>
@@ -81,14 +88,11 @@ export default function Edit() {
                     />
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href='/admin/articles'>Cancelar</Link>
+                        <Link href="/admin/articles">Cancelar</Link>
                     </div>
                 </form>
             </FormLayout>
-            <QuickMediaDrawer
-                isOpen={mediaOpen}
-                onClose={() => setMediaOpen(false)}
-            />
+            <QuickMediaDrawer isOpen={mediaOpen} onClose={() => setMediaOpen(false)} />
         </ModuleLayout>
     );
 }

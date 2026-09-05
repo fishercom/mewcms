@@ -1,8 +1,8 @@
 import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { type BreadcrumbItem } from '@/types';
 import { generateBreadcrumb } from '@/lib/breadcrumbs';
+import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
@@ -51,12 +51,12 @@ export default function Password() {
                 setErrors(err);
                 setProcessing(false);
                 if (err.password) {
-                    setData(prevData => ({ ...prevData, password: '', password_confirmation: '' }));
+                    setData((prevData) => ({ ...prevData, password: '', password_confirmation: '' }));
                     passwordInput.current?.focus();
                 }
 
                 if (err.current_password) {
-                    setData(prevData => ({ ...prevData, current_password: '' }));
+                    setData((prevData) => ({ ...prevData, current_password: '' }));
                     currentPasswordInput.current?.focus();
                 }
             },

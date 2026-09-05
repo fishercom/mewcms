@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->profile = Profile::create([
         'name' => 'Super Admin',
         'sa' => 1,
@@ -58,16 +58,16 @@ beforeEach(function () {
     ]);
 });
 
-it('verifies home schema is detected as unique', function () {
+it('verifies home schema is detected as unique', function (): void {
     $this->assertTrue($this->homeSchema->isUnique());
     $this->assertFalse($this->standardSchema->isUnique());
 });
 
-it('filters home schema out of available schemas list on create when already assigned', function () {
+it('filters home schema out of available schemas list on create when already assigned', function (): void {
     // 1. Initially, home schema should be in create available templates
     $response = $this->actingAs($this->user)->get('/admin/articles/create');
     $response->assertStatus(200);
-    $response->assertInertia(function ($page) {
+    $response->assertInertia(function ($page): void {
         $schemas = $page->toArray()['props']['schemas'];
         $ids = collect($schemas)->pluck('id')->all();
         $this->assertContains($this->homeSchema->id, $ids);
@@ -86,7 +86,7 @@ it('filters home schema out of available schemas list on create when already ass
     // 3. Now, home schema should NOT be in create list
     $response = $this->actingAs($this->user)->get('/admin/articles/create');
     $response->assertStatus(200);
-    $response->assertInertia(function ($page) {
+    $response->assertInertia(function ($page): void {
         $schemas = $page->toArray()['props']['schemas'];
         $ids = collect($schemas)->pluck('id')->all();
         $this->assertNotContains($this->homeSchema->id, $ids);
@@ -94,7 +94,7 @@ it('filters home schema out of available schemas list on create when already ass
     });
 });
 
-it('keeps unique schema selectable inside edit screen for the article that uses it', function () {
+it('keeps unique schema selectable inside edit screen for the article that uses it', function (): void {
     // Assign the unique schema to an article
     $article = CmsArticle::create([
         'schema_id' => $this->homeSchema->id,
@@ -107,7 +107,7 @@ it('keeps unique schema selectable inside edit screen for the article that uses 
     // Fetch edit view for that article - home template must be present
     $response = $this->actingAs($this->user)->get("/admin/articles/{$article->id}/edit");
     $response->assertStatus(200);
-    $response->assertInertia(function ($page) {
+    $response->assertInertia(function ($page): void {
         $schemas = $page->toArray()['props']['schemas'];
         $ids = collect($schemas)->pluck('id')->all();
         $this->assertContains($this->homeSchema->id, $ids);
@@ -125,7 +125,7 @@ it('keeps unique schema selectable inside edit screen for the article that uses 
 
     $response2 = $this->actingAs($this->user)->get("/admin/articles/{$anotherArticle->id}/edit");
     $response2->assertStatus(200);
-    $response2->assertInertia(function ($page) {
+    $response2->assertInertia(function ($page): void {
         $schemas = $page->toArray()['props']['schemas'];
         $ids = collect($schemas)->pluck('id')->all();
         $this->assertNotContains($this->homeSchema->id, $ids);
@@ -133,7 +133,7 @@ it('keeps unique schema selectable inside edit screen for the article that uses 
     });
 });
 
-it('prevents saving a duplicate unique template page via store API validation', function () {
+it('prevents saving a duplicate unique template page via store API validation', function (): void {
     // 1. Assign home template once
     CmsArticle::create([
         'schema_id' => $this->homeSchema->id,
@@ -155,7 +155,7 @@ it('prevents saving a duplicate unique template page via store API validation', 
     $response->assertSessionHasErrors(['schema_id']);
 });
 
-it('prevents updating an article to use a unique template page already used elsewhere', function () {
+it('prevents updating an article to use a unique template page already used elsewhere', function (): void {
     // 1. Assign home template once
     CmsArticle::create([
         'schema_id' => $this->homeSchema->id,
@@ -186,7 +186,7 @@ it('prevents updating an article to use a unique template page already used else
     $response->assertSessionHasErrors(['schema_id']);
 });
 
-it('blocks unique schema pages from selecting a parent page', function () {
+it('blocks unique schema pages from selecting a parent page', function (): void {
     // 1. Create a parent standard page
     $parentArticle = CmsArticle::create([
         'schema_id' => $this->standardSchema->id,
@@ -209,7 +209,7 @@ it('blocks unique schema pages from selecting a parent page', function () {
     $response->assertSessionHasErrors(['parent_id']);
 });
 
-it('blocks selecting a unique schema page as a parent of another page', function () {
+it('blocks selecting a unique schema page as a parent of another page', function (): void {
     // 1. Create the unique home page at root
     $homeArticle = CmsArticle::create([
         'schema_id' => $this->homeSchema->id,
@@ -232,7 +232,7 @@ it('blocks selecting a unique schema page as a parent of another page', function
     $response->assertSessionHasErrors(['parent_id']);
 });
 
-it('blocks circular parent nesting on update', function () {
+it('blocks circular parent nesting on update', function (): void {
     // 1. Create standard page A
     $articleA = CmsArticle::create([
         'schema_id' => $this->standardSchema->id,
@@ -265,7 +265,7 @@ it('blocks circular parent nesting on update', function () {
     $response->assertSessionHasErrors(['parent_id']);
 });
 
-it('verifies articles listing is returned in hierarchical tree order with depth set', function () {
+it('verifies articles listing is returned in hierarchical tree order with depth set', function (): void {
     // 1. Create structure: Root Page -> Sub Page -> Sub-Sub Page
     $root = CmsArticle::create([
         'schema_id' => $this->standardSchema->id,
@@ -307,7 +307,7 @@ it('verifies articles listing is returned in hierarchical tree order with depth 
 
     $response = $this->actingAs($this->user)->get('/admin/articles');
     $response->assertStatus(200);
-    $response->assertInertia(function ($page) use ($root, $sub, $subsub, $anotherRoot) {
+    $response->assertInertia(function ($page) use ($root, $sub, $subsub, $anotherRoot): void {
         $items = $page->toArray()['props']['items'];
         $ids = collect($items)->pluck('id')->all();
 

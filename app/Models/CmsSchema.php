@@ -28,7 +28,7 @@ class CmsSchema extends Model
 
     public function parent()
     {
-        return $this->hasOne('App\Models\CmsSchema', 'id', 'parent_id');
+        return $this->hasOne(CmsSchema::class, 'id', 'parent_id');
     }
 
     public function children()
@@ -41,7 +41,7 @@ class CmsSchema extends Model
         return $this->hasMany(CmsArticle::class, 'schema_id');
     }
 
-    public static function getAvailableTemplates()
+    public static function getAvailableTemplates(): array
     {
         $directory = resource_path('js/pages/front/templates');
         if (! is_dir($directory)) {

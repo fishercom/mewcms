@@ -19,7 +19,7 @@ class MenuController extends Controller
         $s = $request->get('s');
 
         $items = CmsMenu::select()
-            ->where(function ($query) use ($s) {
+            ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
@@ -53,7 +53,7 @@ class MenuController extends Controller
 
     public function edit($id): Response
     {
-        $item = CmsMenu::with(['items' => function ($q) {
+        $item = CmsMenu::with(['items' => function ($q): void {
             $q->orderBy('position');
         }])->findOrFail($id);
 

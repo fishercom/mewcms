@@ -22,22 +22,22 @@ class CmsMenuItem extends Model
 
     public function menu()
     {
-        return $this->belongsTo('App\Models\CmsMenu', 'menu_id');
+        return $this->belongsTo(CmsMenu::class, 'menu_id');
     }
 
     public function parent()
     {
-        return $this->belongsTo('App\Models\CmsMenuItem', 'parent_id');
+        return $this->belongsTo(CmsMenuItem::class, 'parent_id');
     }
 
     public function children()
     {
-        return $this->hasMany('App\Models\CmsMenuItem', 'parent_id')->orderBy('position');
+        return $this->hasMany(CmsMenuItem::class, 'parent_id')->orderBy('position');
     }
 
     public function article()
     {
-        return $this->belongsTo('App\Models\CmsArticle', 'article_id');
+        return $this->belongsTo(CmsArticle::class, 'article_id');
     }
 
     /**

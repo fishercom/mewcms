@@ -1,23 +1,23 @@
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { createLog } from '@/services/logs';
-import LogFormFields from './partials/fields';
-import { AdmLogForm } from '@/types/models/adm-log';
 import { AdmEvent } from '@/types/models/adm-event';
+import { AdmLogForm } from '@/types/models/adm-log';
 import { User } from '@/types/models/user';
+import LogFormFields from './partials/fields';
 
 export default function Create() {
-    const { events, users } = usePage<{ events: AdmEvent[], users: User[] }>().props;
+    const { events, users } = usePage<{ events: AdmEvent[]; users: User[] }>().props;
 
     const item: AdmLogForm = {
         event_id: events[0]?.id || 0,
         user_id: users[0]?.id || 0,
         comment: '',
-    }
+    };
     const [data, setData] = useState<AdmLogForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -42,21 +42,14 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <FormLayout>
-            <form onSubmit={createLogHandler} className="space-y-6">
-                <LogFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    events={events}
-                    users={users}
-                />
+                <form onSubmit={createLogHandler} className="space-y-6">
+                    <LogFormFields data={data} setData={setData} errors={errors} processing={processing} events={events} users={users} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/logs'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/logs">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );

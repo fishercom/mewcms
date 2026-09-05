@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cms_schemas', function (Blueprint $table) {
+        Schema::table('cms_schemas', function (Blueprint $table): void {
             $table->string('type')->nullable()->change();
         });
 
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cms_schemas', function (Blueprint $table) {
+        Schema::table('cms_schemas', function (Blueprint $table): void {
             $table->enum('type', ['PAGE', 'HOME', 'OPTIONS'])->nullable()->default('PAGE')->change();
         });
     }

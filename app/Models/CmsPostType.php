@@ -34,7 +34,7 @@ class CmsPostType extends Model
 
     protected static function booted()
     {
-        static::created(function ($cpt) {
+        static::created(function ($cpt): void {
             $webMenu = AdmMenu::where('name', 'Contenido Web')->first();
             if ($webMenu) {
                 $nextPos = AdmModule::where('menu_id', $webMenu->id)->max('position') + 1;
@@ -57,7 +57,7 @@ class CmsPostType extends Model
             }
         });
 
-        static::updated(function ($cpt) {
+        static::updated(function ($cpt): void {
             $module = AdmModule::where('url', '/admin/posts?post_type='.$cpt->getOriginal('slug'))->first();
             if ($module) {
                 $module->name = $cpt->name;
@@ -67,7 +67,7 @@ class CmsPostType extends Model
             }
         });
 
-        static::deleted(function ($cpt) {
+        static::deleted(function ($cpt): void {
             $module = AdmModule::where('url', '/admin/posts?post_type='.$cpt->slug)->first();
             if ($module) {
                 AdmEvent::where('module_id', $module->id)->delete();

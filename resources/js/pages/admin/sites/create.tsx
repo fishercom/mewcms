@@ -1,14 +1,13 @@
-
-import ModuleLayout from '@/layouts/module/layout';
 import FormLayout from '@/layouts/module/Form';
+import ModuleLayout from '@/layouts/module/layout';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { createSite } from '@/services/sites';
-import SiteFormFields from './partials/fields';
-import { CmsSiteForm } from '@/types/models/cms-site';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
+import { CmsSiteForm } from '@/types/models/cms-site';
+import SiteFormFields from './partials/fields';
 
 export default function Create() {
     const { schemaGroups } = usePage<{ schemaGroups: CmsSchemaGroup[] }>().props;
@@ -21,7 +20,7 @@ export default function Create() {
         metadata: {},
         default: false,
         active: false,
-    }
+    };
     const [data, setData] = useState<CmsSiteForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -46,22 +45,15 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <FormLayout>
-            <form onSubmit={createSiteHandler} className="space-y-6">
-                <SiteFormFields
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    schemaGroups={schemaGroups}
-                />
+                <form onSubmit={createSiteHandler} className="space-y-6">
+                    <SiteFormFields data={data} setData={setData} errors={errors} processing={processing} schemaGroups={schemaGroups} />
 
-                <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar</Button>
-                    <Link href='/admin/sites'>Cancelar</Link>
-                </div>
-            </form>
+                    <div className="flex items-center gap-4">
+                        <Button disabled={processing}>Guardar</Button>
+                        <Link href="/admin/sites">Cancelar</Link>
+                    </div>
+                </form>
             </FormLayout>
         </ModuleLayout>
     );
 }
-

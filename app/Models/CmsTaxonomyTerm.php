@@ -34,21 +34,21 @@ class CmsTaxonomyTerm extends Model
 
     public function taxonomy()
     {
-        return $this->belongsTo('App\Models\CmsTaxonomy', 'taxonomy_id');
+        return $this->belongsTo(CmsTaxonomy::class, 'taxonomy_id');
     }
 
     public function parent()
     {
-        return $this->belongsTo('App\Models\CmsTaxonomyTerm', 'parent_id');
+        return $this->belongsTo(CmsTaxonomyTerm::class, 'parent_id');
     }
 
     public function children()
     {
-        return $this->hasMany('App\Models\CmsTaxonomyTerm', 'parent_id')->orderBy('position');
+        return $this->hasMany(CmsTaxonomyTerm::class, 'parent_id')->orderBy('position');
     }
 
     public function articles()
     {
-        return $this->belongsToMany('App\Models\CmsArticle', 'cms_article_term', 'term_id', 'article_id');
+        return $this->belongsToMany(CmsArticle::class, 'cms_article_term', 'term_id', 'article_id');
     }
 }

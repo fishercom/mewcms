@@ -8,12 +8,10 @@ class CreateAdmLogsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('adm_logs', function (Blueprint $table) {
+        Schema::create('adm_logs', function (Blueprint $table): void {
             $table->bigincrements('id');
             $table->integer('event_id')->unsigned();
             $table->biginteger('user_id')->unsigned();
@@ -35,10 +33,8 @@ class CreateAdmLogsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('adm_logs');
     }

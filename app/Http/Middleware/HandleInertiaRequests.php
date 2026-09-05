@@ -58,7 +58,7 @@ class HandleInertiaRequests extends Middleware
             $adm_menu[] = ['id' => $group->id, 'title' => $group->name, 'items' => $items];
         }
 
-        $menus = CmsMenu::with(['items' => function ($query) {
+        $menus = CmsMenu::with(['items' => function ($query): void {
             $query->where('active', true)->orderBy('position')->with('article');
         }])->where('active', true)->get();
 

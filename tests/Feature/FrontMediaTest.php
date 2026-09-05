@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->profile = Profile::create([
         'name' => 'Super Admin',
         'sa' => 1,
@@ -28,14 +28,14 @@ beforeEach(function () {
     Storage::fake('public');
 });
 
-it('allows authenticated admin to create folders via LFM', function () {
+it('allows authenticated admin to create folders via LFM', function (): void {
     $response = $this->actingAs($this->user)->get('/laravel-filemanager/newfolder?name=test_quick_folder&type=Images');
 
     $response->assertStatus(200);
     $this->assertEquals('OK', $response->getContent());
 });
 
-it('allows authenticated admin to upload files via LFM', function () {
+it('allows authenticated admin to upload files via LFM', function (): void {
     $file = UploadedFile::fake()->image('test_image.jpg');
 
     $response = $this->actingAs($this->user)->post('/laravel-filemanager/upload', [
@@ -50,14 +50,14 @@ it('allows authenticated admin to upload files via LFM', function () {
     $response->assertJsonStructure(['url', 'uploaded']);
 });
 
-it('allows listing files and directories via LFM jsonitems', function () {
+it('allows listing files and directories via LFM jsonitems', function (): void {
     $response = $this->actingAs($this->user)->get('/laravel-filemanager/jsonitems?type=Images&working_dir=/');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['items', 'paginator', 'working_dir']);
 });
 
-it('allows authenticated admin to delete files via LFM', function () {
+it('allows authenticated admin to delete files via LFM', function (): void {
     $file = UploadedFile::fake()->image('test_delete_image.jpg');
 
     $this->actingAs($this->user)->post('/laravel-filemanager/upload', [

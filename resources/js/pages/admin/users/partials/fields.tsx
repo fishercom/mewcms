@@ -1,11 +1,11 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Profile } from "@/types/models/profile";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Profile } from '@/types/models/profile';
 
 export interface UserForm {
     id?: number;
@@ -137,7 +137,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
                         try {
                             setData({ ...data, metadata: JSON.parse(e.target.value) });
                         } catch (error) {
-                            console.error("Invalid JSON for metadata:", error);
+                            console.error('Invalid JSON for metadata:', error);
                         }
                     }}
                     disabled={processing}

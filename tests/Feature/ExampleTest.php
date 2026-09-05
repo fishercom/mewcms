@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('returns a successful response', function () {
+it('returns a successful response', function (): void {
     $group = CmsSchemaGroup::create([
         'name' => 'Default Group',
         'layout' => 'layout',
