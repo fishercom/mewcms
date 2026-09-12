@@ -355,7 +355,52 @@ class DatabaseSeeder extends Seeder
             'active' => 1,
         ]);
 
-        // 10. Demo Home Slider
+        // 10. Demo Sliders (Default and Home)
+        $defaultSlider = CmsSlider::create([
+            'name' => 'Slider Predeterminado',
+            'key' => 'default',
+            'description' => 'Slider predeterminado del sistema para páginas principales y secciones de bienvenida',
+            'settings' => [
+                'autoplay' => true,
+                'autoplaySpeed' => 5000,
+                'transitionSpeed' => 600,
+                'effect' => 'fade',
+                'loop' => true,
+                'dots' => true,
+                'arrows' => true,
+            ],
+        ]);
+
+        CmsSlide::create([
+            'slider_id' => $defaultSlider->id,
+            'title' => 'Bienvenido a MewCMS',
+            'caption' => 'La plataforma de contenidos flexible, ágil y de código abierto construida para desarrolladores y creadores.',
+            'image_url' => 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2072&q=80',
+            'link_url' => '/admin',
+            'position' => 1,
+            'active' => true,
+        ]);
+
+        CmsSlide::create([
+            'slider_id' => $defaultSlider->id,
+            'title' => 'Estructura Dinámica y Extensible',
+            'caption' => 'Crea campos personalizados a medida, colecciones complejas y taxonomías sin límites de diseño.',
+            'image_url' => 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2070&q=80',
+            'link_url' => '/admin/schemas',
+            'position' => 2,
+            'active' => true,
+        ]);
+
+        CmsSlide::create([
+            'slider_id' => $defaultSlider->id,
+            'title' => 'Rendimiento Extremo con React e Inertia',
+            'caption' => 'Carga instantánea de páginas, navegación fluida tipo aplicación móvil y diseño adaptable.',
+            'image_url' => 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=2070&q=80',
+            'link_url' => '/admin/articles',
+            'position' => 3,
+            'active' => true,
+        ]);
+
         $homeSlider = CmsSlider::create([
             'name' => 'Slider Principal Home',
             'key' => 'home_slider',

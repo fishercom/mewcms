@@ -131,6 +131,13 @@ class FrontController extends Controller
             $slider = $findSlider($article->metadata);
         }
 
+        // Fallback to default or home slider if template is home and no slider was found in metadata
+        if (! $slider && in_array($template, ['front/templates/home', 'home'])) {
+            $slider = CmsSlider::getSlider('default') ?? CmsSlider::getSlider('home_slider') ?? CmsSlider::with(['slides' => function ($query): void {
+                $query->where('active', true)->orderBy('position');
+            }])->first();
+        }
+
         return Inertia::render($template, [
             'article' => $article,
             'navigation' => $navigation,
