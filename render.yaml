@@ -1,51 +1,39 @@
 services:
   - type: web
-    name: dashboard
-    runtime: php
-    buildCommand: |
-      npm ci
-      npm run build
-    startCommand: |
-      composer install --no-dev --optimize-autoloader --no-interaction
-      php artisan migrate --force
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
-      php artisan serve --host=0.0.0.0 --port=$PORT
+    name: mewcms
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
+      - key: APP_NAME
+        value: MewCMS
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        sync: false
       - key: DB_CONNECTION
-        value: pgsql
+        value: mysql
       - key: DB_HOST
-        fromDatabase:
-          name: dashboard-db
-          property: host
+        sync: false
       - key: DB_PORT
-        fromDatabase:
-          name: dashboard-db
-          property: port
+        value: "4000"
       - key: DB_DATABASE
-        fromDatabase:
-          name: dashboard-db
-          property: database
+        value: test
       - key: DB_USERNAME
-        fromDatabase:
-          name: dashboard-db
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: dashboard-db
-          property: password
+        sync: false
+      - key: DB_SSL
+        value: "true"
+      - key: RUN_SEED
+        value: "true"
       - key: SESSION_DRIVER
         value: database
-      - key: CACHE_DRIVER
+      - key: CACHE_STORE
         value: database
-
-databases:
-  - name: dashboard-db
-    databaseName: dashboard
-    user: dashboard_user
-
+      - key: QUEUE_CONNECTION
+        value: database

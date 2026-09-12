@@ -1,15 +1,19 @@
 #!/bin/bash
+set -e
 
-# Render deployment script for Laravel
-echo "🚀 Starting Render deployment..."
+# Render build script for MewCMS
+echo "🚀 Starting Render build process..."
+
+# Install Composer dependencies
+echo "📦 Installing PHP dependencies..."
+composer install --no-dev --optimize-autoloader --no-interaction
 
 # Install Node dependencies
 echo "📦 Installing Node dependencies..."
 npm ci
 
 # Build frontend assets
-echo "🏗️ Building frontend assets..."
+echo "🏗️ Building frontend assets with Vite..."
 npm run build
 
-echo "✅ Build completed! PHP dependencies and Laravel optimization will happen at runtime."
-
+echo "✅ Build completed successfully!"

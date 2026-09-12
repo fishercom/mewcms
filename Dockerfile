@@ -34,9 +34,9 @@ RUN npm run build
 FROM php:8.3-alpine AS runtime
 WORKDIR /var/www/html
 
-# System and PHP extensions (add more if needed)
-RUN apk add --no-cache bash curl icu-dev oniguruma-dev && \
-    docker-php-ext-install pdo_mysql mbstring intl && \
+# System and PHP extensions
+RUN apk add --no-cache bash curl icu-dev oniguruma-dev ca-certificates && \
+    docker-php-ext-install pdo_mysql mbstring intl bcmath && \
     rm -rf /var/cache/apk/*
 
 # Copy application code
@@ -54,7 +54,10 @@ RUN mkdir -p storage bootstrap/cache && \
 ENV PORT=8080
 EXPOSE 8080
 
-# Start PHP's built-in server serving Laravel's public/ dir
-CMD ["sh", "-lc", "php -S 0.0.0.0:$PORT -t public public/index.php"]
+# Configure entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 
