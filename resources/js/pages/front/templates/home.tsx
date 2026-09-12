@@ -2,6 +2,7 @@
  * Template Name: Home Page
  * Unique: true
  */
+import ContentRenderer from '@/components/content-renderer';
 import FrontSlider from '@/components/front-slider';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsSlider } from '@/types/models/cms-slider';
@@ -33,6 +34,17 @@ interface HomeMetadata {
     hero_title?: string;
     hero_subtitle?: string;
     hero_description?: string;
+    badge_text?: string;
+    stat_speed?: string;
+    stat_typesafe?: string;
+    stat_stack?: string;
+    stat_navigation?: string;
+    section_features_title?: string;
+    section_features_subtitle?: string;
+    cta_title?: string;
+    cta_description?: string;
+    cta_button_text?: string;
+    cta_button_url?: string;
     [key: string]: unknown;
 }
 
@@ -45,6 +57,17 @@ export default function Home({ article, navigation, slider }: HomeProps) {
     const heroDescription =
         meta.hero_description ||
         'Personaliza cada sección, gestiona taxonomías y administra contenidos con esquemas dinámicos directamente desde el panel de control.';
+    const badgeText = meta.badge_text || 'Gestor de Contenidos de Nueva Generación';
+    const sectionFeaturesTitle = meta.section_features_title || 'Todo lo que necesitas para tu proyecto web';
+    const sectionFeaturesSubtitle =
+        meta.section_features_subtitle ||
+        'Diseñado tanto para creadores de contenido no técnicos como para ingenieros que exigen código limpio y escalable.';
+    const ctaTitle = meta.cta_title || 'Comienza a administrar tu contenido hoy mismo';
+    const ctaDescription =
+        meta.cta_description ||
+        'Accede al panel de control para crear nuevas páginas, gestionar artículos de blog, configurar menús y personalizar cada aspecto de tu sitio.';
+    const ctaButtonText = meta.cta_button_text || 'Abrir Dashboard';
+    const ctaButtonUrl = meta.cta_button_url || '/admin';
 
     const features = [
         {
@@ -98,10 +121,10 @@ export default function Home({ article, navigation, slider }: HomeProps) {
     ];
 
     const stats = [
-        { label: 'Tiempo de Respuesta', value: '< 100ms', icon: Zap },
-        { label: 'Tipado Seguro', value: '100% TS', icon: CheckCircle2 },
-        { label: 'Arquitectura', value: 'Laravel + React', icon: Database },
-        { label: 'Navegación Fluida', value: 'Inertia v2', icon: Globe },
+        { label: 'Tiempo de Respuesta', value: meta.stat_speed || '< 100ms', icon: Zap },
+        { label: 'Tipado Seguro', value: meta.stat_typesafe || '100% TS', icon: CheckCircle2 },
+        { label: 'Arquitectura', value: meta.stat_stack || 'Laravel + React', icon: Database },
+        { label: 'Navegación Fluida', value: meta.stat_navigation || 'Inertia v2', icon: Globe },
     ];
 
     return (
@@ -117,7 +140,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                         <div className="mx-auto max-w-3xl space-y-6">
                             <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300 backdrop-blur-md">
                                 <Sparkles className="h-3.5 w-3.5" />
-                                <span>Gestor de Contenidos de Nueva Generación</span>
+                                <span>{badgeText}</span>
                             </span>
 
                             <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-6xl md:text-7xl leading-tight">
@@ -183,10 +206,10 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                             Potencia & Modularidad
                         </span>
                         <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-                            Todo lo que necesitas para tu proyecto web
+                            {sectionFeaturesTitle}
                         </h2>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                            Diseñado tanto para creadores de contenido no técnicos como para ingenieros que exigen código limpio y escalable.
+                            {sectionFeaturesSubtitle}
                         </p>
                     </div>
 
@@ -221,12 +244,25 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                     </div>
                 </div>
 
-                {/* 4. Custom Metadata Blocks (if extra fields are set in admin) */}
+                {/* 4. Editorial Content Showcase (if article content is set) */}
+                {article.content && article.content.trim().length > 0 && (
+                    <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-card via-card to-violet-500/5 p-8 sm:p-12 shadow-2xs dark:to-violet-950/20">
+                        <div className="mx-auto max-w-3xl space-y-6">
+                            <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
+                                <Sparkles className="h-5 w-5" />
+                                <span className="text-xs font-bold uppercase tracking-wider">Presentación Editorial</span>
+                            </div>
+                            <ContentRenderer html={article.content} className="text-foreground/90 leading-relaxed font-normal" />
+                        </div>
+                    </div>
+                )}
+
+                {/* 5. Custom Metadata Blocks (if extra fields are set in admin) */}
                 {Object.keys(meta).length > 4 && (
                     <div className="space-y-6 rounded-3xl border border-border/60 bg-muted/10 p-6 sm:p-10">
                         <div className="flex items-center gap-2">
                             <Layers className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                            <h3 className="text-lg font-bold text-foreground">Campos Personalizados Activos</h3>
+                            <h3 className="text-lg font-bold text-foreground">Campos Personalizados del Esquema</h3>
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -238,6 +274,17 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                                             'hero_title',
                                             'hero_subtitle',
                                             'hero_description',
+                                            'badge_text',
+                                            'stat_speed',
+                                            'stat_typesafe',
+                                            'stat_stack',
+                                            'stat_navigation',
+                                            'section_features_title',
+                                            'section_features_subtitle',
+                                            'cta_title',
+                                            'cta_description',
+                                            'cta_button_text',
+                                            'cta_button_url',
                                             '_id',
                                         ].includes(key) && !key.startsWith('seo_'),
                                 )
@@ -263,24 +310,24 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                     </div>
                 )}
 
-                {/* 5. Call to Action Banner */}
+                {/* 6. Call to Action Banner */}
                 <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-r from-violet-900/90 via-purple-900/90 to-zinc-950 p-8 sm:p-12 text-white shadow-2xl">
                     <div className="relative z-10 max-w-2xl space-y-4">
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur-md uppercase tracking-wider">
                             Control Total
                         </span>
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
-                            Comienza a administrar tu contenido hoy mismo
+                            {ctaTitle}
                         </h2>
                         <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                            Accede al panel de control para crear nuevas páginas, gestionar artículos de blog, configurar menús y personalizar cada aspecto de tu sitio.
+                            {ctaDescription}
                         </p>
                         <div className="pt-2">
                             <Link
-                                href="/admin"
+                                href={ctaButtonUrl}
                                 className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs sm:text-sm font-bold text-zinc-950 shadow-lg transition-all hover:bg-zinc-100 hover:scale-[1.02] active:scale-95"
                             >
-                                <span>Abrir Dashboard</span>
+                                <span>{ctaButtonText}</span>
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
