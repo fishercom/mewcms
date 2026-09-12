@@ -43,4 +43,4 @@ php artisan view:cache
 
 # Start web server
 echo "🌐 Starting web server on 0.0.0.0:${PORT:-8080}..."
-exec php -S 0.0.0.0:${PORT:-8080} -t public public/index.php
+exec php -S 0.0.0.0:${PORT:-8080} -t public server.php
