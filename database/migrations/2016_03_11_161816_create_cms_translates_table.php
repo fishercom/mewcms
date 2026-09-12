@@ -13,7 +13,7 @@ class CreateCmsTranslatesTable extends Migration
     {
         Schema::create('cms_translates', function (Blueprint $table): void {
             $table->increments('id');
-            $table->string('alias');
+            $table->string('alias')->index();
             $table->tinyInteger('input_type')->unsigned();
             $table->json('metadata')->nullable();
             $table->timestamps();

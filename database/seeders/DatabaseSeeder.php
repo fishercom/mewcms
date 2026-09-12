@@ -3,12 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\AdmAction;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
+use App\Models\CmsConfig;
 use App\Models\CmsForm;
 use App\Models\CmsLang;
+use App\Models\CmsMenu;
+use App\Models\CmsMenuItem;
 use App\Models\CmsParameterGroup;
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
@@ -24,114 +26,378 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::factory()->create([
-        //    'name' => 'Test User',
-        //    'email' => 'test@example.com',
-        // ]);
-
-        // Seeding cms_langs
+        // 1. Languages
         CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true]);
         CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => true]);
 
-        // Seeding cms_schema_groups
-        $schg_default = CmsSchemaGroup::create(['name' => 'Site Principal', 'layout' => 'front', 'default' => '1', 'active' => true]);
+        // 2. Schema groups and sites
+        $schgDefault = CmsSchemaGroup::create([
+            'name' => 'Site Principal',
+            'layout' => 'front',
+            'default' => '1',
+            'active' => true,
+        ]);
 
-        // Seeding cms_sites
-        CmsSite::create(['name' => 'Site Principal', 'site_url' => 'http://localhost/lasbambas-reconocimientos', 'schema_group_id' => $schg_default->id, 'default' => '1', 'active' => true]);
+        CmsSite::create([
+            'name' => 'Site Principal',
+            'site_url' => 'http://localhost/lasbambas-reconocimientos',
+            'schema_group_id' => $schgDefault->id,
+            'default' => '1',
+            'active' => true,
+        ]);
 
-        // Seeding cms_translates_alias
-
-        // Seeding cms_parameters_group
+        // 3. Parameter groups and forms
         CmsParameterGroup::create(['name' => 'Asunto de Contacto', 'alias' => 'asunto', 'active' => true]);
-
-        // Seeding cms_forms
         CmsForm::create(['name' => 'Formulario de Contacto', 'alias' => 'contacto', 'active' => true]);
 
-        // Seeding profiles
-        $perfil_sa = Profile::create(['name' => 'Super', 'active' => true, 'sa' => '1']);
+        // 4. Profiles
+        $profileSa = Profile::create(['name' => 'Super', 'active' => true, 'sa' => '1']);
         Profile::create(['name' => 'Admin', 'active' => true]);
         Profile::create(['name' => 'Webmaster', 'active' => true]);
 
-        // Seeding users
-        User::create(['username' => 'fischer', 'email' => 'fishdev@gmail.com', 'password' => 'admin$2277', 'name' => 'Administrador', 'profile_id' => $perfil_sa->id, 'active' => '1', 'default' => '1']);
+        // 5. Default Administrator User
+        User::create([
+            'username' => 'fischer',
+            'email' => 'fishdev@gmail.com',
+            'password' => 'admin$2277',
+            'name' => 'Administrador',
+            'profile_id' => $profileSa->id,
+            'active' => '1',
+            'default' => '1',
+        ]);
 
-        // Seeding menus
-        $menu_home = AdmMenu::create(['name' => 'Inicio', 'position' => '0', 'visible' => false]);
-        $menu_admin = AdmMenu::create(['name' => 'Administración', 'position' => '1', 'visible' => true]);
-        $menu_web = AdmMenu::create(['name' => 'Website', 'position' => '2', 'visible' => true]);
-        $menu_cms = AdmMenu::create(['name' => 'CMS', 'position' => '3', 'visible' => true]);
-        $menu_forms = AdmMenu::create(['name' => 'Formularios', 'position' => '4', 'visible' => true]);
-        $menu_modules = AdmMenu::create(['name' => 'Módulos del Sistema', 'position' => '5', 'visible' => true]);
-        $module_contenido = AdmMenu::create(['name' => 'Contenido Web', 'position' => '6', 'visible' => true]);
+        // 6. Admin actions
+        $actionList = AdmAction::create(['name' => 'Listar (solo lectura)', 'alias' => 'listar', 'write_log' => '0']);
+        $actionAdmin = AdmAction::create(['name' => 'Administrar (agregar/modificar/eliminar)', 'alias' => 'administrar', 'write_log' => '1']);
+        $actionLogin = AdmAction::create(['name' => 'Login (ingresar al sistema)', 'alias' => 'login', 'write_log' => '1']);
+        $actionLogout = AdmAction::create(['name' => 'Logout (salir del sistema)', 'alias' => 'logout', 'write_log' => '1']);
 
-        // Seeding adm_modules
-        AdmModule::create(['menu_id' => $menu_home->id, 'name' => 'admin', 'url' => '/admin/home', 'icon' => 'layout-dashboard', 'position' => '0', 'visible' => true]);
-        $module_acceso = AdmModule::create(['menu_id' => $menu_home->id, 'name' => 'Acceso', 'url' => '/admin/login', 'position' => '0', 'visible' => false]);
-        $module_usradm = AdmModule::create(['menu_id' => $menu_admin->id, 'name' => 'Usuarios', 'title' => 'usuario', 'url' => '/admin/users', 'icon' => 'users', 'position' => '1', 'visible' => true]);
-        $module_perfil = AdmModule::create(['menu_id' => $menu_admin->id, 'name' => 'Perfiles', 'title' => 'perfil', 'url' => '/admin/profiles', 'icon' => 'flask-conical', 'position' => '2', 'visible' => true]);
-        $module_reglog = AdmModule::create(['menu_id' => $menu_admin->id, 'name' => 'Registro de Logs', 'title' => 'log', 'url' => '/admin/logs', 'icon' => 'book', 'position' => '3', 'visible' => true]);
-        $module_idioma = AdmModule::create(['menu_id' => $menu_web->id, 'name' => 'Idiomas', 'title' => 'idioma', 'url' => '/admin/langs', 'icon' => 'flag', 'position' => '2', 'visible' => true]);
-        $module_transl = AdmModule::create(['menu_id' => $menu_web->id, 'name' => 'Traducciones', 'title' => 'traducción', 'url' => '/admin/translates', 'icon' => 'list', 'position' => '4', 'visible' => true]);
-        $module_mensaje = AdmModule::create(['menu_id' => $menu_forms->id, 'name' => 'Mensajes recibidos', 'title' => 'mensaje', 'url' => '/admin/registers', 'icon' => 'inbox', 'position' => '1', 'visible' => true]);
-        $module_cuenta = AdmModule::create(['menu_id' => $menu_forms->id, 'name' => 'Cuentas de correo', 'title' => 'cuenta', 'url' => '/admin/notifies', 'icon' => 'mail', 'position' => '2', 'visible' => true]);
+        // 7. Admin Navigation Menus (Groups)
+        $menuPrincipal = AdmMenu::create(['name' => 'Principal', 'position' => 0, 'visible' => true]);
+        $menuContent = AdmMenu::create(['name' => 'Contenido', 'position' => 1, 'visible' => true]);
+        $menuCms = AdmMenu::create(['name' => 'Estructura CMS', 'position' => 2, 'visible' => true]);
+        $menuForms = AdmMenu::create(['name' => 'Formularios & Leads', 'position' => 3, 'visible' => true]);
+        $menuAdmin = AdmMenu::create(['name' => 'Administración & Sistema', 'position' => 4, 'visible' => true]);
 
-        $module_config = AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Configuración', 'title' => 'configuración', 'url' => '/admin/configs', 'icon' => 'cog', 'position' => '1', 'visible' => true]);
-        $module_site = AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Sites', 'title' => 'site', 'url' => '/admin/sites', 'icon' => 'globe', 'position' => '2', 'visible' => true]);
-        $module_schema = AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Campos Personalizados', 'title' => 'esquema', 'url' => '/admin/schemas', 'icon' => 'shuffle', 'position' => '3', 'visible' => true]);
+        // 8. Admin Modules
+        $modules = [
+            // Principal
+            [
+                'menu_id' => $menuPrincipal->id,
+                'name' => 'Panel Principal',
+                'url' => '/admin',
+                'route' => 'admin.dashboard',
+                'icon' => 'layout-dashboard',
+                'position' => 0,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuPrincipal->id,
+                'name' => 'Acceso',
+                'url' => '/admin/login',
+                'route' => 'login',
+                'icon' => null,
+                'position' => 0,
+                'visible' => false,
+                'custom_actions' => [$actionLogin->id, $actionLogout->id],
+            ],
 
-        $module_taxonomy = AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Taxonomías', 'url' => '/admin/taxonomies', 'icon' => 'tags', 'position' => '5', 'visible' => true]);
-        $module_menu = AdmModule::create(['menu_id' => $menu_cms->id, 'name' => 'Menús', 'title' => 'menús', 'url' => '/admin/menus', 'icon' => 'menu', 'position' => '6', 'visible' => true]);
+            // Contenido
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Páginas',
+                'url' => '/admin/articles',
+                'route' => 'articles.index',
+                'icon' => 'file-text',
+                'position' => 1,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Posts',
+                'url' => '/admin/posts',
+                'route' => 'posts.index',
+                'icon' => 'pen-tool',
+                'position' => 2,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Taxonomías',
+                'url' => '/admin/taxonomies',
+                'route' => 'taxonomies.index',
+                'icon' => 'tags',
+                'position' => 3,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Menús',
+                'url' => '/admin/menus',
+                'route' => 'menus.index',
+                'icon' => 'menu',
+                'position' => 4,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Biblioteca de Medios',
+                'url' => '/admin/media',
+                'route' => 'media.index',
+                'icon' => 'image',
+                'position' => 5,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Sliders',
+                'url' => '/admin/sliders',
+                'route' => 'sliders.index',
+                'icon' => 'gallery-horizontal',
+                'position' => 6,
+                'visible' => true,
+            ],
 
-        $module_parameter = AdmModule::create(['menu_id' => $menu_modules->id, 'name' => 'Parámetros', 'title' => 'parámetro', 'url' => '/admin/parameters', 'icon' => 'cog', 'position' => '1', 'visible' => true]);
-        $module_article = AdmModule::create(['menu_id' => $module_contenido->id, 'name' => 'Páginas', 'title' => 'contenido', 'url' => '/admin/articles', 'icon' => 'file', 'position' => '1', 'visible' => true]);
+            // Estructura CMS
+            [
+                'menu_id' => $menuCms->id,
+                'name' => 'Sites',
+                'url' => '/admin/sites',
+                'route' => 'sites.index',
+                'icon' => 'globe',
+                'position' => 1,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuCms->id,
+                'name' => 'Campos Personalizados',
+                'url' => '/admin/schemas',
+                'route' => 'schemas.index',
+                'icon' => 'sliders-horizontal',
+                'position' => 2,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuCms->id,
+                'name' => 'Plantillas',
+                'url' => '/admin/templates',
+                'route' => 'templates.index',
+                'icon' => 'file-code',
+                'position' => 3,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuCms->id,
+                'name' => 'Tipos de Contenido',
+                'url' => '/admin/post-types',
+                'route' => 'post-types.index',
+                'icon' => 'file-box',
+                'position' => 4,
+                'visible' => true,
+            ],
 
-        // Seeding adm_actions
-        $action_lista = AdmAction::create(['name' => 'Listar (solo lectura)', 'alias' => 'listar', 'write_log' => '0']);
-        $action_admin = AdmAction::create(['name' => 'Administrar (agregar/modificar/eliminar)', 'alias' => 'administrar', 'write_log' => '1']);
-        $action_login = AdmAction::create(['name' => 'Login (ingresar al sistema)', 'alias' => 'login', 'write_log' => '1']);
-        $action_logout = AdmAction::create(['name' => 'Logout (salir del sistema)', 'alias' => 'logout', 'write_log' => '1']);
+            // Formularios & Leads
+            [
+                'menu_id' => $menuForms->id,
+                'name' => 'Formularios',
+                'url' => '/admin/forms',
+                'route' => 'forms.index',
+                'icon' => 'file-text',
+                'position' => 1,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuForms->id,
+                'name' => 'Mensajes recibidos',
+                'url' => '/admin/registers',
+                'route' => 'registers.index',
+                'icon' => 'inbox',
+                'position' => 2,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuForms->id,
+                'name' => 'Cuentas de correo',
+                'url' => '/admin/notifies',
+                'route' => 'notifies.index',
+                'icon' => 'mail',
+                'position' => 3,
+                'visible' => true,
+            ],
 
-        // Seeding adm_events
-        AdmEvent::create(['module_id' => $module_acceso->id, 'action_id' => $action_login->id]);
-        AdmEvent::create(['module_id' => $module_acceso->id, 'action_id' => $action_logout->id]);
-        AdmEvent::create(['module_id' => $module_usradm->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_usradm->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_perfil->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_perfil->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_reglog->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_reglog->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_idioma->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_idioma->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_transl->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_transl->id, 'action_id' => $action_admin->id]);
+            // Administración & Sistema
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Personalizar Layout',
+                'url' => '/admin/layout',
+                'route' => 'layout.index',
+                'icon' => 'palette',
+                'position' => 1,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Usuarios',
+                'url' => '/admin/users',
+                'route' => 'users.index',
+                'icon' => 'users',
+                'position' => 2,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Perfiles',
+                'url' => '/admin/profiles',
+                'route' => 'profiles.index',
+                'icon' => 'shield-check',
+                'position' => 3,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Parámetros',
+                'url' => '/admin/parameters',
+                'route' => 'parameters.index',
+                'icon' => 'settings',
+                'position' => 4,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Idiomas',
+                'url' => '/admin/langs',
+                'route' => 'langs.index',
+                'icon' => 'languages',
+                'position' => 5,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Traducciones',
+                'url' => '/admin/translates',
+                'route' => 'translates.index',
+                'icon' => 'list-checks',
+                'position' => 6,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Registro de Logs',
+                'url' => '/admin/logs',
+                'route' => 'logs.index',
+                'icon' => 'activity',
+                'position' => 7,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Configuración',
+                'url' => '/admin/configs',
+                'route' => 'configs.index',
+                'icon' => 'cog',
+                'position' => 8,
+                'visible' => false,
+            ],
+        ];
 
-        AdmEvent::create(['module_id' => $module_config->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_config->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_site->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_site->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_schema->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_schema->id, 'action_id' => $action_admin->id]);
+        foreach ($modules as $modData) {
+            $customActions = $modData['custom_actions'] ?? null;
+            unset($modData['custom_actions']);
 
-        AdmEvent::create(['module_id' => $module_taxonomy->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_taxonomy->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_menu->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_menu->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_mensaje->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_mensaje->id, 'action_id' => $action_admin->id]);
-        AdmEvent::create(['module_id' => $module_cuenta->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_cuenta->id, 'action_id' => $action_admin->id]);
+            $module = AdmModule::create($modData);
 
-        AdmEvent::create(['module_id' => $module_parameter->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_parameter->id, 'action_id' => $action_admin->id]);
+            if ($customActions) {
+                foreach ($customActions as $actionId) {
+                    AdmEvent::create(['module_id' => $module->id, 'action_id' => $actionId]);
+                }
+            } else {
+                AdmEvent::create(['module_id' => $module->id, 'action_id' => $actionList->id]);
+                AdmEvent::create(['module_id' => $module->id, 'action_id' => $actionAdmin->id]);
+            }
+        }
 
-        AdmEvent::create(['module_id' => $module_article->id, 'action_id' => $action_lista->id]);
-        AdmEvent::create(['module_id' => $module_article->id, 'action_id' => $action_admin->id]);
+        // 9. Base Schemas
+        CmsSchema::create([
+            'group_id' => $schgDefault->id,
+            'name' => 'Home Page',
+            'fields' => [],
+            'iterations' => 1,
+            'type' => 'PAGE',
+            'front_view' => 'front/templates/home',
+            'active' => 1,
+        ]);
 
-        // Seeding cms_schema
-        CmsSchema::create(['group_id' => $schg_default->id, 'name' => 'Home Page', 'fields' => [], 'iterations' => 1, 'type' => 'HOME', 'active' => 1]);
-        CmsSchema::create(['group_id' => $schg_default->id, 'name' => 'Options Page', 'fields' => [], 'iterations' => 1, 'type' => 'OPTIONS', 'active' => 1]);
+        CmsSchema::create([
+            'group_id' => $schgDefault->id,
+            'name' => 'Options Page',
+            'fields' => [],
+            'iterations' => 1,
+            'type' => 'PAGE',
+            'active' => 1,
+        ]);
 
+        // 10. Layout Configurations
+        $configs = [
+            ['type' => 'string', 'name' => 'Logo de Cabecera (URL)', 'alias' => 'layout_header_logo', 'value' => null],
+            ['type' => 'string', 'name' => 'Logo de Pie de Página (URL)', 'alias' => 'layout_footer_logo', 'value' => null],
+            ['type' => 'string', 'name' => 'Texto Copyright', 'alias' => 'layout_copyright', 'value' => '© '.date('Y').' MewCMS. Powered by Laravel, Inertia, and React.'],
+            ['type' => 'string', 'name' => 'Facebook Link', 'alias' => 'layout_facebook', 'value' => ''],
+            ['type' => 'string', 'name' => 'Instagram Link', 'alias' => 'layout_instagram', 'value' => ''],
+            ['type' => 'string', 'name' => 'Twitter/X Link', 'alias' => 'layout_twitter', 'value' => ''],
+            ['type' => 'string', 'name' => 'LinkedIn Link', 'alias' => 'layout_linkedin', 'value' => ''],
+            ['type' => 'string', 'name' => 'YouTube Link', 'alias' => 'layout_youtube', 'value' => ''],
+            ['type' => 'text', 'name' => 'Custom CSS', 'alias' => 'layout_custom_css', 'value' => ''],
+        ];
+
+        foreach ($configs as $cfg) {
+            CmsConfig::create($cfg);
+        }
+
+        // 11. Default Front Menus
+        $mainMenu = CmsMenu::create([
+            'name' => 'Main',
+            'slug' => 'main',
+            'description' => 'Main navigation menu displayed in the header.',
+            'active' => true,
+        ]);
+
+        CmsMenuItem::create([
+            'menu_id' => $mainMenu->id,
+            'title' => 'Inicio',
+            'url' => '/',
+            'position' => 1,
+            'active' => true,
+        ]);
+
+        $footerMenu = CmsMenu::create([
+            'name' => 'Footer',
+            'slug' => 'footer',
+            'description' => 'Footer navigation menu with policy and contact links.',
+            'active' => true,
+        ]);
+
+        CmsMenuItem::create([
+            'menu_id' => $footerMenu->id,
+            'title' => 'Políticas de Privacidad',
+            'url' => '/politicas-de-privacidad',
+            'position' => 1,
+            'active' => true,
+        ]);
+
+        CmsMenuItem::create([
+            'menu_id' => $footerMenu->id,
+            'title' => 'Términos y Condiciones',
+            'url' => '/terminos-y-condiciones',
+            'position' => 2,
+            'active' => true,
+        ]);
+
+        CmsMenuItem::create([
+            'menu_id' => $footerMenu->id,
+            'title' => 'Contáctenos',
+            'url' => '/contactenos',
+            'position' => 3,
+            'active' => true,
+        ]);
     }
 }

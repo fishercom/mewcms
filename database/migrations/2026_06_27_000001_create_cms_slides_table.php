@@ -11,15 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_sliders', function (Blueprint $table): void {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('key')->unique();
-            $table->string('description')->nullable();
-            $table->json('settings')->nullable();
-            $table->timestamps();
-        });
-
         Schema::create('cms_slides', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('slider_id')->unsigned();
@@ -44,6 +35,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('cms_slides');
-        Schema::dropIfExists('cms_sliders');
     }
 };
