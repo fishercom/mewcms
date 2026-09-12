@@ -16,6 +16,8 @@ use App\Models\CmsParameterGroup;
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
 use App\Models\CmsSite;
+use App\Models\CmsSlide;
+use App\Models\CmsSlider;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -341,7 +343,53 @@ class DatabaseSeeder extends Seeder
             'active' => 1,
         ]);
 
-        // 10. Demo Home Page Article
+        // 10. Demo Home Slider
+        $homeSlider = CmsSlider::create([
+            'name' => 'Slider Principal Home',
+            'key' => 'home_slider',
+            'description' => 'Slider visual destacado para la página de inicio',
+            'settings' => [
+                'autoplay' => true,
+                'autoplaySpeed' => 5000,
+                'transitionSpeed' => 600,
+                'effect' => 'fade',
+                'loop' => true,
+                'dots' => true,
+                'arrows' => true,
+            ],
+        ]);
+
+        CmsSlide::create([
+            'slider_id' => $homeSlider->id,
+            'title' => 'Construye Experiencias Web Extraordinarias',
+            'caption' => 'Plataforma CMS moderna impulsada por la potencia y robustez de Laravel 11 y la velocidad de React 19.',
+            'image_url' => 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2072&q=80',
+            'link_url' => '/admin',
+            'position' => 1,
+            'active' => true,
+        ]);
+
+        CmsSlide::create([
+            'slider_id' => $homeSlider->id,
+            'title' => 'Gestión Dinámica de Contenidos y Esquemas',
+            'caption' => 'Modela campos dinámicos personalizados, taxonomías, repetidores y menús jerárquicos con facilidad.',
+            'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2070&q=80',
+            'link_url' => '/admin/schemas',
+            'position' => 2,
+            'active' => true,
+        ]);
+
+        CmsSlide::create([
+            'slider_id' => $homeSlider->id,
+            'title' => 'Diseño de Vanguardia y Máxima Velocidad',
+            'caption' => 'Paleta de comandos ⌘K, modo oscuro impecable, y componentes de alta fidelidad en TypeScript.',
+            'image_url' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2015&q=80',
+            'link_url' => '/admin/articles',
+            'position' => 3,
+            'active' => true,
+        ]);
+
+        // 11. Demo Home Page Article
         $homeArticle = CmsArticle::create([
             'schema_id' => $homeSchema->id,
             'lang_id' => $langEs->id,
@@ -351,6 +399,7 @@ class DatabaseSeeder extends Seeder
             'excerpt' => 'Página principal de demostración con secciones dinámicas y diseño responsive.',
             'status' => 'published',
             'metadata' => [
+                'slider' => 'home_slider',
                 'hero_title' => 'Construye experiencias web extraordinarias',
                 'hero_subtitle' => 'Un CMS ágil, potente y elegante con React e Inertia.js.',
                 'hero_description' => 'Personaliza cada sección, gestiona taxonomías y administra contenidos con esquemas dinámicos directamente desde el panel de control.',

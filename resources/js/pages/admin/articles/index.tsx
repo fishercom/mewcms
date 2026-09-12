@@ -4,13 +4,14 @@ import { deleteArticle, getArticles } from '@/services/articles';
 import { router, usePage } from '@inertiajs/react';
 
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { Check, ChevronDown, ChevronRight, Edit, ListOrdered, Plus, Search, Trash2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Edit, FileText, ListOrdered, Plus, Search, Trash2 } from 'lucide-react';
 import SortableArticlesModal from './partials/SortableArticlesModal';
 
 export default function Index() {
@@ -236,8 +237,25 @@ export default function Index() {
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={7} className="py-12 text-center text-muted-foreground italic">
-                                            No se encontraron páginas que coincidan con la búsqueda.
+                                        <td colSpan={7} className="p-8">
+                                            <EmptyState
+                                                icon={FileText}
+                                                title={query.s ? 'No se encontraron páginas' : 'Aún no hay páginas creadas'}
+                                                description={
+                                                    query.s
+                                                        ? `No hay ninguna página que coincida con "${query.s}". Intenta con otro término de búsqueda.`
+                                                        : 'Comienza creando tu primera página para estructurar el contenido de tu sitio web.'
+                                                }
+                                                action={
+                                                    !query.s
+                                                        ? {
+                                                              label: 'Crear Primera Página',
+                                                              href: route('articles.create'),
+                                                              icon: Plus,
+                                                          }
+                                                        : undefined
+                                                }
+                                            />
                                         </td>
                                     </tr>
                                 )}

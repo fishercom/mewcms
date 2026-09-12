@@ -46,9 +46,9 @@ export default function FrontSlider({ slider }: FrontSliderProps) {
     if (slides.length === 0) return null;
 
     return (
-        <div className="dark:border-zinc-850 group relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-zinc-200/50 bg-zinc-950 shadow-lg sm:aspect-[24/9] md:aspect-[32/10]">
+        <div className="group relative min-h-[380px] sm:min-h-[440px] md:min-h-[500px] w-full overflow-hidden rounded-3xl border border-border/60 bg-zinc-950 shadow-2xl">
             {/* Slides container */}
-            <div className="relative h-full w-full">
+            <div className="relative h-full w-full min-h-[380px] sm:min-h-[440px] md:min-h-[500px]">
                 {slides.map((slide, idx) => {
                     const isActive = idx === currentIndex;
                     const transitionStyle = {
@@ -57,10 +57,9 @@ export default function FrontSlider({ slider }: FrontSliderProps) {
 
                     let slideClass = 'absolute inset-0 w-full h-full transition-all ease-in-out ';
                     if (effect === 'fade') {
-                        slideClass += isActive ? 'opacity-100 z-10' : 'opacity-0 z-0';
+                        slideClass += isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none';
                     } else {
-                        // Slide effect (horizontal translating transition)
-                        slideClass += isActive ? 'translate-x-0 z-10' : idx < currentIndex ? '-translate-x-full z-0' : 'translate-x-full z-0';
+                        slideClass += isActive ? 'translate-x-0 z-10' : idx < currentIndex ? '-translate-x-full z-0 pointer-events-none' : 'translate-x-full z-0 pointer-events-none';
                     }
 
                     return (
@@ -68,30 +67,34 @@ export default function FrontSlider({ slider }: FrontSliderProps) {
                             <img
                                 src={slide.image_url}
                                 alt={slide.title || 'Slide'}
-                                className="h-full w-full object-cover brightness-[0.7] dark:brightness-[0.6]"
+                                className="h-full w-full object-cover brightness-[0.6] dark:brightness-[0.5] scale-105 transition-transform duration-700 ease-out"
                             />
 
                             {/* Slide Text Caption Content */}
                             {(slide.title || slide.caption) && (
-                                <div className="absolute inset-0 z-20 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/30 to-transparent p-8 text-white select-none sm:p-12 md:p-16">
-                                    <div className="animate-in fade-in slide-in-from-bottom-6 max-w-2xl space-y-2 duration-700 sm:space-y-3">
+                                <div className="absolute inset-0 z-20 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 text-white select-none sm:p-14 md:p-18">
+                                    <div className="max-w-2xl space-y-3 animate-in fade-in slide-in-from-bottom-6 duration-700">
+                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wider text-white uppercase backdrop-blur-md">
+                                            MewCMS Destacado
+                                        </span>
                                         {slide.title && (
-                                            <h2 className="text-2xl leading-tight font-extrabold tracking-tight sm:text-4xl md:text-5xl">
+                                            <h2 className="text-2xl font-black tracking-tight sm:text-4xl md:text-5xl leading-tight">
                                                 {slide.title}
                                             </h2>
                                         )}
                                         {slide.caption && (
-                                            <p className="line-clamp-2 max-w-xl text-xs font-normal text-zinc-200 sm:text-base md:text-lg">
+                                            <p className="line-clamp-3 max-w-xl text-xs sm:text-sm md:text-base font-normal text-zinc-300 leading-relaxed">
                                                 {slide.caption}
                                             </p>
                                         )}
                                         {slide.link_url && (
-                                            <div className="pt-2">
+                                            <div className="pt-3">
                                                 <a
                                                     href={slide.link_url}
-                                                    className="bg-red-655 inline-flex transform items-center justify-center rounded-lg px-5 py-2.5 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-700 sm:text-sm dark:bg-red-500 dark:hover:bg-red-600"
+                                                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-all hover:scale-[1.02] hover:from-violet-700 hover:to-indigo-700 active:scale-95"
                                                 >
-                                                    Más información
+                                                    <span>Explorar Sección</span>
+                                                    <span>&rarr;</span>
                                                 </a>
                                             </div>
                                         )}
