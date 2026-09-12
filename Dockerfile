@@ -5,6 +5,7 @@ COPY composer.json composer.lock ./
 RUN composer install \
   --no-dev \
   --no-scripts \
+  --ignore-platform-reqs \
   --prefer-dist \
   --no-interaction \
   --no-progress \
@@ -36,8 +37,18 @@ FROM php:8.3-alpine AS runtime
 WORKDIR /var/www/html
 
 # System and PHP extensions
-RUN apk add --no-cache bash curl icu-dev oniguruma-dev ca-certificates && \
-    docker-php-ext-install pdo_mysql mbstring intl bcmath && \
+RUN apk add --no-cache \
+    bash \
+    curl \
+    icu-dev \
+    oniguruma-dev \
+    ca-certificates \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libwebp-dev && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
+    docker-php-ext-install pdo_mysql mbstring intl bcmath exif gd && \
     rm -rf /var/cache/apk/*
 
 # Copy application code
