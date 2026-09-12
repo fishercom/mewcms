@@ -1,9 +1,10 @@
-# --- Stage 1: Build frontend assets with Vite ---
+# --- Stage 1: Build PHP dependencies ---
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install \
   --no-dev \
+  --no-scripts \
   --prefer-dist \
   --no-interaction \
   --no-progress \
@@ -42,7 +43,8 @@ RUN apk add --no-cache bash curl icu-dev oniguruma-dev ca-certificates && \
 # Copy application code
 COPY . .
 
-# Bring in vendor deps and built assets
+# Bring in vendor deps, composer binary and built assets
+COPY --from=vendor /usr/bin/composer /usr/bin/composer
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=asset-builder /app/public/build ./public/build
 

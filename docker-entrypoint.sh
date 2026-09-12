@@ -16,6 +16,10 @@ chmod -R 775 storage bootstrap/cache
 # Create storage symlink
 php artisan storage:link || true
 
+# Dump autoload and discover packages with code in place
+echo "📦 Finalizing Composer autoloader..."
+composer dump-autoload --optimize --no-dev --no-interaction
+
 # Run database migrations
 echo "🗄️ Running database migrations..."
 php artisan migrate --force
