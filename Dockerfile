@@ -21,7 +21,7 @@ COPY --from=vendor /app/vendor ./vendor
 
 # Install deps
 COPY package*.json ./
-RUN npm ci --omit=dev=false
+RUN npm ci
 
 # Copy only files needed for the Vite build
 COPY resources ./resources
