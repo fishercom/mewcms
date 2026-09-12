@@ -6,6 +6,7 @@ use App\Models\AdmAction;
 use App\Models\AdmEvent;
 use App\Models\AdmMenu;
 use App\Models\AdmModule;
+use App\Models\CmsArticle;
 use App\Models\CmsConfig;
 use App\Models\CmsForm;
 use App\Models\CmsLang;
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Languages
-        CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true]);
+        $langEs = CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true]);
         CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => true]);
 
         // 2. Schema groups and sites
@@ -317,10 +318,14 @@ class DatabaseSeeder extends Seeder
         }
 
         // 9. Base Schemas
-        CmsSchema::create([
+        $homeSchema = CmsSchema::create([
             'group_id' => $schgDefault->id,
             'name' => 'Home Page',
-            'fields' => [],
+            'fields' => [
+                ['name' => 'Hero Title', 'alias' => 'hero_title', 'type' => 'text'],
+                ['name' => 'Hero Subtitle', 'alias' => 'hero_subtitle', 'type' => 'text'],
+                ['name' => 'Hero Description', 'alias' => 'hero_description', 'type' => 'textarea'],
+            ],
             'iterations' => 1,
             'type' => 'PAGE',
             'front_view' => 'front/templates/home',
@@ -336,7 +341,28 @@ class DatabaseSeeder extends Seeder
             'active' => 1,
         ]);
 
-        // 10. Layout Configurations
+        // 10. Demo Home Page Article
+        $homeArticle = CmsArticle::create([
+            'schema_id' => $homeSchema->id,
+            'lang_id' => $langEs->id,
+            'title' => 'Inicio',
+            'slug' => 'home',
+            'content' => 'Bienvenido a MewCMS, un gestor de contenidos moderno, potente y flexible construido con Laravel, Inertia.js y React.',
+            'excerpt' => 'Página principal de demostración con secciones dinámicas y diseño responsive.',
+            'status' => 'published',
+            'metadata' => [
+                'hero_title' => 'Construye experiencias web extraordinarias',
+                'hero_subtitle' => 'Un CMS ágil, potente y elegante con React e Inertia.js.',
+                'hero_description' => 'Personaliza cada sección, gestiona taxonomías y administra contenidos con esquemas dinámicos directamente desde el panel de control.',
+                'arquitectura_moderna' => 'Desarrollado sobre la arquitectura de componentes React y TypeScript con la robustez de Laravel 11.',
+                'esquemas_dinamicos' => 'Define plantillas y campos personalizados a medida para cualquier tipo de contenido sin código repetitivo.',
+                'optimizacion_seo' => 'Metadatos personalizables, URLs limpias y rendimiento optimizado para motores de búsqueda y móviles.',
+            ],
+            'position' => 1,
+            'active' => 1,
+        ]);
+
+        // 11. Layout Configurations
         $configs = [
             ['type' => 'string', 'name' => 'Logo de Cabecera (URL)', 'alias' => 'layout_header_logo', 'value' => null],
             ['type' => 'string', 'name' => 'Logo de Pie de Página (URL)', 'alias' => 'layout_footer_logo', 'value' => null],
@@ -353,7 +379,7 @@ class DatabaseSeeder extends Seeder
             CmsConfig::create($cfg);
         }
 
-        // 11. Default Front Menus
+        // 12. Default Front Menus
         $mainMenu = CmsMenu::create([
             'name' => 'Main',
             'slug' => 'main',
@@ -364,6 +390,7 @@ class DatabaseSeeder extends Seeder
         CmsMenuItem::create([
             'menu_id' => $mainMenu->id,
             'title' => 'Inicio',
+            'article_id' => $homeArticle->id,
             'url' => '/',
             'position' => 1,
             'active' => true,
