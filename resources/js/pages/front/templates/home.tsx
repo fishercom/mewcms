@@ -30,6 +30,15 @@ interface HomeProps {
     slider?: CmsSlider;
 }
 
+interface FeatureItem {
+    _id?: string;
+    title?: string;
+    description?: string;
+    badge?: string;
+    icon?: string;
+    color?: string;
+}
+
 interface HomeMetadata {
     hero_title?: string;
     hero_subtitle?: string;
@@ -45,8 +54,41 @@ interface HomeMetadata {
     cta_description?: string;
     cta_button_text?: string;
     cta_button_url?: string;
+    features?: FeatureItem[];
     [key: string]: unknown;
 }
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+    Cpu,
+    Layers,
+    Palette,
+    Command,
+    FileText,
+    Lock,
+    Zap,
+    Sparkles,
+    Database,
+    Globe,
+    LayoutDashboard,
+    CheckCircle2,
+    ArrowRight,
+};
+
+const COLOR_MAP: Record<string, string> = {
+    violet: 'from-violet-500/20 to-purple-500/10 text-violet-600 dark:text-violet-400',
+    purple: 'from-violet-500/20 to-purple-500/10 text-violet-600 dark:text-violet-400',
+    blue: 'from-blue-500/20 to-cyan-500/10 text-blue-600 dark:text-blue-400',
+    cyan: 'from-cyan-500/20 to-blue-500/10 text-cyan-600 dark:text-cyan-400',
+    amber: 'from-amber-500/20 to-orange-500/10 text-amber-600 dark:text-amber-400',
+    orange: 'from-orange-500/20 to-amber-500/10 text-orange-600 dark:text-orange-400',
+    emerald: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
+    teal: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
+    green: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
+    rose: 'from-rose-500/20 to-pink-500/10 text-rose-600 dark:text-rose-400',
+    pink: 'from-pink-500/20 to-rose-500/10 text-pink-600 dark:text-pink-400',
+    red: 'from-rose-500/20 to-pink-500/10 text-rose-600 dark:text-rose-400',
+    indigo: 'from-indigo-500/20 to-blue-500/10 text-indigo-600 dark:text-indigo-400',
+};
 
 export default function Home({ article, navigation, slider }: HomeProps) {
     const meta = (article.metadata || {}) as HomeMetadata;
@@ -69,56 +111,72 @@ export default function Home({ article, navigation, slider }: HomeProps) {
     const ctaButtonText = meta.cta_button_text || 'Abrir Dashboard';
     const ctaButtonUrl = meta.cta_button_url || '/admin';
 
-    const features = [
+    const defaultFeatures: FeatureItem[] = [
         {
-            icon: Cpu,
+            icon: 'Cpu',
             title: 'Arquitectura SPA Unificada',
             description:
                 'Combina la robustez de Laravel 11 con la velocidad instantánea de Inertia.js v2 y React 19 sin recargas de página.',
             badge: 'Alto Rendimiento',
-            color: 'from-violet-500/20 to-purple-500/10 text-violet-600 dark:text-violet-400',
+            color: 'violet',
         },
         {
-            icon: Layers,
+            icon: 'Layers',
             title: 'Esquemas y Campos a Medida',
             description:
                 'Modela cualquier tipo de dato con campos de texto, repetidores, selecciones y metadatos dinámicos sin tocar código de base de datos.',
             badge: 'Modular',
-            color: 'from-blue-500/20 to-cyan-500/10 text-blue-600 dark:text-blue-400',
+            color: 'blue',
         },
         {
-            icon: Palette,
+            icon: 'Palette',
             title: 'Plantillas React & Tailwind',
             description:
                 'Diseña tus páginas con componentes limpios en TypeScript y estilos con Tailwind CSS con soporte nativo para temas claro y oscuro.',
             badge: 'UI Vanguardista',
-            color: 'from-amber-500/20 to-orange-500/10 text-amber-600 dark:text-amber-400',
+            color: 'amber',
         },
         {
-            icon: Command,
+            icon: 'Command',
             title: 'Paleta de Comandos ⌘K',
             description:
                 'Navegación ultra rápida por teclado para saltar a cualquier módulo, editar páginas o realizar acciones al vuelo.',
             badge: 'Productividad',
-            color: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
+            color: 'emerald',
         },
         {
-            icon: FileText,
+            icon: 'FileText',
             title: 'Editor Enriquecido TipTap',
             description:
                 'Crea y maqueta publicaciones, blogs y artículos con un editor de texto enriquecido moderno, potente e intuitivo.',
             badge: 'Edición Ágil',
-            color: 'from-rose-500/20 to-pink-500/10 text-rose-600 dark:text-rose-400',
+            color: 'rose',
         },
         {
-            icon: Lock,
+            icon: 'Lock',
             title: 'Seguridad y Roles Granulares',
             description:
                 'Control de acceso detallado por módulos y acciones, auditoría de eventos y protección integrada de datos.',
             badge: 'Enterprise',
-            color: 'from-indigo-500/20 to-blue-500/10 text-indigo-600 dark:text-indigo-400',
+            color: 'indigo',
         },
     ];
+
+    const rawFeatures: FeatureItem[] =
+        Array.isArray(meta.features) && meta.features.length > 0 ? meta.features : defaultFeatures;
+
+    const features = rawFeatures.map((feature) => {
+        const IconComponent = (feature.icon && ICON_MAP[feature.icon]) || Sparkles;
+        const colorClass =
+            (feature.color && COLOR_MAP[feature.color.toLowerCase()]) ||
+            (feature.color?.startsWith('from-') ? feature.color : COLOR_MAP.violet);
+
+        return {
+            ...feature,
+            iconComponent: IconComponent,
+            colorClass,
+        };
+    });
 
     const stats = [
         { label: 'Tiempo de Respuesta', value: meta.stat_speed || '< 100ms', icon: Zap },
@@ -215,29 +273,33 @@ export default function Home({ article, navigation, slider }: HomeProps) {
 
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {features.map((feature, idx) => {
-                            const FeatureIcon = feature.icon;
+                            const FeatureIcon = feature.iconComponent;
                             return (
                                 <div
-                                    key={idx}
+                                    key={feature._id || idx}
                                     className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-6 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-md dark:hover:border-violet-500/30"
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <div
-                                            className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.color} shadow-2xs`}
+                                            className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.colorClass} shadow-2xs`}
                                         >
                                             <FeatureIcon className="h-6 w-6 stroke-[1.8]" />
                                         </div>
-                                        <span className="rounded-full border border-border/60 bg-muted/60 px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                                            {feature.badge}
-                                        </span>
+                                        {feature.badge && (
+                                            <span className="rounded-full border border-border/60 bg-muted/60 px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                                {feature.badge}
+                                            </span>
+                                        )}
                                     </div>
 
                                     <h3 className="text-base font-bold text-foreground group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                                         {feature.title}
                                     </h3>
-                                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                                        {feature.description}
-                                    </p>
+                                    {feature.description && (
+                                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                                            {feature.description}
+                                        </p>
+                                    )}
                                 </div>
                             );
                         })}
@@ -285,6 +347,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                                             'cta_description',
                                             'cta_button_text',
                                             'cta_button_url',
+                                            'features',
                                             '_id',
                                         ].includes(key) && !key.startsWith('seo_'),
                                 )
