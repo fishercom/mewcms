@@ -29,6 +29,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Guard against duplicate execution if database has already been seeded
+        if (! app()->environment('testing') && User::count() > 0) {
+            $this->command?->info('Database is already seeded. Skipping to prevent duplicate records.');
+
+            return;
+        }
+
         // 1. Languages
         $langEs = CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true]);
         CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => true]);

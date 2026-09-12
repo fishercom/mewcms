@@ -24,10 +24,15 @@ composer dump-autoload --optimize --no-dev --no-interaction
 echo "🗄️ Running database migrations..."
 php artisan migrate --force
 
-# Seed database if RUN_SEED is enabled
+# Seed database only if requested and users table is empty
 if [ "$RUN_SEED" = "true" ]; then
-  echo "🌱 Seeding initial demo content..."
-  php artisan db:seed --force
+  USER_COUNT=$(php artisan tinker --execute="echo \App\Models\User::count();" 2>/dev/null || echo "0")
+  if [ "$USER_COUNT" = "0" ]; then
+    echo "🌱 Fresh database detected (0 users). Seeding initial demo content..."
+    php artisan db:seed --force
+  else
+    echo "ℹ️ Database is already seeded ($USER_COUNT users found). Skipping seeder."
+  fi
 fi
 
 # Cache production routes, views and config
