@@ -67,10 +67,10 @@ class DatabaseSeeder extends Seeder
 
         // 5. Default Administrator User
         User::create([
-            'username' => 'fischer',
-            'email' => 'fishdev@gmail.com',
-            'password' => 'admin$2277',
-            'name' => 'Administrador',
+            'username' => 'dummyadmin',
+            'email' => 'dummyadmin@domain.com',
+            'password' => 'adminPwd/247',
+            'name' => 'Dummy Admin',
             'profile_id' => $profileSa->id,
             'active' => '1',
             'default' => '1',
