@@ -67,13 +67,13 @@ flowchart TB
         AuthMiddleware["Authentication & Role Middleware (ACL)"]
         
         subgraph Controllers ["Controllers"]
-            FrontCtrl["FrontController\n(Catch-all Dynamic Slug Resolver)"]
-            AdminCtrl["Admin Controllers\n(Articles, Schemas, Taxonomies, Menus, Media)"]
-            FormCtrl["Form API Controller\n(Lead Capture & Validation)"]
+            FrontCtrl["FrontController<br/>(Catch-all Dynamic Slug Resolver)"]
+            AdminCtrl["Admin Controllers<br/>(Articles, Schemas, Taxonomies, Menus, Media)"]
+            FormCtrl["Form API Controller<br/>(Lead Capture & Validation)"]
         end
 
         subgraph Services ["Core Engines & Models"]
-            SchemaEngine["Schema Engine (CmsSchema)\nDynamic Fields & Repeaters"]
+            SchemaEngine["Schema Engine (CmsSchema)<br/>Dynamic Fields & Repeaters"]
             ContentEngine["Content Models (CmsArticle, CmsPost, CmsMenu)"]
             TaxonomyEngine["Taxonomy Engine (CmsTaxonomy, CmsTaxonomyTerm)"]
             MediaEngine["Media & File Manager (LFM & QuickMediaDrawer)"]
@@ -87,12 +87,12 @@ flowchart TB
     end
 
     subgraph DataLayer ["Data & Storage Layer"]
-        DB[(SQLite / MySQL / PostgreSQL)]
+        DB[("Database (SQLite / MySQL / PostgreSQL)")]
         StorageDisk["Public Storage Disk (storage/app/public)"]
     end
 
-    PublicUser -->|GET /{slug}| Router
-    AdminUser -->|Admin Dashboard Actions| Router
+    PublicUser -->|"GET Request (/slug)"| Router
+    AdminUser -->|"Admin Dashboard Actions"| Router
 
     Router --> AuthMiddleware
     Router --> FrontCtrl
@@ -168,11 +168,11 @@ sequenceDiagram
     actor Admin as Admin Dashboard
 
     Visitor->>Form: Fills out form and submits
-    Form->>API: Send JSON payload {form_id, fields...}
+    Form->>API: Send form payload (form_id, fields)
     API->>DB: Validate schema & store submission
     DB-->>API: Registration ID
     API->>Mail: Trigger notification emails to site admins
-    API-->>Form: HTTP 200 {status: success, message: "Thank you!"}
+    API-->>Form: HTTP 200 (Success response)
     Form-->>Visitor: Display success notification
     Admin->>DB: View submission under "Mensajes recibidos"
 ```
@@ -185,13 +185,13 @@ Editors create rich content using schemas, drag-and-drop media, and taxonomies:
 
 ```mermaid
 flowchart LR
-    A[Admin Editor] -->|1. Create / Edit| B[Article / Post]
-    B -->|2. Select Schema| C[Dynamic Fields / Repeaters]
-    B -->|3. Open QuickMediaDrawer| D[Browse & Upload Images]
-    D -->|Insert into| E[TipTap WYSIWYG]
-    B -->|4. Assign| F[Taxonomy Terms Categories / Tags]
-    B -->|5. Save & Publish| G[(Database)]
-    G -->|Instant Invalidation & Cache Update| H[Live Public Website]
+    A["Admin Editor"] -->|"1. Create / Edit"| B["Article / Post"]
+    B -->|"2. Select Schema"| C["Dynamic Fields & Repeaters"]
+    B -->|"3. Open QuickMediaDrawer"| D["Browse & Upload Images"]
+    D -->|"Insert into"| E["TipTap WYSIWYG"]
+    B -->|"4. Assign"| F["Taxonomy Terms (Categories / Tags)"]
+    B -->|"5. Save & Publish"| G[("Database")]
+    G -->|"Cache Update"| H["Live Public Website"]
 ```
 
 ---
