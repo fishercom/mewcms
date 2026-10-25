@@ -45,17 +45,14 @@ export default function Index() {
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm"
+                                    className="border-border-strong block w-full rounded-md border p-2 pl-10 text-sm"
                                     placeholder="Buscar"
                                 />
                             </div>
                         </form>
                     </div>
                     <div className="flex w-full justify-end md:w-auto">
-                        <Button
-                            asChild
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
+                        <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href="/admin/langs/create">
                                 <Plus className="h-4 w-4" />
                                 <span>Agregar Idioma</span>
@@ -64,8 +61,8 @@ export default function Index() {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Name
@@ -85,8 +82,8 @@ export default function Index() {
                         <tbody>
                             {items.data.map((item: CmsLang) => {
                                 return (
-                                    <tr key={item.id} className="border-b dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             {item.name}
                                         </th>
                                         <td className="px-4 py-3">{item.active ? <Check /> : <></>}</td>
@@ -106,7 +103,7 @@ export default function Index() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
                                                 onClick={() => deleteLangHandler(item.id)}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />

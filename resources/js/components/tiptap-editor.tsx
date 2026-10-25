@@ -154,7 +154,7 @@ const MenuBar = ({ editor, onOpenMedia }: MenuBarProps) => {
     ];
 
     return (
-        <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-b-0 border-border/70 bg-muted/40 p-2 backdrop-blur-xs">
+        <div className="border-border/70 bg-muted/40 flex flex-wrap items-center gap-1 rounded-t-xl border border-b-0 p-2 backdrop-blur-xs">
             {menuItems.map((item, index) => (
                 <button
                     key={index}
@@ -162,7 +162,7 @@ const MenuBar = ({ editor, onOpenMedia }: MenuBarProps) => {
                     onClick={item.onClick}
                     className={`rounded-lg p-2 text-xs font-medium transition-all ${
                         item.isActive
-                            ? 'bg-violet-600 text-white shadow-xs dark:bg-violet-500'
+                            ? 'bg-primary text-primary-foreground shadow-xs'
                             : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95'
                     }`}
                 >
@@ -185,7 +185,7 @@ const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
         editable: true,
         editorProps: {
             attributes: {
-                class: 'prose dark:prose-invert max-w-none p-5 border border-border/70 rounded-b-xl min-h-[320px] bg-card focus:outline-hidden focus:ring-1 focus:ring-violet-500/30 transition-all text-sm leading-relaxed',
+                class: 'prose dark:prose-invert max-w-none p-5 border border-border/70 rounded-b-xl min-h-[320px] bg-card focus:outline-hidden focus:ring-1 focus:ring-primary/30 transition-all text-sm leading-relaxed',
             },
         },
     });

@@ -16,10 +16,7 @@ export function NavFooter({
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.id}>
-                            <SidebarMenuButton
-                                asChild
-                                className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
-                            >
+                            <SidebarMenuButton asChild className="text-muted-foreground hover:text-foreground">
                                 <a href={item.url} target="_blank" rel="noopener noreferrer">
                                     {item.icon && <DynamicIcon name={item.icon as IconName} className="h-5 w-5" />}
                                     <span>{item.title}</span>

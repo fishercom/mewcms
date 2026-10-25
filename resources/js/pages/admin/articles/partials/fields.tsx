@@ -120,7 +120,7 @@ export default function ArticleFields({
                         className={cn(
                             'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
                             activeTab === 'content'
-                                ? 'bg-violet-600 text-white shadow-violet-500/20'
+                                ? 'bg-primary shadow-primary/20 text-white'
                                 : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
                         )}
                     >
@@ -135,7 +135,7 @@ export default function ArticleFields({
                             className={cn(
                                 'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
                                 activeTab === 'schema'
-                                    ? 'bg-violet-600 text-white shadow-violet-500/20'
+                                    ? 'bg-primary shadow-primary/20 text-white'
                                     : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
                             )}
                         >
@@ -158,7 +158,7 @@ export default function ArticleFields({
                         className={cn(
                             'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
                             activeTab === 'seo'
-                                ? 'bg-violet-600 text-white shadow-violet-500/20'
+                                ? 'bg-primary shadow-primary/20 text-white'
                                 : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
                         )}
                     >
@@ -172,7 +172,7 @@ export default function ArticleFields({
                     <div className="animate-in fade-in space-y-6 duration-200">
                         <div className="space-y-2">
                             <Label htmlFor="title" className="text-foreground font-semibold">
-                                Título de la Página <span className="text-rose-500">*</span>
+                                Título de la Página <span className="text-destructive">*</span>
                             </Label>
                             <Input
                                 id="title"
@@ -212,7 +212,7 @@ export default function ArticleFields({
                                 value={data.excerpt || ''}
                                 onChange={(e) => setData({ ...data, excerpt: e.target.value })}
                                 rows={3}
-                                className="border-input text-foreground w-full rounded-xl border bg-transparent p-3 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                                className="border-input text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border bg-transparent p-3 text-sm transition-all focus:ring-2 focus:outline-hidden"
                                 placeholder="Escribe un breve extracto que resuma el propósito de la página..."
                             />
                             <InputError message={errors.excerpt} />
@@ -226,7 +226,7 @@ export default function ArticleFields({
                         <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-5 shadow-xs">
                             <div className="border-border/60 flex items-center justify-between border-b pb-3">
                                 <div className="flex items-center gap-2">
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                                    <div className="bg-primary/10 text-primary flex h-7 w-7 items-center justify-center rounded-lg">
                                         <Sliders className="h-3.5 w-3.5" />
                                     </div>
                                     <div>
@@ -234,7 +234,7 @@ export default function ArticleFields({
                                         <p className="text-muted-foreground text-[11px]">Valores dinámicos configurados para esta plantilla</p>
                                     </div>
                                 </div>
-                                <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400">
+                                <span className="border-primary/20 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-[10px] font-semibold">
                                     {schema?.fields?.length} campos
                                 </span>
                             </div>
@@ -288,7 +288,7 @@ export default function ArticleFields({
                             id="status"
                             value={data.status || 'published'}
                             onChange={(e) => setData({ ...data, status: e.target.value })}
-                            className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                            className="border-input text-foreground focus:border-primary focus:ring-primary/20 h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:ring-2 focus:outline-hidden"
                         >
                             <option value="published">Publicado</option>
                             <option value="draft">Borrador</option>
@@ -304,7 +304,7 @@ export default function ArticleFields({
                             type="datetime-local"
                             value={getPublishedAtValue()}
                             onChange={(e) => setData({ ...data, published_at: e.target.value })}
-                            className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                            className="border-input text-foreground focus:border-primary focus:ring-primary/20 h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:ring-2 focus:outline-hidden"
                         />
                         <p className="text-muted-foreground text-[11px]">Vacío para publicar de inmediato. Una fecha futura programa la página.</p>
                         <InputError message={errors.published_at} />
@@ -320,7 +320,7 @@ export default function ArticleFields({
                                 const template = templates.find((t) => t.value === e.target.value);
                                 selectSchema(template?.schema_ids[0] ?? null);
                             }}
-                            className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                            className="border-input text-foreground focus:border-primary focus:ring-primary/20 h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:ring-2 focus:outline-hidden"
                         >
                             {!currentTemplate && <option value="">Elige una plantilla</option>}
                             {templates.map((t) => (
@@ -338,7 +338,7 @@ export default function ArticleFields({
                                 aria-label="Campos"
                                 value={data.schema_id ?? ''}
                                 onChange={(e) => selectSchema(Number(e.target.value))}
-                                className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                                className="border-input text-foreground focus:border-primary focus:ring-primary/20 h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:ring-2 focus:outline-hidden"
                             >
                                 {currentTemplate.schema_ids.map((id) => (
                                     <option key={id} value={id}>
@@ -365,7 +365,7 @@ export default function ArticleFields({
                     </div>
 
                     {schema?.unique ? (
-                        <div className="grid gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-[11px] text-amber-800 dark:text-amber-200">
+                        <div className="border-warning/20 bg-warning/10 text-warning grid gap-1.5 rounded-xl border p-3 text-[11px]">
                             <span className="font-semibold">🔒 Plantilla Única</span>
                             <span className="opacity-90">Las plantillas únicas no pueden tener páginas superiores.</span>
                         </div>
@@ -386,7 +386,7 @@ export default function ArticleFields({
                                             ...(!data.id && !menusTouched ? { menu_ids: defaultMenuIds(menus, parentId) } : {}),
                                         });
                                     }}
-                                    className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                                    className="border-input text-foreground focus:border-primary focus:ring-primary/20 h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:ring-2 focus:outline-hidden"
                                 >
                                     <option value="root">Página Raíz (Ninguna)</option>
                                     {parents.map((p) => (
@@ -404,7 +404,7 @@ export default function ArticleFields({
                     {/* URL: the last segment; the parent path comes from the parent page */}
                     <div className="space-y-1.5">
                         <Label htmlFor="slug">URL</Label>
-                        <div className="border-input flex h-9 items-center overflow-hidden rounded-xl border text-xs focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/20">
+                        <div className="border-input focus-within:border-primary focus-within:ring-primary/20 flex h-9 items-center overflow-hidden rounded-xl border text-xs focus-within:ring-2">
                             <span className="text-muted-foreground bg-muted/40 max-w-[55%] truncate px-2 font-mono" title={parentPrefix}>
                                 {parentPrefix}
                             </span>
@@ -454,14 +454,14 @@ export default function ArticleFields({
                                 className="border-border/70 flex h-9 w-full items-center gap-1.5 rounded-xl text-xs font-medium shadow-2xs"
                                 onClick={() => setMediaOpen(true)}
                             >
-                                <ImageIcon className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                                <ImageIcon className="text-primary h-3.5 w-3.5" />
                                 <span>Elegir Imagen</span>
                             </Button>
                             {data.featured_image && (
                                 <button
                                     type="button"
                                     onClick={() => setData({ ...data, featured_image: '' })}
-                                    className="text-muted-foreground rounded-lg p-2 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-lg p-2 transition-colors"
                                     title="Quitar imagen"
                                 >
                                     <Trash2 className="h-4 w-4" />

@@ -1,3 +1,4 @@
+import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { router } from '@inertiajs/react';
@@ -151,7 +152,7 @@ export function TrashRowActions({ routeName, id }: { routeName: string; id: numb
             <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 gap-1 px-2 text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/20"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 gap-1 px-2 text-xs"
                 onClick={() => runBulkAction(routeName, 'force_delete', [id])}
             >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -162,12 +163,5 @@ export function TrashRowActions({ routeName, id }: { routeName: string; id: numb
 }
 
 export function ScheduledBadge({ date }: { date?: string | Date | null }) {
-    return (
-        <span
-            title={date ? `Se publicará el ${new Date(date).toLocaleString()}` : undefined}
-            className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-sky-600 uppercase dark:text-sky-400"
-        >
-            Programado
-        </span>
-    );
+    return <StatusBadge status="scheduled" title={date ? `Se publicará el ${new Date(date).toLocaleString()}` : undefined} />;
 }

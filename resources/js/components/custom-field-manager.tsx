@@ -43,8 +43,8 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
 
     return (
         <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-zinc-200/50 pb-2 dark:border-zinc-800/50">
-                <h3 className="text-base font-bold text-zinc-800 dark:text-zinc-200">Configuración de Campos Personalizados</h3>
+            <div className="border-border flex items-center justify-between border-b pb-2">
+                <h3 className="text-foreground text-base font-bold">Configuración de Campos Personalizados</h3>
             </div>
 
             <div className="space-y-4">
@@ -59,10 +59,10 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                     {sortableFields.map((field, index) => (
                         <div
                             key={field.id}
-                            className="animate-in fade-in-50 relative flex items-start gap-4 rounded-xl border border-zinc-200 bg-zinc-50/40 p-4 shadow-xs transition-colors duration-200 hover:border-zinc-300 dark:border-zinc-800/80 dark:bg-zinc-900/15 dark:hover:border-zinc-700"
+                            className="animate-in fade-in-50 border-border bg-muted/50 hover:border-border relative flex items-start gap-4 rounded-xl border p-4 shadow-xs transition-colors duration-200"
                         >
                             {/* Drag handle */}
-                            <div className="drag-handle hover:text-zinc-650 shrink-0 cursor-grab self-center p-1.5 text-zinc-400 active:cursor-grabbing">
+                            <div className="drag-handle hover:text-foreground text-muted-foreground shrink-0 cursor-grab self-center p-1.5 active:cursor-grabbing">
                                 <GripVertical className="h-5 w-5" />
                             </div>
 
@@ -70,28 +70,28 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                             <div className="min-w-0 flex-1 space-y-3">
                                 <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
                                     <div className="space-y-1.5">
-                                        <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Etiqueta</Label>
+                                        <Label className="text-muted-foreground text-xs font-semibold">Etiqueta</Label>
                                         <Input
-                                            className="h-9 bg-white dark:bg-[#161615]"
+                                            className="bg-card h-9"
                                             value={field.label}
                                             onChange={(e) => updateField(index, { ...field, label: e.target.value })}
                                             placeholder="Ej. Imagen de Cabecera"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Clave (Key única)</Label>
+                                        <Label className="text-muted-foreground text-xs font-semibold">Clave (Key única)</Label>
                                         <Input
-                                            className="h-9 bg-white dark:bg-[#161615]"
+                                            className="bg-card h-9"
                                             value={field.key}
                                             onChange={(e) => updateField(index, { ...field, key: e.target.value.replace(/[^a-zA-Z0-9-_]/g, '') })}
                                             placeholder="Ej. header_image"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Tipo de Campo</Label>
+                                        <Label className="text-muted-foreground text-xs font-semibold">Tipo de Campo</Label>
                                         <div className="flex items-center gap-2">
                                             <Select onValueChange={(value) => updateField(index, { ...field, type: value })} value={field.type}>
-                                                <SelectTrigger className="h-9 flex-1 bg-white dark:bg-[#161615]">
+                                                <SelectTrigger className="bg-card h-9 flex-1">
                                                     <SelectValue placeholder="Tipo" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -114,7 +114,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                                 type="button"
                                                 onClick={() => removeField(index)}
                                                 size="icon"
-                                                className="h-9 w-9 shrink-0 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                                                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-9 w-9 shrink-0 rounded-md"
                                             >
                                                 <Trash className="h-4 w-4" />
                                                 <span className="sr-only">Eliminar</span>
@@ -124,7 +124,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                 </div>
 
                                 {(field.type === 'repeater' || field.type === 'container') && field.fields && (
-                                    <div className="mt-3 ml-4 border-l border-zinc-200 pt-1 pl-4 dark:border-zinc-800">
+                                    <div className="border-border mt-3 ml-4 border-l pt-1 pl-4">
                                         <CustomFieldManager
                                             fields={field.fields || []}
                                             setFields={(newRepeaterFields) => updateRepeaterFields(index, newRepeaterFields)}
@@ -137,32 +137,32 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                 </ReactSortable>
             </div>
 
-            <div className="dark:border-zinc-850 space-y-3 rounded-xl border border-dashed border-zinc-200 bg-zinc-100/30 p-4 dark:bg-zinc-950/20">
-                <div className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Nuevo Campo</div>
+            <div className="border-border bg-muted/30 space-y-3 rounded-xl border border-dashed p-4">
+                <div className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">Nuevo Campo</div>
                 <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
                     <div className="space-y-1.5">
-                        <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Etiqueta</Label>
+                        <Label className="text-muted-foreground text-xs font-semibold">Etiqueta</Label>
                         <Input
-                            className="h-9 bg-white dark:bg-[#161615]"
+                            className="bg-card h-9"
                             value={newField.label}
                             onChange={(e) => setNewField({ ...newField, label: e.target.value })}
                             placeholder="Ej. Enlace de Destino"
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Clave (Key única)</Label>
+                        <Label className="text-muted-foreground text-xs font-semibold">Clave (Key única)</Label>
                         <Input
-                            className="h-9 bg-white dark:bg-[#161615]"
+                            className="bg-card h-9"
                             value={newField.key}
                             onChange={(e) => setNewField({ ...newField, key: e.target.value.replace(/[^a-zA-Z0-9-_]/g, '') })}
                             placeholder="Ej. destination_url"
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Tipo de Campo</Label>
+                        <Label className="text-muted-foreground text-xs font-semibold">Tipo de Campo</Label>
                         <div className="flex items-center gap-2">
                             <Select onValueChange={(value) => setNewField({ ...newField, type: value })} value={newField.type}>
-                                <SelectTrigger className="h-9 flex-1 bg-white dark:bg-[#161615]">
+                                <SelectTrigger className="bg-card h-9 flex-1">
                                     <SelectValue placeholder="Tipo" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -183,7 +183,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                             <Button
                                 type="button"
                                 onClick={addField}
-                                className="flex h-9 shrink-0 items-center gap-1.5 bg-red-600 px-4 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-9 shrink-0 items-center gap-1.5 px-4"
                             >
                                 <Plus className="h-4 w-4" />
                                 <span>Agregar</span>

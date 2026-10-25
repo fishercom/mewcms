@@ -5,7 +5,15 @@ import { NavGroup, NavItem, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-export default function ModuleLayout({ children, view = '' }: PropsWithChildren<{ view?: string | null }>) {
+/**
+ * Admin page frame. The title and breadcrumb come from the module's sidebar entry;
+ * `title` names modules that have no visible entry (e.g. Configuración).
+ */
+export default function ModuleLayout({
+    children,
+    view = '',
+    title: fallbackTitle = '',
+}: PropsWithChildren<{ view?: string | null; title?: string }>) {
     const { adm_menu } = usePage<{ adm_menu: NavGroup[] }>().props;
     const page = usePage();
     const url = page.url;
@@ -25,6 +33,11 @@ export default function ModuleLayout({ children, view = '' }: PropsWithChildren<
         }
     }
 
+    if (!module.title && fallbackTitle) {
+        module.title = fallbackTitle;
+        module.url = currentPath.split('/').slice(0, 3).join('/');
+    }
+
     const breadcrumbs: BreadcrumbItem[] = generateBreadcrumb(module.title, view, module.url);
     const title = view ? `${view} ${module.title}` : module.title;
 
@@ -36,7 +49,7 @@ export default function ModuleLayout({ children, view = '' }: PropsWithChildren<
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head />
-            <section className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8 antialiased">
+            <section className="mx-auto w-full max-w-7xl p-4 antialiased sm:p-6 lg:p-8">
                 <div className="mb-6">
                     <Heading title={title} description={module.description} />
                 </div>

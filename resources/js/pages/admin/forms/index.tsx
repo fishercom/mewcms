@@ -38,23 +38,20 @@ export default function Index() {
                     <div className="flex w-full gap-3 md:w-3/4">
                         <div className="relative flex-1">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <Search className="h-4 w-4 text-zinc-400" />
+                                <Search className="text-muted-foreground h-4 w-4" />
                             </div>
                             <Input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="block w-full rounded-md border border-gray-300 bg-transparent p-2 pl-10 text-sm text-zinc-800 dark:border-zinc-800 dark:text-zinc-200"
+                                className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
                                 placeholder="Buscar formulario..."
                             />
                         </div>
                     </div>
 
                     <div className="flex w-full justify-end md:w-auto">
-                        <Button
-                            asChild
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
+                        <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={route('forms.create')}>
                                 <Plus className="h-4 w-4" />
                                 <span>Crear Formulario</span>
@@ -64,47 +61,44 @@ export default function Index() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
-                                <th scope="col" className="px-6 py-3">
+                                <th scope="col" className="rounded-l-md px-4 py-3">
                                     Nombre
                                 </th>
-                                <th scope="col" className="px-6 py-3">
+                                <th scope="col" className="hidden px-4 py-3 xl:table-cell">
                                     Alias
                                 </th>
-                                <th scope="col" className="px-6 py-3">
+                                <th scope="col" className="px-4 py-3">
                                     Shortcode (Copiar)
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-center">
+                                <th scope="col" className="px-4 py-3 text-center">
                                     Campos
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-center">
+                                <th scope="col" className="px-4 py-3 text-center">
                                     Estado
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-right">
-                                    Acciones
-                                </th>
+                                <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredItems.length > 0 ? (
                                 filteredItems.map((item) => (
-                                    <tr
-                                        key={item.id}
-                                        className="dark:border-zinc-850 border-b bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800/40"
-                                    >
-                                        <td className="px-6 py-4 font-semibold text-gray-900 capitalize dark:text-white">{item.name}</td>
-                                        <td className="px-6 py-4 font-mono text-xs text-zinc-500 dark:text-zinc-400">{item.alias}</td>
-                                        <td className="px-6 py-4">
+                                    <tr key={item.id} className="hover:bg-muted/50 border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium capitalize">
+                                            {item.name}
+                                        </th>
+                                        <td className="text-muted-foreground hidden px-4 py-3 font-mono text-xs xl:table-cell">{item.alias}</td>
+                                        <td className="px-4 py-3">
                                             <button
                                                 onClick={() => handleCopyShortcode(item.alias, item.id)}
-                                                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1 font-mono text-xs text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                                                className="border-border bg-muted/50 text-muted-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 font-mono text-xs transition-colors"
                                             >
                                                 {copiedId === item.id ? (
                                                     <>
-                                                        <Check className="h-3 w-3 text-green-600" />
-                                                        <span className="text-green-600">¡Copiado!</span>
+                                                        <Check className="text-success h-3 w-3" />
+                                                        <span className="text-success">¡Copiado!</span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -114,41 +108,43 @@ export default function Index() {
                                                 )}
                                             </button>
                                         </td>
-                                        <td className="px-6 py-4 text-center font-medium">{item.fields_count ?? 0}</td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-4 py-3 text-center font-medium">{item.fields_count ?? 0}</td>
+                                        <td className="px-4 py-3 text-center">
                                             <span
                                                 className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${
-                                                    item.active
-                                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                        : 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-400'
+                                                    item.active ? 'bg-success-soft text-success' : 'bg-muted text-foreground'
                                                 }`}
                                             >
                                                 {item.active ? 'Activo' : 'Inactivo'}
                                             </span>
                                         </td>
-                                        <td className="space-x-2 px-6 py-4 text-right">
-                                            <Button variant="ghost" size="icon" asChild>
-                                                <Link
-                                                    href={route('forms.edit', item.id)}
-                                                    className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="flex h-8 items-center gap-1 px-2.5"
+                                                    onClick={() => router.visit(route('forms.edit', item.id))}
                                                 >
-                                                    <Edit className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(item.id, item.name)}
-                                                className="text-red-500 hover:text-red-700 dark:hover:text-red-400"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                                    <Edit className="h-3.5 w-3.5" />
+                                                    <span>Editar</span>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
+                                                    onClick={() => handleDelete(item.id, item.name)}
+                                                >
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                    <span>Eliminar</span>
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-zinc-400">
+                                    <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
                                         No se encontraron formularios.
                                     </td>
                                 </tr>
@@ -157,11 +153,7 @@ export default function Index() {
                     </table>
                 </div>
 
-                {items.last_page > 1 && (
-                    <div className="pt-4">
-                        <PaginationNav data={items} />
-                    </div>
-                )}
+                {items.links && <PaginationNav data={items} />}
             </div>
         </ModuleLayout>
     );

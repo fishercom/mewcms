@@ -203,7 +203,7 @@ export default function MediaLibrary() {
                 {/* Left side actions: Create Folder & Upload Files */}
                 <div className="space-y-6 lg:col-span-4">
                     {/* Category tabs */}
-                    <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50/50 p-1 dark:border-zinc-800 dark:bg-black/10">
+                    <div className="border-border bg-muted/50 grid grid-cols-2 overflow-hidden rounded-xl border p-1 dark:bg-black/10">
                         <button
                             type="button"
                             onClick={() => {
@@ -211,9 +211,7 @@ export default function MediaLibrary() {
                                 setWorkingDir('');
                             }}
                             className={`cursor-pointer rounded-lg py-2 text-center text-xs font-semibold transition-colors ${
-                                type === 'Images'
-                                    ? 'bg-white text-red-600 shadow-xs dark:bg-zinc-800 dark:text-red-500'
-                                    : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                type === 'Images' ? 'bg-card text-primary shadow-xs' : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
                             Imágenes / Fotos
@@ -225,9 +223,7 @@ export default function MediaLibrary() {
                                 setWorkingDir('');
                             }}
                             className={`cursor-pointer rounded-lg py-2 text-center text-xs font-semibold transition-colors ${
-                                type === 'Files'
-                                    ? 'bg-white text-red-600 shadow-xs dark:bg-zinc-800 dark:text-red-500'
-                                    : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                type === 'Files' ? 'bg-card text-primary shadow-xs' : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
                             Documentos / Files
@@ -235,15 +231,12 @@ export default function MediaLibrary() {
                     </div>
 
                     {/* Folder creation */}
-                    <form
-                        onSubmit={handleCreateFolder}
-                        className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#161615]"
-                    >
+                    <form onSubmit={handleCreateFolder} className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                         <Label
                             htmlFor="page-folder-name"
-                            className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-zinc-500 uppercase dark:text-zinc-400"
+                            className="text-muted-foreground flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase"
                         >
-                            <FolderPlus className="h-4 w-4 text-red-600 dark:text-red-500" />
+                            <FolderPlus className="text-primary h-4 w-4" />
                             <span>Crear Carpeta en: {workingDir || '/'}</span>
                         </Label>
                         <div className="flex gap-2">
@@ -253,12 +246,12 @@ export default function MediaLibrary() {
                                 placeholder="Nombre de carpeta"
                                 value={newFolderName}
                                 onChange={(e) => setNewFolderName(e.target.value)}
-                                className="h-9 bg-white text-xs dark:bg-[#161615]"
+                                className="bg-card h-9 text-xs"
                                 disabled={creatingFolder}
                             />
                             <Button
                                 size="sm"
-                                className="h-9 shrink-0 bg-red-600 px-4 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 shrink-0 px-4"
                                 disabled={creatingFolder}
                             >
                                 {creatingFolder ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Crear'}
@@ -267,41 +260,36 @@ export default function MediaLibrary() {
                     </form>
 
                     {/* File upload */}
-                    <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#161615]">
-                        <Label className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-                            <UploadCloud className="h-4 w-4 text-red-600 dark:text-red-500" />
+                    <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
+                        <Label className="text-muted-foreground flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
+                            <UploadCloud className="text-primary h-4 w-4" />
                             <span>Subir Archivos</span>
                         </Label>
-                        <div className="relative cursor-pointer rounded-xl border-2 border-dashed border-zinc-300 py-8 text-center transition-colors hover:border-red-500/40 hover:bg-zinc-50/50 dark:border-zinc-800 dark:hover:bg-zinc-900/10">
+                        <div className="border-border hover:border-primary/40 hover:bg-muted/50 relative cursor-pointer rounded-xl border-2 border-dashed py-8 text-center transition-colors">
                             <input
                                 type="file"
                                 multiple
                                 onChange={handleFileUpload}
                                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                             />
-                            <UploadCloud className="mx-auto mb-2 h-9 w-9 text-zinc-400" />
-                            <span className="dark:text-zinc-450 block text-xs font-medium text-zinc-500">
-                                Clic aquí o arrastra archivos para subir
-                            </span>
-                            <span className="mt-1 block text-[10px] text-zinc-400">
+                            <UploadCloud className="text-muted-foreground mx-auto mb-2 h-9 w-9" />
+                            <span className="text-muted-foreground block text-xs font-medium">Clic aquí o arrastra archivos para subir</span>
+                            <span className="text-muted-foreground mt-1 block text-[10px]">
                                 {type === 'Images' ? 'JPG, PNG, GIF, WEBP' : 'PDF, DOC, XLS, PPT, MP3, MP4'}
                             </span>
                         </div>
 
                         {/* Upload progress */}
                         {uploadingFiles.length > 0 && (
-                            <div className="space-y-3 border-t border-zinc-100 pt-3 dark:border-zinc-900">
+                            <div className="border-border space-y-3 border-t pt-3">
                                 {uploadingFiles.map((file, idx) => (
                                     <div key={idx} className="space-y-1">
                                         <div className="flex justify-between text-[10px]">
-                                            <span className="max-w-[220px] truncate font-medium text-zinc-600 dark:text-zinc-400">{file.name}</span>
-                                            <span className="font-bold text-red-600 dark:text-red-500">{file.progress}%</span>
+                                            <span className="text-muted-foreground max-w-[220px] truncate font-medium">{file.name}</span>
+                                            <span className="text-primary font-bold">{file.progress}%</span>
                                         </div>
-                                        <div className="bg-zinc-105 h-1.5 w-full overflow-hidden rounded-full dark:bg-zinc-800">
-                                            <div
-                                                className="h-full bg-red-600 transition-all duration-300 dark:bg-red-500"
-                                                style={{ width: `${file.progress}%` }}
-                                            />
+                                        <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+                                            <div className="bg-primary h-full transition-all duration-300" style={{ width: `${file.progress}%` }} />
                                         </div>
                                     </div>
                                 ))}
@@ -311,29 +299,27 @@ export default function MediaLibrary() {
                 </div>
 
                 {/* Right side content: Browser List grid */}
-                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs lg:col-span-8 dark:border-zinc-800 dark:bg-[#161615]">
+                <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs lg:col-span-8">
                     {/* Navigation Header */}
-                    <div className="flex items-center justify-between gap-2 border-b border-zinc-100 py-2 text-xs dark:border-zinc-900">
+                    <div className="border-border flex items-center justify-between gap-2 border-b py-2 text-xs">
                         <div className="flex min-w-0 items-center gap-2">
                             {workingDir && (
                                 <Button size="icon" variant="outline" className="h-8 w-8 rounded-lg" onClick={handleGoBack}>
                                     <ArrowLeft className="h-4 w-4" />
                                 </Button>
                             )}
-                            <div className="flex items-center gap-1.5 truncate font-semibold text-zinc-400">
+                            <div className="text-muted-foreground flex items-center gap-1.5 truncate font-semibold">
                                 <span className="capitalize">{type === 'Images' ? 'imágenes' : 'documentos'}</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
-                                <span className="truncate rounded-md bg-zinc-100 px-2 py-0.5 font-bold text-zinc-900 dark:bg-zinc-900 dark:text-white">
-                                    {workingDir || '/'}
-                                </span>
+                                <span className="bg-muted text-foreground truncate rounded-md px-2 py-0.5 font-bold">{workingDir || '/'}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Files and Folders grid */}
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center gap-3 py-24 text-sm text-zinc-500">
-                            <Loader2 className="h-6 w-6 animate-spin text-red-600 dark:text-red-500" />
+                        <div className="text-muted-foreground flex flex-col items-center justify-center gap-3 py-24 text-sm">
+                            <Loader2 className="text-primary h-6 w-6 animate-spin" />
                             <span>Cargando archivos de la biblioteca...</span>
                         </div>
                     ) : filteredItems.length > 0 ? (
@@ -347,19 +333,17 @@ export default function MediaLibrary() {
                                             <button
                                                 type="button"
                                                 onClick={() => handleFolderClick(item.name)}
-                                                className="group flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50/20 p-4 text-center shadow-xs transition-all hover:border-red-500/40 hover:bg-zinc-50/50 dark:border-zinc-800 dark:bg-[#1a1a19]/30 dark:hover:bg-zinc-900/10"
+                                                className="group border-border bg-muted/50 hover:border-primary/40 hover:bg-muted/50 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border p-4 text-center shadow-xs transition-all"
                                             >
-                                                <Folder className="h-10 w-10 text-amber-500 transition-transform duration-200 group-hover:scale-105" />
-                                                <span className="w-full truncate text-xs font-semibold text-zinc-700 capitalize dark:text-zinc-300">
-                                                    {item.name}
-                                                </span>
+                                                <Folder className="text-warning h-10 w-10 transition-transform duration-200 group-hover:scale-105" />
+                                                <span className="text-foreground w-full truncate text-xs font-semibold capitalize">{item.name}</span>
                                             </button>
                                             {!isSystemFolder && (
                                                 <Button
                                                     size="icon"
                                                     variant="ghost"
                                                     type="button"
-                                                    className="absolute top-2 right-2 h-7 w-7 rounded-full text-zinc-400 opacity-0 transition-opacity group-hover/folder:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                                                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 transition-opacity group-hover/folder:opacity-100"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleDeleteItem(item.name);
@@ -378,10 +362,10 @@ export default function MediaLibrary() {
                                 return (
                                     <div
                                         key={idx}
-                                        className="group hover:border-zinc-350 dark:hover:border-zinc-750 relative flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-xs transition-all duration-200 dark:border-zinc-800 dark:bg-[#1f1f1e]/20"
+                                        className="group hover:border-border-strong border-border bg-card relative flex flex-col overflow-hidden rounded-xl border shadow-xs transition-all duration-200"
                                     >
                                         {/* File preview */}
-                                        <div className="bg-zinc-55 flex aspect-square items-center justify-center overflow-hidden border-b border-zinc-100 dark:border-zinc-900 dark:bg-black/10">
+                                        <div className="bg-muted/50 border-border flex aspect-square items-center justify-center overflow-hidden border-b dark:bg-black/10">
                                             {isImg ? (
                                                 <img
                                                     src={item.url}
@@ -389,17 +373,17 @@ export default function MediaLibrary() {
                                                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             ) : (
-                                                <FileText className="h-12 w-12 text-red-500/80" />
+                                                <FileText className="text-primary h-12 w-12" />
                                             )}
                                         </div>
 
                                         {/* Details & actions */}
                                         <div className="flex flex-1 flex-col justify-between space-y-2 p-3">
-                                            <span className="block truncate text-xs font-semibold text-zinc-700 dark:text-zinc-300" title={item.name}>
+                                            <span className="text-foreground block truncate text-xs font-semibold" title={item.name}>
                                                 {item.name}
                                             </span>
 
-                                            <div className="flex gap-1.5 border-t border-zinc-100 pt-2 dark:border-zinc-900/50">
+                                            <div className="border-border flex gap-1.5 border-t pt-2">
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
@@ -409,8 +393,8 @@ export default function MediaLibrary() {
                                                 >
                                                     {copiedUrl === item.url ? (
                                                         <>
-                                                            <Check className="h-3.5 w-3.5 text-green-500" />
-                                                            <span className="text-green-500">Copiado</span>
+                                                            <Check className="text-success h-3.5 w-3.5" />
+                                                            <span className="text-success">Copiado</span>
                                                         </>
                                                     ) : (
                                                         <>
@@ -423,7 +407,7 @@ export default function MediaLibrary() {
                                                     size="icon"
                                                     variant="outline"
                                                     type="button"
-                                                    className="text-zinc-450 h-7 w-7 shrink-0 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                                                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-7 w-7 shrink-0"
                                                     onClick={() => handleDeleteItem(item.name)}
                                                     title="Eliminar elemento"
                                                 >
@@ -433,7 +417,7 @@ export default function MediaLibrary() {
                                                     size="icon"
                                                     variant="ghost"
                                                     type="button"
-                                                    className="h-7 w-7 shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                                                    className="text-muted-foreground hover:text-muted-foreground h-7 w-7 shrink-0"
                                                     asChild
                                                 >
                                                     <a href={item.url} target="_blank" rel="noopener noreferrer" title="Abrir en pestaña nueva">
@@ -447,8 +431,8 @@ export default function MediaLibrary() {
                             })}
                         </div>
                     ) : (
-                        <div className="rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50/10 py-24 text-center dark:border-zinc-800">
-                            <p className="text-sm text-zinc-400 italic">Esta carpeta está vacía.</p>
+                        <div className="border-border bg-muted/50 rounded-xl border-2 border-dashed py-24 text-center">
+                            <p className="text-muted-foreground text-sm italic">Esta carpeta está vacía.</p>
                         </div>
                     )}
                 </div>

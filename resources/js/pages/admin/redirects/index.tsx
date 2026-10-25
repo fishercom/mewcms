@@ -25,7 +25,7 @@ interface Draft {
 
 const emptyDraft: Draft = { from_path: '', to_path: '', status_code: 301 };
 
-const selectClass = 'h-9 rounded-md border border-gray-300 bg-transparent px-2 text-sm text-zinc-800 dark:border-zinc-800 dark:text-zinc-200';
+const selectClass = 'h-9 rounded-md border border-border bg-transparent px-2 text-sm text-foreground  ';
 
 export default function Index() {
     const { items, filters } = usePage<{ items: Pagination<CmsRedirect>; filters: { s?: string } }>().props;
@@ -86,13 +86,13 @@ export default function Index() {
                     <div className="w-full md:w-3/4">
                         <div className="relative">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <Search className="h-4 w-4 text-zinc-400" />
+                                <Search className="text-muted-foreground h-4 w-4" />
                             </div>
                             <Input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="block w-full rounded-md border border-gray-300 bg-transparent p-2 pl-10 text-sm text-zinc-800 dark:border-zinc-800 dark:text-zinc-200"
+                                className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
                                 placeholder="Buscar dirección..."
                             />
                         </div>
@@ -107,7 +107,7 @@ export default function Index() {
                         className="font-mono text-sm md:flex-1"
                         aria-label="Desde"
                     />
-                    <ArrowRight className="hidden h-4 w-4 shrink-0 text-zinc-400 md:block" />
+                    <ArrowRight className="text-muted-foreground hidden h-4 w-4 shrink-0 md:block" />
                     <Input
                         value={draft.to_path}
                         onChange={(e) => setDraft({ ...draft, to_path: e.target.value })}
@@ -127,7 +127,7 @@ export default function Index() {
                     <Button
                         type="submit"
                         disabled={!draft.from_path.trim() || !draft.to_path.trim()}
-                        className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5"
                     >
                         <Plus className="h-4 w-4" />
                         <span>Crear Redirección</span>
@@ -137,8 +137,8 @@ export default function Index() {
                 {error && <p className="text-destructive pb-3 text-sm">{error}</p>}
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Desde
@@ -163,8 +163,8 @@ export default function Index() {
                                 items.data.map((item) => {
                                     const isEditing = editing?.id === item.id;
                                     return (
-                                        <tr key={item.id} className="border-b hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-800/20">
-                                            <td className="px-4 py-3 font-mono text-xs text-gray-900 dark:text-white">
+                                        <tr key={item.id} className="hover:bg-muted/50 border-b">
+                                            <td className="text-foreground px-4 py-3 font-mono text-xs">
                                                 {isEditing ? (
                                                     <Input
                                                         autoFocus
@@ -250,7 +250,7 @@ export default function Index() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
                                                                 onClick={() => destroy(item)}
                                                             >
                                                                 <Trash2 className="h-3.5 w-3.5" />
@@ -265,7 +265,7 @@ export default function Index() {
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-400 italic">
+                                    <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
                                         {search
                                             ? `No hay redirecciones que coincidan con "${search}".`
                                             : 'Aún no hay redirecciones. Se crean solas cuando cambias la dirección de una página.'}

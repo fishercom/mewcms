@@ -3,16 +3,14 @@ import { useEffect, useState } from 'react';
 import { deleteConfig, getConfigs } from '@/services/configs';
 import { router, usePage } from '@inertiajs/react';
 
-import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
 import { Pagination } from '@/types';
 import { CmsConfig } from '@/types/models/cms-config';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { ChevronDown, Search } from 'lucide-react';
+import { Edit, Search, Trash2 } from 'lucide-react';
 
 export default function Index() {
     const { items } = usePage<{ items: Pagination<CmsConfig> }>().props;
@@ -34,7 +32,7 @@ export default function Index() {
     };
 
     return (
-        <ModuleLayout>
+        <ModuleLayout title="Configuración">
             <div className="relative">
                 <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
                     <div className="w-full">
@@ -48,7 +46,7 @@ export default function Index() {
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm"
+                                    className="border-border-strong block w-full rounded-md border p-2 pl-10 text-sm"
                                     placeholder="Buscar"
                                 />
                             </div>
@@ -56,17 +54,17 @@ export default function Index() {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Comment
+                                    Alias
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Created Date
+                                    Creado
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Updated Date
+                                    Actualizado
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -74,37 +72,31 @@ export default function Index() {
                         <tbody>
                             {items.data.map((item: CmsConfig) => {
                                 return (
-                                    <tr key={item.id} className="border-b dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="hover:bg-muted/50 border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             {item.alias}
                                         </th>
                                         <td className="px-4 py-3">{format(item.created_at, 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="px-4 py-3">{format(item.updated_at, 'dd/MM/yyyy HH:mm')}</td>
-                                        <td className="flex items-center justify-end px-4 py-3">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="p-3">
-                                                        Actions
-                                                        <Icon iconNode={ChevronDown} className="h-5 w-5" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent className="w-56" align="end">
-                                                    <DropdownMenuItem asChild>
-                                                        <Button
-                                                            className="block w-full"
-                                                            onClick={() => router.visit(route('configs.edit', item.id))}
-                                                            variant="ghost"
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Button className="block w-full" onClick={() => deleteConfigHandler(item.id)} variant="ghost">
-                                                            Delete
-                                                        </Button>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                        <td className="flex items-center justify-end gap-2 px-4 py-3">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex h-8 items-center gap-1 px-2.5"
+                                                onClick={() => router.visit(route('configs.edit', item.id))}
+                                            >
+                                                <Edit className="h-3.5 w-3.5" />
+                                                <span>Editar</span>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
+                                                onClick={() => deleteConfigHandler(item.id)}
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                <span>Eliminar</span>
+                                            </Button>
                                         </td>
                                     </tr>
                                 );

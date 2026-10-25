@@ -33,11 +33,7 @@ export default function Index() {
         e.preventDefault();
         if (!newName.trim()) return;
         setError(null);
-        router.post(
-            route('tags.store'),
-            { name: newName },
-            { preserveScroll: true, onSuccess: () => setNewName(''), onError: showErrors },
-        );
+        router.post(route('tags.store'), { name: newName }, { preserveScroll: true, onSuccess: () => setNewName(''), onError: showErrors });
     };
 
     const saveEdit = () => {
@@ -65,7 +61,8 @@ export default function Index() {
 
     const destroy = (tag: CmsTag) => {
         const uses = (tag.articles_count ?? 0) + (tag.posts_count ?? 0);
-        const message = uses > 0 ? `"${tag.name}" se quitará de ${uses} contenido(s). ¿Eliminar la etiqueta?` : `¿Eliminar la etiqueta "${tag.name}"?`;
+        const message =
+            uses > 0 ? `"${tag.name}" se quitará de ${uses} contenido(s). ¿Eliminar la etiqueta?` : `¿Eliminar la etiqueta "${tag.name}"?`;
         if (window.confirm(message)) {
             router.delete(route('tags.destroy', tag.id), { preserveScroll: true, onError: showErrors });
         }
@@ -76,7 +73,7 @@ export default function Index() {
             <div className="relative space-y-4">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="relative w-full md:max-w-sm">
-                        <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                         <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar etiqueta..." className="pl-9" />
                     </div>
 
@@ -89,11 +86,11 @@ export default function Index() {
                     </form>
                 </div>
 
-                {error && <p className="text-sm text-destructive">{error}</p>}
+                {error && <p className="text-destructive text-sm">{error}</p>}
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Etiqueta
@@ -118,7 +115,7 @@ export default function Index() {
                                 items.data.map((tag) => {
                                     const isEditing = editing?.id === tag.id;
                                     return (
-                                        <tr key={tag.id} className="border-b hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-800/20">
+                                        <tr key={tag.id} className="hover:bg-muted/50 border-b">
                                             <td className="px-4 py-3">
                                                 {isEditing ? (
                                                     <Input
@@ -130,8 +127,8 @@ export default function Index() {
                                                         aria-label="Nombre"
                                                     />
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1.5 font-medium text-gray-900 dark:text-white">
-                                                        <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                                                    <span className="text-foreground inline-flex items-center gap-1.5 font-medium">
+                                                        <Tag className="text-muted-foreground h-3.5 w-3.5" />
                                                         {tag.name}
                                                     </span>
                                                 )}
@@ -164,9 +161,13 @@ export default function Index() {
                                                     type="button"
                                                     onClick={() => toggleActive(tag)}
                                                     title={tag.active ? 'Desactivar' : 'Activar'}
-                                                    className="inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted"
+                                                    className="hover:bg-muted inline-flex h-6 w-6 items-center justify-center rounded-full"
                                                 >
-                                                    {tag.active ? <Check className="h-4 w-4 text-emerald-600" /> : <X className="h-4 w-4 text-muted-foreground" />}
+                                                    {tag.active ? (
+                                                        <Check className="text-success h-4 w-4" />
+                                                    ) : (
+                                                        <X className="text-muted-foreground h-4 w-4" />
+                                                    )}
                                                 </button>
                                             </td>
                                             <td className="px-4 py-3 text-right">
@@ -194,7 +195,7 @@ export default function Index() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-8 w-8 rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                                                                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-8 w-8 rounded-lg"
                                                                 onClick={() => destroy(tag)}
                                                                 aria-label={`Eliminar ${tag.name}`}
                                                             >
@@ -209,8 +210,10 @@ export default function Index() {
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-400 italic">
-                                        {search ? `No hay etiquetas que coincidan con "${search}".` : 'Aún no hay etiquetas. Crea la primera arriba o desde el editor de una página.'}
+                                    <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
+                                        {search
+                                            ? `No hay etiquetas que coincidan con "${search}".`
+                                            : 'Aún no hay etiquetas. Crea la primera arriba o desde el editor de una página.'}
                                     </td>
                                 </tr>
                             )}

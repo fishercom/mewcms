@@ -1,18 +1,7 @@
 import { NavGroup, NavItem, SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import * as Dialog from '@radix-ui/react-dialog';
-import {
-    ArrowRight,
-    ExternalLink,
-    FilePlus,
-    Globe,
-    Menu as MenuIcon,
-    PenTool,
-    PlusCircle,
-    Search,
-    Sliders,
-    X,
-} from 'lucide-react';
+import { ArrowRight, ExternalLink, FilePlus, Globe, Menu as MenuIcon, PenTool, PlusCircle, Search, Sliders, X } from 'lucide-react';
 import { DynamicIcon, IconName } from 'lucide-react/dynamic';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -94,9 +83,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     const filteredActions = useMemo(() => {
         if (!query.trim()) return defaultActions;
         const q = query.toLowerCase();
-        return defaultActions.filter(
-            (act) => act.title.toLowerCase().includes(q) || act.description.toLowerCase().includes(q),
-        );
+        return defaultActions.filter((act) => act.title.toLowerCase().includes(q) || act.description.toLowerCase().includes(q));
     }, [query]);
 
     const filteredModules = useMemo(() => {
@@ -159,35 +146,35 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs transition-opacity duration-150 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+                <Dialog.Overlay className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50 backdrop-blur-xs transition-opacity duration-150" />
                 <Dialog.Content
                     onKeyDown={handleKeyDown}
-                    className="fixed left-1/2 top-[16%] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border border-border/70 bg-background/95 p-0 shadow-2xl backdrop-blur-xl transition-all duration-150 focus:outline-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+                    className="border-border/70 bg-background/95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed top-[16%] left-1/2 z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border p-0 shadow-2xl backdrop-blur-xl transition-all duration-150 focus:outline-hidden"
                 >
                     <Dialog.Title className="sr-only">Paleta de Comandos</Dialog.Title>
                     <Dialog.Description className="sr-only">Buscar páginas, posts, menús y acciones en MewCMS</Dialog.Description>
 
                     {/* Search Input Box */}
-                    <div className="relative flex items-center border-b border-border/60 px-4 py-3">
-                        <Search className="mr-3 h-5 w-5 text-muted-foreground" />
+                    <div className="border-border/60 relative flex items-center border-b px-4 py-3">
+                        <Search className="text-muted-foreground mr-3 h-5 w-5" />
                         <input
                             ref={inputRef}
                             type="text"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             placeholder="Buscar sección, acción o atajo en MewCMS..."
-                            className="w-full bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground/70 focus:outline-hidden"
+                            className="text-foreground placeholder:text-muted-foreground/70 w-full bg-transparent text-sm font-medium focus:outline-hidden"
                         />
                         {query && (
                             <button
                                 type="button"
                                 onClick={() => setQuery('')}
-                                className="mr-2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                className="text-muted-foreground hover:bg-muted hover:text-foreground mr-2 rounded-md p-1"
                             >
                                 <X className="h-4 w-4" />
                             </button>
                         )}
-                        <span className="rounded-md border border-border/70 bg-muted/60 px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                        <span className="border-border/70 bg-muted/60 text-muted-foreground rounded-md border px-1.5 py-0.5 text-[10px] font-semibold">
                             ESC
                         </span>
                     </div>
@@ -195,7 +182,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     {/* Results List */}
                     <div className="max-h-80 overflow-y-auto p-2">
                         {totalResults === 0 ? (
-                            <div className="py-10 text-center text-xs text-muted-foreground">
+                            <div className="text-muted-foreground py-10 text-center text-xs">
                                 No se encontraron resultados para &ldquo;<span className="text-foreground font-medium">{query}</span>&rdquo;
                             </div>
                         ) : (
@@ -203,7 +190,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 {/* Quick Actions */}
                                 {filteredActions.length > 0 && (
                                     <div>
-                                        <div className="px-2 py-1 text-[10px] font-bold tracking-wider text-muted-foreground/70 uppercase">
+                                        <div className="text-muted-foreground/70 px-2 py-1 text-[10px] font-bold tracking-wider uppercase">
                                             Acciones Rápidas
                                         </div>
                                         <div className="mt-1 space-y-0.5">
@@ -217,16 +204,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                         onMouseEnter={() => setSelectedIndex(idx)}
                                                         className={`flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-xs transition-colors ${
                                                             isSelected
-                                                                ? 'bg-violet-600 text-white shadow-xs'
+                                                                ? 'bg-primary text-primary-foreground shadow-xs'
                                                                 : 'text-foreground hover:bg-muted/60'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-2.5">
                                                             <div
                                                                 className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-                                                                    isSelected
-                                                                        ? 'bg-white/20 text-white'
-                                                                        : 'bg-muted text-muted-foreground'
+                                                                    isSelected ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
                                                                 }`}
                                                             >
                                                                 <ActionIcon className="h-3.5 w-3.5" />
@@ -250,9 +235,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                             />
                                                         ) : (
                                                             <ArrowRight
-                                                                className={`h-3.5 w-3.5 ${
-                                                                    isSelected ? 'text-white' : 'text-muted-foreground/50'
-                                                                }`}
+                                                                className={`h-3.5 w-3.5 ${isSelected ? 'text-white' : 'text-muted-foreground/50'}`}
                                                             />
                                                         )}
                                                     </div>
@@ -265,7 +248,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 {/* Navigation Modules */}
                                 {filteredModules.length > 0 && (
                                     <div>
-                                        <div className="px-2 py-1 text-[10px] font-bold tracking-wider text-muted-foreground/70 uppercase">
+                                        <div className="text-muted-foreground/70 px-2 py-1 text-[10px] font-bold tracking-wider uppercase">
                                             Módulos del Sistema
                                         </div>
                                         <div className="mt-1 space-y-0.5">
@@ -279,23 +262,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                         onMouseEnter={() => setSelectedIndex(globalIndex)}
                                                         className={`flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-xs transition-colors ${
                                                             isSelected
-                                                                ? 'bg-violet-600 text-white shadow-xs'
+                                                                ? 'bg-primary text-primary-foreground shadow-xs'
                                                                 : 'text-foreground hover:bg-muted/60'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-2.5">
                                                             <div
                                                                 className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-                                                                    isSelected
-                                                                        ? 'bg-white/20 text-white'
-                                                                        : 'bg-muted text-muted-foreground'
+                                                                    isSelected ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
                                                                 }`}
                                                             >
                                                                 {mod.icon ? (
-                                                                    <DynamicIcon
-                                                                        name={mod.icon as IconName}
-                                                                        className="h-3.5 w-3.5"
-                                                                    />
+                                                                    <DynamicIcon name={mod.icon as IconName} className="h-3.5 w-3.5" />
                                                                 ) : (
                                                                     <PlusCircle className="h-3.5 w-3.5" />
                                                                 )}
@@ -312,9 +290,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                             </div>
                                                         </div>
                                                         <ArrowRight
-                                                            className={`h-3.5 w-3.5 ${
-                                                                isSelected ? 'text-white' : 'text-muted-foreground/50'
-                                                            }`}
+                                                            className={`h-3.5 w-3.5 ${isSelected ? 'text-white' : 'text-muted-foreground/50'}`}
                                                         />
                                                     </div>
                                                 );
@@ -327,21 +303,15 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     </div>
 
                     {/* Footer shortcuts hint */}
-                    <div className="flex items-center justify-between border-t border-border/60 bg-muted/30 px-4 py-2 text-[11px] text-muted-foreground">
+                    <div className="border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-between border-t px-4 py-2 text-[11px]">
                         <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1">
-                                <kbd className="rounded bg-background px-1.5 py-0.5 border border-border/70 font-mono text-[10px]">
-                                    ↑
-                                </kbd>
-                                <kbd className="rounded bg-background px-1.5 py-0.5 border border-border/70 font-mono text-[10px]">
-                                    ↓
-                                </kbd>
+                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↑</kbd>
+                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↓</kbd>
                                 Navegar
                             </span>
                             <span className="flex items-center gap-1">
-                                <kbd className="rounded bg-background px-1.5 py-0.5 border border-border/70 font-mono text-[10px]">
-                                    ↵
-                                </kbd>
+                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↵</kbd>
                                 Seleccionar
                             </span>
                         </div>

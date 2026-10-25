@@ -48,7 +48,7 @@ export default function Index() {
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm"
+                                    className="border-border-strong block w-full rounded-md border p-2 pl-10 text-sm"
                                     placeholder="Buscar"
                                 />
                             </div>
@@ -57,7 +57,7 @@ export default function Index() {
                     <div className="flex w-full flex-shrink-0 flex-col items-stretch justify-end space-y-2 md:w-auto md:flex-row md:items-center md:space-y-0 md:space-x-3">
                         <button
                             type="button"
-                            className="flex items-center justify-center gap-1.5 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors"
                             onClick={() => router.visit('/admin/notifies/create')}
                         >
                             <Plus className="h-4 w-4" />
@@ -66,8 +66,8 @@ export default function Index() {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Name
@@ -87,11 +87,11 @@ export default function Index() {
                         <tbody>
                             {items.data.map((item: CmsNotify) => {
                                 return (
-                                    <tr key={item.id} className="border-b dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             {item.user_id}
                                         </th>
-                                        <td className="px-4 py-3">{item.active ? <Check className="h-4 w-4 text-green-500" /> : <></>}</td>
+                                        <td className="px-4 py-3">{item.active ? <Check className="text-success h-4 w-4" /> : <></>}</td>
                                         <td className="px-4 py-3">{format(new Date(item.created_at), 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="px-4 py-3">{format(new Date(item.updated_at), 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="flex items-center justify-end gap-2 px-4 py-3">
@@ -107,7 +107,7 @@ export default function Index() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
                                                 onClick={() => deleteNotifyHandler(item.id)}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />

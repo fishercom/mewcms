@@ -32,7 +32,7 @@ export default function Show() {
                 <div className="flex items-center justify-between">
                     <Link
                         href={route('registers.index')}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400"
+                        className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
                     >
                         <ArrowLeft className="h-3.5 w-3.5" />
                         Volver a Mensajes
@@ -46,7 +46,7 @@ export default function Show() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="flex h-8 items-center gap-1.5 px-3 text-xs text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20"
+                            className="text-destructive hover:bg-destructive/10 flex h-8 items-center gap-1.5 px-3 text-xs"
                             onClick={handleDelete}
                         >
                             <Trash2 className="h-3 w-3" />
@@ -56,33 +56,33 @@ export default function Show() {
                 </div>
 
                 {/* Header card */}
-                <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-[#161615]/20">
+                <div className="border-border bg-card space-y-4 rounded-2xl border p-6 shadow-xs">
                     <div className="flex items-start justify-between gap-4">
                         <div>
                             <div className="mb-1 flex items-center gap-2">
                                 {item.review ? (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold text-zinc-500 uppercase dark:bg-zinc-800 dark:text-zinc-400">
+                                    <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
                                         <CheckCircle className="h-3 w-3" /> Revisado
                                     </span>
                                 ) : (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 uppercase dark:bg-red-950/30 dark:text-red-400">
+                                    <span className="bg-primary-soft text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
                                         <Clock className="h-3 w-3" /> Nuevo
                                     </span>
                                 )}
-                                <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-400 capitalize dark:bg-zinc-800">
+                                <span className="bg-muted text-muted-foreground rounded px-2 py-0.5 text-xs capitalize">
                                     {item.form?.name ?? `Formulario #${item.form_id}`}
                                 </span>
                             </div>
-                            <h1 className="text-xl font-bold text-zinc-900 dark:text-white">{item.name || 'Remitente Anónimo'}</h1>
+                            <h1 className="text-foreground text-xl font-bold">{item.name || 'Remitente Anónimo'}</h1>
                         </div>
 
-                        <div className="shrink-0 text-right text-xs text-zinc-400">
+                        <div className="text-muted-foreground shrink-0 text-right text-xs">
                             <div className="flex items-center justify-end gap-1">
                                 <Calendar className="h-3 w-3" />
                                 <span>{format(new Date(item.created_at), 'dd/MM/yyyy HH:mm')}</span>
                             </div>
                             {item.review && item.review_date && (
-                                <div className="mt-0.5 text-zinc-300 dark:text-zinc-600">
+                                <div className="text-muted-foreground/70 mt-0.5">
                                     Revisado: {format(new Date(item.review_date), 'dd/MM/yyyy HH:mm')}
                                 </div>
                             )}
@@ -90,22 +90,22 @@ export default function Show() {
                     </div>
 
                     {/* Quick contact info */}
-                    <div className="dark:border-zinc-850 flex flex-wrap gap-4 border-t border-zinc-100 pt-2">
+                    <div className="border-border flex flex-wrap gap-4 border-t pt-2">
                         {item.email && (
                             <a
                                 href={`mailto:${item.email}`}
-                                className="inline-flex items-center gap-1.5 text-sm text-zinc-600 transition-colors hover:text-red-600 dark:text-zinc-300 dark:hover:text-red-400"
+                                className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-sm transition-colors"
                             >
-                                <Mail className="h-4 w-4 text-zinc-400" />
+                                <Mail className="text-muted-foreground h-4 w-4" />
                                 {item.email}
                             </a>
                         )}
                         {item.phone && (
                             <a
                                 href={`tel:${item.phone}`}
-                                className="inline-flex items-center gap-1.5 text-sm text-zinc-600 transition-colors hover:text-red-600 dark:text-zinc-300 dark:hover:text-red-400"
+                                className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-sm transition-colors"
                             >
-                                <Phone className="h-4 w-4 text-zinc-400" />
+                                <Phone className="text-muted-foreground h-4 w-4" />
                                 {item.phone}
                             </a>
                         )}
@@ -114,33 +114,33 @@ export default function Show() {
 
                 {/* Dynamic form fields */}
                 {item.fields && item.fields.length > 0 && (
-                    <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-[#161615]/20">
-                        <h2 className="flex items-center gap-2 border-b border-zinc-100 pb-3 text-sm font-bold text-zinc-700 dark:border-zinc-800 dark:text-zinc-200">
-                            <FileText className="h-4 w-4 text-red-600" />
+                    <div className="border-border bg-card space-y-4 rounded-2xl border p-6 shadow-xs">
+                        <h2 className="border-border text-foreground flex items-center gap-2 border-b pb-3 text-sm font-bold">
+                            <FileText className="text-primary h-4 w-4" />
                             Datos del formulario
                         </h2>
 
-                        <dl className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <dl className="divide-border divide-y">
                             {item.fields.map((f) => {
                                 const displayValue = f.txt_value || f.value;
                                 return (
                                     <div key={f.id} className="grid grid-cols-3 gap-4 py-3">
-                                        <dt className="col-span-1 flex items-start gap-1.5 pt-0.5 text-xs font-bold text-zinc-500 capitalize dark:text-zinc-400">
-                                            <User className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-300" />
+                                        <dt className="text-muted-foreground col-span-1 flex items-start gap-1.5 pt-0.5 text-xs font-bold capitalize">
+                                            <User className="text-muted-foreground/70 mt-0.5 h-3.5 w-3.5 shrink-0" />
                                             {f.field?.name || f.field?.alias || `Campo #${f.field_id}`}
                                         </dt>
-                                        <dd className="col-span-2 text-sm break-words text-zinc-800 dark:text-zinc-200">
+                                        <dd className="text-foreground col-span-2 text-sm break-words">
                                             {displayValue ? (
                                                 // Detect long text or multiline to use a block
                                                 displayValue.length > 100 ? (
-                                                    <div className="rounded-lg bg-zinc-50 p-3 text-xs leading-relaxed whitespace-pre-wrap dark:bg-zinc-900/40">
+                                                    <div className="bg-muted/50 rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">
                                                         {displayValue}
                                                     </div>
                                                 ) : (
                                                     displayValue
                                                 )
                                             ) : (
-                                                <span className="text-zinc-300 italic dark:text-zinc-600">—</span>
+                                                <span className="text-muted-foreground/70 italic">—</span>
                                             )}
                                         </dd>
                                     </div>
@@ -152,14 +152,12 @@ export default function Show() {
 
                 {/* Fallback: legacy message field if no dynamic fields */}
                 {(!item.fields || item.fields.length === 0) && item.message && (
-                    <div className="space-y-3 rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-[#161615]/20">
-                        <h2 className="flex items-center gap-2 text-sm font-bold text-zinc-700 dark:text-zinc-200">
-                            <FileText className="h-4 w-4 text-red-600" />
+                    <div className="border-border bg-card space-y-3 rounded-2xl border p-6 shadow-xs">
+                        <h2 className="text-foreground flex items-center gap-2 text-sm font-bold">
+                            <FileText className="text-primary h-4 w-4" />
                             Mensaje
                         </h2>
-                        <p className="rounded-lg bg-zinc-50 p-4 text-sm leading-relaxed whitespace-pre-wrap text-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-300">
-                            {item.message}
-                        </p>
+                        <p className="bg-muted/50 text-foreground rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap">{item.message}</p>
                     </div>
                 )}
             </div>

@@ -49,9 +49,9 @@ export default function Index() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const IconComponent = (LucideIcons as any)[iconName];
         if (IconComponent) {
-            return <IconComponent className="h-4 w-4 text-zinc-500" />;
+            return <IconComponent className="text-muted-foreground h-4 w-4" />;
         }
-        return <BookOpen className="h-4 w-4 text-zinc-500" />;
+        return <BookOpen className="text-muted-foreground h-4 w-4" />;
     };
 
     return (
@@ -62,24 +62,21 @@ export default function Index() {
                         <form className="flex items-center" onSubmit={(e) => e.preventDefault()}>
                             <div className="relative w-full">
                                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <Search className="h-4 w-4 text-zinc-400" />
+                                    <Search className="text-muted-foreground h-4 w-4" />
                                 </div>
                                 <Input
                                     type="text"
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-300 bg-transparent p-2 pl-10 text-sm text-zinc-800 dark:border-zinc-800 dark:text-zinc-200"
+                                    className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
                                     placeholder="Buscar tipo de contenido..."
                                 />
                             </div>
                         </form>
                     </div>
                     <div className="flex w-full justify-end md:w-auto">
-                        <Button
-                            asChild
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
+                        <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href="/admin/post-types/create">
                                 <Plus className="h-4 w-4" />
                                 <span>Nuevo Tipo de Contenido</span>
@@ -89,8 +86,8 @@ export default function Index() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Nombre
@@ -116,26 +113,30 @@ export default function Index() {
                         <tbody>
                             {items.data.length > 0 ? (
                                 items.data.map((item: CmsPostType) => (
-                                    <tr key={item.id} className="border-b hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-800/20">
-                                        <td className="flex items-center gap-2.5 px-4 py-3 font-semibold text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="hover:bg-muted/50 border-b">
+                                        <td className="text-foreground flex items-center gap-2.5 px-4 py-3 font-semibold">
                                             {renderIcon(item.icon)}
                                             <span>{item.name}</span>
                                         </td>
-                                        <td className="px-4 py-3 font-mono text-xs text-red-600 dark:text-red-400">/{item.slug}</td>
-                                        <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                                            {item.default_schema ? item.default_schema.name : <em className="text-xs text-zinc-400">Ninguna</em>}
+                                        <td className="text-primary px-4 py-3 font-mono text-xs">/{item.slug}</td>
+                                        <td className="text-muted-foreground px-4 py-3">
+                                            {item.default_schema ? (
+                                                item.default_schema.name
+                                            ) : (
+                                                <em className="text-muted-foreground text-xs">Ninguna</em>
+                                            )}
                                         </td>
-                                        <td className="max-w-xs truncate px-4 py-3 text-zinc-500">{item.description || '-'}</td>
+                                        <td className="text-muted-foreground max-w-xs truncate px-4 py-3">{item.description || '-'}</td>
                                         <td className="px-4 py-3 text-center">
                                             {item.active ? (
-                                                <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 p-1 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                <span className="bg-success-soft text-success inline-flex items-center justify-center rounded-full p-1">
                                                     <Check className="h-3.5 w-3.5" />
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-zinc-400">Inactivo</span>
+                                                <span className="text-muted-foreground text-xs">Inactivo</span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-center text-zinc-500">
+                                        <td className="text-muted-foreground px-4 py-3 text-center">
                                             {item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}
                                         </td>
                                         <td className="px-4 py-3 text-right">
@@ -152,7 +153,7 @@ export default function Index() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                                                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-8 w-8 rounded-lg"
                                                     onClick={() => handleDelete(item.id, item.name)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -163,7 +164,7 @@ export default function Index() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="px-4 py-8 text-center text-zinc-400 italic">
+                                    <td colSpan={7} className="text-muted-foreground px-4 py-8 text-center italic">
                                         No se encontraron tipos de contenido.
                                     </td>
                                 </tr>

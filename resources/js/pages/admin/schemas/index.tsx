@@ -45,7 +45,7 @@ export default function Index() {
         <ModuleLayout>
             <div className="relative">
                 {errors?.error && (
-                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
+                    <div className="border-destructive/30 bg-destructive-soft text-destructive mb-4 rounded-lg border p-3 text-sm">
                         {errors.error}
                     </div>
                 )}
@@ -64,14 +64,14 @@ export default function Index() {
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm"
+                                    className="border-border-strong block w-full rounded-md border p-2 pl-10 text-sm"
                                     placeholder="Buscar"
                                 />
                             </div>
                             <label htmlFor="simple-search" className="sr-only">
                                 Group
                             </label>
-                            <div className="block rounded-md border border-gray-500 text-sm">
+                            <div className="border-border-strong block rounded-md border text-sm">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="p-3">
@@ -99,7 +99,7 @@ export default function Index() {
                     <div className="flex w-full justify-end md:w-auto">
                         <Button
                             onClick={() => router.visit(route('schemas.create', { group_id: group_id }))}
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5"
                         >
                             <Plus className="h-4 w-4" />
                             <span>Agregar Campo Personalizado</span>
@@ -107,8 +107,8 @@ export default function Index() {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Nombre
@@ -131,8 +131,8 @@ export default function Index() {
                         <tbody>
                             {items.data.map((item: CmsSchema) => {
                                 return (
-                                    <tr key={item.id} className="border-b dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             <a href={route('schemas.edit', item.id)} className="hover:underline">
                                                 {item.name}
                                             </a>
@@ -141,7 +141,7 @@ export default function Index() {
                                             {item.front_view ? (
                                                 `${item.front_view.split('/').pop()}.tsx`
                                             ) : (
-                                                <span className="text-zinc-400 italic">-</span>
+                                                <span className="text-muted-foreground italic">-</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-center">{item.fields?.length ?? 0}</td>
@@ -162,7 +162,7 @@ export default function Index() {
                                                 variant="ghost"
                                                 size="sm"
                                                 disabled={item.articles_count !== undefined && item.articles_count > 0}
-                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:text-gray-400 disabled:opacity-40 disabled:hover:bg-transparent dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300 dark:disabled:text-gray-600"
+                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive disabled:text-muted-foreground flex h-8 items-center gap-1 px-2.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                                                 onClick={() => deleteSchemaHandler(item.id)}
                                                 title={
                                                     item.articles_count !== undefined && item.articles_count > 0

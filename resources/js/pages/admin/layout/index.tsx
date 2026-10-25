@@ -63,22 +63,22 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                 <div className="space-y-6">
                     {/* Top alert feedback */}
                     {flash?.success && (
-                        <div className="animate-in fade-in flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 duration-200 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-400">
-                            <CheckCircle2 className="h-4.5 w-4.5 shrink-0 text-emerald-600 dark:text-emerald-500" />
+                        <div className="animate-in fade-in border-success/30 bg-success-soft text-success flex items-center gap-2 rounded-xl border p-4 text-xs font-semibold duration-200">
+                            <CheckCircle2 className="text-success h-4.5 w-4.5 shrink-0" />
                             <span>{flash.success}</span>
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Tab Headers */}
-                        <div className="flex gap-4 border-b border-zinc-200 dark:border-zinc-800">
+                        <div className="border-border flex gap-4 border-b">
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('general')}
                                 className={`flex cursor-pointer items-center gap-2 border-b-2 pb-3.5 text-xs font-bold transition-all ${
                                     activeTab === 'general'
-                                        ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500'
-                                        : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                        ? 'border-primary text-primary'
+                                        : 'text-muted-foreground hover:text-foreground border-transparent'
                                 }`}
                             >
                                 <Layout className="h-4 w-4" />
@@ -89,8 +89,8 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                 onClick={() => setActiveTab('social')}
                                 className={`flex cursor-pointer items-center gap-2 border-b-2 pb-3.5 text-xs font-bold transition-all ${
                                     activeTab === 'social'
-                                        ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500'
-                                        : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                        ? 'border-primary text-primary'
+                                        : 'text-muted-foreground hover:text-foreground border-transparent'
                                 }`}
                             >
                                 <Globe className="h-4 w-4" />
@@ -101,8 +101,8 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                 onClick={() => setActiveTab('css')}
                                 className={`flex cursor-pointer items-center gap-2 border-b-2 pb-3.5 text-xs font-bold transition-all ${
                                     activeTab === 'css'
-                                        ? 'border-red-600 text-red-600 dark:border-red-500 dark:text-red-500'
-                                        : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                        ? 'border-primary text-primary'
+                                        : 'text-muted-foreground hover:text-foreground border-transparent'
                                 }`}
                             >
                                 <Code className="h-4 w-4" />
@@ -114,16 +114,18 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                         {activeTab === 'general' && (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 {/* Header Logo Upload Card */}
-                                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#161615]">
+                                <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                                     <div>
-                                        <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Logo de Cabecera (Header)</h3>
-                                        <p className="mt-0.5 text-[10px] text-zinc-400">Se muestra en la barra de navegación superior</p>
+                                        <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                                            Logo de Cabecera (Header)
+                                        </h3>
+                                        <p className="text-muted-foreground mt-0.5 text-[10px]">Se muestra en la barra de navegación superior</p>
                                     </div>
 
                                     {data.layout_header_logo ? (
-                                        <div className="relative flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-800 dark:bg-black/10">
+                                        <div className="border-border bg-muted/50 relative flex items-center justify-between gap-4 rounded-lg border p-3 dark:bg-black/10">
                                             <div className="flex min-w-0 items-center gap-3">
-                                                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
+                                                <div className="border-border bg-muted flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border">
                                                     <img
                                                         src={data.layout_header_logo}
                                                         alt="Header Logo"
@@ -131,10 +133,11 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                                     />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <span className="block truncate text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                                                        Logo Seleccionado
-                                                    </span>
-                                                    <span className="text-zinc-450 mt-0.5 block truncate text-[9px]" title={data.layout_header_logo}>
+                                                    <span className="text-foreground block truncate text-xs font-semibold">Logo Seleccionado</span>
+                                                    <span
+                                                        className="text-muted-foreground mt-0.5 block truncate text-[9px]"
+                                                        title={data.layout_header_logo}
+                                                    >
                                                         {data.layout_header_logo}
                                                     </span>
                                                 </div>
@@ -153,7 +156,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                                     type="button"
                                                     size="icon"
                                                     variant="ghost"
-                                                    className="h-8 w-8 text-zinc-400 hover:text-red-500"
+                                                    className="text-muted-foreground hover:text-destructive h-8 w-8"
                                                     onClick={() => clearLogo('header')}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -163,28 +166,28 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                     ) : (
                                         <div
                                             onClick={() => setDrawerTarget('header')}
-                                            className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 p-8 text-center transition-colors hover:border-red-500/40 hover:bg-zinc-50/30 dark:border-zinc-800 dark:hover:bg-zinc-900/10"
+                                            className="group border-border hover:border-primary/40 hover:bg-muted/30 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors"
                                         >
-                                            <UploadCloud className="mb-2 h-8 w-8 text-zinc-400 transition-colors group-hover:text-red-500" />
-                                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                                                Seleccionar Logo de Cabecera
-                                            </span>
-                                            <span className="mt-1 text-[9px] text-zinc-400">Busca o sube un archivo en la biblioteca</span>
+                                            <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-8 w-8 transition-colors" />
+                                            <span className="text-foreground text-xs font-semibold">Seleccionar Logo de Cabecera</span>
+                                            <span className="text-muted-foreground mt-1 text-[9px]">Busca o sube un archivo en la biblioteca</span>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Footer Logo Upload Card */}
-                                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#161615]">
+                                <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                                     <div>
-                                        <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Logo de Pie de Página (Footer)</h3>
-                                        <p className="mt-0.5 text-[10px] text-zinc-400">Se muestra en la zona inferior del sitio</p>
+                                        <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                                            Logo de Pie de Página (Footer)
+                                        </h3>
+                                        <p className="text-muted-foreground mt-0.5 text-[10px]">Se muestra en la zona inferior del sitio</p>
                                     </div>
 
                                     {data.layout_footer_logo ? (
-                                        <div className="relative flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-800 dark:bg-black/10">
+                                        <div className="border-border bg-muted/50 relative flex items-center justify-between gap-4 rounded-lg border p-3 dark:bg-black/10">
                                             <div className="flex min-w-0 items-center gap-3">
-                                                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
+                                                <div className="border-border bg-muted flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border">
                                                     <img
                                                         src={data.layout_footer_logo}
                                                         alt="Footer Logo"
@@ -192,10 +195,11 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                                     />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <span className="block truncate text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                                                        Logo Seleccionado
-                                                    </span>
-                                                    <span className="text-zinc-450 mt-0.5 block truncate text-[9px]" title={data.layout_footer_logo}>
+                                                    <span className="text-foreground block truncate text-xs font-semibold">Logo Seleccionado</span>
+                                                    <span
+                                                        className="text-muted-foreground mt-0.5 block truncate text-[9px]"
+                                                        title={data.layout_footer_logo}
+                                                    >
                                                         {data.layout_footer_logo}
                                                     </span>
                                                 </div>
@@ -214,7 +218,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                                     type="button"
                                                     size="icon"
                                                     variant="ghost"
-                                                    className="h-8 w-8 text-zinc-400 hover:text-red-500"
+                                                    className="text-muted-foreground hover:text-destructive h-8 w-8"
                                                     onClick={() => clearLogo('footer')}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -224,18 +228,18 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                     ) : (
                                         <div
                                             onClick={() => setDrawerTarget('footer')}
-                                            className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 p-8 text-center transition-colors hover:border-red-500/40 hover:bg-zinc-50/30 dark:border-zinc-800 dark:hover:bg-zinc-900/10"
+                                            className="group border-border hover:border-primary/40 hover:bg-muted/30 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors"
                                         >
-                                            <UploadCloud className="mb-2 h-8 w-8 text-zinc-400 transition-colors group-hover:text-red-500" />
-                                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Seleccionar Logo de Footer</span>
-                                            <span className="mt-1 text-[9px] text-zinc-400">Busca o sube un archivo en la biblioteca</span>
+                                            <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-8 w-8 transition-colors" />
+                                            <span className="text-foreground text-xs font-semibold">Seleccionar Logo de Footer</span>
+                                            <span className="text-muted-foreground mt-1 text-[9px]">Busca o sube un archivo en la biblioteca</span>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Copyright Text Field */}
-                                <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs md:col-span-2 dark:border-zinc-800 dark:bg-[#161615]">
-                                    <Label htmlFor="layout_copyright" className="text-xs font-bold tracking-wider text-zinc-400 uppercase">
+                                <div className="border-border bg-card space-y-3 rounded-xl border p-5 shadow-xs md:col-span-2">
+                                    <Label htmlFor="layout_copyright" className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                                         Texto de Derechos Reservados (Copyright)
                                     </Label>
                                     <Input
@@ -243,7 +247,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                         type="text"
                                         value={data.layout_copyright}
                                         onChange={(e) => setData('layout_copyright', e.target.value)}
-                                        className="h-9 w-full bg-white text-xs dark:bg-[#161615]"
+                                        className="bg-card h-9 w-full text-xs"
                                         placeholder="Ej: © 2026 MewCMS. Todos los derechos reservados."
                                     />
                                 </div>
@@ -252,10 +256,10 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
 
                         {/* Tab Content: Social Networks */}
                         {activeTab === 'social' && (
-                            <div className="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#161615]">
+                            <div className="border-border bg-card space-y-5 rounded-xl border p-5 shadow-xs">
                                 <div>
-                                    <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Enlaces de Redes Sociales</h3>
-                                    <p className="mt-0.5 text-[10px] text-zinc-400">
+                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Enlaces de Redes Sociales</h3>
+                                    <p className="text-muted-foreground mt-0.5 text-[10px]">
                                         Introduce las URLs completas (con https://) para los íconos del layout
                                     </p>
                                 </div>
@@ -263,10 +267,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     {/* Facebook */}
                                     <div className="space-y-1.5">
-                                        <Label
-                                            htmlFor="layout_facebook"
-                                            className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300"
-                                        >
+                                        <Label htmlFor="layout_facebook" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                                             <Facebook className="h-4 w-4 text-blue-600" />
                                             <span>Facebook</span>
                                         </Label>
@@ -275,17 +276,14 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                             type="url"
                                             value={data.layout_facebook}
                                             onChange={(e) => setData('layout_facebook', e.target.value)}
-                                            className="h-9 w-full bg-white text-xs dark:bg-[#161615]"
+                                            className="bg-card h-9 w-full text-xs"
                                             placeholder="https://facebook.com/usuario"
                                         />
                                     </div>
 
                                     {/* Instagram */}
                                     <div className="space-y-1.5">
-                                        <Label
-                                            htmlFor="layout_instagram"
-                                            className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300"
-                                        >
+                                        <Label htmlFor="layout_instagram" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                                             <Instagram className="h-4 w-4 text-pink-600" />
                                             <span>Instagram</span>
                                         </Label>
@@ -294,17 +292,14 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                             type="url"
                                             value={data.layout_instagram}
                                             onChange={(e) => setData('layout_instagram', e.target.value)}
-                                            className="h-9 w-full bg-white text-xs dark:bg-[#161615]"
+                                            className="bg-card h-9 w-full text-xs"
                                             placeholder="https://instagram.com/usuario"
                                         />
                                     </div>
 
                                     {/* Twitter */}
                                     <div className="space-y-1.5">
-                                        <Label
-                                            htmlFor="layout_twitter"
-                                            className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300"
-                                        >
+                                        <Label htmlFor="layout_twitter" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                                             <Twitter className="h-4 w-4 text-sky-500" />
                                             <span>Twitter / X</span>
                                         </Label>
@@ -313,17 +308,14 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                             type="url"
                                             value={data.layout_twitter}
                                             onChange={(e) => setData('layout_twitter', e.target.value)}
-                                            className="h-9 w-full bg-white text-xs dark:bg-[#161615]"
+                                            className="bg-card h-9 w-full text-xs"
                                             placeholder="https://x.com/usuario"
                                         />
                                     </div>
 
                                     {/* LinkedIn */}
                                     <div className="space-y-1.5">
-                                        <Label
-                                            htmlFor="layout_linkedin"
-                                            className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300"
-                                        >
+                                        <Label htmlFor="layout_linkedin" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                                             <Linkedin className="h-4 w-4 text-blue-700" />
                                             <span>LinkedIn</span>
                                         </Label>
@@ -332,18 +324,15 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                             type="url"
                                             value={data.layout_linkedin}
                                             onChange={(e) => setData('layout_linkedin', e.target.value)}
-                                            className="h-9 w-full bg-white text-xs dark:bg-[#161615]"
+                                            className="bg-card h-9 w-full text-xs"
                                             placeholder="https://linkedin.com/in/usuario"
                                         />
                                     </div>
 
                                     {/* YouTube */}
                                     <div className="space-y-1.5 md:col-span-2">
-                                        <Label
-                                            htmlFor="layout_youtube"
-                                            className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300"
-                                        >
-                                            <Youtube className="h-4 w-4 text-red-600" />
+                                        <Label htmlFor="layout_youtube" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
+                                            <Youtube className="text-primary h-4 w-4" />
                                             <span>YouTube</span>
                                         </Label>
                                         <Input
@@ -351,7 +340,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                             type="url"
                                             value={data.layout_youtube}
                                             onChange={(e) => setData('layout_youtube', e.target.value)}
-                                            className="h-9 w-full bg-white text-xs dark:bg-[#161615]"
+                                            className="bg-card h-9 w-full text-xs"
                                             placeholder="https://youtube.com/c/canal"
                                         />
                                     </div>
@@ -361,10 +350,10 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
 
                         {/* Tab Content: Custom CSS */}
                         {activeTab === 'css' && (
-                            <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#161615]">
+                            <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                                 <div>
-                                    <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Estilos CSS Personalizados</h3>
-                                    <p className="mt-0.5 text-[10px] text-zinc-400">
+                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Estilos CSS Personalizados</h3>
+                                    <p className="text-muted-foreground mt-0.5 text-[10px]">
                                         Se inyectarán como un bloque inline global en la cabecera del frontend
                                     </p>
                                 </div>
@@ -377,7 +366,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                                         id="layout_custom_css"
                                         value={data.layout_custom_css}
                                         onChange={(e) => setData('layout_custom_css', e.target.value)}
-                                        className="min-h-[300px] bg-zinc-50 font-mono text-xs text-zinc-800 focus-visible:ring-1 dark:bg-black/10 dark:text-zinc-300"
+                                        className="bg-muted/50 text-foreground min-h-[300px] font-mono text-xs focus-visible:ring-1 dark:bg-black/10"
                                         placeholder="/* Ejemplo: \nbody { \n  font-family: sans-serif; \n} */"
                                     />
                                 </div>
@@ -389,7 +378,7 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="flex cursor-pointer items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-1.5"
                             >
                                 {processing ? (
                                     <>

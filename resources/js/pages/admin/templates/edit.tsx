@@ -60,7 +60,7 @@ export default function Edit() {
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {!canEdit && (
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400">
+                        <div className="border-warning/30 bg-warning-soft text-warning rounded-lg border p-3 text-sm">
                             El editor de plantillas está deshabilitado. Solo un super administrador puede guardar cambios cuando CMS_TEMPLATE_EDITOR
                             está activo.
                         </div>
@@ -77,7 +77,7 @@ export default function Edit() {
                             disabled={processing}
                             placeholder="e.g. Contacto Principal"
                         />
-                        {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
+                        {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                     </div>
 
                     <div className="grid gap-2">
@@ -86,17 +86,19 @@ export default function Edit() {
                             type="text"
                             disabled
                             value={`${filename}.tsx`}
-                            className="cursor-not-allowed bg-gray-50 font-mono text-sm text-gray-500 dark:bg-[#1c1c1a]"
+                            className="bg-muted/50 text-muted-foreground cursor-not-allowed font-mono text-sm"
                         />
-                        <p className="text-xs text-gray-400">Para cambiar el nombre del archivo, cámbielo en el sistema de archivos del servidor.</p>
+                        <p className="text-muted-foreground text-xs">
+                            Para cambiar el nombre del archivo, cámbielo en el sistema de archivos del servidor.
+                        </p>
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="content">Código de la Plantilla (React / TypeScript)</Label>
-                        <div className="overflow-hidden rounded-md border border-gray-800 bg-gray-900">
-                            <div className="flex items-center justify-between border-b border-gray-900 bg-gray-800/60 px-4 py-2 font-mono text-xs text-gray-400">
+                        <div className="border-border-strong bg-muted overflow-hidden rounded-md border">
+                            <div className="border-border-strong bg-muted/60 text-muted-foreground flex items-center justify-between border-b px-4 py-2 font-mono text-xs">
                                 <span>{`${filename}.tsx`}</span>
-                                <span className="font-semibold text-red-400">TSX</span>
+                                <span className="text-primary font-semibold">TSX</span>
                             </div>
                             <Textarea
                                 id="content"
@@ -104,22 +106,19 @@ export default function Edit() {
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 disabled={processing}
-                                className="min-h-[400px] resize-y border-0 bg-gray-900 p-4 font-mono text-sm leading-relaxed text-gray-100 focus-visible:ring-0"
+                                className="bg-muted text-muted-foreground/70 min-h-[400px] resize-y border-0 p-4 font-mono text-sm leading-relaxed focus-visible:ring-0"
                                 placeholder="// Escribe el código de tu componente React..."
                                 spellCheck={false}
                             />
                         </div>
-                        {errors.content && <span className="text-xs text-red-500">{errors.content}</span>}
+                        {errors.content && <span className="text-destructive text-xs">{errors.content}</span>}
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button
-                            disabled={processing || !canEdit}
-                            className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
+                        <Button disabled={processing || !canEdit} className="bg-primary text-primary-foreground hover:bg-primary/90">
                             {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
-                        <Link href="/admin/templates" className="text-sm text-gray-500 hover:underline">
+                        <Link href="/admin/templates" className="text-muted-foreground text-sm hover:underline">
                             Cancelar
                         </Link>
                     </div>
