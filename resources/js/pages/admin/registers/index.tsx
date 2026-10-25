@@ -51,7 +51,7 @@ export default function Index() {
 
     return (
         <ModuleLayout>
-            <div className="relative space-y-4 overflow-hidden">
+            <div className="relative space-y-4">
                 {/* Toolbar */}
                 <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
                     {/* Search */}

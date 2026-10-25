@@ -61,7 +61,7 @@ export default function Index() {
 
     return (
         <ModuleLayout>
-            <div className="relative overflow-hidden">
+            <div className="relative">
                 <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
                     <div className="flex w-full flex-col gap-3 sm:flex-row md:w-3/4">
                         <div className="relative flex-1">
@@ -73,7 +73,7 @@ export default function Index() {
                                 autoFocus
                                 value={filters.s}
                                 onChange={handleSearch}
-                                className="block w-full rounded-md border border-gray-300 bg-transparent p-2 pl-10 text-sm text-zinc-800 focus-within:outline-2 focus-within:outline-gray-400 dark:border-zinc-800 dark:text-zinc-200"
+                                className="block w-full rounded-md border border-gray-300 bg-transparent p-2 pl-10 text-sm text-zinc-800 dark:border-zinc-800 dark:text-zinc-200"
                                 placeholder={`Buscar ${singularName.toLowerCase()}...`}
                             />
                         </div>
