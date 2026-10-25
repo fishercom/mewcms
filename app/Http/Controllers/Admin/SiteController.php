@@ -55,7 +55,7 @@ class SiteController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsSite::find($id);
+        $item = CmsSite::findOrFail($id);
         $schemaGroups = CmsSchemaGroup::all();
 
         return Inertia::render('admin/sites/edit', [
@@ -81,7 +81,7 @@ class SiteController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsSite::find($id);
+        $item = CmsSite::findOrFail($id);
         $item->delete();
 
         return redirect('admin/sites');

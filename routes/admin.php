@@ -17,8 +17,7 @@ use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\SchemaController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\SliderController;
-use App\Http\Controllers\Admin\TaxonomyController;
-use App\Http\Controllers\Admin\TaxonomyTermController;
+use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\UserController;
@@ -47,11 +46,11 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::resource('forms', FormController::class);
     Route::resource('registers', RegisterController::class);
     Route::resource('notifies', NotifyController::class);
+    Route::post('articles/bulk', [ArticleController::class, 'bulk'])->name('articles.bulk');
     Route::resource('articles', ArticleController::class);
     Route::post('articles/sort', [ArticleController::class, 'sort'])->name('articles.sort');
-    Route::resource('taxonomies', TaxonomyController::class);
-    Route::resource('taxonomies.terms', TaxonomyTermController::class)->shallow();
-    Route::post('taxonomies/terms/sort', [TaxonomyTermController::class, 'sort'])->name('taxonomies.terms.sort');
+    Route::post('tags/quick', [TagController::class, 'quickStore'])->name('tags.quick');
+    Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
 
     Route::resource('menus', MenuController::class);
     Route::post('menus/{menu}/items', [MenuController::class, 'storeItems'])->name('menus.items.store');
@@ -64,6 +63,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::resource('sliders', SliderController::class);
 
     Route::resource('post-types', PostTypeController::class);
+    Route::post('posts/bulk', [PostController::class, 'bulk'])->name('posts.bulk');
     Route::resource('posts', PostController::class);
 
     Route::get('layout', [LayoutController::class, 'index'])->name('layout.index');

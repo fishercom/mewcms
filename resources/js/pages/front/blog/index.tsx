@@ -1,7 +1,7 @@
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
-import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { PopularTag } from '../components/sidebar';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { ArrowRight, BookOpen, Calendar, Search, User } from 'lucide-react';
@@ -13,11 +13,11 @@ interface Props {
     posts: Pagination<CmsPost>;
     cpt: CmsPostType | null;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    allTaxonomies?: CmsTaxonomy[];
+    popularTags?: PopularTag[];
     recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-export default function Index({ posts, cpt, navigation, allTaxonomies = [], recentArticles = [] }: Props) {
+export default function Index({ posts, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
     const [search, setSearch] = useState('');
 
     const pageTitle = cpt ? cpt.name : 'Blog / Entradas';
@@ -87,15 +87,15 @@ export default function Index({ posts, cpt, navigation, allTaxonomies = [], rece
                                         {/* Post Description */}
                                         <div className="flex flex-1 flex-col justify-between space-y-4 p-5">
                                             <div className="space-y-2">
-                                                {/* Category tag badges */}
-                                                {post.terms && post.terms.length > 0 && (
+                                                {/* Tag badges */}
+                                                {post.tags && post.tags.length > 0 && (
                                                     <div className="flex flex-wrap gap-1.5">
-                                                        {post.terms.slice(0, 2).map((term) => (
+                                                        {post.tags.slice(0, 2).map((term) => (
                                                             <span
                                                                 key={term.id}
                                                                 className="text-[10px] font-semibold tracking-wider text-red-600 uppercase dark:text-red-400"
                                                             >
-                                                                {term.name}
+                                                                #{term.name}
                                                             </span>
                                                         ))}
                                                     </div>
@@ -166,7 +166,7 @@ export default function Index({ posts, cpt, navigation, allTaxonomies = [], rece
 
                 {/* Sidebar Column */}
                 <div className="lg:col-span-4">
-                    <FrontSidebar allTaxonomies={allTaxonomies} recentArticles={recentArticles} />
+                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
                 </div>
             </div>
         </FrontLayout>

@@ -2,6 +2,7 @@
  * Template Name: Standard Page
  */
 import ContentRenderer from '@/components/content-renderer';
+import { tagUrl } from '@/lib/tag-url';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
 import FrontLayout from '../layout';
@@ -9,7 +10,6 @@ import FrontLayout from '../layout';
 interface PageProps {
     article: CmsArticle;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    allTaxonomies?: import('@/types/models/cms-taxonomy').CmsTaxonomy[];
     recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
@@ -25,11 +25,7 @@ export default function Page({ article, navigation }: PageProps) {
         return '/' + slug.replace(/_/g, '/');
     };
 
-    // Separate categories and tags
-    const categoryTerms =
-        article.terms?.filter((term) => ['categorias', 'categories', 'category'].includes(term.taxonomy?.slug?.toLowerCase() || '')) || [];
-
-    const tagTerms = article.terms?.filter((term) => ['tags', 'etiquetas', 'tag'].includes(term.taxonomy?.slug?.toLowerCase() || '')) || [];
+    const tags = article.tags ?? [];
 
     return (
         <FrontLayout navigation={navigation}>
@@ -40,24 +36,15 @@ export default function Page({ article, navigation }: PageProps) {
                 <div className="space-y-2 border-b border-[#19140015] pb-6 dark:border-[#3E3E3A]/40">
                     <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{article.title}</h1>
 
-                    {(categoryTerms.length > 0 || tagTerms.length > 0) && (
+                    {tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 pt-2">
-                            {categoryTerms.map((term) => (
+                            {tags.map((tag) => (
                                 <Link
-                                    key={term.id}
-                                    href={`/category/${term.slug}`}
-                                    className="rounded bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700 capitalize transition-colors hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:hover:bg-amber-950/60"
+                                    key={tag.id}
+                                    href={tagUrl(tag.slug)}
+                                    className="rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60"
                                 >
-                                    {term.name}
-                                </Link>
-                            ))}
-                            {tagTerms.map((term) => (
-                                <Link
-                                    key={term.id}
-                                    href={`/tag/${term.slug}`}
-                                    className="rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 capitalize transition-colors hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60"
-                                >
-                                    #{term.name}
+                                    #{tag.name}
                                 </Link>
                             ))}
                         </div>

@@ -37,7 +37,7 @@ class AdmModule extends Model
     }
 
     /**
-     * Resolve the permission key for a route name, e.g. "taxonomies.terms.store" => "taxonomies".
+     * Resolve the permission key for a route name, e.g. "tags.update" => "tags".
      */
     public static function keyFromRouteName(?string $routeName): ?string
     {
@@ -45,12 +45,6 @@ class AdmModule extends Model
             return null;
         }
 
-        $key = explode('.', $routeName)[0];
-
-        // Shallow nested resources drop their parent from the route name
-        return match ($key) {
-            'terms' => 'taxonomies',
-            default => $key,
-        };
+        return explode('.', $routeName)[0];
     }
 }

@@ -59,7 +59,7 @@ class ParameterController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsParameter::find($id);
+        $item = CmsParameter::findOrFail($id);
         $groups = CmsParameterGroup::all();
         $parents = CmsParameter::whereNull('parent_id')->get(); // Only top-level parameters can be parents
 
@@ -87,7 +87,7 @@ class ParameterController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsParameter::find($id);
+        $item = CmsParameter::findOrFail($id);
         $item->delete();
 
         return redirect('admin/parameters');

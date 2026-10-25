@@ -20,7 +20,7 @@ export default function Index() {
 
     const isCoreTemplate = (file: string) => {
         const base = file.replace('.tsx', '');
-        return ['home', 'page', 'post', 'term-list'].includes(base);
+        return ['home', 'page', 'post'].includes(base);
     };
 
     const handleDelete = (file: string) => {

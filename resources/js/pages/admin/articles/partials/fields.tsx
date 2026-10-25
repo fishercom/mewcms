@@ -1,4 +1,5 @@
 import CustomFieldRenderer from '@/components/custom-field-renderer';
+import TagField from '@/components/tag-field';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import TiptapEditor from '@/components/tiptap-editor';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { CmsArticle, CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
-import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { CmsTag } from '@/types/models/cms-tag';
 import { FileText, Globe, Image as ImageIcon, Settings, Sliders, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
@@ -22,21 +23,11 @@ interface Props {
     schema?: CmsSchema & { unique?: boolean };
     schemas?: (CmsSchema & { unique?: boolean })[];
     parents?: CmsArticle[];
-    taxonomies?: CmsTaxonomy[];
+    tags?: CmsTag[];
     onChangeSchema?: (schemaId: number) => void;
 }
 
-export default function ArticleFields({
-    data,
-    setData,
-    errors,
-    processing,
-    schema,
-    schemas = [],
-    parents = [],
-    taxonomies,
-    onChangeSchema,
-}: Props) {
+export default function ArticleFields({ data, setData, errors, processing, schema, schemas = [], parents = [], tags = [], onChangeSchema }: Props) {
     const [mediaOpen, setMediaOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'content' | 'schema' | 'seo'>('content');
 
@@ -48,17 +39,26 @@ export default function ArticleFields({
 
     const hasSchemaFields = Boolean(schema?.fields && schema.fields.length > 0);
 
+    // Format datetime-local value (YYYY-MM-DDTHH:MM)
+    const getPublishedAtValue = () => {
+        if (!data.published_at) return '';
+        const d = new Date(data.published_at);
+        if (isNaN(d.getTime())) return '';
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             {/* Left Column: Tabbed Content, Custom Fields & SEO */}
             <div className="space-y-6 lg:col-span-8">
                 {/* Visual Tab Navigation Bar */}
-                <div className="flex flex-wrap items-center gap-1.5 border-b border-border/70 pb-3">
+                <div className="border-border/70 flex flex-wrap items-center gap-1.5 border-b pb-3">
                     <button
                         type="button"
                         onClick={() => setActiveTab('content')}
                         className={cn(
-                            'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer shadow-2xs',
+                            'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
                             activeTab === 'content'
                                 ? 'bg-violet-600 text-white shadow-violet-500/20'
                                 : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
@@ -72,7 +72,7 @@ export default function ArticleFields({
                         type="button"
                         onClick={() => setActiveTab('schema')}
                         className={cn(
-                            'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer shadow-2xs',
+                            'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
                             activeTab === 'schema'
                                 ? 'bg-violet-600 text-white shadow-violet-500/20'
                                 : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
@@ -83,10 +83,8 @@ export default function ArticleFields({
                         {hasSchemaFields && (
                             <span
                                 className={cn(
-                                    'ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-bold',
-                                    activeTab === 'schema'
-                                        ? 'bg-white/25 text-white'
-                                        : 'bg-muted text-muted-foreground',
+                                    'py-0.2 ml-0.5 rounded-full px-1.5 text-[10px] font-bold',
+                                    activeTab === 'schema' ? 'bg-white/25 text-white' : 'bg-muted text-muted-foreground',
                                 )}
                             >
                                 {schema?.fields?.length}
@@ -98,7 +96,7 @@ export default function ArticleFields({
                         type="button"
                         onClick={() => setActiveTab('seo')}
                         className={cn(
-                            'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer shadow-2xs',
+                            'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
                             activeTab === 'seo'
                                 ? 'bg-violet-600 text-white shadow-violet-500/20'
                                 : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
@@ -111,9 +109,9 @@ export default function ArticleFields({
 
                 {/* Tab 1: Main Content */}
                 {activeTab === 'content' && (
-                    <div className="space-y-6 animate-in fade-in duration-200">
+                    <div className="animate-in fade-in space-y-6 duration-200">
                         <div className="space-y-2">
-                            <Label htmlFor="title" className="font-semibold text-foreground">
+                            <Label htmlFor="title" className="text-foreground font-semibold">
                                 Título de la Página <span className="text-rose-500">*</span>
                             </Label>
                             <Input
@@ -135,10 +133,10 @@ export default function ArticleFields({
                         {/* Rich Text Editor */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="content" className="font-semibold text-foreground">
+                                <Label htmlFor="content" className="text-foreground font-semibold">
                                     Cuerpo del Contenido
                                 </Label>
-                                <span className="text-[11px] text-muted-foreground">Editor enriquecido interactivo</span>
+                                <span className="text-muted-foreground text-[11px]">Editor enriquecido interactivo</span>
                             </div>
                             <TiptapEditor value={data.content || ''} onChange={(value) => setData({ ...data, content: value })} />
                             <InputError message={errors.content} />
@@ -146,7 +144,7 @@ export default function ArticleFields({
 
                         {/* Excerpt */}
                         <div className="space-y-2">
-                            <Label htmlFor="excerpt" className="font-semibold text-foreground">
+                            <Label htmlFor="excerpt" className="text-foreground font-semibold">
                                 Extracto / Resumen Corto
                             </Label>
                             <textarea
@@ -154,7 +152,7 @@ export default function ArticleFields({
                                 value={data.excerpt || ''}
                                 onChange={(e) => setData({ ...data, excerpt: e.target.value })}
                                 rows={3}
-                                className="w-full rounded-xl border border-input bg-transparent p-3 text-sm text-foreground transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                                className="border-input text-foreground w-full rounded-xl border bg-transparent p-3 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
                                 placeholder="Escribe un breve extracto que resuma el propósito de la página..."
                             />
                             <InputError message={errors.excerpt} />
@@ -164,21 +162,19 @@ export default function ArticleFields({
 
                 {/* Tab 2: Custom Schema Fields */}
                 {activeTab === 'schema' && (
-                    <div className="space-y-6 animate-in fade-in duration-200">
+                    <div className="animate-in fade-in space-y-6 duration-200">
                         {hasSchemaFields ? (
-                            <div className="rounded-2xl border border-border/70 bg-card p-5 shadow-xs space-y-4">
-                                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                            <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-5 shadow-xs">
+                                <div className="border-border/60 flex items-center justify-between border-b pb-3">
                                     <div className="flex items-center gap-2">
                                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
                                             <Sliders className="h-3.5 w-3.5" />
                                         </div>
                                         <div>
-                                            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                            <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
                                                 Campos Personalizados ({schema?.name})
                                             </h4>
-                                            <p className="text-[11px] text-muted-foreground">
-                                                Valores dinámicos configurados para esta plantilla
-                                            </p>
+                                            <p className="text-muted-foreground text-[11px]">Valores dinámicos configurados para esta plantilla</p>
                                         </div>
                                     </div>
                                     <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400">
@@ -196,12 +192,12 @@ export default function ArticleFields({
                                 />
                             </div>
                         ) : (
-                            <div className="rounded-2xl border border-dashed border-border/80 bg-muted/20 p-10 text-center">
-                                <Sliders className="mx-auto mb-3 h-8 w-8 text-muted-foreground/60 stroke-[1.5]" />
-                                <h4 className="text-sm font-semibold text-foreground">
+                            <div className="border-border/80 bg-muted/20 rounded-2xl border border-dashed p-10 text-center">
+                                <Sliders className="text-muted-foreground/60 mx-auto mb-3 h-8 w-8 stroke-[1.5]" />
+                                <h4 className="text-foreground text-sm font-semibold">
                                     {schema ? 'La plantilla actual no tiene campos adicionales' : 'Sin plantilla seleccionada'}
                                 </h4>
-                                <p className="mt-1 max-w-sm mx-auto text-xs text-muted-foreground">
+                                <p className="text-muted-foreground mx-auto mt-1 max-w-sm text-xs">
                                     {schema
                                         ? 'Esta plantilla solo utiliza el contenido estándar. Puedes añadir campos personalizados en el módulo de Esquemas.'
                                         : 'Selecciona una plantilla en el panel lateral derecho para cargar sus campos dinámicos correspondientes.'}
@@ -213,7 +209,7 @@ export default function ArticleFields({
 
                 {/* Tab 3: SEO & Social Metadata */}
                 {activeTab === 'seo' && (
-                    <div className="space-y-6 animate-in fade-in duration-200">
+                    <div className="animate-in fade-in space-y-6 duration-200">
                         <SeoFields
                             values={
                                 (data.metadata as {
@@ -235,8 +231,8 @@ export default function ArticleFields({
             {/* Right Column: Settings, Images & Metadata */}
             <div className="space-y-6 lg:col-span-4">
                 {/* Publish & Parent Card */}
-                <div className="space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs">
-                    <h3 className="flex items-center gap-1.5 border-b border-border/60 pb-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-4 shadow-2xs">
+                    <h3 className="border-border/60 text-muted-foreground flex items-center gap-1.5 border-b pb-2 text-xs font-bold tracking-wider uppercase">
                         <Settings className="h-3.5 w-3.5" />
                         <span>Ajustes de Publicación</span>
                     </h3>
@@ -248,12 +244,26 @@ export default function ArticleFields({
                             id="status"
                             value={data.status || 'published'}
                             onChange={(e) => setData({ ...data, status: e.target.value })}
-                            className="h-9 w-full rounded-xl border border-input bg-transparent px-3 text-xs text-foreground transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                            className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
                         >
                             <option value="published">Publicado</option>
                             <option value="draft">Borrador</option>
                         </select>
                         <InputError message={errors.status} />
+                    </div>
+
+                    {/* Publication date: a future date schedules the page */}
+                    <div className="space-y-1.5">
+                        <Label htmlFor="published_at">Fecha de publicación</Label>
+                        <input
+                            id="published_at"
+                            type="datetime-local"
+                            value={getPublishedAtValue()}
+                            onChange={(e) => setData({ ...data, published_at: e.target.value })}
+                            className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                        />
+                        <p className="text-muted-foreground text-[11px]">Vacío para publicar de inmediato. Una fecha futura programa la página.</p>
+                        <InputError message={errors.published_at} />
                     </div>
 
                     {/* Template Selector */}
@@ -271,7 +281,7 @@ export default function ArticleFields({
                                         onChangeSchema(newId || 0);
                                     }
                                 }}
-                                className="h-9 w-full rounded-xl border border-input bg-transparent px-3 text-xs text-foreground transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                                className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
                             >
                                 <option value="none">Ninguna (Sin Plantilla)</option>
                                 {schemas.map((s) => (
@@ -300,7 +310,7 @@ export default function ArticleFields({
                                         const val = e.target.value;
                                         setData({ ...data, parent_id: val === 'root' ? null : Number(val) });
                                     }}
-                                    className="h-9 w-full rounded-xl border border-input bg-transparent px-3 text-xs text-foreground transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                                    className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
                                 >
                                     <option value="root">Página Raíz (Ninguna)</option>
                                     {parents.map((p) => (
@@ -323,17 +333,15 @@ export default function ArticleFields({
                             checked={Boolean(data.active)}
                             onClick={() => setData({ ...data, active: !data.active })}
                         />
-                        <Label htmlFor="active" className="cursor-pointer text-xs font-semibold text-foreground">
+                        <Label htmlFor="active" className="text-foreground cursor-pointer text-xs font-semibold">
                             Activo (Visible en sitio y menús)
                         </Label>
                     </div>
                 </div>
 
                 {/* Featured Image Card */}
-                <div className="space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs">
-                    <Label className="block text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                        Imagen Destacada
-                    </Label>
+                <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-4 shadow-2xs">
+                    <Label className="text-muted-foreground block text-xs font-bold tracking-wider uppercase">Imagen Destacada</Label>
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <QuickMediaDrawer
@@ -348,7 +356,7 @@ export default function ArticleFields({
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="flex h-9 w-full items-center gap-1.5 rounded-xl border-border/70 text-xs font-medium shadow-2xs"
+                                className="border-border/70 flex h-9 w-full items-center gap-1.5 rounded-xl text-xs font-medium shadow-2xs"
                                 onClick={() => setMediaOpen(true)}
                             >
                                 <ImageIcon className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
@@ -358,7 +366,7 @@ export default function ArticleFields({
                                 <button
                                     type="button"
                                     onClick={() => setData({ ...data, featured_image: '' })}
-                                    className="rounded-lg p-2 text-muted-foreground hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                                    className="text-muted-foreground rounded-lg p-2 transition-colors hover:bg-rose-50 hover:text-rose-600"
                                     title="Quitar imagen"
                                 >
                                     <Trash2 className="h-4 w-4" />
@@ -366,65 +374,19 @@ export default function ArticleFields({
                             )}
                         </div>
                         {data.featured_image && (
-                            <div className="aspect-[16/10] overflow-hidden rounded-xl border border-border/60 bg-muted/30 shadow-2xs">
+                            <div className="border-border/60 bg-muted/30 aspect-[16/10] overflow-hidden rounded-xl border shadow-2xs">
                                 <img src={data.featured_image} className="h-full w-full object-cover" alt="Featured" />
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Taxonomies Card */}
-                {taxonomies && taxonomies.length > 0 && (
-                    <div className="space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs">
-                        <Label className="block text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                            Taxonomías & Categorías
-                        </Label>
-                        <div className="space-y-3">
-                            {taxonomies.map((taxonomy) => (
-                                <div key={taxonomy.id} className="rounded-xl border border-border/60 bg-muted/20 p-3">
-                                    <Label className="mb-2 block text-xs font-semibold text-foreground capitalize">
-                                        {taxonomy.name}
-                                    </Label>
-                                    <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-                                        {taxonomy.terms && taxonomy.terms.length > 0 ? (
-                                            taxonomy.terms.map((term) => {
-                                                const isChecked = data.term_ids?.includes(term.id) || false;
-                                                return (
-                                                    <div
-                                                        key={term.id}
-                                                        style={{ paddingLeft: term.parent_id ? '1.25rem' : '0' }}
-                                                        className="flex items-center space-x-2"
-                                                    >
-                                                        <Checkbox
-                                                            id={`term-${term.id}`}
-                                                            checked={isChecked}
-                                                            onClick={() => {
-                                                                const termIds = data.term_ids || [];
-                                                                const next = isChecked
-                                                                    ? termIds.filter((id) => id !== term.id)
-                                                                    : [...termIds, term.id];
-                                                                setData({ ...data, term_ids: next });
-                                                            }}
-                                                        />
-                                                        <Label
-                                                            htmlFor={`term-${term.id}`}
-                                                            className="cursor-pointer text-xs font-normal text-muted-foreground hover:text-foreground"
-                                                        >
-                                                            {term.parent_id && <span className="mr-1 text-muted-foreground/60">—</span>}
-                                                            {term.name}
-                                                        </Label>
-                                                    </div>
-                                                );
-                                            })
-                                        ) : (
-                                            <span className="text-[11px] text-muted-foreground italic">No hay términos.</span>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                {/* Tags */}
+                <div className="space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs">
+                    <h3 className="border-b border-border/60 pb-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">Etiquetas</h3>
+                    <TagField tags={tags} selected={data.tag_ids || []} onChange={(tagIds) => setData({ ...data, tag_ids: tagIds })} />
+                    <InputError message={errors.tag_ids} />
+                </div>
             </div>
         </div>
     );

@@ -2,8 +2,7 @@
 
 use App\Models\AdmLog;
 use App\Models\CmsLang;
-use App\Models\CmsTaxonomy;
-use App\Models\CmsTaxonomyTerm;
+use App\Models\CmsTag;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,17 +57,17 @@ test('the manage permission allows writing', function (): void {
     $this->actingAs($user)->get('/admin/articles/create')->assertOk();
 });
 
-test('shallow taxonomy term routes are protected by the taxonomies module', function (): void {
-    $taxonomy = CmsTaxonomy::create(['name' => 'Categorías', 'slug' => 'categorias', 'active' => true]);
-    $term = CmsTaxonomyTerm::create(['taxonomy_id' => $taxonomy->id, 'name' => 'News', 'active' => true]);
+test('tag routes are protected by the tags module', function (): void {
+    CmsTag::create(['name' => 'News', 'active' => true]);
 
     $reader = User::factory()->create();
-    grantPermissions($reader, ['taxonomies' => 'listar']);
-    $this->actingAs($reader)->get("/admin/terms/{$term->id}/edit")->assertForbidden();
+    grantPermissions($reader, ['tags' => 'listar']);
+    $this->actingAs($reader)->get('/admin/tags')->assertOk();
+    $this->actingAs($reader)->post('/admin/tags', ['name' => 'Tech'])->assertForbidden();
 
     $editor = User::factory()->create();
-    grantPermissions($editor, ['taxonomies' => 'administrar']);
-    $this->actingAs($editor)->get("/admin/terms/{$term->id}/edit")->assertOk();
+    grantPermissions($editor, ['tags' => 'administrar']);
+    $this->actingAs($editor)->post('/admin/tags', ['name' => 'Tech'])->assertRedirect();
 });
 
 test('the file manager requires the media manage permission to change files', function (): void {
@@ -150,14 +149,14 @@ test('audit log entries cannot be created or edited through the admin', function
 
 test('admin changes and logins are written to the audit log', function (): void {
     $admin = User::factory()->superAdmin()->create();
-    grantPermissions($admin, ['taxonomies' => 'administrar', 'login' => 'login']);
+    grantPermissions($admin, ['tags' => 'administrar', 'login' => 'login']);
 
     $this->post('/login', ['email' => $admin->email, 'password' => 'password']);
 
-    $this->post('/admin/taxonomies', ['name' => 'Categorías', 'active' => true])->assertRedirect();
+    $this->post('/admin/tags', ['name' => 'Categorías'])->assertRedirect();
 
     $comments = AdmLog::where('user_id', $admin->id)->pluck('comment');
 
     expect($comments)->toContain('Inicio de sesión')
-        ->and($comments->contains(fn (string $comment): bool => str_contains($comment, 'Creado en Taxonomies') && str_contains($comment, 'Categorías')))->toBeTrue();
+        ->and($comments->contains(fn (string $comment): bool => str_contains($comment, 'Creado en Tags') && str_contains($comment, 'Categorías')))->toBeTrue();
 });

@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
 use App\Models\CmsLang;
 use App\Models\CmsPost;
 use App\Models\CmsPostType;
 use App\Models\CmsSchema;
-use App\Models\CmsTaxonomy;
+use App\Models\CmsTag;
 use App\Models\User;
+use App\Support\FrontCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +19,8 @@ use Inertia\Response;
 
 class PostController extends Controller
 {
+    use BulkContentActions;
+
     protected $lang_id;
 
     protected $post_type;
@@ -43,8 +47,10 @@ class PostController extends Controller
     {
         $s = $request->get('s');
         $status = $request->get('status');
+        $trash = $request->boolean('trash');
 
-        $query = CmsPost::with(['user', 'terms', 'schema'])
+        $query = ($trash ? CmsPost::onlyTrashed() : CmsPost::query())
+            ->with(['user', 'tags', 'schema'])
             ->where('lang_id', $this->lang_id)
             ->where('post_type', $this->post_type);
 
@@ -70,6 +76,11 @@ class PostController extends Controller
         return Inertia::render('admin/posts/index', [
             'items' => $items,
             'cpt' => $cpt,
+            'trash' => $trash,
+            'trashCount' => CmsPost::onlyTrashed()
+                ->where('lang_id', $this->lang_id)
+                ->where('post_type', $this->post_type)
+                ->count(),
         ]);
     }
 
@@ -77,9 +88,6 @@ class PostController extends Controller
     {
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
         $authors = User::where('active', 1)->get(['id', 'name', 'username']);
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
-            $query->where('active', true)->orderBy('position');
-        }])->where('active', true)->get();
 
         $cpt = null;
         $defaultSchemaId = null;
@@ -108,7 +116,7 @@ class PostController extends Controller
             'status' => 'draft',
             'published_at' => now()->format('Y-m-d\TH:i'),
             'active' => true,
-            'term_ids' => [],
+            'tag_ids' => [],
         ];
 
         return Inertia::render('admin/posts/create', [
@@ -116,7 +124,7 @@ class PostController extends Controller
             'schema' => $schema,
             'schemas' => $schemas,
             'authors' => $authors,
-            'taxonomies' => $taxonomies,
+            'tags' => CmsTag::options(),
             'cpt' => $cpt,
         ]);
     }
@@ -133,9 +141,11 @@ class PostController extends Controller
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
             'featured_image' => 'nullable|string|max:500',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => ['integer', CmsTag::existsRule()],
         ]);
 
-        $post = new CmsPost($request->except('term_ids'));
+        $post = new CmsPost($request->except('tag_ids'));
         $post->post_type = $this->post_type;
         $post->lang_id = $this->lang_id;
 
@@ -145,10 +155,10 @@ class PostController extends Controller
 
         $post->save();
 
-        if ($request->has('term_ids')) {
-            $termIds = collect($request->input('term_ids'))->filter()->all();
-            $post->terms()->sync($termIds);
-        }
+        $post->tags()->sync($request->input('tag_ids', []));
+
+        // Tag counts change with the pivot sync, which fires no model events
+        FrontCache::flush();
 
         return redirect()->route('posts.index', [
             'lang_id' => $this->lang_id,
@@ -158,13 +168,10 @@ class PostController extends Controller
 
     public function edit($id, Request $request): Response
     {
-        $item = CmsPost::with(['terms'])->findOrFail($id);
+        $item = CmsPost::with(['tags'])->findOrFail($id);
 
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
         $authors = User::where('active', 1)->get(['id', 'name', 'username']);
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
-            $query->where('active', true)->orderBy('position');
-        }])->where('active', true)->get();
 
         $schemaId = $request->get('schema_id', $item->schema_id);
         $schema = $schemaId ? CmsSchema::find($schemaId) : null;
@@ -174,15 +181,14 @@ class PostController extends Controller
             $cpt = CmsPostType::where('slug', $this->post_type)->first();
         }
 
-        // Map terms to term_ids
-        $item->term_ids = $item->terms->pluck('id')->all();
+        $item->tag_ids = $item->tags->pluck('id')->all();
 
         return Inertia::render('admin/posts/edit', [
             'item' => $item,
             'schema' => $schema,
             'schemas' => $schemas,
             'authors' => $authors,
-            'taxonomies' => $taxonomies,
+            'tags' => CmsTag::options(),
             'cpt' => $cpt,
         ]);
     }
@@ -201,13 +207,15 @@ class PostController extends Controller
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
             'featured_image' => 'nullable|string|max:500',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => ['integer', CmsTag::existsRule()],
         ]);
 
         if (empty($request->slug)) {
             $post->slug = null;
         }
 
-        $post->update($request->except('term_ids', 'slug'));
+        $post->update($request->except('tag_ids', 'slug'));
 
         if (! empty($request->slug)) {
             $post->slug = $request->slug;
@@ -219,10 +227,10 @@ class PostController extends Controller
 
         $post->save();
 
-        if ($request->has('term_ids')) {
-            $termIds = collect($request->input('term_ids'))->filter()->all();
-            $post->terms()->sync($termIds);
-        }
+        $post->tags()->sync($request->input('tag_ids', []));
+
+        // Tag counts change with the pivot sync, which fires no model events
+        FrontCache::flush();
 
         return redirect()->route('posts.index', [
             'lang_id' => $this->lang_id,
@@ -230,6 +238,19 @@ class PostController extends Controller
         ]);
     }
 
+    /**
+     * Apply a bulk action (publish, draft, trash, restore, force_delete) to the selected posts.
+     */
+    public function bulk(Request $request): RedirectResponse
+    {
+        $this->applyBulkAction($request, CmsPost::class, 'posts');
+
+        return back();
+    }
+
+    /**
+     * Move the post to the trash.
+     */
     public function destroy($id): RedirectResponse
     {
         $post = CmsPost::findOrFail($id);

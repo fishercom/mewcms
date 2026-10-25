@@ -60,13 +60,13 @@ it('caches the shared public data after the first request', function (): void {
         ->assertOk()
         ->assertInertia(fn (Assert $page): Assert => $page
             ->has('navigation', 1)
-            ->has('allTaxonomies')
+            ->has('popularTags')
             ->has('recentArticles')
             ->has('menus')
             ->has('layout_settings')
         );
 
-    $sharedQueries = array_filter($queries, fn (string $sql): bool => str_contains($sql, 'cms_taxonomies') || str_contains($sql, 'cms_menus'));
+    $sharedQueries = array_filter($queries, fn (string $sql): bool => str_contains($sql, 'cms_menus'));
     expect($sharedQueries)->toBeEmpty();
 });
 

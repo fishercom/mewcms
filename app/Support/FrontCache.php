@@ -5,7 +5,8 @@ namespace App\Support;
 use App\Models\CmsArticle;
 use App\Models\CmsConfig;
 use App\Models\CmsMenu;
-use App\Models\CmsTaxonomy;
+use App\Models\CmsPost;
+use App\Models\CmsTag;
 use Closure;
 use Illuminate\Support\Facades\Cache;
 
@@ -19,25 +20,31 @@ class FrontCache
     private const KEYS = ['front.shared', 'front.menus', 'front.layout', 'front.sitemap'];
 
     /**
-     * Navigation, taxonomies and recent articles shared by the public templates.
+     * Navigation, popular tags and recent articles shared by the public templates.
      *
-     * @return array{navigation: array<int, mixed>, allTaxonomies: array<int, mixed>, recentArticles: array<int, mixed>}
+     * @return array{navigation: array<int, mixed>, popularTags: list<array{id: int, name: string, slug: string, count: int}>, recentArticles: array<int, mixed>}
      */
     public static function shared(): array
     {
-        return Cache::remember('front.shared', self::TTL, fn (): array => [
-            // Root navigation links (all active top-level pages)
-            'navigation' => CmsArticle::whereNull('parent_id')
-                ->where('active', 1)
+        return Cache::remember('front.shared', self::ttl(...), fn (): array => [
+            // Root navigation links (all published top-level pages)
+            'navigation' => CmsArticle::published()
+                ->whereNull('parent_id')
                 ->orderBy('position')
                 ->get(['id', 'title', 'slug'])
                 ->toArray(),
-            // Active taxonomies with active terms and their articles count
-            'allTaxonomies' => CmsTaxonomy::with(['terms' => function ($q): void {
-                $q->where('active', true)->orderBy('position')->withCount('articles');
-            }])->where('active', true)->get()->toArray(),
-            // Recent active articles (except home page)
-            'recentArticles' => CmsArticle::where('active', 1)
+            // Most used tags across published pages and posts
+            'popularTags' => CmsTag::where('active', true)
+                ->withPublishedCounts()
+                ->get()
+                ->map(fn (CmsTag $tag): array => [...$tag->only(['id', 'name', 'slug']), 'count' => $tag->articles_count + $tag->posts_count])
+                ->filter(fn (array $tag): bool => $tag['count'] > 0)
+                ->sortByDesc('count')
+                ->take(20)
+                ->values()
+                ->all(),
+            // Recent published articles (except home page)
+            'recentArticles' => CmsArticle::published()
                 ->where('slug', '!=', 'home-page')
                 ->latest()
                 ->take(5)
@@ -53,8 +60,12 @@ class FrontCache
      */
     public static function menus(): array
     {
-        return Cache::remember('front.menus', self::TTL, fn (): array => CmsMenu::with(['items' => function ($query): void {
-            $query->where('active', true)->orderBy('position')->with('article');
+        return Cache::remember('front.menus', self::ttl(...), fn (): array => CmsMenu::with(['items' => function ($query): void {
+            // Items pointing at a draft, scheduled or trashed page are hidden
+            $query->where('active', true)
+                ->where(fn ($query) => $query->whereNull('article_id')->orWhereHas('article', fn ($query) => $query->published()))
+                ->orderBy('position')
+                ->with('article');
         }])->where('active', true)->get()->toArray());
     }
 
@@ -75,7 +86,29 @@ class FrontCache
      */
     public static function sitemap(Closure $build): string
     {
-        return Cache::remember('front.sitemap', self::TTL, $build);
+        return Cache::remember('front.sitemap', self::ttl(...), $build);
+    }
+
+    /**
+     * Seconds to keep published content, cut short so scheduled pages and posts
+     * appear as soon as their publication date passes.
+     */
+    public static function ttl(): int
+    {
+        $next = collect([CmsArticle::class, CmsPost::class])
+            ->map(fn (string $model) => $model::query()
+                ->where('status', 'published')
+                ->where('active', true)
+                ->where('published_at', '>', now())
+                ->min('published_at'))
+            ->filter()
+            ->min();
+
+        if ($next === null) {
+            return self::TTL;
+        }
+
+        return max(1, min(self::TTL, (int) ceil(now()->diffInSeconds($next, true))));
     }
 
     public static function flush(): void

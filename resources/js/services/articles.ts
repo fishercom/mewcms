@@ -21,10 +21,10 @@ export const deleteArticle = (id: number) => {
     router.delete(route('articles.destroy', id), {
         preserveScroll: true,
         onBefore: () => {
-            return window.confirm('Esta seguro que desea eliminar este registro?');
+            return window.confirm('¿Mover esta página a la papelera?');
         },
-        onError: () => {
-            alert('Ocurrió un error al eliminar el registro.');
+        onError: (errors) => {
+            alert(Object.values(errors)[0] ?? 'Ocurrió un error al eliminar el registro.');
         },
     });
 };

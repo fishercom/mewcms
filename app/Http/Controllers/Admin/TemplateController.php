@@ -186,7 +186,7 @@ class TemplateController extends Controller
         }
 
         $baseName = basename($filename, '.tsx');
-        $coreTemplates = ['home', 'page', 'post', 'term-list'];
+        $coreTemplates = ['home', 'page', 'post'];
         if (in_array($baseName, $coreTemplates)) {
             return back()->withErrors(['error' => 'No se pueden eliminar las plantillas principales del sistema.']);
         }

@@ -1,3 +1,12 @@
+import {
+    BulkActionsBar,
+    RowCheckbox,
+    ScheduledBadge,
+    SelectAllCheckbox,
+    TrashRowActions,
+    TrashToggle,
+    useRowSelection,
+} from '@/components/content-bulk-actions';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
@@ -10,17 +19,21 @@ import { Calendar, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Index() {
-    const { items, cpt, post_type, lang_id } = usePage<{
+    const { items, cpt, post_type, lang_id, trash, trashCount } = usePage<{
         items: Pagination<CmsPost>;
         cpt: CmsPostType | null;
         post_type: string;
         lang_id: number;
+        trash: boolean;
+        trashCount: number;
     }>().props;
 
     const [filters, setFilters] = useState({
         s: '',
         status: '',
+        trash,
     });
+    const selection = useRowSelection(items.data.map((item) => item.id));
 
     useEffect(() => {
         router.get(
@@ -30,6 +43,7 @@ export default function Index() {
                 lang_id,
                 s: filters.s,
                 status: filters.status,
+                trash: filters.trash ? 1 : undefined,
             },
             {
                 preserveState: true,
@@ -46,12 +60,17 @@ export default function Index() {
         setFilters((prev) => ({ ...prev, status: e.target.value }));
     };
 
+    const handleTrashToggle = (showTrash: boolean) => {
+        selection.clear();
+        setFilters((prev) => ({ ...prev, trash: showTrash }));
+    };
+
     const handleDelete = (id: number, title: string) => {
-        if (window.confirm(`¿Estás seguro de que deseas eliminar "${title}"?`)) {
+        if (window.confirm(`¿Mover "${title}" a la papelera?`)) {
             router.delete(route('posts.destroy', id), {
                 data: { post_type, lang_id },
                 preserveScroll: true,
-                onError: () => alert('Ocurrió un error al eliminar la entrada.'),
+                onError: () => alert('Ocurrió un error al mover la entrada a la papelera.'),
             });
         }
     };
@@ -89,7 +108,8 @@ export default function Index() {
                         </select>
                     </div>
 
-                    <div className="flex w-full justify-end md:w-auto">
+                    <div className="flex w-full justify-end gap-2.5 md:w-auto">
+                        <TrashToggle trash={filters.trash} count={trashCount} onChange={handleTrashToggle} />
                         <Button
                             asChild
                             className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
@@ -102,24 +122,31 @@ export default function Index() {
                     </div>
                 </div>
 
+                <div className="pb-4">
+                    <BulkActionsBar routeName="posts.bulk" selected={selection.selected} trash={filters.trash} onClear={selection.clear} />
+                </div>
+
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                         <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
                             <tr>
-                                <th scope="col" className="rounded-l-md px-4 py-3">
+                                <th scope="col" className="w-10 rounded-l-md py-3 pl-4">
+                                    <SelectAllCheckbox state={selection.allState} onToggle={selection.toggleAll} />
+                                </th>
+                                <th scope="col" className="px-4 py-3">
                                     Título
                                 </th>
                                 <th scope="col" className="px-4 py-3">
                                     Autor
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Taxonomías / Términos
+                                    Etiquetas
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
                                     Estado
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Fecha Publicación
+                                    {filters.trash ? 'Eliminado' : 'Fecha Publicación'}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -128,6 +155,13 @@ export default function Index() {
                             {items.data.length > 0 ? (
                                 items.data.map((item: CmsPost) => (
                                     <tr key={item.id} className="border-b hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-800/20">
+                                        <td className="py-3 pl-4">
+                                            <RowCheckbox
+                                                checked={selection.isSelected(item.id)}
+                                                onToggle={() => selection.toggle(item.id)}
+                                                label={item.title}
+                                            />
+                                        </td>
                                         <td className="px-4 py-3">
                                             <div className="font-semibold text-gray-900 dark:text-white">
                                                 <Link
@@ -143,9 +177,9 @@ export default function Index() {
                                             {item.user ? item.user.name : <span className="text-xs text-zinc-400 italic">Desconocido</span>}
                                         </td>
                                         <td className="max-w-xs px-4 py-3">
-                                            {item.terms && item.terms.length > 0 ? (
+                                            {item.tags && item.tags.length > 0 ? (
                                                 <div className="flex flex-wrap gap-1.5">
-                                                    {item.terms.map((t) => (
+                                                    {item.tags.map((t) => (
                                                         <span
                                                             key={t.id}
                                                             className="inline-flex items-center rounded bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-800 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300"
@@ -159,7 +193,9 @@ export default function Index() {
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-center">
-                                            {item.status === 'published' ? (
+                                            {item.is_scheduled ? (
+                                                <ScheduledBadge date={item.published_at} />
+                                            ) : item.status === 'published' ? (
                                                 <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
                                                     Publicado
                                                 </span>
@@ -172,38 +208,47 @@ export default function Index() {
                                         <td className="px-4 py-3 text-center whitespace-nowrap text-zinc-500">
                                             <div className="flex items-center justify-center gap-1 text-xs">
                                                 <Calendar className="h-3.5 w-3.5 text-zinc-400" />
-                                                <span>{format(new Date(item.published_at), 'dd/MM/yyyy HH:mm')}</span>
+                                                <span>
+                                                    {format(
+                                                        new Date((filters.trash ? item.deleted_at : item.published_at) ?? item.created_at),
+                                                        'dd/MM/yyyy HH:mm',
+                                                    )}
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-4 py-3 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="flex h-8 items-center gap-1 px-2.5"
-                                                    onClick={() =>
-                                                        router.visit(`/admin/posts/${item.id}/edit?post_type=${post_type}&lang_id=${lang_id}`)
-                                                    }
-                                                >
-                                                    <Edit className="h-3.5 w-3.5" />
-                                                    <span>Editar</span>
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
-                                                    onClick={() => handleDelete(item.id, item.title)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                            {filters.trash ? (
+                                                <TrashRowActions routeName="posts.bulk" id={item.id} />
+                                            ) : (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="flex h-8 items-center gap-1 px-2.5"
+                                                        onClick={() =>
+                                                            router.visit(`/admin/posts/${item.id}/edit?post_type=${post_type}&lang_id=${lang_id}`)
+                                                        }
+                                                    >
+                                                        <Edit className="h-3.5 w-3.5" />
+                                                        <span>Editar</span>
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                                                        onClick={() => handleDelete(item.id, item.title)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-zinc-400 italic">
-                                        No se encontraron entradas de {pluralName.toLowerCase()}.
+                                    <td colSpan={7} className="px-4 py-8 text-center text-zinc-400 italic">
+                                        {filters.trash ? 'La papelera está vacía.' : `No se encontraron entradas de ${pluralName.toLowerCase()}.`}
                                     </td>
                                 </tr>
                             )}
