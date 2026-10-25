@@ -58,7 +58,7 @@ class NotifyController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsNotify::find($id);
+        $item = CmsNotify::findOrFail($id);
         $forms = CmsForm::all();
         $users = User::all();
 
@@ -86,7 +86,7 @@ class NotifyController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsNotify::find($id);
+        $item = CmsNotify::findOrFail($id);
         $item->delete();
 
         return redirect('admin/notifies');

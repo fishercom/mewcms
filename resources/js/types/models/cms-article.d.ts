@@ -17,6 +17,9 @@ export interface CmsArticle {
     excerpt?: string | null;
     featured_image?: string | null;
     status?: string | null;
+    published_at?: string | null;
+    is_scheduled?: boolean;
+    deleted_at?: string | null;
     metadata: Record<string, unknown>;
     slug: string;
     active: boolean;
@@ -26,7 +29,7 @@ export interface CmsArticle {
     schema?: import('./cms-schema').CmsSchema;
     parent?: CmsArticle | null;
     children?: CmsArticle[];
-    terms?: import('./cms-taxonomy').CmsTaxonomyTerm[];
+    tags?: import('./cms-tag').CmsTag[];
 }
 
 export interface CmsArticleForm {
@@ -39,9 +42,10 @@ export interface CmsArticleForm {
     excerpt?: string | null;
     featured_image?: string | null;
     status?: string | null;
+    published_at?: string | null;
     metadata: { [key: string]: FormDataConvertible };
     slug: string;
     active: boolean;
-    term_ids?: number[];
+    tag_ids?: number[];
     [key: string]: FormDataConvertible;
 }

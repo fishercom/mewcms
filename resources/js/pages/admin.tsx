@@ -9,7 +9,7 @@ interface DashboardProps {
     stats: {
         total_articles: number;
         active_articles: number;
-        total_terms: number;
+        total_tags: number;
         total_messages: number;
         unreviewed_messages: number;
         file_count: number;
@@ -170,17 +170,17 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Card 2: Taxonomy Terms */}
+                    {/* Card 2: Tags */}
                     <div className="group relative rounded-xl border border-border/70 bg-card p-5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-500/30 hover:shadow-md">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Taxonomías</span>
+                            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Etiquetas</span>
                             <div className="rounded-xl bg-amber-500/10 p-2.5 text-amber-600 dark:text-amber-400 transition-transform group-hover:scale-110">
                                 <Tags className="h-5 w-5" />
                             </div>
                         </div>
                         <div className="mt-4 space-y-1">
-                            <h3 className="text-3xl font-bold tracking-tight text-foreground">{stats.total_terms}</h3>
-                            <p className="text-xs font-medium text-muted-foreground">Términos Registrados</p>
+                            <h3 className="text-3xl font-bold tracking-tight text-foreground">{stats.total_tags}</h3>
+                            <p className="text-xs font-medium text-muted-foreground">Etiquetas registradas</p>
                             <div className="pt-2">
                                 <span className="inline-flex items-center rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300">
                                     Categorías & Etiquetas
@@ -471,16 +471,16 @@ export default function Dashboard() {
                                 <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                             </Link>
 
-                            {/* Action 2: Taxonomies */}
+                            {/* Action 2: Tags */}
                             <Link
-                                href="/admin/taxonomies"
+                                href="/admin/tags"
                                 className="group flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3.5 transition-all hover:border-amber-500/30 hover:bg-amber-500/5 dark:hover:bg-amber-950/20"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400 transition-transform group-hover:scale-105">
                                         <Tags className="h-4.5 w-4.5" />
                                     </div>
-                                    <span className="text-xs font-semibold text-foreground">Taxonomías</span>
+                                    <span className="text-xs font-semibold text-foreground">Etiquetas</span>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                             </Link>

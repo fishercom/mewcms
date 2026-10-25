@@ -133,9 +133,9 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'menu_id' => $menuContent->id,
-                'name' => 'Taxonomías',
-                'url' => '/admin/taxonomies',
-                'route' => 'taxonomies.index',
+                'name' => 'Etiquetas',
+                'url' => '/admin/tags',
+                'route' => 'tags.index',
                 'icon' => 'tags',
                 'position' => 3,
                 'visible' => true,

@@ -22,7 +22,7 @@ test('authenticated users can visit the dashboard and receive dashboard metrics'
         ->has('stats')
         ->has('stats.total_articles')
         ->has('stats.active_articles')
-        ->has('stats.total_terms')
+        ->has('stats.total_tags')
         ->has('stats.total_messages')
         ->has('stats.unreviewed_messages')
         ->has('stats.file_count')

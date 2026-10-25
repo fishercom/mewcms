@@ -24,3 +24,4 @@ yarn-error.log
 /.zed
 /.npm-cache
 
+.DS_Store

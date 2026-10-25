@@ -50,7 +50,7 @@ class TranslateController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsTranslate::find($id);
+        $item = CmsTranslate::findOrFail($id);
 
         return Inertia::render('admin/translates/edit', [
             'item' => $item,
@@ -74,7 +74,7 @@ class TranslateController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsTranslate::find($id);
+        $item = CmsTranslate::findOrFail($id);
         $item->delete();
 
         return redirect('admin/translates');

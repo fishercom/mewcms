@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use App\Models\Concerns\FlushesFrontCache;
+use App\Models\Concerns\HasPublishing;
 use App\Models\Concerns\LogsAdminActivity;
 use App\Support\ContentSanitizer;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Rutorika\Sortable\SortableTrait;
 
 class CmsArticle extends Model
 {
     use FlushesFrontCache;
+    use HasPublishing;
     use LogsAdminActivity;
 
     /**
@@ -21,11 +24,12 @@ class CmsArticle extends Model
      */
     use Sluggable;
 
+    use SoftDeletes;
     use SortableTrait;
 
     protected $table = 'cms_articles';
 
-    protected $fillable = ['schema_id', 'parent_id', 'lang_id', 'title', 'content', 'excerpt', 'featured_image', 'status', 'metadata', 'slug', 'active'];
+    protected $fillable = ['schema_id', 'parent_id', 'lang_id', 'title', 'content', 'excerpt', 'featured_image', 'status', 'published_at', 'metadata', 'slug', 'active'];
 
     protected static $sortableField = 'position';
 
@@ -42,6 +46,10 @@ class CmsArticle extends Model
     protected static function booted(): void
     {
         static::saving(function (self $model): void {
+            // Pages have always treated an empty status as published
+            if (blank($model->status)) {
+                $model->status = self::STATUS_PUBLISHED;
+            }
             if ($model->isDirty('content')) {
                 $model->content = ContentSanitizer::html($model->content);
             }
@@ -56,6 +64,8 @@ class CmsArticle extends Model
         return [
             'slug' => [
                 'source' => 'ParentSlug',
+                // Trashed pages keep their slug so they can be restored without clashes
+                'includeTrashed' => true,
             ],
         ];
     }
@@ -131,9 +141,9 @@ class CmsArticle extends Model
             ->orderBy('position');
     }
 
-    public function terms()
+    public function tags()
     {
-        return $this->belongsToMany(CmsTaxonomyTerm::class, 'cms_article_term', 'article_id', 'term_id');
+        return $this->belongsToMany(CmsTag::class, 'cms_article_term', 'article_id', 'term_id')->orderBy('name');
     }
 
     public function getAllDescendantIds(): array

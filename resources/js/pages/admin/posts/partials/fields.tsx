@@ -1,27 +1,27 @@
+import TagField from '@/components/tag-field';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CmsPost } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
-import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { CmsTag } from '@/types/models/cms-tag';
 import { Calendar, Eye, Image as ImageIcon, Settings, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
 
 interface Props {
-    data: Partial<CmsPost> & { term_ids?: number[] };
+    data: Partial<CmsPost> & { tag_ids?: number[] };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setData: (data: any) => void;
     errors: Record<string, string>;
     processing: boolean;
     schemas: CmsSchema[];
     authors: { id: number; name: string; username: string }[];
-    taxonomies: CmsTaxonomy[];
+    tags: CmsTag[];
     schema: CmsSchema | null;
     onChangeSchema: (schemaId: number) => void;
     cptLabelSingular: string;
@@ -34,7 +34,7 @@ export default function PostFields({
     processing,
     schemas,
     authors,
-    taxonomies,
+    tags,
     schema,
     onChangeSchema,
     cptLabelSingular,
@@ -213,6 +213,7 @@ export default function PostFields({
                             onChange={handlePublishedAtChange}
                             disabled={processing}
                         />
+                        <p className="text-[11px] text-zinc-500">Una fecha futura programa la entrada.</p>
                         <InputError message={errors.published_at} />
                     </div>
 
@@ -297,60 +298,12 @@ export default function PostFields({
                     <InputError message={errors.featured_image} />
                 </div>
 
-                {/* Taxonomies Terms selectors */}
-                {taxonomies && taxonomies.length > 0 && (
-                    <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#161615]/20">
-                        <h3 className="border-b border-zinc-100 pb-2 text-sm font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-                            Categorías / Etiquetas
-                        </h3>
-
-                        <div className="max-h-[300px] space-y-4 overflow-y-auto pr-1">
-                            {taxonomies.map((taxonomy) => (
-                                <div
-                                    key={taxonomy.id}
-                                    className="space-y-2 border-b border-zinc-100 pb-3 last:border-b-0 last:pb-0 dark:border-zinc-800"
-                                >
-                                    <Label className="text-xs font-bold tracking-wider text-zinc-400 uppercase">{taxonomy.name}</Label>
-                                    <div className="space-y-1.5">
-                                        {taxonomy.terms && taxonomy.terms.length > 0 ? (
-                                            taxonomy.terms.map((term) => {
-                                                const isChecked = data.term_ids?.includes(term.id) || false;
-                                                return (
-                                                    <div
-                                                        key={term.id}
-                                                        style={{ paddingLeft: term.parent_id ? '1rem' : '0' }}
-                                                        className="flex items-center space-x-2.5"
-                                                    >
-                                                        <Checkbox
-                                                            id={`term-${term.id}`}
-                                                            checked={isChecked}
-                                                            onClick={() => {
-                                                                const termIds = data.term_ids || [];
-                                                                const next = isChecked
-                                                                    ? termIds.filter((id) => id !== term.id)
-                                                                    : [...termIds, term.id];
-                                                                setData({ ...data, term_ids: next });
-                                                            }}
-                                                        />
-                                                        <Label
-                                                            htmlFor={`term-${term.id}`}
-                                                            className="cursor-pointer text-xs font-normal text-zinc-600 dark:text-zinc-400"
-                                                        >
-                                                            {term.parent_id && <span className="mr-1 text-zinc-400">—</span>}
-                                                            {term.name}
-                                                        </Label>
-                                                    </div>
-                                                );
-                                            })
-                                        ) : (
-                                            <div className="text-[10px] text-zinc-400 italic">No hay términos registrados</div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                {/* Tags */}
+                <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#161615]/20">
+                    <h3 className="border-b border-zinc-100 pb-2 text-sm font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">Etiquetas</h3>
+                    <TagField tags={tags} selected={data.tag_ids || []} onChange={(tagIds) => setData({ ...data, tag_ids: tagIds })} />
+                    <InputError message={errors.tag_ids} />
+                </div>
             </div>
 
             {/* Media Drawer for selecting Featured Image */}

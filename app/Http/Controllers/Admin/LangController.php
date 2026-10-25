@@ -50,7 +50,7 @@ class LangController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsLang::find($id);
+        $item = CmsLang::findOrFail($id);
 
         return Inertia::render('admin/langs/edit', [
             'item' => $item,
@@ -74,7 +74,7 @@ class LangController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsLang::find($id);
+        $item = CmsLang::findOrFail($id);
         $item->delete();
 
         return redirect('admin/langs');

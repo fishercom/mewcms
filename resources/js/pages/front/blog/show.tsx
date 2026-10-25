@@ -1,7 +1,8 @@
 import ContentRenderer from '@/components/content-renderer';
+import { tagUrl } from '@/lib/tag-url';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
-import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { PopularTag } from '../components/sidebar';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { ArrowLeft, Calendar, Settings, Tag, User } from 'lucide-react';
@@ -12,19 +13,15 @@ interface Props {
     post: CmsPost;
     cpt: CmsPostType | null;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    allTaxonomies?: CmsTaxonomy[];
+    popularTags?: PopularTag[];
     recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-export default function Show({ post, cpt, navigation, allTaxonomies = [], recentArticles = [] }: Props) {
+export default function Show({ post, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
     const parentLabel = cpt ? cpt.name : 'Blog';
     const parentUrl = cpt ? `/${cpt.slug}` : '/blog';
 
-    // Separate categories and tags
-    const categoryTerms =
-        post.terms?.filter((term) => ['categorias', 'categories', 'category'].includes(term.taxonomy?.slug?.toLowerCase() || '')) || [];
-
-    const tagTerms = post.terms?.filter((term) => ['tags', 'etiquetas', 'tag'].includes(term.taxonomy?.slug?.toLowerCase() || '')) || [];
+    const tags = post.tags ?? [];
 
     // Filter out standard fields from custom metadata keys to print remaining fields cleanly
     const metadataEntries = Object.entries(post.metadata || {}).filter(
@@ -50,20 +47,6 @@ export default function Show({ post, cpt, navigation, allTaxonomies = [], recent
                 {/* Main Content Article */}
                 <article className="space-y-6 lg:col-span-8">
                     <div className="space-y-4">
-                        {/* Categories badges */}
-                        {categoryTerms.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                {categoryTerms.map((term) => (
-                                    <Link
-                                        key={term.id}
-                                        href={`/category/${term.slug}`}
-                                        className="text-xs font-semibold tracking-wider text-red-600 uppercase transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                    >
-                                        {term.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
 
                         <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-zinc-900 capitalize sm:text-5xl dark:text-white">
                             {post.title}
@@ -132,17 +115,17 @@ export default function Show({ post, cpt, navigation, allTaxonomies = [], recent
                     )}
 
                     {/* Tags section */}
-                    {tagTerms.length > 0 && (
+                    {tags.length > 0 && (
                         <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
                             <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
                                 <Tag className="h-3.5 w-3.5 text-red-600 dark:text-red-500" />
                                 <span>Etiquetas</span>
                             </h4>
                             <div className="flex flex-wrap gap-2">
-                                {tagTerms.map((term) => (
+                                {tags.map((term) => (
                                     <Link
                                         key={term.id}
-                                        href={`/tag/${term.slug}`}
+                                        href={tagUrl(term.slug)}
                                         className="inline-flex items-center rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs text-zinc-600 transition-colors hover:bg-red-50/20 hover:text-red-600 dark:border-zinc-800 dark:bg-[#161615]/40 dark:text-zinc-400 dark:hover:text-red-400"
                                     >
                                         #{term.name}
@@ -155,7 +138,7 @@ export default function Show({ post, cpt, navigation, allTaxonomies = [], recent
 
                 {/* Sidebar Column */}
                 <div className="lg:col-span-4">
-                    <FrontSidebar allTaxonomies={allTaxonomies} recentArticles={recentArticles} />
+                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
                 </div>
             </div>
         </FrontLayout>
