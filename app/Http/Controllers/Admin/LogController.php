@@ -3,92 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdmEvent;
 use App\Models\AdmLog;
-use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class LogController extends Controller
 {
     /**
-     * Show the user's log settings page.
+     * List audit log entries (read-only).
      */
     public function index(Request $request): Response
     {
         $s = $request->get('s');
 
-        $items = AdmLog::select()
-            ->where(function ($query) use ($s): void {
-                if (! empty($s)) {
-                    $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
-                }
+        $items = AdmLog::with('user:id,name')
+            ->when(! empty($s), function ($query) use ($s): void {
+                $query->where('comment', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
             })
-            ->paginate(15);
+            ->latest('id')
+            ->paginate(15)
+            ->withQueryString();
 
         return Inertia::render('admin/logs/index', [
             'items' => $items,
         ]);
-    }
-
-    public function create()
-    {
-        $events = AdmEvent::with('action')->get();
-        $users = User::all();
-
-        return Inertia::render('admin/logs/create', [
-            'events' => $events,
-            'users' => $users,
-        ]);
-    }
-
-    public function store(Request $request): Redirector|RedirectResponse
-    {
-        $log = new AdmLog($request->all());
-        $log->save();
-
-        return redirect('admin/logs');
-    }
-
-    /**
-     * Show the user's log settings page.
-     */
-    public function edit($id, Request $request): Response
-    {
-        $item = AdmLog::find($id);
-        $events = AdmEvent::with('action')->get();
-        $users = User::all();
-
-        return Inertia::render('admin/logs/edit', [
-            'item' => $item,
-            'events' => $events,
-            'users' => $users,
-        ]);
-    }
-
-    /**
-     * Update the user's log settings.
-     */
-    public function update($id, Request $request): RedirectResponse
-    {
-        $item = AdmLog::find($id);
-        $item->fill($request->all());
-        $item->save();
-
-        return redirect('admin/logs');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy($id, Request $request): RedirectResponse
-    {
-        $item = AdmLog::find($id);
-        $item->delete();
-
-        return redirect('admin/logs');
     }
 }

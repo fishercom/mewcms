@@ -44,7 +44,7 @@ class SiteController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $site = new CmsSite($request->all());
+        $site = new CmsSite($this->validatedData($request));
         $site->save();
 
         return redirect('admin/sites');
@@ -69,8 +69,8 @@ class SiteController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsSite::find($id);
-        $item->fill($request->all());
+        $item = CmsSite::findOrFail($id);
+        $item->fill($this->validatedData($request));
         $item->save();
 
         return redirect('admin/sites');
@@ -85,5 +85,21 @@ class SiteController extends Controller
         $item->delete();
 
         return redirect('admin/sites');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'segment' => 'nullable|string|max:255',
+            'site_url' => 'nullable|string|max:255',
+            'schema_group_id' => 'nullable|integer|exists:cms_schema_groups,id',
+            'metadata' => 'nullable|array',
+            'default' => 'nullable|boolean',
+            'active' => 'nullable|boolean',
+        ]);
     }
 }

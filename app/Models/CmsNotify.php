@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsNotify extends Model
 {
+    use LogsAdminActivity;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -18,5 +21,10 @@ class CmsNotify extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'notifies';
     }
 }

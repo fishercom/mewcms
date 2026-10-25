@@ -39,7 +39,7 @@ class LangController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $lang = new CmsLang($request->all());
+        $lang = new CmsLang($this->validatedData($request));
         $lang->save();
 
         return redirect('admin/langs');
@@ -62,8 +62,8 @@ class LangController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsLang::find($id);
-        $item->fill($request->all());
+        $item = CmsLang::findOrFail($id);
+        $item->fill($this->validatedData($request));
         $item->save();
 
         return redirect('admin/langs');
@@ -78,5 +78,17 @@ class LangController extends Controller
         $item->delete();
 
         return redirect('admin/langs');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'iso' => 'required|string|max:5',
+            'active' => 'nullable|boolean',
+        ]);
     }
 }

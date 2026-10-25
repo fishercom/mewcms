@@ -45,4 +45,24 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user is a super administrator.
+     */
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'profile_id' => Profile::factory()->superAdmin()->create()->id,
+        ]);
+    }
+
+    /**
+     * Indicate that the user has no admin profile, like a self-registered user.
+     */
+    public function withoutProfile(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'profile_id' => null,
+        ]);
+    }
 }

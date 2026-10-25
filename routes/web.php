@@ -3,14 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use UniSharp\LaravelFilemanager\Lfm;
 
-Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function (): void {
+Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth', 'admin.permission:media']], function (): void {
     Lfm::routes();
 });
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FrontController;
 
-Route::middleware(['auth', 'verified'])->group(function (): void {
+Route::middleware(['auth', 'verified', 'admin.access'])->group(function (): void {
     Route::get('admin', [DashboardController::class, 'index'])->name('admin');
 });
 
@@ -31,7 +31,9 @@ Route::get('blog/{slug}', [FrontController::class, 'blogShow'])->name('front.blo
 
 // Public form submission API
 Route::get('api/forms/{alias}', [FrontController::class, 'getFormConfig'])->name('front.forms.config');
-Route::post('api/forms/submit', [FrontController::class, 'publicFormSubmit'])->name('front.forms.submit');
+Route::post('api/forms/submit', [FrontController::class, 'publicFormSubmit'])
+    ->middleware('throttle:form-submissions')
+    ->name('front.forms.submit');
 
 // Public search route
 Route::get('search', [FrontController::class, 'search'])->name('front.search');

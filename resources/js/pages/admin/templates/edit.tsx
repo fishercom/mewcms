@@ -12,11 +12,12 @@ interface EditProps {
     filename: string;
     name: string;
     content: string;
+    canEdit: boolean;
     [key: string]: unknown;
 }
 
 export default function Edit() {
-    const { filename, name: initialName, content: initialContent } = usePage<EditProps>().props;
+    const { filename, name: initialName, content: initialContent, canEdit } = usePage<EditProps>().props;
 
     const [name, setName] = useState(initialName);
     const [content, setContent] = useState(initialContent);
@@ -58,6 +59,12 @@ export default function Edit() {
         <ModuleLayout view="Editar">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {!canEdit && (
+                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400">
+                            El editor de plantillas está deshabilitado. Solo un super administrador puede guardar cambios cuando CMS_TEMPLATE_EDITOR
+                            está activo.
+                        </div>
+                    )}
                     <div className="grid gap-2">
                         <Label htmlFor="name">Nombre de la Plantilla</Label>
                         <Input
@@ -106,7 +113,10 @@ export default function Edit() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing} className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600">
+                        <Button
+                            disabled={processing || !canEdit}
+                            className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                        >
                             {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
                         <Link href="/admin/templates" className="text-sm text-gray-500 hover:underline">

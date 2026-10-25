@@ -45,11 +45,12 @@ class ProfileController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $profile = new Profile($request->all());
+        $data = $this->validatedData($request);
+        $profile = new Profile($data);
         $profile->save();
 
-        if ($request->has('permissions')) {
-            foreach ($request->input('permissions') as $event_id) {
+        if (! empty($data['permissions'])) {
+            foreach ($data['permissions'] as $event_id) {
                 AdmPermission::create([
                     'profile_id' => $profile->id,
                     'event_id' => $event_id,
@@ -80,14 +81,16 @@ class ProfileController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = Profile::find($id);
-        $item->fill($request->all());
+        $item = Profile::findOrFail($id);
+        $this->authorizeProfileChange($request, $item);
+        $data = $this->validatedData($request);
+        $item->fill($data);
         $item->save();
 
         AdmPermission::where('profile_id', $id)->delete();
 
-        if ($request->has('permissions')) {
-            foreach ($request->input('permissions') as $event_id) {
+        if (! empty($data['permissions'])) {
+            foreach ($data['permissions'] as $event_id) {
                 AdmPermission::create([
                     'profile_id' => $id,
                     'event_id' => $event_id,
@@ -103,9 +106,31 @@ class ProfileController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = Profile::find($id);
+        $item = Profile::findOrFail($id);
+        $this->authorizeProfileChange($request, $item);
         $item->delete();
 
         return redirect('admin/profiles');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'active' => 'nullable|boolean',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'integer|exists:adm_events,id',
+        ]);
+    }
+
+    /**
+     * Only super administrators may change a super administrator profile.
+     */
+    protected function authorizeProfileChange(Request $request, Profile $profile): void
+    {
+        abort_if($profile->sa && ! $request->user()->isSuperAdmin(), 403);
     }
 }

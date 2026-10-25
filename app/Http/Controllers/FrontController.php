@@ -376,6 +376,14 @@ class FrontController extends Controller
             ->where('active', 1)
             ->firstOrFail();
 
+        // A filled honeypot means a bot: pretend success without storing anything
+        if (filled($request->input('_hp'))) {
+            return response()->json([
+                'success' => true,
+                'message' => '¡Formulario enviado con éxito!',
+            ]);
+        }
+
         $validationRules = [];
         foreach ($form->fields as $field) {
             if (! $field->active) {
@@ -384,6 +392,14 @@ class FrontController extends Controller
             $rule = ['required'];
             if ($field->type === 'email') {
                 $rule[] = 'email';
+                $rule[] = 'max:255';
+            } elseif ($field->type === 'checkbox') {
+                $rule[] = 'array';
+                $rule[] = 'max:50';
+                $validationRules[$field->alias.'.*'] = ['string', 'max:255'];
+            } else {
+                $rule[] = 'string';
+                $rule[] = 'max:5000';
             }
             $validationRules[$field->alias] = $rule;
         }
@@ -426,10 +442,10 @@ class FrontController extends Controller
 
         $register = CmsRegister::create([
             'form_id' => $form->id,
-            'name' => $nameVal,
-            'email' => $emailVal,
-            'phone' => $phoneVal,
-            'message' => $msgVal,
+            'name' => Str::limit((string) $nameVal, 255, ''),
+            'email' => Str::limit((string) $emailVal, 255, ''),
+            'phone' => Str::limit((string) $phoneVal, 50, ''),
+            'message' => Str::limit((string) $msgVal, 5000, ''),
             'acceptance' => true,
         ]);
 

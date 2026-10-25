@@ -12,7 +12,7 @@ test('guests are redirected to the login page', function (): void {
 });
 
 test('authenticated users can visit the dashboard and receive dashboard metrics', function (): void {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = User::factory()->superAdmin()->create());
 
     $response = $this->get('/admin');
 

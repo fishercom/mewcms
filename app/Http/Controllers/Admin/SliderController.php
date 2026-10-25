@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsSlide;
 use App\Models\CmsSlider;
+use App\Rules\SafeUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,7 +54,7 @@ class SliderController extends Controller
             'settings' => 'array',
         ]);
 
-        CmsSlider::create($request->all());
+        CmsSlider::create($request->only(['name', 'key', 'description', 'settings']));
 
         return redirect()->route('sliders.index');
     }
@@ -87,7 +88,7 @@ class SliderController extends Controller
             'slides.*.title' => 'nullable|string',
             'slides.*.caption' => 'nullable|string',
             'slides.*.image_url' => 'required|string',
-            'slides.*.link_url' => 'nullable|string',
+            'slides.*.link_url' => ['nullable', 'string', new SafeUrl],
             'slides.*.active' => 'boolean',
         ]);
 
@@ -101,7 +102,7 @@ class SliderController extends Controller
         foreach ($slidesData as $index => $slideData) {
             if (! empty($slideData['id']) && is_numeric($slideData['id'])) {
                 // Update existing
-                $slide = CmsSlide::findOrFail($slideData['id']);
+                $slide = $slider->slides()->findOrFail($slideData['id']);
                 $slide->update([
                     'title' => $slideData['title'] ?? null,
                     'caption' => $slideData['caption'] ?? null,

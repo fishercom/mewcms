@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsMenuItem extends Model
 {
+    use LogsAdminActivity;
+
     protected $table = 'cms_menu_items';
 
     protected $fillable = ['menu_id', 'parent_id', 'title', 'url', 'article_id', 'target', 'position', 'active'];
@@ -55,5 +58,10 @@ class CmsMenuItem extends Model
         }
 
         return $this->url;
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'menus';
     }
 }

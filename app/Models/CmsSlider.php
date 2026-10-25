@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsSlider extends Model
 {
+    use LogsAdminActivity;
+
     protected $table = 'cms_sliders';
 
     protected $fillable = ['name', 'key', 'description', 'settings'];
@@ -29,5 +32,10 @@ class CmsSlider extends Model
                 $query->where('active', true)->orderBy('position');
             }])
             ->first();
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'sliders';
     }
 }

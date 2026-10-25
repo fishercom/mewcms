@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
 
 class CmsTaxonomyTerm extends Model
 {
+    use LogsAdminActivity;
     use Sluggable;
     use SortableTrait;
 
@@ -50,5 +52,10 @@ class CmsTaxonomyTerm extends Model
     public function articles()
     {
         return $this->belongsToMany(CmsArticle::class, 'cms_article_term', 'term_id', 'article_id');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'taxonomies';
     }
 }

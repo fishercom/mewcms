@@ -106,7 +106,7 @@ return [
 
     'alphanumeric_directory' => false,
 
-    'should_validate_size' => false,
+    'should_validate_size' => true,
 
     'should_validate_mime' => true,
 
@@ -116,10 +116,19 @@ return [
     'over_write_on_duplicate' => false,
 
     // mimetypes of executables to prevent from uploading
-    'disallowed_mimetypes' => ['text/x-php', 'text/html', 'text/plain'],
+    'disallowed_mimetypes' => [
+        'text/x-php',
+        'application/x-php',
+        'application/x-httpd-php',
+        'text/html',
+        'application/xhtml+xml',
+        'image/svg+xml',
+        'text/javascript',
+        'application/javascript',
+    ],
 
     // extensions of executables to prevent from uploading
-    'disallowed_extensions' => ['php', 'html'],
+    'disallowed_extensions' => ['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar', 'html', 'htm', 'xhtml', 'shtml', 'svg', 'svgz', 'js', 'mjs', 'htaccess'],
 
     // Item Columns
     'item_columns' => ['name', 'url', 'time', 'icon', 'is_file', 'is_image', 'thumb_url'],

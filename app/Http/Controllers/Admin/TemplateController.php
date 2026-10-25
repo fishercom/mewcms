@@ -12,6 +12,11 @@ use Inertia\Response;
 class TemplateController extends Controller
 {
     /**
+     * Template names are written into a code comment, so they may not close it.
+     */
+    protected const NAME_PATTERN = '/^[^\r\n*\/]+$/';
+
+    /**
      * List all templates inside the templates directory.
      */
     public function index(Request $request): Response
@@ -20,14 +25,17 @@ class TemplateController extends Controller
 
         return Inertia::render('admin/templates/index', [
             'items' => $templates,
+            'canEdit' => $this->editorEnabled($request),
         ]);
     }
 
     /**
      * Show the template creation form.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        $this->ensureEditorEnabled($request);
+
         // Default React boilerplate code for a new MewCMS template
         $defaultBoilerplate = "import React from 'react';\n"
             ."import FrontLayout from '../layout';\n"
@@ -61,8 +69,10 @@ class TemplateController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->ensureEditorEnabled($request);
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', 'regex:'.self::NAME_PATTERN],
             'filename' => 'required|string|max:255|regex:/^[a-zA-Z0-9_-]+$/',
             'content' => 'required|string',
         ]);
@@ -101,7 +111,7 @@ class TemplateController extends Controller
     /**
      * Show the template editing form.
      */
-    public function edit(string $filename): Response
+    public function edit(string $filename, Request $request): Response
     {
         [$filePath, $filename] = $this->getSafeFilePath($filename);
 
@@ -124,6 +134,7 @@ class TemplateController extends Controller
             'filename' => basename($filename, '.tsx'),
             'name' => $templateName,
             'content' => $content,
+            'canEdit' => $this->editorEnabled($request),
         ]);
     }
 
@@ -132,6 +143,8 @@ class TemplateController extends Controller
      */
     public function update(string $filename, Request $request): RedirectResponse
     {
+        $this->ensureEditorEnabled($request);
+
         [$filePath, $filename] = $this->getSafeFilePath($filename);
 
         if (! file_exists($filePath)) {
@@ -139,7 +152,7 @@ class TemplateController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', 'regex:'.self::NAME_PATTERN],
             'content' => 'required|string',
         ]);
 
@@ -162,8 +175,10 @@ class TemplateController extends Controller
     /**
      * Delete a template file.
      */
-    public function destroy(string $filename): RedirectResponse
+    public function destroy(string $filename, Request $request): RedirectResponse
     {
+        $this->ensureEditorEnabled($request);
+
         [$filePath, $filename] = $this->getSafeFilePath($filename);
 
         if (! file_exists($filePath)) {
@@ -212,5 +227,19 @@ class TemplateController extends Controller
         }
 
         return [$filePath, $filename];
+    }
+
+    /**
+     * Writing template files puts executable code into the front-end build, so it
+     * is limited to super administrators and must be enabled in config/cms.php.
+     */
+    protected function editorEnabled(Request $request): bool
+    {
+        return config('cms.template_editor') && $request->user()?->isSuperAdmin();
+    }
+
+    protected function ensureEditorEnabled(Request $request): void
+    {
+        abort_unless($this->editorEnabled($request), 403, 'El editor de plantillas está deshabilitado.');
     }
 }

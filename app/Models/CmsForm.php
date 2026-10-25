@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsForm extends Model
 {
+    use LogsAdminActivity;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -18,5 +21,10 @@ class CmsForm extends Model
     public function fields()
     {
         return $this->hasMany(CmsFormField::class, 'form_id')->orderBy('id');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'forms';
     }
 }

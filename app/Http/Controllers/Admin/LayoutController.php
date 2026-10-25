@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CmsConfig;
+use App\Rules\SafeUrl;
+use App\Support\ContentSanitizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,17 +36,23 @@ class LayoutController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        $data = $request->only([
-            'layout_header_logo',
-            'layout_footer_logo',
-            'layout_copyright',
-            'layout_facebook',
-            'layout_instagram',
-            'layout_twitter',
-            'layout_linkedin',
-            'layout_youtube',
-            'layout_custom_css',
+        $url = ['nullable', 'string', 'max:2048', new SafeUrl];
+
+        $data = $request->validate([
+            'layout_header_logo' => $url,
+            'layout_footer_logo' => $url,
+            'layout_copyright' => 'nullable|string|max:1000',
+            'layout_facebook' => $url,
+            'layout_instagram' => $url,
+            'layout_twitter' => $url,
+            'layout_linkedin' => $url,
+            'layout_youtube' => $url,
+            'layout_custom_css' => 'nullable|string|max:65535',
         ]);
+
+        if (array_key_exists('layout_custom_css', $data)) {
+            $data['layout_custom_css'] = ContentSanitizer::css($data['layout_custom_css']);
+        }
 
         foreach ($data as $alias => $value) {
             CmsConfig::where('alias', $alias)->update(['value' => $value ?? '']);

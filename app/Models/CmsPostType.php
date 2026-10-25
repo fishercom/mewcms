@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsPostType extends Model
 {
+    use LogsAdminActivity;
+
     protected $table = 'cms_post_types';
 
     protected $fillable = [
@@ -76,5 +79,10 @@ class CmsPostType extends Model
 
             CmsPost::where('post_type', $cpt->slug)->delete();
         });
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'post-types';
     }
 }

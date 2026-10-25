@@ -42,22 +42,6 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        $groups = AdmMenu::select()
-            ->where('visible', true)
-            ->orderBy('position', 'asc')
-            ->get();
-
-        $adm_menu = [];
-        foreach ($groups as $group) {
-            $modules = $group->modules;
-
-            $items = [];
-            foreach ($modules as $module) {
-                $items[] = ['id' => $module->id, 'title' => $module->name, 'description' => $module->description, 'url' => $module->url, 'icon' => $module->icon];
-            }
-            $adm_menu[] = ['id' => $group->id, 'title' => $group->name, 'items' => $items];
-        }
-
         $menus = CmsMenu::with(['items' => function ($query): void {
             $query->where('active', true)->orderBy('position')->with('article');
         }])->where('active', true)->get();
@@ -74,14 +58,54 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => fn (): ?array => $request->user()?->canAccessAdmin() ? [
+                    'super_admin' => $request->user()->isSuperAdmin(),
+                    'modules' => $request->user()->adminPermissions(),
+                ] : null,
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'adm_menu' => $adm_menu,
+            'adm_menu' => fn (): array => $this->adminMenu($request),
             'menus' => $menus,
             'layout_settings' => $layoutSettings,
         ];
+    }
+
+    /**
+     * Build the admin sidebar, limited to the modules the user may list.
+     *
+     * @return list<array<string, mixed>>
+     */
+    protected function adminMenu(Request $request): array
+    {
+        $user = $request->user();
+        if (! $user?->canAccessAdmin()) {
+            return [];
+        }
+
+        $groups = AdmMenu::with('modules')
+            ->where('visible', true)
+            ->orderBy('position', 'asc')
+            ->get();
+
+        $adm_menu = [];
+        foreach ($groups as $group) {
+            $items = [];
+            foreach ($group->modules as $module) {
+                $key = $module->key();
+                if ($key !== 'admin' && ($key === null || ! $user->hasAdminPermission($key))) {
+                    continue;
+                }
+                $items[] = ['id' => $module->id, 'title' => $module->name, 'description' => $module->description, 'url' => $module->url, 'icon' => $module->icon];
+            }
+
+            if ($items !== []) {
+                $adm_menu[] = ['id' => $group->id, 'title' => $group->name, 'items' => $items];
+            }
+        }
+
+        return $adm_menu;
     }
 }

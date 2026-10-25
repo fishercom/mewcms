@@ -12,6 +12,8 @@ export default function FrontForm({ alias }: Props) {
     const [form, setForm] = useState<CmsForm | null>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [values, setValues] = useState<Record<string, any>>({});
+    // Honeypot: hidden from people, often filled in by spam bots
+    const [honeypot, setHoneypot] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -70,6 +72,7 @@ export default function FrontForm({ alias }: Props) {
             .post('/api/forms/submit', {
                 ...values,
                 form_alias: alias,
+                _hp: honeypot,
             })
             .then((res) => {
                 if (res.data.success) {
@@ -145,6 +148,19 @@ export default function FrontForm({ alias }: Props) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+                <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                    <label>
+                        Leave this field empty
+                        <input
+                            type="text"
+                            name="_hp"
+                            tabIndex={-1}
+                            autoComplete="off"
+                            value={honeypot}
+                            onChange={(e) => setHoneypot(e.target.value)}
+                        />
+                    </label>
+                </div>
                 {form.fields?.map((field) => {
                     const isInvalid = !!errors[field.alias];
                     return (

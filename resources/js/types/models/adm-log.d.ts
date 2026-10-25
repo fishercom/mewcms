@@ -11,11 +11,3 @@ export interface AdmLog {
     user: User;
     event: AdmEvent;
 }
-
-export interface AdmLogForm {
-    id?: number;
-    event_id: number;
-    user_id: number;
-    comment: string;
-    [key: string]: string | number | boolean | null | undefined | Record<string, unknown>;
-}

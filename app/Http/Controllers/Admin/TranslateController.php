@@ -39,7 +39,7 @@ class TranslateController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $Translate = new CmsTranslate($request->all());
+        $Translate = new CmsTranslate($this->validatedData($request));
         $Translate->save();
 
         return redirect('admin/translates');
@@ -62,8 +62,8 @@ class TranslateController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsTranslate::find($id);
-        $item->fill($request->all());
+        $item = CmsTranslate::findOrFail($id);
+        $item->fill($this->validatedData($request));
         $item->save();
 
         return redirect('admin/translates');
@@ -78,5 +78,17 @@ class TranslateController extends Controller
         $item->delete();
 
         return redirect('admin/translates');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'alias' => 'required|string|max:255',
+            'input_type' => 'nullable|string|max:50',
+            'metadata' => 'nullable|array',
+        ]);
     }
 }

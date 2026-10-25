@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\CmsArticle;
 use App\Models\CmsMenu;
 use App\Models\CmsMenuItem;
+use App\Rules\SafeUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,14 +40,14 @@ class MenuController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:cms_menus,slug',
             'description' => 'nullable|string',
             'active' => 'boolean',
         ]);
 
-        $menu = new CmsMenu($request->all());
+        $menu = new CmsMenu($data);
         $menu->save();
 
         return redirect('admin/menus');
@@ -71,7 +73,7 @@ class MenuController extends Controller
     {
         $item = CmsMenu::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:cms_menus,slug,'.$id,
             'description' => 'nullable|string',
@@ -82,7 +84,7 @@ class MenuController extends Controller
             $item->slug = null;
         }
 
-        $item->fill($request->except('slug'));
+        $item->fill(Arr::except($data, 'slug'));
         if (! empty($request->slug)) {
             $item->slug = $request->slug;
         }
@@ -110,7 +112,7 @@ class MenuController extends Controller
             'id' => 'nullable|integer',
             'parent_id' => 'nullable|integer|exists:cms_menu_items,id',
             'title' => 'required|string|max:255',
-            'url' => 'nullable|string|max:255',
+            'url' => ['nullable', 'string', 'max:255', new SafeUrl],
             'article_id' => 'nullable|integer|exists:cms_articles,id',
             'target' => 'string|in:_self,_blank',
             'active' => 'boolean',
