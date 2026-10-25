@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
 
 class CmsParameter extends Model
 {
+    use LogsAdminActivity;
     use SortableTrait;
 
     protected $table = 'cms_parameters';
@@ -46,5 +48,10 @@ class CmsParameter extends Model
         return $this->hasMany('App\Models\CmsParameterAlias', 'parent_id', 'id')
             ->where('active', '1')
             ->orderBy('position');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'parameters';
     }
 }

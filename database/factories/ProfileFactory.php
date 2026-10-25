@@ -22,4 +22,14 @@ class ProfileFactory extends Factory
             'active' => true,
         ];
     }
+
+    /**
+     * A super administrator profile, which bypasses module permissions.
+     */
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'sa' => true,
+        ]);
+    }
 }

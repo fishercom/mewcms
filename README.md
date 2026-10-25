@@ -283,6 +283,13 @@ php artisan migrate --seed
 >
 > *(Remember to change these credentials immediately in production!)*
 
+#### Access control & security settings
+
+- **Profiles and permissions are enforced.** Each admin module has a *Listar* (read) and *Administrar* (create/edit/delete) permission. Assign them to profiles under *Perfiles*; the sidebar only shows modules the user can open. Profiles flagged as super admin bypass these checks.
+- **Public registration is off by default.** Set `CMS_ALLOW_REGISTRATION=true` to enable `/register`. Self-registered users get no profile, so they cannot open the admin until an administrator assigns one.
+- **The template file editor is limited.** Writing `.tsx` templates from the browser is only allowed for super admins, and only when `CMS_TEMPLATE_EDITOR=true` (enabled by default only when `APP_ENV=local`).
+- Page and post HTML is sanitized on save, link fields only accept relative, `http(s)`, `mailto` and `tel` URLs, public form submissions are rate limited, and admin changes and logins are recorded in the audit log (*Logs*).
+
 ---
 
 ### Step 6: Create the Storage Symlink

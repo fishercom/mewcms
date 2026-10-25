@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
+use App\Support\ContentSanitizer;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsPost extends Model
 {
+    use LogsAdminActivity;
     use Sluggable;
 
     protected $table = 'cms_posts';
@@ -32,6 +35,18 @@ class CmsPost extends Model
         'published_at' => 'datetime',
         'active' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $model): void {
+            if ($model->isDirty('content')) {
+                $model->content = ContentSanitizer::html($model->content);
+            }
+            if ($model->isDirty('metadata')) {
+                $model->metadata = ContentSanitizer::metadata($model->metadata);
+            }
+        });
+    }
 
     public function sluggable(): array
     {
@@ -60,5 +75,10 @@ class CmsPost extends Model
     public function terms()
     {
         return $this->belongsToMany(CmsTaxonomyTerm::class, 'cms_post_term', 'post_id', 'term_id');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'posts';
     }
 }

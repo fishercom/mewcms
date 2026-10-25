@@ -13,7 +13,7 @@ class AdmEvent extends Model
      */
     protected $table = 'adm_events';
 
-    protected $fillable = ['event_id', 'profile_id'];
+    protected $fillable = ['module_id', 'action_id'];
 
     public function action()
     {

@@ -39,7 +39,7 @@ class ConfigController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $config = new CmsConfig($request->all());
+        $config = new CmsConfig($this->validatedData($request));
         $config->save();
 
         return redirect('admin/configs');
@@ -62,8 +62,8 @@ class ConfigController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsConfig::find($id);
-        $item->fill($request->all());
+        $item = CmsConfig::findOrFail($id);
+        $item->fill($this->validatedData($request));
         $item->save();
 
         return redirect('admin/configs');
@@ -78,5 +78,18 @@ class ConfigController extends Controller
         $item->delete();
 
         return redirect('admin/configs');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'type' => 'nullable|string|max:50',
+            'name' => 'required|string|max:255',
+            'alias' => 'required|string|max:255',
+            'value' => 'nullable|string',
+        ]);
     }
 }

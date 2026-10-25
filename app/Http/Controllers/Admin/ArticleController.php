@@ -133,15 +133,7 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'schema_id' => 'nullable|integer|exists:cms_schemas,id',
-            'parent_id' => 'nullable|integer|exists:cms_articles,id',
-            'content' => 'nullable|string',
-            'excerpt' => 'nullable|string',
-            'featured_image' => 'nullable|string|max:2048',
-            'status' => 'nullable|string|max:20',
-        ]);
+        $data = $this->validatedData($request);
 
         $schemaId = $request->input('schema_id');
         $schema = $schemaId ? CmsSchema::find($schemaId) : null;
@@ -163,7 +155,7 @@ class ArticleController extends Controller
             }
         }
 
-        $profile = new CmsArticle($request->all());
+        $profile = new CmsArticle($data);
         $profile->save();
 
         if ($request->has('term_ids')) {
@@ -232,15 +224,7 @@ class ArticleController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'schema_id' => 'nullable|integer|exists:cms_schemas,id',
-            'parent_id' => 'nullable|integer|exists:cms_articles,id',
-            'content' => 'nullable|string',
-            'excerpt' => 'nullable|string',
-            'featured_image' => 'nullable|string|max:2048',
-            'status' => 'nullable|string|max:20',
-        ]);
+        $data = $this->validatedData($request);
 
         $schemaId = $request->input('schema_id');
         $schema = $schemaId ? CmsSchema::find($schemaId) : null;
@@ -270,7 +254,7 @@ class ArticleController extends Controller
             }
         }
 
-        $item->fill($request->all());
+        $item->fill($data);
         $item->save();
 
         if ($request->has('term_ids')) {
@@ -307,6 +291,28 @@ class ArticleController extends Controller
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'title' => 'required|string|max:255',
+            'schema_id' => 'nullable|integer|exists:cms_schemas,id',
+            'parent_id' => 'nullable|integer|exists:cms_articles,id',
+            'lang_id' => 'nullable|integer|exists:cms_langs,id',
+            'content' => 'nullable|string',
+            'excerpt' => 'nullable|string',
+            'featured_image' => 'nullable|string|max:2048',
+            'status' => 'nullable|string|max:20',
+            'metadata' => 'nullable|array',
+            'slug' => 'nullable|string|max:500',
+            'active' => 'nullable|boolean',
+            'term_ids' => 'nullable|array',
+            'term_ids.*' => 'nullable|integer|exists:cms_taxonomy_terms,id',
+        ]);
     }
 
     protected function buildTree($elements, $parentId, &$sorted, $depth = 0)

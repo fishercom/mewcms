@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\AdmAction;
+use App\Models\AdmEvent;
+use App\Models\AdmMenu;
+use App\Models\AdmModule;
+use App\Models\AdmPermission;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -42,7 +48,32 @@ expect()->extend('toBeOne', fn () => $this->toBe(1));
 |
 */
 
-function something(): void
+/**
+ * Grant admin module permissions to a user's profile, e.g. ['articles' => 'administrar'].
+ *
+ * @param  array<string, string>  $permissions
+ */
+function grantPermissions(User $user, array $permissions): void
 {
-    // ..
+    $menu = AdmMenu::where('name', 'Test')->first()
+        ?? AdmMenu::forceCreate(['name' => 'Test', 'position' => 0, 'visible' => true]);
+
+    foreach ($permissions as $moduleKey => $actionAlias) {
+        $module = AdmModule::where('route', $moduleKey.'.index')->first()
+            ?? AdmModule::forceCreate([
+                'menu_id' => $menu->id,
+                'name' => ucfirst($moduleKey),
+                'url' => '/admin/'.$moduleKey,
+                'route' => $moduleKey.'.index',
+                'position' => 0,
+                'visible' => true,
+            ]);
+
+        $action = AdmAction::where('alias', $actionAlias)->first()
+            ?? AdmAction::forceCreate(['name' => $actionAlias, 'alias' => $actionAlias, 'write_log' => true]);
+
+        $event = AdmEvent::firstOrCreate(['module_id' => $module->id, 'action_id' => $action->id]);
+
+        AdmPermission::firstOrCreate(['profile_id' => $user->profile_id, 'event_id' => $event->id]);
+    }
 }

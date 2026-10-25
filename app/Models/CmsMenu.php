@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsMenu extends Model
 {
+    use LogsAdminActivity;
     use Sluggable;
 
     protected $table = 'cms_menus';
@@ -29,5 +31,10 @@ class CmsMenu extends Model
     public function items()
     {
         return $this->hasMany(CmsMenuItem::class, 'menu_id')->orderBy('position');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'menus';
     }
 }

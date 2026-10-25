@@ -20,6 +20,7 @@ class AuthenticatedSessionController extends Controller
     {
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
+            'canRegister' => (bool) config('cms.registration'),
             'status' => $request->session()->get('status'),
         ]);
     }
@@ -32,6 +33,10 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        if (! $request->user()->canAccessAdmin()) {
+            return redirect()->route('home');
+        }
 
         return redirect()->intended(route('admin', absolute: false));
     }

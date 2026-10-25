@@ -48,7 +48,7 @@ class ParameterController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $profile = new CmsParameter($request->all());
+        $profile = new CmsParameter($this->validatedData($request));
         $profile->save();
 
         return redirect('admin/parameters');
@@ -75,8 +75,8 @@ class ParameterController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsParameter::find($id);
-        $item->fill($request->all());
+        $item = CmsParameter::findOrFail($id);
+        $item->fill($this->validatedData($request));
         $item->save();
 
         return redirect('admin/parameters');
@@ -91,5 +91,20 @@ class ParameterController extends Controller
         $item->delete();
 
         return redirect('admin/parameters');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'group_id' => 'required|integer|exists:cms_parameters_group,id',
+            'parent_id' => 'nullable|integer|exists:cms_parameters,id',
+            'name' => 'required|string|max:255',
+            'value' => 'nullable|string',
+            'metadata' => 'nullable|array',
+            'active' => 'nullable|boolean',
+        ]);
     }
 }

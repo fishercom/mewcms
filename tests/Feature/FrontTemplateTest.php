@@ -21,6 +21,8 @@ beforeEach(function (): void {
         'profile_id' => $this->profile->id,
         'active' => 1,
     ]);
+
+    config(['cms.template_editor' => true]);
 });
 
 afterEach(function (): void {
@@ -84,4 +86,35 @@ it('allows authenticated admin users to create, update, and delete a custom temp
 it('prevents deletion of core system templates', function (): void {
     $response = $this->actingAs($this->user)->delete('/admin/templates/home');
     $response->assertSessionHasErrors(['error']);
+});
+
+it('blocks template file writes when the editor is disabled', function (): void {
+    config(['cms.template_editor' => false]);
+
+    $this->actingAs($this->user)->post('/admin/templates', [
+        'name' => 'Test Page Template',
+        'filename' => 'test-page-template',
+        'content' => 'import React from "react";',
+    ])->assertForbidden();
+
+    expect(file_exists(resource_path('js/pages/front/templates/test-page-template.tsx')))->toBeFalse();
+});
+
+it('blocks template file writes for admins who are not super administrators', function (): void {
+    $admin = User::factory()->create();
+    grantPermissions($admin, ['templates' => 'administrar']);
+
+    $this->actingAs($admin)->get('/admin/templates')->assertOk();
+    $this->actingAs($admin)->put('/admin/templates/page', [
+        'name' => 'Page',
+        'content' => 'export default function Hacked() {}',
+    ])->assertForbidden();
+});
+
+it('rejects template names that could break out of the header comment', function (): void {
+    $this->actingAs($this->user)->post('/admin/templates', [
+        'name' => 'Evil */ alert(1); /*',
+        'filename' => 'test-page-template',
+        'content' => 'import React from "react";',
+    ])->assertSessionHasErrors('name');
 });

@@ -24,7 +24,12 @@ use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->prefix('admin')->group(function (): void {
+// Endpoints any admin user may call from shared editor components
+Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function (): void {
+    Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
+});
+
+Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function (): void {
 
     Route::get('schemas/root', [SchemaController::class, 'root'])->name('schemas.root');
     Route::get('schemas/{schema}/children', [SchemaController::class, 'children'])->name('schemas.children');
@@ -32,7 +37,7 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
     Route::resource('profiles', ProfileController::class);
     Route::resource('users', UserController::class);
     Route::resource('langs', LangController::class);
-    Route::resource('logs', LogController::class);
+    Route::resource('logs', LogController::class)->only(['index']);
     Route::resource('translates', TranslateController::class);
     Route::resource('configs', ConfigController::class);
 
@@ -56,7 +61,6 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
     Route::resource('templates', TemplateController::class)->except(['show']);
     Route::get('media', [MediaController::class, 'index'])->name('media.index');
 
-    Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
     Route::resource('sliders', SliderController::class);
 
     Route::resource('post-types', PostTypeController::class);
@@ -66,4 +70,4 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
     Route::post('layout', [LayoutController::class, 'update'])->name('layout.update');
 });
 
-Route::get('dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');
+Route::redirect('dashboard', 'admin')->name('dashboard');

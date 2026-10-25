@@ -21,6 +21,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
+        abort_unless(config('cms.registration'), 404);
+
         return Inertia::render('auth/register');
     }
 
@@ -31,22 +33,27 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(config('cms.registration'), 404);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        // Self-registered users get no profile: an administrator must grant admin access
+        $user = new User([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        $user->profile_id = null;
+        $user->save();
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return to_route('admin');
+        return to_route('home');
     }
 }

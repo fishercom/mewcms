@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
+use App\Support\ContentSanitizer;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
 
 class CmsArticle extends Model
 {
+    use LogsAdminActivity;
+
     /**
      * The database table used by the model.
      *
@@ -32,6 +36,18 @@ class CmsArticle extends Model
     public $front_view;
 
     public $route_view;
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $model): void {
+            if ($model->isDirty('content')) {
+                $model->content = ContentSanitizer::html($model->content);
+            }
+            if ($model->isDirty('metadata')) {
+                $model->metadata = ContentSanitizer::metadata($model->metadata);
+            }
+        });
+    }
 
     public function sluggable(): array
     {
@@ -154,5 +170,9 @@ class CmsArticle extends Model
             $query->where('schema_id', $schemaId);
         });
     }
-}
 
+    public function adminActivityModule(): string
+    {
+        return 'articles';
+    }
+}

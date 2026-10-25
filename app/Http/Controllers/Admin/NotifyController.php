@@ -47,7 +47,7 @@ class NotifyController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $profile = new CmsNotify($request->all());
+        $profile = new CmsNotify($this->validatedData($request));
         $profile->save();
 
         return redirect('admin/notifies');
@@ -74,8 +74,8 @@ class NotifyController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $item = CmsNotify::find($id);
-        $item->fill($request->all());
+        $item = CmsNotify::findOrFail($id);
+        $item->fill($this->validatedData($request));
         $item->save();
 
         return redirect('admin/notifies');
@@ -90,5 +90,18 @@ class NotifyController extends Controller
         $item->delete();
 
         return redirect('admin/notifies');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'form_id' => 'required|integer|exists:cms_forms,id',
+            'user_id' => 'nullable|integer|exists:users,id',
+            'recipients' => 'nullable|string|max:1024',
+            'active' => 'nullable|boolean',
+        ]);
     }
 }

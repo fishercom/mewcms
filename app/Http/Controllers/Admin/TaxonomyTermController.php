@@ -7,6 +7,7 @@ use App\Models\CmsTaxonomy;
 use App\Models\CmsTaxonomyTerm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -49,7 +50,7 @@ class TaxonomyTermController extends Controller
 
     public function store($taxonomyId, Request $request): RedirectResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:cms_taxonomy_terms,slug,NULL,id,taxonomy_id,'.$taxonomyId,
             'description' => 'nullable|string',
@@ -57,7 +58,7 @@ class TaxonomyTermController extends Controller
             'active' => 'boolean',
         ]);
 
-        $term = new CmsTaxonomyTerm($request->all());
+        $term = new CmsTaxonomyTerm($data);
         $term->taxonomy_id = $taxonomyId;
         $term->save();
 
@@ -85,7 +86,7 @@ class TaxonomyTermController extends Controller
     {
         $item = CmsTaxonomyTerm::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:cms_taxonomy_terms,slug,'.$id.',id,taxonomy_id,'.$item->taxonomy_id,
             'description' => 'nullable|string',
@@ -97,7 +98,7 @@ class TaxonomyTermController extends Controller
             $item->slug = null;
         }
 
-        $item->fill($request->except('slug'));
+        $item->fill(Arr::except($data, 'slug'));
         if (! empty($request->slug)) {
             $item->slug = $request->slug;
         }

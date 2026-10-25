@@ -14,7 +14,7 @@ interface TemplateItem {
 }
 
 export default function Index() {
-    const { items = [] } = usePage<{ items: TemplateItem[] }>().props;
+    const { items = [], canEdit } = usePage<{ items: TemplateItem[]; canEdit: boolean }>().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -57,15 +57,17 @@ export default function Index() {
                         </div>
                     </div>
                     <div className="flex w-full justify-end md:w-auto">
-                        <Button
-                            asChild
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
-                            <Link href="/admin/templates/create">
-                                <Plus className="h-4 w-4" />
-                                <span>Crear Plantilla</span>
-                            </Link>
-                        </Button>
+                        {canEdit && (
+                            <Button
+                                asChild
+                                className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                            >
+                                <Link href="/admin/templates/create">
+                                    <Plus className="h-4 w-4" />
+                                    <span>Crear Plantilla</span>
+                                </Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -127,10 +129,10 @@ export default function Index() {
                                                     onClick={() => router.visit(route('templates.edit', item.file))}
                                                 >
                                                     <Edit className="h-3 w-3" />
-                                                    <span>Editar</span>
+                                                    <span>{canEdit ? 'Editar' : 'Ver'}</span>
                                                 </Button>
 
-                                                {!isCore && (
+                                                {canEdit && !isCore && (
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"

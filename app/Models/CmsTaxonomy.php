@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsTaxonomy extends Model
 {
+    use LogsAdminActivity;
     use Sluggable;
 
     protected $table = 'cms_taxonomies';
@@ -29,5 +31,10 @@ class CmsTaxonomy extends Model
     public function terms()
     {
         return $this->hasMany(CmsTaxonomyTerm::class, 'taxonomy_id')->orderBy('position');
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'taxonomies';
     }
 }

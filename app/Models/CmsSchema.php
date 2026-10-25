@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
 
 class CmsSchema extends Model
 {
+    use LogsAdminActivity;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -105,5 +108,10 @@ class CmsSchema extends Model
         }
 
         return false;
+    }
+
+    public function adminActivityModule(): string
+    {
+        return 'schemas';
     }
 }

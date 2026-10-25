@@ -41,7 +41,7 @@ class PostTypeController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'singular_name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:cms_post_types,slug',
@@ -51,7 +51,7 @@ class PostTypeController extends Controller
             'active' => 'boolean',
         ]);
 
-        $cpt = new CmsPostType($request->all());
+        $cpt = new CmsPostType($data);
         $cpt->save();
 
         return redirect()->route('post-types.index');
@@ -72,7 +72,7 @@ class PostTypeController extends Controller
     {
         $item = CmsPostType::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'singular_name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:cms_post_types,slug,'.$id,
@@ -82,7 +82,7 @@ class PostTypeController extends Controller
             'active' => 'boolean',
         ]);
 
-        $item->update($request->all());
+        $item->update($data);
 
         return redirect()->route('post-types.index');
     }
