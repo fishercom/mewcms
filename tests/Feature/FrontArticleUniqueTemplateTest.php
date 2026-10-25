@@ -63,7 +63,7 @@ it('verifies home schema is detected as unique', function (): void {
     $this->assertFalse($this->standardSchema->isUnique());
 });
 
-it('filters home schema out of available schemas list on create when already assigned', function (): void {
+it('marks the home template as taken on create once a page uses it', function (): void {
     // 1. Initially, home schema should be in create available templates
     $response = $this->actingAs($this->user)->get('/admin/articles/create');
     $response->assertStatus(200);
@@ -83,14 +83,13 @@ it('filters home schema out of available schemas list on create when already ass
         'active' => 1,
     ]);
 
-    // 3. Now, home schema should NOT be in create list
+    // 3. Now the home template is shown as taken instead of selectable
     $response = $this->actingAs($this->user)->get('/admin/articles/create');
     $response->assertStatus(200);
     $response->assertInertia(function ($page): void {
-        $schemas = $page->toArray()['props']['schemas'];
-        $ids = collect($schemas)->pluck('id')->all();
-        $this->assertNotContains($this->homeSchema->id, $ids);
-        $this->assertContains($this->standardSchema->id, $ids);
+        $templates = collect($page->toArray()['props']['templates'])->keyBy('value');
+        $this->assertSame('Home Page Page', $templates[$this->homeSchema->front_view]['used_by']['title']);
+        $this->assertNull($templates[$this->standardSchema->front_view]['used_by']);
     });
 });
 
@@ -104,17 +103,16 @@ it('keeps unique schema selectable inside edit screen for the article that uses 
         'active' => 1,
     ]);
 
-    // Fetch edit view for that article - home template must be present
+    // Fetch edit view for that article - home template must be selectable
     $response = $this->actingAs($this->user)->get("/admin/articles/{$article->id}/edit");
     $response->assertStatus(200);
     $response->assertInertia(function ($page): void {
-        $schemas = $page->toArray()['props']['schemas'];
-        $ids = collect($schemas)->pluck('id')->all();
-        $this->assertContains($this->homeSchema->id, $ids);
-        $this->assertContains($this->standardSchema->id, $ids);
+        $templates = collect($page->toArray()['props']['templates'])->keyBy('value');
+        $this->assertNull($templates[$this->homeSchema->front_view]['used_by']);
+        $this->assertContains($this->homeSchema->id, $templates[$this->homeSchema->front_view]['schema_ids']);
     });
 
-    // Fetch edit view for another article - home template must NOT be present
+    // Fetch edit view for another article - home template is shown as taken
     $anotherArticle = CmsArticle::create([
         'schema_id' => $this->standardSchema->id,
         'lang_id' => $this->lang->id,
@@ -126,10 +124,9 @@ it('keeps unique schema selectable inside edit screen for the article that uses 
     $response2 = $this->actingAs($this->user)->get("/admin/articles/{$anotherArticle->id}/edit");
     $response2->assertStatus(200);
     $response2->assertInertia(function ($page): void {
-        $schemas = $page->toArray()['props']['schemas'];
-        $ids = collect($schemas)->pluck('id')->all();
-        $this->assertNotContains($this->homeSchema->id, $ids);
-        $this->assertContains($this->standardSchema->id, $ids);
+        $templates = collect($page->toArray()['props']['templates'])->keyBy('value');
+        $this->assertSame('Home Page Page', $templates[$this->homeSchema->front_view]['used_by']['title']);
+        $this->assertNull($templates[$this->standardSchema->front_view]['used_by']);
     });
 });
 

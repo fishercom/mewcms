@@ -111,16 +111,19 @@ export default function Index() {
                         <thead className="bg-gray-100 text-sm text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Name
+                                    Nombre
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Active
+                                    Plantilla
+                                </th>
+                                <th scope="col" className="px-4 py-3 text-center">
+                                    Campos
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Created Date
+                                    Activo
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Updated Date
+                                    Actualizado
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -134,8 +137,15 @@ export default function Index() {
                                                 {item.name}
                                             </a>
                                         </th>
+                                        <td className="px-4 py-3 font-mono text-xs">
+                                            {item.front_view ? (
+                                                `${item.front_view.split('/').pop()}.tsx`
+                                            ) : (
+                                                <span className="text-zinc-400 italic">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">{item.fields?.length ?? 0}</td>
                                         <td className="px-4 py-3">{item.active ? <Check /> : <></>}</td>
-                                        <td className="px-4 py-3">{format(item.created_at, 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="px-4 py-3">{format(item.updated_at, 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="flex items-center justify-end gap-2 px-4 py-3">
                                             <Button

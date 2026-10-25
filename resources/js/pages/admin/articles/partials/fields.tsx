@@ -1,7 +1,7 @@
 import CustomFieldRenderer from '@/components/custom-field-renderer';
-import TagField from '@/components/tag-field';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import TagField from '@/components/tag-field';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -11,9 +11,20 @@ import { cn } from '@/lib/utils';
 import { CmsArticle, CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
+import { usePage } from '@inertiajs/react';
 import { FileText, Globe, Image as ImageIcon, Settings, Sliders, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
+
+/** A page template file, with the field groups (schemas) that use it. */
+export interface PageTemplate {
+    name: string;
+    value: string;
+    file: string;
+    unique: boolean;
+    used_by: { id: number; title: string } | null;
+    schema_ids: number[];
+}
 
 interface Props {
     data: CmsArticleForm;
@@ -22,12 +33,24 @@ interface Props {
     processing: boolean;
     schema?: CmsSchema & { unique?: boolean };
     schemas?: (CmsSchema & { unique?: boolean })[];
+    templates?: PageTemplate[];
     parents?: CmsArticle[];
     tags?: CmsTag[];
     onChangeSchema?: (schemaId: number) => void;
 }
 
-export default function ArticleFields({ data, setData, errors, processing, schema, schemas = [], parents = [], tags = [], onChangeSchema }: Props) {
+export default function ArticleFields({
+    data,
+    setData,
+    errors,
+    processing,
+    schema,
+    schemas = [],
+    templates = [],
+    parents = [],
+    tags = [],
+    onChangeSchema,
+}: Props) {
     const [mediaOpen, setMediaOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'content' | 'schema' | 'seo'>('content');
 
@@ -38,6 +61,20 @@ export default function ArticleFields({ data, setData, errors, processing, schem
     }, [schema, data, setData]);
 
     const hasSchemaFields = Boolean(schema?.fields && schema.fields.length > 0);
+    const { auth } = usePage<{ auth?: { permissions?: { super_admin?: boolean; modules?: Record<string, string[]> } | null } }>().props;
+    const canManageSchemas = Boolean(auth?.permissions?.super_admin || auth?.permissions?.modules?.schemas?.includes('administrar'));
+
+    const currentTemplate = templates.find((t) => data.schema_id !== null && t.schema_ids.includes(data.schema_id));
+
+    const selectSchema = (schemaId: number | null) => {
+        setData({ ...data, schema_id: schemaId });
+        onChangeSchema?.(schemaId ?? 0);
+    };
+
+    // The fields tab disappears when the chosen template has no fields
+    useEffect(() => {
+        if (activeTab === 'schema' && !hasSchemaFields) setActiveTab('content');
+    }, [activeTab, hasSchemaFields]);
 
     // Format datetime-local value (YYYY-MM-DDTHH:MM)
     const getPublishedAtValue = () => {
@@ -68,19 +105,19 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                         <span>Contenido Principal</span>
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab('schema')}
-                        className={cn(
-                            'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
-                            activeTab === 'schema'
-                                ? 'bg-violet-600 text-white shadow-violet-500/20'
-                                : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
-                        )}
-                    >
-                        <Sliders className="h-3.5 w-3.5" />
-                        <span>Campos del Esquema</span>
-                        {hasSchemaFields && (
+                    {hasSchemaFields && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('schema')}
+                            className={cn(
+                                'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
+                                activeTab === 'schema'
+                                    ? 'bg-violet-600 text-white shadow-violet-500/20'
+                                    : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
+                            )}
+                        >
+                            <Sliders className="h-3.5 w-3.5" />
+                            <span>Campos</span>
                             <span
                                 className={cn(
                                     'py-0.2 ml-0.5 rounded-full px-1.5 text-[10px] font-bold',
@@ -89,8 +126,8 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                             >
                                 {schema?.fields?.length}
                             </span>
-                        )}
-                    </button>
+                        </button>
+                    )}
 
                     <button
                         type="button"
@@ -160,50 +197,34 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                     </div>
                 )}
 
-                {/* Tab 2: Custom Schema Fields */}
-                {activeTab === 'schema' && (
+                {/* Tab 2: Custom fields of the template */}
+                {activeTab === 'schema' && hasSchemaFields && (
                     <div className="animate-in fade-in space-y-6 duration-200">
-                        {hasSchemaFields ? (
-                            <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-5 shadow-xs">
-                                <div className="border-border/60 flex items-center justify-between border-b pb-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
-                                            <Sliders className="h-3.5 w-3.5" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
-                                                Campos Personalizados ({schema?.name})
-                                            </h4>
-                                            <p className="text-muted-foreground text-[11px]">Valores dinámicos configurados para esta plantilla</p>
-                                        </div>
+                        <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-5 shadow-xs">
+                            <div className="border-border/60 flex items-center justify-between border-b pb-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                                        <Sliders className="h-3.5 w-3.5" />
                                     </div>
-                                    <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400">
-                                        {schema?.fields?.length} campos
-                                    </span>
+                                    <div>
+                                        <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">Campos de {schema?.name}</h4>
+                                        <p className="text-muted-foreground text-[11px]">Valores dinámicos configurados para esta plantilla</p>
+                                    </div>
                                 </div>
+                                <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400">
+                                    {schema?.fields?.length} campos
+                                </span>
+                            </div>
 
-                                <CustomFieldRenderer
-                                    fields={schema?.fields || []}
-                                    values={data.metadata as Record<string, JsonValue>}
-                                    onChange={(key: string, value: JsonValue) => {
-                                        const next = { ...data.metadata, [key]: value };
-                                        setData({ ...data, metadata: next });
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            <div className="border-border/80 bg-muted/20 rounded-2xl border border-dashed p-10 text-center">
-                                <Sliders className="text-muted-foreground/60 mx-auto mb-3 h-8 w-8 stroke-[1.5]" />
-                                <h4 className="text-foreground text-sm font-semibold">
-                                    {schema ? 'La plantilla actual no tiene campos adicionales' : 'Sin plantilla seleccionada'}
-                                </h4>
-                                <p className="text-muted-foreground mx-auto mt-1 max-w-sm text-xs">
-                                    {schema
-                                        ? 'Esta plantilla solo utiliza el contenido estándar. Puedes añadir campos personalizados en el módulo de Esquemas.'
-                                        : 'Selecciona una plantilla en el panel lateral derecho para cargar sus campos dinámicos correspondientes.'}
-                                </p>
-                            </div>
-                        )}
+                            <CustomFieldRenderer
+                                fields={schema?.fields || []}
+                                values={data.metadata as Record<string, JsonValue>}
+                                onChange={(key: string, value: JsonValue) => {
+                                    const next = { ...data.metadata, [key]: value };
+                                    setData({ ...data, metadata: next });
+                                }}
+                            />
+                        </div>
                     </div>
                 )}
 
@@ -266,33 +287,59 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                         <InputError message={errors.published_at} />
                     </div>
 
-                    {/* Template Selector */}
-                    {schemas && schemas.length > 0 && (
-                        <div className="space-y-1.5">
-                            <Label htmlFor="schema_id">Plantilla / Schema</Label>
+                    {/* Template: the design file. Behind it, a field group (schema) gives the page its custom fields */}
+                    <div className="space-y-1.5">
+                        <Label htmlFor="template">Plantilla</Label>
+                        <select
+                            id="template"
+                            value={currentTemplate?.value ?? ''}
+                            onChange={(e) => {
+                                const template = templates.find((t) => t.value === e.target.value);
+                                selectSchema(template?.schema_ids[0] ?? null);
+                            }}
+                            className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                        >
+                            {!currentTemplate && <option value="">Elige una plantilla</option>}
+                            {templates.map((t) => (
+                                <option key={t.value} value={t.value} disabled={Boolean(t.used_by) || t.schema_ids.length === 0}>
+                                    {t.name}
+                                    {t.used_by ? ` — Ya la usa «${t.used_by.title}»` : ''}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Only when a template has several field groups */}
+                        {currentTemplate && currentTemplate.schema_ids.length > 1 && (
                             <select
                                 id="schema_id"
-                                value={data.schema_id || 'none'}
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    const newId = val === 'none' ? null : Number(val);
-                                    setData({ ...data, schema_id: newId });
-                                    if (onChangeSchema) {
-                                        onChangeSchema(newId || 0);
-                                    }
-                                }}
+                                aria-label="Campos"
+                                value={data.schema_id ?? ''}
+                                onChange={(e) => selectSchema(Number(e.target.value))}
                                 className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
                             >
-                                <option value="none">Ninguna (Sin Plantilla)</option>
-                                {schemas.map((s) => (
-                                    <option key={s.id} value={s.id}>
-                                        {s.name}
+                                {currentTemplate.schema_ids.map((id) => (
+                                    <option key={id} value={id}>
+                                        Campos: {schemas.find((s) => s.id === id)?.name}
                                     </option>
                                 ))}
                             </select>
-                            <InputError message={errors.schema_id} />
-                        </div>
-                    )}
+                        )}
+
+                        {schema && !hasSchemaFields && canManageSchemas && (
+                            <p className="text-muted-foreground text-[11px]">
+                                Esta plantilla no tiene campos personalizados.{' '}
+                                <a
+                                    href={`/admin/schemas/${schema.id}/edit`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="hover:text-foreground underline"
+                                >
+                                    Añadir campos
+                                </a>
+                            </p>
+                        )}
+                        <InputError message={errors.schema_id} />
+                    </div>
 
                     {schema?.unique ? (
                         <div className="grid gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-[11px] text-amber-800 dark:text-amber-200">
@@ -382,8 +429,8 @@ export default function ArticleFields({ data, setData, errors, processing, schem
                 </div>
 
                 {/* Tags */}
-                <div className="space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs">
-                    <h3 className="border-b border-border/60 pb-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">Etiquetas</h3>
+                <div className="border-border/70 bg-card space-y-3 rounded-2xl border p-4 shadow-2xs">
+                    <h3 className="border-border/60 text-muted-foreground border-b pb-2 text-xs font-bold tracking-wider uppercase">Etiquetas</h3>
                     <TagField tags={tags} selected={data.tag_ids || []} onChange={(tagIds) => setData({ ...data, tag_ids: tagIds })} />
                     <InputError message={errors.tag_ids} />
                 </div>

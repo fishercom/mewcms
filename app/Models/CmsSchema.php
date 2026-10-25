@@ -88,6 +88,60 @@ class CmsSchema extends Model
         return $templates;
     }
 
+    /**
+     * Templates used only by posts, not offered in the page editor.
+     */
+    public const POST_TEMPLATES = ['front/templates/post'];
+
+    /**
+     * Names for the field groups created automatically for templates that have none.
+     */
+    protected const DEFAULT_NAMES = [
+        'front/templates/page' => 'Página estándar',
+        'front/templates/home' => 'Página de inicio',
+    ];
+
+    /**
+     * Template files a page can use.
+     *
+     * @return list<array{name: string, value: string, file: string, unique: bool}>
+     */
+    public static function pageTemplates(): array
+    {
+        return array_values(array_filter(
+            self::getAvailableTemplates(),
+            fn (array $template): bool => ! in_array($template['value'], self::POST_TEMPLATES, true),
+        ));
+    }
+
+    /**
+     * Give every page template an active field group, so picking a template always
+     * resolves to one. Existing groups are left untouched. Safe to run repeatedly.
+     */
+    public static function ensureTemplateDefaults(): void
+    {
+        $groupId = CmsSchemaGroup::where('default', true)->value('id') ?? CmsSchemaGroup::value('id');
+        if (! $groupId) {
+            return;
+        }
+
+        foreach (self::pageTemplates() as $template) {
+            if (self::where('front_view', $template['value'])->where('active', true)->exists()) {
+                continue;
+            }
+
+            $schema = new self([
+                'group_id' => $groupId,
+                'name' => self::DEFAULT_NAMES[$template['value']] ?? $template['name'],
+                'fields' => [],
+                'front_view' => $template['value'],
+                'active' => true,
+            ]);
+            $schema->type = 'PAGE';
+            $schema->save();
+        }
+    }
+
     public function isUnique(): bool
     {
         if (! $this->front_view) {
