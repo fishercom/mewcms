@@ -40,23 +40,20 @@ export default function Index() {
                     <div className="w-full md:w-3/4">
                         <div className="relative">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <Search className="h-4 w-4 text-zinc-400" />
+                                <Search className="text-muted-foreground h-4 w-4" />
                             </div>
                             <Input
                                 type="text"
                                 autoFocus
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full rounded-md border border-gray-300 bg-transparent p-2 pl-10 text-sm text-zinc-800 dark:border-zinc-800 dark:text-zinc-200"
+                                className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
                                 placeholder="Buscar slider..."
                             />
                         </div>
                     </div>
                     <div className="flex w-full justify-end md:w-auto">
-                        <Button
-                            asChild
-                            className="flex items-center gap-1.5 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
+                        <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={route('sliders.create')}>
                                 <Plus className="h-4 w-4" />
                                 <span>Crear Slider</span>
@@ -66,8 +63,8 @@ export default function Index() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Nombre
@@ -87,24 +84,24 @@ export default function Index() {
                         <tbody>
                             {items.data.length > 0 ? (
                                 items.data.map((item) => (
-                                    <tr key={item.id} className="border-b hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-800/20">
-                                        <th scope="row" className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="hover:bg-muted/50 border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium">
                                             <Link href={route('sliders.edit', item.id)} className="hover:underline">
                                                 {item.name}
                                             </Link>
-                                            <div className="font-mono text-[11px] font-normal text-zinc-400">{item.key}</div>
+                                            <div className="text-muted-foreground font-mono text-[11px] font-normal">{item.key}</div>
                                         </th>
                                         <td className="px-4 py-3 text-center">{item.slides_count || 0}</td>
                                         <td className="hidden px-4 py-3 xl:table-cell">
                                             <div className="flex max-w-[160px] flex-wrap gap-1">
-                                                <span className="inline-flex items-center rounded bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300">
+                                                <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px]">
                                                     {item.settings?.autoplay ? `Autoplay ${item.settings.autoplaySpeed}ms` : 'Manual'}
                                                 </span>
-                                                <span className="inline-flex items-center rounded bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-800 capitalize dark:bg-zinc-800 dark:text-zinc-300">
+                                                <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px] capitalize">
                                                     {item.settings?.effect || 'slide'}
                                                 </span>
                                                 {item.settings?.loop && (
-                                                    <span className="inline-flex items-center rounded bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300">
+                                                    <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px]">
                                                         Loop
                                                     </span>
                                                 )}
@@ -125,7 +122,7 @@ export default function Index() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                                                    className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
                                                     onClick={() => handleDelete(item.id, item.name)}
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
@@ -137,7 +134,7 @@ export default function Index() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-zinc-400 italic">
+                                    <td colSpan={5} className="text-muted-foreground px-4 py-8 text-center italic">
                                         No se encontraron sliders.
                                     </td>
                                 </tr>

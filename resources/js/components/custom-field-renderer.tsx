@@ -57,14 +57,14 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
     return (
         <div className="space-y-2">
             {value ? (
-                <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 transition-all duration-200 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/30 dark:hover:border-zinc-700">
+                <div className="border-border bg-muted/50 hover:border-border flex items-center justify-between gap-4 rounded-xl border p-3 transition-all duration-200">
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
+                        <div className="border-border bg-muted relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border">
                             <img src={value} alt={field.label} className="h-full w-full object-cover" />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <div className="truncate text-xs font-semibold text-zinc-800 dark:text-zinc-200">{filename}</div>
-                            <div className="mt-0.5 truncate text-[10px] text-zinc-400 dark:text-zinc-500">{value}</div>
+                            <div className="text-foreground truncate text-xs font-semibold">{filename}</div>
+                            <div className="text-muted-foreground mt-0.5 truncate text-[10px]">{value}</div>
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -75,7 +75,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-zinc-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-8 w-8"
                             onClick={() => onChange('')}
                         >
                             <Trash2 className="h-4 w-4" />
@@ -85,13 +85,11 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
             ) : (
                 <div
                     onClick={() => setIsDrawerOpen(true)}
-                    className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 p-6 text-center transition-all hover:border-red-500/40 hover:bg-zinc-50/50 dark:border-zinc-800 dark:hover:border-red-500/30 dark:hover:bg-zinc-900/10"
+                    className="group border-border hover:border-primary/40 hover:bg-muted/50 flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center transition-all"
                 >
-                    <UploadCloud className="mb-2 h-7 w-7 text-zinc-400 transition-colors group-hover:text-red-500" />
-                    <span className="text-xs font-semibold text-zinc-700 transition-colors group-hover:text-red-500 dark:text-zinc-300">
-                        Seleccionar Imagen
-                    </span>
-                    <span className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">Biblioteca de Medios Rápida</span>
+                    <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-7 w-7 transition-colors" />
+                    <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">Seleccionar Imagen</span>
+                    <span className="text-muted-foreground mt-1 text-[10px]">Biblioteca de Medios Rápida</span>
                 </div>
             )}
 
@@ -99,7 +97,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                 <button
                     type="button"
                     onClick={() => setShowManualUrl(!showManualUrl)}
-                    className="text-[10px] text-zinc-400 underline transition-colors hover:text-zinc-600 focus:outline-none dark:text-zinc-500 dark:hover:text-zinc-300"
+                    className="text-muted-foreground hover:text-muted-foreground text-[10px] underline transition-colors focus:outline-none"
                 >
                     {showManualUrl ? 'Ocultar edición manual' : 'Editar URL manualmente'}
                 </button>
@@ -112,7 +110,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                         placeholder="https://ejemplo.com/imagen.jpg"
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
-                        className="h-8 bg-white text-xs dark:bg-[#161615]"
+                        className="bg-card h-8 text-xs"
                     />
                 </div>
             )}
@@ -152,14 +150,14 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
     return (
         <div className="space-y-2">
             {value ? (
-                <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 transition-all duration-200 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/30 dark:hover:border-zinc-700">
+                <div className="border-border bg-muted/50 hover:border-border flex items-center justify-between gap-4 rounded-xl border p-3 transition-all duration-200">
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
-                            <FileText className="h-5 w-5 text-red-500 dark:text-red-400" />
+                        <div className="border-border bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border">
+                            <FileText className="text-primary h-5 w-5" />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <div className="truncate text-xs font-semibold text-zinc-800 dark:text-zinc-200">{filename}</div>
-                            <div className="mt-0.5 truncate text-[10px] text-zinc-400 dark:text-zinc-500">{value}</div>
+                            <div className="text-foreground truncate text-xs font-semibold">{filename}</div>
+                            <div className="text-muted-foreground mt-0.5 truncate text-[10px]">{value}</div>
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -170,7 +168,7 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-zinc-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-8 w-8"
                             onClick={() => onChange('')}
                         >
                             <Trash2 className="h-4 w-4" />
@@ -180,13 +178,13 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
             ) : (
                 <div
                     onClick={() => setIsDrawerOpen(true)}
-                    className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 p-6 text-center transition-all hover:border-red-500/40 hover:bg-zinc-50/50 dark:border-zinc-800 dark:hover:border-red-500/30 dark:hover:bg-zinc-900/10"
+                    className="group border-border hover:border-primary/40 hover:bg-muted/50 flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center transition-all"
                 >
-                    <UploadCloud className="mb-2 h-7 w-7 text-zinc-400 transition-colors group-hover:text-red-500" />
-                    <span className="text-xs font-semibold text-zinc-700 transition-colors group-hover:text-red-500 dark:text-zinc-300">
+                    <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-7 w-7 transition-colors" />
+                    <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">
                         Seleccionar Archivo / Documento
                     </span>
-                    <span className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">Biblioteca de Medios Rápida</span>
+                    <span className="text-muted-foreground mt-1 text-[10px]">Biblioteca de Medios Rápida</span>
                 </div>
             )}
 
@@ -194,7 +192,7 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
                 <button
                     type="button"
                     onClick={() => setShowManualUrl(!showManualUrl)}
-                    className="text-[10px] text-zinc-400 underline transition-colors hover:text-zinc-600 focus:outline-none dark:text-zinc-500 dark:hover:text-zinc-300"
+                    className="text-muted-foreground hover:text-muted-foreground text-[10px] underline transition-colors focus:outline-none"
                 >
                     {showManualUrl ? 'Ocultar edición manual' : 'Editar URL manualmente'}
                 </button>
@@ -207,7 +205,7 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
                         placeholder="https://ejemplo.com/archivo.pdf"
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
-                        className="h-8 bg-white text-xs dark:bg-[#161615]"
+                        className="bg-card h-8 text-xs"
                     />
                 </div>
             )}
@@ -251,7 +249,7 @@ function SliderFieldRenderer({ value, onChange }: SliderFieldRendererProps) {
 
     return (
         <Select value={value || ''} onValueChange={onChange}>
-            <SelectTrigger className="w-full bg-white dark:bg-[#161615]">
+            <SelectTrigger className="bg-card w-full">
                 <SelectValue placeholder={loading ? 'Cargando sliders...' : 'Selecciona un slider'} />
             </SelectTrigger>
             <SelectContent>
@@ -324,13 +322,13 @@ function RepeaterField({ field, values, onChange }: RepeaterFieldProps) {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-200/50 pb-2 dark:border-zinc-800/50">
-                <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{field.label}</div>
+            <div className="border-border flex items-center justify-between border-b pb-2">
+                <div className="text-foreground text-sm font-semibold">{field.label}</div>
                 <Button
                     type="button"
                     size="sm"
                     onClick={addItem}
-                    className="flex h-8 items-center gap-1.5 bg-red-600 px-3 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-8 items-center gap-1.5 px-3"
                 >
                     <Plus className="h-4 w-4" />
                     <span>Añadir</span>
@@ -344,17 +342,17 @@ function RepeaterField({ field, values, onChange }: RepeaterFieldProps) {
                         return (
                             <div
                                 key={itemKey}
-                                className="relative rounded-xl border border-zinc-200 bg-zinc-50/30 p-5 transition-all duration-200 hover:border-zinc-300 hover:shadow-xs dark:border-zinc-800 dark:bg-zinc-900/10 dark:hover:border-zinc-700"
+                                className="border-border bg-muted/50 hover:border-border relative rounded-xl border p-5 transition-all duration-200 hover:shadow-xs"
                             >
-                                <div className="mb-4 flex items-center justify-between border-b border-zinc-200/60 pb-3 dark:border-zinc-800/60">
-                                    <span className="bg-zinc-250 inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-zinc-600 uppercase dark:bg-zinc-800 dark:text-zinc-400">
+                                <div className="border-border mb-4 flex items-center justify-between border-b pb-3">
+                                    <span className="bg-muted text-muted-foreground inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
                                         Elemento {idx + 1}
                                     </span>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
-                                        className="h-7 w-7 rounded-full text-zinc-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                                        className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-7 w-7 rounded-full"
                                         onClick={() => removeItem(idx)}
                                     >
                                         <Trash2 className="h-4 w-4" />
@@ -370,8 +368,8 @@ function RepeaterField({ field, values, onChange }: RepeaterFieldProps) {
                     })}
                 </div>
             ) : (
-                <div className="dark:border-zinc-850 rounded-xl border border-dashed border-zinc-200 bg-zinc-50/10 py-6 text-center dark:bg-zinc-900/5">
-                    <p className="text-xs text-zinc-400 italic">No se han añadido elementos.</p>
+                <div className="border-border bg-muted/50 rounded-xl border border-dashed py-6 text-center">
+                    <p className="text-muted-foreground text-xs italic">No se han añadido elementos.</p>
                 </div>
             )}
         </div>
@@ -391,10 +389,8 @@ function ContainerField({ field, values, onChange }: ContainerFieldProps) {
         onChange(field.key, next);
     };
     return (
-        <div className="relative space-y-4 rounded-xl border border-zinc-200 bg-zinc-50/20 p-5 dark:border-zinc-800 dark:bg-zinc-900/5">
-            <div className="border-b border-zinc-200/60 pb-2.5 text-sm font-semibold text-zinc-800 dark:border-zinc-800/60 dark:text-zinc-200">
-                {field.label}
-            </div>
+        <div className="border-border bg-muted/50 relative space-y-4 rounded-xl border p-5">
+            <div className="border-border text-foreground border-b pb-2.5 text-sm font-semibold">{field.label}</div>
             <CustomFieldRenderer fields={field.fields || []} values={containerValues} onChange={updateContainer} />
         </div>
     );

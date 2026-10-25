@@ -39,7 +39,7 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout title="Configuración" view="Editar">
             <FormLayout>
                 <form onSubmit={updateConfigHandler} className="space-y-6">
                     <ConfigFormFields data={data} setData={setData} errors={errors} processing={processing} />

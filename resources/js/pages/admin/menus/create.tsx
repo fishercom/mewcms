@@ -45,7 +45,7 @@ export default function Create() {
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/menus" className="text-sm text-gray-600 hover:underline">
+                        <Link href="/admin/menus" className="text-muted-foreground text-sm hover:underline">
                             Cancelar
                         </Link>
                     </div>

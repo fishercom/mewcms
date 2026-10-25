@@ -71,7 +71,7 @@ export default function Create() {
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Información General</h3>
+                        <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">Información General</h3>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nombre del Slider</Label>
@@ -84,9 +84,9 @@ export default function Create() {
                                     onChange={(e) => setName(e.target.value)}
                                     disabled={processing}
                                     placeholder="e.g. Carrusel de Inicio"
-                                    className="bg-white dark:bg-[#161615]"
+                                    className="bg-card"
                                 />
-                                {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
+                                {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                             </div>
 
                             <div className="grid gap-2">
@@ -99,12 +99,12 @@ export default function Create() {
                                     onChange={(e) => setKey(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
                                     disabled={processing}
                                     placeholder="e.g. carrusel_inicio"
-                                    className="bg-white font-mono text-sm dark:bg-[#161615]"
+                                    className="bg-card font-mono text-sm"
                                 />
-                                <span className="text-[10px] text-zinc-400">
+                                <span className="text-muted-foreground text-[10px]">
                                     Usada para cargar este slider en el código/plantillas. Caracteres alfanuméricos y guiones.
                                 </span>
-                                {errors.key && <span className="text-xs text-red-500">{errors.key}</span>}
+                                {errors.key && <span className="text-destructive text-xs">{errors.key}</span>}
                             </div>
                         </div>
 
@@ -117,22 +117,22 @@ export default function Create() {
                                 onChange={(e) => setDescription(e.target.value)}
                                 disabled={processing}
                                 placeholder="Describa dónde se utiliza este slider o su propósito..."
-                                className="bg-white dark:bg-[#161615]"
+                                className="bg-card"
                             />
-                            {errors.description && <span className="text-xs text-red-500">{errors.description}</span>}
+                            {errors.description && <span className="text-destructive text-xs">{errors.description}</span>}
                         </div>
                     </div>
 
-                    <hr className="border-zinc-200 dark:border-zinc-800" />
+                    <hr className="border-border" />
 
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Configuración del Slider</h3>
+                        <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">Configuración del Slider</h3>
 
                         <div className="grid gap-4 md:grid-cols-3">
                             <div className="grid gap-2">
                                 <Label htmlFor="effect">Efecto de Transición</Label>
                                 <Select value={effect} onValueChange={(val: 'slide' | 'fade') => setEffect(val)} disabled={processing}>
-                                    <SelectTrigger className="bg-white dark:bg-[#161615]">
+                                    <SelectTrigger className="bg-card">
                                         <SelectValue placeholder="Efecto" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -152,7 +152,7 @@ export default function Create() {
                                     value={autoplaySpeed}
                                     onChange={(e) => setAutoplaySpeed(Number(e.target.value))}
                                     disabled={processing || !autoplay}
-                                    className="bg-white dark:bg-[#161615]"
+                                    className="bg-card"
                                 />
                             </div>
 
@@ -166,13 +166,13 @@ export default function Create() {
                                     value={transitionSpeed}
                                     onChange={(e) => setTransitionSpeed(Number(e.target.value))}
                                     disabled={processing}
-                                    className="bg-white dark:bg-[#161615]"
+                                    className="bg-card"
                                 />
                             </div>
                         </div>
 
                         <div className="grid gap-4 pt-2 md:grid-cols-2">
-                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
+                            <div className="border-border bg-muted/50 flex items-center space-x-3 rounded-lg border p-3">
                                 <Checkbox
                                     id="autoplay"
                                     checked={autoplay}
@@ -183,31 +183,33 @@ export default function Create() {
                                     <Label htmlFor="autoplay" className="cursor-pointer">
                                         Autoplay (Reproducción Automática)
                                     </Label>
-                                    <span className="text-[10px] text-zinc-400">Las diapositivas avanzarán automáticamente.</span>
+                                    <span className="text-muted-foreground text-[10px]">Las diapositivas avanzarán automáticamente.</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
+                            <div className="border-border bg-muted/50 flex items-center space-x-3 rounded-lg border p-3">
                                 <Checkbox id="loop" checked={loop} onCheckedChange={(checked) => setLoop(Boolean(checked))} disabled={processing} />
                                 <div className="grid gap-0.5 leading-none">
                                     <Label htmlFor="loop" className="cursor-pointer">
                                         Loop Infinito
                                     </Label>
-                                    <span className="text-[10px] text-zinc-400">El slider volverá a empezar al llegar al final.</span>
+                                    <span className="text-muted-foreground text-[10px]">El slider volverá a empezar al llegar al final.</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
+                            <div className="border-border bg-muted/50 flex items-center space-x-3 rounded-lg border p-3">
                                 <Checkbox id="dots" checked={dots} onCheckedChange={(checked) => setDots(Boolean(checked))} disabled={processing} />
                                 <div className="grid gap-0.5 leading-none">
                                     <Label htmlFor="dots" className="cursor-pointer">
                                         Mostrar Paginación (Puntos)
                                     </Label>
-                                    <span className="text-[10px] text-zinc-400">Muestra pequeños puntos indicadores en la parte inferior.</span>
+                                    <span className="text-muted-foreground text-[10px]">
+                                        Muestra pequeños puntos indicadores en la parte inferior.
+                                    </span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-3 rounded-lg border border-zinc-200/50 bg-zinc-50/50 p-3 dark:border-zinc-800/50 dark:bg-zinc-900/10">
+                            <div className="border-border bg-muted/50 flex items-center space-x-3 rounded-lg border p-3">
                                 <Checkbox
                                     id="arrows"
                                     checked={arrows}
@@ -218,18 +220,14 @@ export default function Create() {
                                     <Label htmlFor="arrows" className="cursor-pointer">
                                         Mostrar Flechas de Navegación
                                     </Label>
-                                    <span className="text-[10px] text-zinc-400">Muestra flechas laterales para avanzar o retroceder.</span>
+                                    <span className="text-muted-foreground text-[10px]">Muestra flechas laterales para avanzar o retroceder.</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4 pt-4">
-                        <Button
-                            type="submit"
-                            disabled={processing}
-                            className="h-10 bg-red-600 px-6 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
+                        <Button type="submit" disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
                             {processing ? 'Guardando...' : 'Crear Slider'}
                         </Button>
                         <Button asChild variant="ghost" className="h-10 px-4">

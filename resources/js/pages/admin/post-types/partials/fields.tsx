@@ -50,9 +50,9 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const IconComponent = (LucideIcons as any)[iconName || 'book-open'];
         if (IconComponent) {
-            return <IconComponent className="h-5 w-5 text-red-600 dark:text-red-500" />;
+            return <IconComponent className="text-primary h-5 w-5" />;
         }
-        return <LucideIcons.BookOpen className="h-5 w-5 text-red-600 dark:text-red-500" />;
+        return <LucideIcons.BookOpen className="text-primary h-5 w-5" />;
     };
 
     return (
@@ -108,7 +108,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                     <select
                         id="default_schema_id"
                         value={data.default_schema_id || ''}
-                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         onChange={(e) => setData({ ...data, default_schema_id: e.target.value ? Number(e.target.value) : null })}
                         disabled={processing}
                     >
@@ -125,7 +125,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
 
             <div className="grid gap-2">
                 <Label>Icono del Menú (Sidebar)</Label>
-                <div className="grid max-h-[220px] grid-cols-1 gap-2 overflow-y-auto rounded-lg border border-zinc-200 bg-zinc-50/20 p-3 sm:grid-cols-2 lg:grid-cols-3 dark:border-zinc-800 dark:bg-transparent">
+                <div className="border-border bg-muted/50 grid max-h-[220px] grid-cols-1 gap-2 overflow-y-auto rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-3 dark:bg-transparent">
                     {AVAILABLE_ICONS.map((icon) => {
                         const isSelected = data.icon === icon.value || (!data.icon && icon.value === 'book-open');
                         return (
@@ -133,18 +133,14 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                                 key={icon.value}
                                 type="button"
                                 className={`flex items-center gap-3 rounded-lg border p-2.5 text-left transition-all ${
-                                    isSelected
-                                        ? 'border-red-500 bg-red-50/40 text-red-700 dark:bg-red-950/25 dark:text-red-400'
-                                        : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700'
+                                    isSelected ? 'border-primary bg-primary/40 text-primary' : 'border-border hover:border-border'
                                 }`}
                                 onClick={() => setData({ ...data, icon: icon.value })}
                             >
-                                <div className="rounded-md border border-zinc-100 bg-white p-1 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
-                                    {renderIconPreview(icon.value)}
-                                </div>
+                                <div className="border-border bg-card rounded-md border p-1 shadow-2xs">{renderIconPreview(icon.value)}</div>
                                 <div className="min-w-0">
                                     <div className="text-xs font-semibold">{icon.label}</div>
-                                    <div className="w-[130px] truncate text-[10px] text-zinc-400 dark:text-zinc-500">{icon.desc}</div>
+                                    <div className="text-muted-foreground w-[130px] truncate text-[10px]">{icon.desc}</div>
                                 </div>
                             </button>
                         );
@@ -158,7 +154,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                 <textarea
                     id="description"
                     rows={3}
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     placeholder="Descripción interna del tipo de contenido..."
                     value={data.description || ''}
                     onChange={(e) => setData({ ...data, description: e.target.value })}

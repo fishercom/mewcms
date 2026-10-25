@@ -168,11 +168,13 @@ export default function Edit() {
     return (
         <ModuleLayout view={`Editar Menú: ${item.name}`}>
             {/* Tab Navigation */}
-            <div className="mb-6 flex gap-6 border-b border-gray-200 dark:border-gray-800">
+            <div className="border-border mb-6 flex gap-6 border-b">
                 <button
                     onClick={() => setActiveTab('builder')}
                     className={`flex items-center gap-1.5 border-b-2 pb-3 text-sm font-semibold transition-colors ${
-                        activeTab === 'builder' ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        activeTab === 'builder'
+                            ? 'border-primary-700 text-primary-700'
+                            : 'text-muted-foreground hover:text-foreground border-transparent'
                     }`}
                 >
                     <Layers className="h-4 w-4" />
@@ -181,7 +183,9 @@ export default function Edit() {
                 <button
                     onClick={() => setActiveTab('details')}
                     className={`flex items-center gap-1.5 border-b-2 pb-3 text-sm font-semibold transition-colors ${
-                        activeTab === 'details' ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        activeTab === 'details'
+                            ? 'border-primary-700 text-primary-700'
+                            : 'text-muted-foreground hover:text-foreground border-transparent'
                     }`}
                 >
                     <Settings className="h-4 w-4" />
@@ -195,7 +199,7 @@ export default function Edit() {
                         <MenuFormFields data={menuData} setData={setMenuData} errors={menuErrors} processing={menuProcessing} />
                         <div className="flex items-center gap-4">
                             <Button disabled={menuProcessing}>Guardar Detalles</Button>
-                            <Link href="/admin/menus" className="text-sm text-gray-600 hover:underline">
+                            <Link href="/admin/menus" className="text-muted-foreground text-sm hover:underline">
                                 Cancelar
                             </Link>
                         </div>
@@ -207,10 +211,10 @@ export default function Edit() {
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                     {/* Left side: Drag-and-Drop Structure */}
                     <div className="space-y-4 lg:col-span-7">
-                        <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-[#161615]">
+                        <div className="border-border bg-muted/50 flex items-center justify-between rounded-xl border p-4">
                             <div>
                                 <h3 className="text-sm font-semibold">Estructura del Menú</h3>
-                                <p className="text-xs text-gray-500">Arrastra y suelta los ítems para ordenarlos.</p>
+                                <p className="text-muted-foreground text-xs">Arrastra y suelta los ítems para ordenarlos.</p>
                             </div>
                             {sortNotice && (
                                 <span className="bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400 border-primary-200/50 flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs">
@@ -232,22 +236,22 @@ export default function Edit() {
                                     {topLevelItems.map((parent) => {
                                         const subItems = getSubItems(parent.id);
                                         return (
-                                            <div
-                                                key={parent.id}
-                                                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#161615]"
-                                            >
+                                            <div key={parent.id} className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
                                                 {/* Top Level Item Bar */}
-                                                <div className="flex items-center justify-between p-3.5 transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+                                                <div className="hover:bg-muted/50 flex items-center justify-between p-3.5 transition-colors">
                                                     <div className="flex items-center gap-3">
-                                                        <button type="button" className="handle cursor-grab text-gray-400 hover:text-gray-700">
+                                                        <button
+                                                            type="button"
+                                                            className="handle text-muted-foreground hover:text-foreground cursor-grab"
+                                                        >
                                                             <GripVertical className="h-4.5 w-4.5" />
                                                         </button>
                                                         <div>
                                                             <span className="text-sm font-medium">{parent.title}</span>
-                                                            <span className="ml-2.5 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] tracking-wider text-gray-400 uppercase dark:bg-gray-800">
+                                                            <span className="bg-muted text-muted-foreground ml-2.5 rounded px-1.5 py-0.5 text-[10px] tracking-wider uppercase">
                                                                 {parent.article_id ? 'Artículo' : 'Enlace'}
                                                             </span>
-                                                            <span className="ml-1.5 block max-w-[200px] truncate text-xs text-gray-400 sm:inline">
+                                                            <span className="text-muted-foreground ml-1.5 block max-w-[200px] truncate text-xs sm:inline">
                                                                 {parent.resolved_url}
                                                             </span>
                                                         </div>
@@ -256,7 +260,7 @@ export default function Edit() {
                                                         <Button
                                                             size="icon"
                                                             variant="ghost"
-                                                            className="h-8 w-8 text-gray-500 hover:text-gray-800"
+                                                            className="text-muted-foreground hover:text-foreground h-8 w-8"
                                                             onClick={() => handleEditItem(parent)}
                                                         >
                                                             <Edit2 className="h-3.5 w-3.5" />
@@ -264,7 +268,7 @@ export default function Edit() {
                                                         <Button
                                                             size="icon"
                                                             variant="ghost"
-                                                            className="h-8 w-8 text-red-500 hover:text-red-700"
+                                                            className="text-destructive hover:text-destructive h-8 w-8"
                                                             onClick={() => handleDeleteItem(parent.id)}
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5" />
@@ -273,7 +277,7 @@ export default function Edit() {
                                                 </div>
 
                                                 {/* Nested Sub-Items Area */}
-                                                <div className="space-y-2 border-t border-gray-100 bg-gray-50/30 pr-4 pb-3 pl-8 dark:border-gray-900/50 dark:bg-black/5">
+                                                <div className="border-border bg-muted/50 space-y-2 border-t pr-4 pb-3 pl-8 dark:bg-black/5">
                                                     <ReactSortable
                                                         list={subItems}
                                                         setList={(sortedSub) => handleSortSubItems(parent.id, sortedSub)}
@@ -284,18 +288,18 @@ export default function Edit() {
                                                         {subItems.map((sub) => (
                                                             <div
                                                                 key={sub.id}
-                                                                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-2.5 shadow-sm hover:border-gray-300 dark:border-gray-800 dark:bg-[#1f1f1e] dark:hover:border-gray-700"
+                                                                className="border-border bg-card hover:border-border flex items-center justify-between rounded-lg border p-2.5 shadow-sm"
                                                             >
                                                                 <div className="flex items-center gap-2.5">
                                                                     <button
                                                                         type="button"
-                                                                        className="subhandle cursor-grab text-gray-400 hover:text-gray-700"
+                                                                        className="subhandle text-muted-foreground hover:text-foreground cursor-grab"
                                                                     >
                                                                         <GripVertical className="h-4 w-4" />
                                                                     </button>
                                                                     <div className="flex items-center gap-1.5">
                                                                         <span className="text-xs font-medium">{sub.title}</span>
-                                                                        <span className="py-0.2 rounded border bg-gray-50 px-1 text-[9px] text-gray-400 dark:bg-gray-800">
+                                                                        <span className="py-0.2 bg-muted/50 text-muted-foreground rounded border px-1 text-[9px]">
                                                                             {sub.resolved_url}
                                                                         </span>
                                                                     </div>
@@ -304,7 +308,7 @@ export default function Edit() {
                                                                     <Button
                                                                         size="icon"
                                                                         variant="ghost"
-                                                                        className="h-7 w-7 text-gray-500"
+                                                                        className="text-muted-foreground h-7 w-7"
                                                                         onClick={() => handleEditItem(sub)}
                                                                     >
                                                                         <Edit2 className="h-3 w-3" />
@@ -312,7 +316,7 @@ export default function Edit() {
                                                                     <Button
                                                                         size="icon"
                                                                         variant="ghost"
-                                                                        className="h-7 w-7 text-red-500"
+                                                                        className="text-destructive h-7 w-7"
                                                                         onClick={() => handleDeleteItem(sub.id)}
                                                                     >
                                                                         <Trash2 className="h-3 w-3" />
@@ -322,7 +326,7 @@ export default function Edit() {
                                                         ))}
                                                     </ReactSortable>
                                                     {subItems.length === 0 && (
-                                                        <div className="pt-2 text-[11px] text-gray-400 italic">
+                                                        <div className="text-muted-foreground pt-2 text-[11px] italic">
                                                             No hay sub-elementos. Arrastra aquí para anidar o cambia su ítem padre.
                                                         </div>
                                                     )}
@@ -333,16 +337,16 @@ export default function Edit() {
                                 </ReactSortable>
                             </div>
                         ) : (
-                            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/20 py-16 text-center dark:border-gray-800">
-                                <p className="text-sm text-gray-400 italic">No hay ítems en este menú.</p>
+                            <div className="border-border bg-muted/50 rounded-xl border-2 border-dashed py-16 text-center">
+                                <p className="text-muted-foreground text-sm italic">No hay ítems en este menú.</p>
                             </div>
                         )}
                     </div>
 
                     {/* Right side: Add / Edit Link Form */}
                     <div className="lg:col-span-5">
-                        <div className="space-y-5 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#161615]">
-                            <h3 className="flex items-center gap-1.5 border-b border-gray-100 pb-3 text-sm font-semibold dark:border-gray-900">
+                        <div className="border-border bg-card space-y-5 rounded-xl border p-6 shadow-sm">
+                            <h3 className="border-border flex items-center gap-1.5 border-b pb-3 text-sm font-semibold">
                                 <PlusCircle className="text-primary-700 h-4.5 w-4.5" />
                                 <span>{itemData.id ? 'Editar Ítem de Menú' : 'Agregar Ítem de Menú'}</span>
                             </h3>
@@ -358,7 +362,7 @@ export default function Edit() {
                                             className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-colors ${
                                                 linkType === 'custom'
                                                     ? 'border-primary-700 bg-primary-50/30 text-primary-700 dark:bg-primary-950/20'
-                                                    : 'border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-800'
+                                                    : 'border-border text-muted-foreground hover:bg-muted'
                                             }`}
                                         >
                                             Enlace Personalizado
@@ -369,7 +373,7 @@ export default function Edit() {
                                             className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-colors ${
                                                 linkType === 'article'
                                                     ? 'border-primary-700 bg-primary-50/30 text-primary-700 dark:bg-primary-950/20'
-                                                    : 'border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-800'
+                                                    : 'border-border text-muted-foreground hover:bg-muted'
                                             }`}
                                         >
                                             Artículo de CMS
@@ -389,7 +393,7 @@ export default function Edit() {
                                         onChange={(e) => setItemData({ ...itemData, title: e.target.value })}
                                         disabled={itemProcessing}
                                     />
-                                    {itemErrors.title && <span className="text-xs text-red-500">{itemErrors.title}</span>}
+                                    {itemErrors.title && <span className="text-destructive text-xs">{itemErrors.title}</span>}
                                 </div>
 
                                 {/* Custom URL input */}
@@ -404,7 +408,7 @@ export default function Edit() {
                                             onChange={(e) => setItemData({ ...itemData, url: e.target.value })}
                                             disabled={itemProcessing}
                                         />
-                                        {itemErrors.url && <span className="text-xs text-red-500">{itemErrors.url}</span>}
+                                        {itemErrors.url && <span className="text-destructive text-xs">{itemErrors.url}</span>}
                                     </div>
                                 )}
 
@@ -414,7 +418,7 @@ export default function Edit() {
                                         <Label htmlFor="item-article">Selecciona Artículo</Label>
                                         <select
                                             id="item-article"
-                                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1f1f1e] dark:text-white"
+                                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring bg-card text-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                             value={itemData.article_id ?? ''}
                                             onChange={(e) =>
                                                 setItemData({
@@ -431,7 +435,7 @@ export default function Edit() {
                                                 </option>
                                             ))}
                                         </select>
-                                        {itemErrors.article_id && <span className="text-xs text-red-500">{itemErrors.article_id}</span>}
+                                        {itemErrors.article_id && <span className="text-destructive text-xs">{itemErrors.article_id}</span>}
                                     </div>
                                 )}
 
@@ -440,7 +444,7 @@ export default function Edit() {
                                     <Label htmlFor="item-parent">Nivel Padre (Opcional)</Label>
                                     <select
                                         id="item-parent"
-                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1f1f1e] dark:text-white"
+                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring bg-card text-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                         value={itemData.parent_id ?? ''}
                                         onChange={(e) =>
                                             setItemData({
@@ -467,7 +471,7 @@ export default function Edit() {
                                     <Label htmlFor="item-target">Destino / Target</Label>
                                     <select
                                         id="item-target"
-                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1f1f1e] dark:text-white"
+                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring bg-card text-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                         value={itemData.target}
                                         onChange={(e) =>
                                             setItemData({

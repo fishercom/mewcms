@@ -100,7 +100,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFDFC] text-[#1b1b18] transition-colors duration-200 dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
+        <div className="front-theme min-h-screen bg-[#FDFDFC] text-[#1b1b18] transition-colors duration-200 dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
             <Head>
                 {seoTitle && <title>{seoTitle}</title>}
                 {seoDescription && <meta name="description" content={seoDescription} />}

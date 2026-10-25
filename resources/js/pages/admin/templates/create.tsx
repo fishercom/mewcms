@@ -73,7 +73,7 @@ export default function Create() {
                             disabled={processing}
                             placeholder="e.g. Contacto Principal"
                         />
-                        {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
+                        {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                     </div>
 
                     <div className="grid gap-2">
@@ -89,18 +89,18 @@ export default function Create() {
                                 placeholder="contacto-principal"
                                 className="font-mono text-sm"
                             />
-                            <span className="text-sm font-semibold text-gray-400">.tsx</span>
+                            <span className="text-muted-foreground text-sm font-semibold">.tsx</span>
                         </div>
-                        <p className="text-xs text-gray-400">Debe constar de caracteres alfanuméricos, guiones o guiones bajos.</p>
-                        {errors.filename && <span className="text-xs text-red-500">{errors.filename}</span>}
+                        <p className="text-muted-foreground text-xs">Debe constar de caracteres alfanuméricos, guiones o guiones bajos.</p>
+                        {errors.filename && <span className="text-destructive text-xs">{errors.filename}</span>}
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="content">Código de la Plantilla (React / TypeScript)</Label>
-                        <div className="overflow-hidden rounded-md border border-gray-800 bg-gray-900">
-                            <div className="flex items-center justify-between border-b border-gray-900 bg-gray-800/60 px-4 py-2 font-mono text-xs text-gray-400">
+                        <div className="border-border-strong bg-muted overflow-hidden rounded-md border">
+                            <div className="border-border-strong bg-muted/60 text-muted-foreground flex items-center justify-between border-b px-4 py-2 font-mono text-xs">
                                 <span>{filename ? `${filename}.tsx` : 'template.tsx'}</span>
-                                <span className="font-semibold text-red-400">TSX</span>
+                                <span className="text-primary font-semibold">TSX</span>
                             </div>
                             <Textarea
                                 id="content"
@@ -108,19 +108,19 @@ export default function Create() {
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 disabled={processing}
-                                className="min-h-[400px] resize-y border-0 bg-gray-900 p-4 font-mono text-sm leading-relaxed text-gray-100 focus-visible:ring-0"
+                                className="bg-muted text-muted-foreground/70 min-h-[400px] resize-y border-0 p-4 font-mono text-sm leading-relaxed focus-visible:ring-0"
                                 placeholder="// Escribe el código de tu componente React..."
                                 spellCheck={false}
                             />
                         </div>
-                        {errors.content && <span className="text-xs text-red-500">{errors.content}</span>}
+                        {errors.content && <span className="text-destructive text-xs">{errors.content}</span>}
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing} className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600">
+                        <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">
                             {processing ? 'Guardando...' : 'Guardar'}
                         </Button>
-                        <Link href="/admin/templates" className="text-sm text-gray-500 hover:underline">
+                        <Link href="/admin/templates" className="text-muted-foreground text-sm hover:underline">
                             Cancelar
                         </Link>
                     </div>

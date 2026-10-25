@@ -129,7 +129,7 @@ export default function ContentEditorTools({ module, id, data, initialData, auto
     return (
         <div className="space-y-3">
             {pendingAutosave && (
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-800 dark:text-amber-300">
+                <div className="border-warning/30 bg-warning/10 text-warning flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-xs">
                     <span className="flex items-center gap-2">
                         <Save className="h-4 w-4" />
                         Hay un borrador autoguardado más reciente
@@ -281,8 +281,8 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
                     <DialogHeader>
                         <DialogTitle>Comparar revisión</DialogTitle>
                         <DialogDescription>
-                            <span className="rounded bg-rose-500/15 px-1 text-rose-700 line-through dark:text-rose-300">Revisión</span> frente a{' '}
-                            <span className="rounded bg-emerald-500/15 px-1 text-emerald-700 dark:text-emerald-300">editor actual</span>
+                            <span className="bg-destructive/15 text-destructive rounded px-1 line-through">Revisión</span> frente a{' '}
+                            <span className="bg-success/15 text-success rounded px-1">editor actual</span>
                         </DialogDescription>
                     </DialogHeader>
                     {comparing && (
@@ -313,11 +313,11 @@ function DiffField({ label, before, after }: { label: string; before: string; af
                     part.type === 'same' ? (
                         <span key={i}>{part.text}</span>
                     ) : part.type === 'added' ? (
-                        <ins key={i} className="rounded bg-emerald-500/15 text-emerald-700 no-underline dark:text-emerald-300">
+                        <ins key={i} className="bg-success/15 text-success rounded no-underline">
                             {part.text}
                         </ins>
                     ) : (
-                        <del key={i} className="rounded bg-rose-500/15 text-rose-700 dark:text-rose-300">
+                        <del key={i} className="bg-destructive/15 text-destructive rounded">
                             {part.text}
                         </del>
                     ),

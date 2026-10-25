@@ -1,7 +1,7 @@
-import TagField from '@/components/tag-field';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import TagField from '@/components/tag-field';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,18 +27,7 @@ interface Props {
     cptLabelSingular: string;
 }
 
-export default function PostFields({
-    data,
-    setData,
-    errors,
-    processing,
-    schemas,
-    authors,
-    tags,
-    schema,
-    onChangeSchema,
-    cptLabelSingular,
-}: Props) {
+export default function PostFields({ data, setData, errors, processing, schemas, authors, tags, schema, onChangeSchema, cptLabelSingular }: Props) {
     const [mediaDrawerOpen, setMediaDrawerOpen] = useState(false);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,11 +88,11 @@ export default function PostFields({
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="slug" className="text-xs font-semibold text-zinc-400">
+                    <Label htmlFor="slug" className="text-muted-foreground text-xs font-semibold">
                         Enlace Permanente (Slug)
                     </Label>
                     <div className="flex items-center gap-1 text-xs">
-                        <span className="font-mono text-zinc-400">/{data.post_type !== 'post' ? `${data.post_type}/` : 'blog/'}</span>
+                        <span className="text-muted-foreground font-mono">/{data.post_type !== 'post' ? `${data.post_type}/` : 'blog/'}</span>
                         <input
                             id="slug"
                             type="text"
@@ -111,7 +100,7 @@ export default function PostFields({
                             value={data.slug || ''}
                             onChange={(e) => setData({ ...data, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                             disabled={processing}
-                            className="max-w-full border-b border-dashed border-zinc-300 bg-transparent font-mono text-red-600 focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:text-red-400"
+                            className="border-border text-destructive focus:border-border-strong max-w-full border-b border-dashed bg-transparent font-mono focus:outline-none"
                         />
                     </div>
                     <InputError message={errors.slug} />
@@ -137,7 +126,7 @@ export default function PostFields({
                         value={data.excerpt || ''}
                         onChange={(e) => setData({ ...data, excerpt: e.target.value })}
                         disabled={processing}
-                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="Escribe una pequeña introducción o resumen..."
                     />
                     <InputError message={errors.excerpt} />
@@ -145,12 +134,12 @@ export default function PostFields({
 
                 {/* Dynamic Custom Fields Schema */}
                 {schema?.fields && schema.fields.length > 0 && (
-                    <div className="space-y-4 border-t border-zinc-100 pt-5 dark:border-zinc-800">
-                        <div className="flex items-center gap-2 text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                            <Settings className="h-4 w-4 text-red-600 dark:text-red-500" />
+                    <div className="border-border space-y-4 border-t pt-5">
+                        <div className="text-foreground flex items-center gap-2 text-sm font-bold">
+                            <Settings className="text-primary h-4 w-4" />
                             <span>Campos Personalizados ({schema.name})</span>
                         </div>
-                        <div className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50/20 p-5 dark:border-zinc-800 dark:bg-[#161615]/30">
+                        <div className="border-border bg-muted/50 space-y-4 rounded-xl border p-5">
                             <CustomFieldRenderer
                                 fields={schema.fields}
                                 values={data.metadata as Record<string, import('@/types/models/cms-article').JsonValue>}
@@ -163,7 +152,7 @@ export default function PostFields({
                     </div>
                 )}
 
-                <div className="border-t border-zinc-100 pt-5 dark:border-zinc-800">
+                <div className="border-border border-t pt-5">
                     <SeoFields
                         values={
                             (data.metadata as { seo_title?: string; seo_description?: string; seo_keywords?: string; seo_og_image?: string }) || {}
@@ -179,9 +168,9 @@ export default function PostFields({
             {/* Right Column: Settings, Images & Metadata */}
             <div className="space-y-6 lg:col-span-4">
                 {/* Publish settings card */}
-                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#161615]/20">
-                    <h3 className="flex items-center gap-1.5 border-b border-zinc-100 pb-2 text-sm font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-                        <Eye className="h-4 w-4 text-zinc-400" />
+                <div className="border-border bg-card space-y-4 rounded-xl border p-4">
+                    <h3 className="border-border text-foreground flex items-center gap-1.5 border-b pb-2 text-sm font-bold">
+                        <Eye className="text-muted-foreground h-4 w-4" />
                         <span>Publicación</span>
                     </h3>
 
@@ -190,7 +179,7 @@ export default function PostFields({
                         <select
                             id="status"
                             value={data.status || 'draft'}
-                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             onChange={(e) => setData({ ...data, status: e.target.value })}
                             disabled={processing}
                         >
@@ -202,30 +191,30 @@ export default function PostFields({
 
                     <div className="grid gap-2">
                         <Label htmlFor="published_at" className="flex items-center gap-1">
-                            <Calendar className="h-3.5 w-3.5 text-zinc-400" />
+                            <Calendar className="text-muted-foreground h-3.5 w-3.5" />
                             <span>Fecha de publicación</span>
                         </Label>
                         <input
                             id="published_at"
                             type="datetime-local"
                             value={getPublishedAtValue()}
-                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             onChange={handlePublishedAtChange}
                             disabled={processing}
                         />
-                        <p className="text-[11px] text-zinc-500">Una fecha futura programa la entrada.</p>
+                        <p className="text-muted-foreground text-[11px]">Una fecha futura programa la entrada.</p>
                         <InputError message={errors.published_at} />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="user_id" className="flex items-center gap-1">
-                            <User className="h-3.5 w-3.5 text-zinc-400" />
+                            <User className="text-muted-foreground h-3.5 w-3.5" />
                             <span>Autor</span>
                         </Label>
                         <select
                             id="user_id"
                             value={data.user_id || ''}
-                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             onChange={(e) => setData({ ...data, user_id: Number(e.target.value) })}
                             disabled={processing}
                         >
@@ -243,7 +232,7 @@ export default function PostFields({
                         <select
                             id="schema_id"
                             value={data.schema_id || ''}
-                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800"
+                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             onChange={(e) => onChangeSchema(e.target.value ? Number(e.target.value) : 0)}
                             disabled={processing}
                         >
@@ -259,15 +248,15 @@ export default function PostFields({
                 </div>
 
                 {/* Featured image card */}
-                <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#161615]/20">
-                    <h3 className="flex items-center gap-1.5 border-b border-zinc-100 pb-2 text-sm font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-                        <ImageIcon className="h-4 w-4 text-zinc-400" />
+                <div className="border-border bg-card space-y-3 rounded-xl border p-4">
+                    <h3 className="border-border text-foreground flex items-center gap-1.5 border-b pb-2 text-sm font-bold">
+                        <ImageIcon className="text-muted-foreground h-4 w-4" />
                         <span>Imagen Destacada</span>
                     </h3>
 
                     {data.featured_image ? (
                         <div className="space-y-3">
-                            <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800">
+                            <div className="group border-border bg-muted/50 relative aspect-[16/10] w-full overflow-hidden rounded-lg border">
                                 <img src={data.featured_image} alt="Imagen Destacada" className="h-full w-full object-cover" />
                                 <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                                     <Button type="button" variant="secondary" size="sm" onClick={() => setMediaDrawerOpen(true)}>
@@ -289,18 +278,18 @@ export default function PostFields({
                         <button
                             type="button"
                             onClick={() => setMediaDrawerOpen(true)}
-                            className="group flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-300 p-4 transition-all hover:border-red-500/40 dark:border-zinc-800 dark:hover:border-zinc-700"
+                            className="group border-border hover:border-primary/40 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 transition-all"
                         >
-                            <ImageIcon className="h-8 w-8 text-zinc-400 transition-transform group-hover:scale-105" />
-                            <span className="text-xs font-medium text-zinc-500">Asignar imagen destacada</span>
+                            <ImageIcon className="text-muted-foreground h-8 w-8 transition-transform group-hover:scale-105" />
+                            <span className="text-muted-foreground text-xs font-medium">Asignar imagen destacada</span>
                         </button>
                     )}
                     <InputError message={errors.featured_image} />
                 </div>
 
                 {/* Tags */}
-                <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#161615]/20">
-                    <h3 className="border-b border-zinc-100 pb-2 text-sm font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">Etiquetas</h3>
+                <div className="border-border bg-card space-y-3 rounded-xl border p-4">
+                    <h3 className="border-border text-foreground border-b pb-2 text-sm font-bold">Etiquetas</h3>
                     <TagField tags={tags} selected={data.tag_ids || []} onChange={(tagIds) => setData({ ...data, tag_ids: tagIds })} />
                     <InputError message={errors.tag_ids} />
                 </div>

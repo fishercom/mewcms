@@ -37,14 +37,14 @@ export default function Index() {
                         <form className="flex items-center">
                             <div className="relative w-full">
                                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
-                                    <Search className="h-4 w-4 text-gray-400" />
+                                    <Search className="text-muted-foreground h-4 w-4" />
                                 </div>
                                 <Input
                                     type="text"
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 bg-transparent p-2 pl-10 text-sm text-gray-900 dark:text-white"
+                                    className="border-border-strong text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
                                     placeholder="Buscar menú"
                                 />
                             </div>
@@ -53,7 +53,7 @@ export default function Index() {
                     <div className="flex w-full flex-shrink-0 flex-col items-stretch justify-end space-y-2 md:w-auto md:flex-row md:items-center md:space-y-0 md:space-x-3">
                         <Link
                             href="/admin/menus/create"
-                            className="flex items-center justify-center gap-1.5 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors"
                         >
                             <Plus className="h-4 w-4" />
                             <span>Agregar Menú</span>
@@ -61,8 +61,8 @@ export default function Index() {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="bg-gray-100 text-xs text-gray-700 uppercase dark:bg-gray-800 dark:text-gray-400">
+                    <table className="text-muted-foreground w-full text-left text-sm">
+                        <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
                                     Nombre / Name
@@ -85,8 +85,8 @@ export default function Index() {
                         <tbody>
                             {items.data.map((item: CmsMenu) => {
                                 return (
-                                    <tr key={item.id} className="border-b dark:border-gray-700">
-                                        <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+                                    <tr key={item.id} className="border-b">
+                                        <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             <Link
                                                 href={`/admin/menus/${item.id}/edit`}
                                                 className="text-primary-700 flex items-center gap-1.5 hover:underline"
@@ -97,7 +97,7 @@ export default function Index() {
                                         </th>
                                         <td className="px-4 py-3">{item.slug}</td>
                                         <td className="max-w-xs truncate px-4 py-3">{item.description}</td>
-                                        <td className="px-4 py-3">{item.active ? <Check className="h-4 w-4 text-green-500" /> : <></>}</td>
+                                        <td className="px-4 py-3">{item.active ? <Check className="text-success h-4 w-4" /> : <></>}</td>
                                         <td className="px-4 py-3">{format(new Date(item.created_at), 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="flex items-center justify-end gap-2 px-4 py-3">
                                             <Button
@@ -121,7 +121,7 @@ export default function Index() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="flex h-8 items-center gap-1 px-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive flex h-8 items-center gap-1 px-2.5"
                                                 onClick={() => deleteMenuHandler(item.id)}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
@@ -133,7 +133,7 @@ export default function Index() {
                             })}
                             {items.data.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                                    <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center">
                                         No se encontraron menús.
                                     </td>
                                 </tr>

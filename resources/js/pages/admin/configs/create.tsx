@@ -39,7 +39,7 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout title="Configuración" view="Crear">
             <FormLayout>
                 <form onSubmit={createConfigHandler} className="space-y-6">
                     <ConfigFormFields data={data} setData={setData} errors={errors} processing={processing} />

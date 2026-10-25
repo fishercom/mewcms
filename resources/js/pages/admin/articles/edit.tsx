@@ -95,14 +95,14 @@ export default function Edit() {
                             className="border-border/70 h-9 gap-1.5 rounded-xl text-xs font-medium shadow-2xs"
                             onClick={() => setMediaOpen(true)}
                         >
-                            <ImageIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                            <ImageIcon className="text-primary h-4 w-4" />
                             <span>Biblioteca de Medios</span>
                         </Button>
 
                         <Button
                             type="submit"
                             disabled={processing}
-                            className="h-9 gap-1.5 rounded-xl bg-violet-600 px-4 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 transition-all hover:bg-violet-700 active:scale-95"
+                            className="bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 h-9 gap-1.5 rounded-xl px-4 text-xs font-semibold shadow-sm transition-all active:scale-95"
                         >
                             <span>Guardar Cambios</span>
                         </Button>
@@ -157,7 +157,7 @@ export default function Edit() {
                         <Button
                             type="submit"
                             disabled={processing}
-                            className="h-9 rounded-xl bg-violet-600 px-5 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 hover:bg-violet-700 active:scale-95"
+                            className="bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 h-9 rounded-xl px-5 text-xs font-semibold shadow-sm active:scale-95"
                         >
                             {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>

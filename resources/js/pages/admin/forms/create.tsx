@@ -41,14 +41,11 @@ export default function Create() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <FormFields data={data} setData={setData} errors={errors} />
 
-                    <div className="flex items-center gap-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                        <Button disabled={processing} className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600">
+                    <div className="border-border flex items-center gap-4 border-t pt-4">
+                        <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">
                             Crear Formulario
                         </Button>
-                        <Link
-                            href={route('forms.index')}
-                            className="text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-                        >
+                        <Link href={route('forms.index')} className="text-muted-foreground hover:text-foreground text-sm font-medium">
                             Cancelar
                         </Link>
                     </div>

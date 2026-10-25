@@ -58,48 +58,48 @@ export default function FormFields({ data, setData, errors }: Props) {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             {/* Left Column: Form Settings */}
             <div className="space-y-4 lg:col-span-4">
-                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
-                    <h3 className="dark:border-zinc-850 flex items-center gap-1.5 border-b border-zinc-100 pb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                        <Settings className="h-4 w-4 text-red-600" />
+                <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
+                    <h3 className="border-border text-foreground flex items-center gap-1.5 border-b pb-3 text-sm font-bold">
+                        <Settings className="text-primary h-4 w-4" />
                         <span>Ajustes del Formulario</span>
                     </h3>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Nombre</label>
+                        <label className="text-muted-foreground text-xs font-semibold">Nombre</label>
                         <input
                             type="text"
                             required
                             value={data.name || ''}
                             onChange={(e) => handleFormChange('name', e.target.value)}
-                            className="dark:border-zinc-850 w-full rounded-lg border border-zinc-200 bg-transparent px-3 py-2 text-sm text-zinc-800 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none dark:text-zinc-200"
+                            className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
                             placeholder="Ej. Formulario de Contacto"
                         />
-                        {errors.name && <p className="text-[11px] text-red-500">{errors.name}</p>}
+                        {errors.name && <p className="text-destructive text-[11px]">{errors.name}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Alias (Clave única)</label>
+                        <label className="text-muted-foreground text-xs font-semibold">Alias (Clave única)</label>
                         <input
                             type="text"
                             required
                             value={data.alias || ''}
                             onChange={(e) => handleFormChange('alias', e.target.value)}
-                            className="dark:border-zinc-850 w-full rounded-lg border border-zinc-200 bg-transparent px-3 py-2 font-mono text-sm text-zinc-800 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none dark:text-zinc-200"
+                            className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 font-mono text-sm focus-visible:ring-2 focus-visible:outline-none"
                             placeholder="Ej. contacto_general"
                         />
-                        {errors.alias && <p className="text-[11px] text-red-500">{errors.alias}</p>}
+                        {errors.alias && <p className="text-destructive text-[11px]">{errors.alias}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Información / Descripción</label>
+                        <label className="text-muted-foreground text-xs font-semibold">Información / Descripción</label>
                         <textarea
                             value={data.info || ''}
                             onChange={(e) => handleFormChange('info', e.target.value)}
                             rows={3}
-                            className="dark:border-zinc-850 w-full rounded-lg border border-zinc-200 bg-transparent px-3 py-2 text-sm text-zinc-800 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none dark:text-zinc-200"
+                            className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
                             placeholder="Info de ayuda o descripción del propósito del formulario"
                         />
-                        {errors.info && <p className="text-[11px] text-red-500">{errors.info}</p>}
+                        {errors.info && <p className="text-destructive text-[11px]">{errors.info}</p>}
                     </div>
 
                     <div className="flex items-center gap-3 pt-2">
@@ -108,9 +108,9 @@ export default function FormFields({ data, setData, errors }: Props) {
                             id="form_active"
                             checked={data.active ?? true}
                             onChange={(e) => handleFormChange('active', e.target.checked)}
-                            className="dark:border-zinc-850 h-4 w-4 rounded-sm border-zinc-200 bg-transparent text-red-600 focus:ring-2 focus:ring-red-500"
+                            className="border-border text-primary focus:ring-primary/40 h-4 w-4 rounded-sm bg-transparent focus:ring-2"
                         />
-                        <label htmlFor="form_active" className="cursor-pointer text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                        <label htmlFor="form_active" className="text-muted-foreground cursor-pointer text-xs font-semibold">
                             Formulario Activo
                         </label>
                     </div>
@@ -119,10 +119,10 @@ export default function FormFields({ data, setData, errors }: Props) {
 
             {/* Right Column: Dynamic Form Fields Schema Builder */}
             <div className="space-y-4 lg:col-span-8">
-                <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
-                    <div className="dark:border-zinc-850 flex items-center justify-between border-b border-zinc-100 pb-3">
-                        <h3 className="flex items-center gap-1.5 text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                            <List className="h-4 w-4 text-red-600" />
+                <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
+                    <div className="border-border flex items-center justify-between border-b pb-3">
+                        <h3 className="text-foreground flex items-center gap-1.5 text-sm font-bold">
+                            <List className="text-primary h-4 w-4" />
                             <span>Campos del Formulario</span>
                         </h3>
                         <Button
@@ -140,43 +140,42 @@ export default function FormFields({ data, setData, errors }: Props) {
                     {data.fields.length > 0 ? (
                         <div className="max-h-[500px] space-y-4 overflow-y-auto pr-1">
                             {data.fields.map((field, idx) => (
-                                <div
-                                    key={idx}
-                                    className="dark:border-zinc-850 relative space-y-3 rounded-xl border border-zinc-100 bg-zinc-50/30 p-4 dark:bg-zinc-900/40"
-                                >
+                                <div key={idx} className="border-border bg-muted/50 relative space-y-3 rounded-xl border p-4">
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Etiqueta</label>
+                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                                                Etiqueta
+                                            </label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={field.name}
                                                 onChange={(e) => handleFieldChange(idx, 'name', e.target.value)}
-                                                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
+                                                className="border-border bg-card text-foreground focus:ring-primary/40 w-full rounded-lg border px-2.5 py-1.5 text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
                                                 placeholder="Ej. Correo Electrónico"
                                             />
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Clave</label>
+                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">Clave</label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={field.alias}
                                                 onChange={(e) => handleFieldChange(idx, 'alias', e.target.value)}
-                                                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 font-mono text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
+                                                className="border-border bg-card text-foreground focus:ring-primary/40 w-full rounded-lg border px-2.5 py-1.5 font-mono text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
                                                 placeholder="Ej. email"
                                             />
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                                                 Tipo de Entrada
                                             </label>
                                             <select
                                                 value={field.type}
                                                 onChange={(e) => handleFieldChange(idx, 'type', e.target.value as CmsFormField['type'])}
-                                                className="h-8 w-full rounded-lg border border-zinc-200 bg-white px-2 text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
+                                                className="border-border bg-card text-foreground focus:ring-primary/40 h-8 w-full rounded-lg border px-2 text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
                                             >
                                                 <option value="text">Texto simple</option>
                                                 <option value="email">Email</option>
@@ -192,8 +191,8 @@ export default function FormFields({ data, setData, errors }: Props) {
                                     {/* Render options list if type is select/checkbox/radio */}
                                     {['select', 'checkbox', 'radio'].includes(field.type) && (
                                         <div className="space-y-1">
-                                            <label className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
-                                                <CircleDot className="h-3 w-3 text-red-500" />
+                                            <label className="text-muted-foreground flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase">
+                                                <CircleDot className="text-primary h-3 w-3" />
                                                 <span>Opciones (Valores separados por coma)</span>
                                             </label>
                                             <input
@@ -207,20 +206,20 @@ export default function FormFields({ data, setData, errors }: Props) {
                                                         .filter(Boolean);
                                                     handleFieldChange(idx, 'options', arr);
                                                 }}
-                                                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-800 focus:ring-1 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
+                                                className="border-border bg-card text-foreground focus:ring-primary/40 w-full rounded-lg border px-2.5 py-1.5 text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
                                                 placeholder="Opción 1, Opción 2, Opción 3"
                                             />
                                         </div>
                                     )}
 
-                                    <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-400">
+                                    <div className="text-muted-foreground flex items-center justify-between pt-1 text-[11px]">
                                         <div className="flex items-center gap-2">
                                             <input
                                                 type="checkbox"
                                                 id={`field_active_${idx}`}
                                                 checked={field.active}
                                                 onChange={(e) => handleFieldChange(idx, 'active', e.target.checked)}
-                                                className="h-3.5 w-3.5 rounded-sm border-zinc-200 bg-transparent text-red-600 dark:border-zinc-800"
+                                                className="border-border text-primary h-3.5 w-3.5 rounded-sm bg-transparent"
                                             />
                                             <label htmlFor={`field_active_${idx}`} className="cursor-pointer font-medium">
                                                 Campo Activo
@@ -230,7 +229,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveField(idx)}
-                                            className="inline-flex items-center gap-1 text-red-500 transition-colors hover:text-red-600"
+                                            className="text-destructive hover:text-destructive inline-flex items-center gap-1 transition-colors"
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
                                             <span>Eliminar Campo</span>
@@ -240,8 +239,8 @@ export default function FormFields({ data, setData, errors }: Props) {
                             ))}
                         </div>
                     ) : (
-                        <div className="rounded-xl border border-dashed border-zinc-200 py-12 text-center text-zinc-400 dark:border-zinc-800">
-                            <List className="mx-auto mb-2 h-8 w-8 text-zinc-300" />
+                        <div className="border-border text-muted-foreground rounded-xl border border-dashed py-12 text-center">
+                            <List className="text-muted-foreground/70 mx-auto mb-2 h-8 w-8" />
                             <p className="text-xs">No hay campos añadidos a este formulario. Haz clic en "Añadir Campo" para empezar.</p>
                         </div>
                     )}
