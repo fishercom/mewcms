@@ -32,7 +32,7 @@ export default function Index() {
 
     return (
         <ModuleLayout view={`Términos de ${taxonomy.name}`}>
-            <div className="relative overflow-hidden">
+            <div className="relative">
                 <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
                     <div className="flex w-full items-center space-x-3 md:w-3/4">
                         <Link href="/admin/taxonomies" className="flex items-center text-sm text-gray-500 hover:text-gray-700">
@@ -49,7 +49,7 @@ export default function Index() {
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm focus-within:outline-2 focus-within:outline-gray-400"
+                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm"
                                     placeholder="Buscar término"
                                 />
                             </div>

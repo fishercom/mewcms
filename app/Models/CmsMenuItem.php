@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsMenuItem extends Model
 {
+    use FlushesFrontCache;
     use LogsAdminActivity;
 
     protected $table = 'cms_menu_items';

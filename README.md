@@ -382,6 +382,14 @@ The container automatically:
 
 A ready-to-use [`render.yaml`](file:///Users/fischer/Projects/mewcms/render.yaml) configuration is included in the project for zero-friction cloud deployment.
 
+#### Server-Side Rendering & Caching
+
+Public pages are server-rendered with Inertia SSR so search engines and social previews get the full HTML (titles, headings, Open Graph tags). The admin panel and account settings stay client-rendered.
+
+- The build runs `npm run build:ssr`, which writes the client assets to `public/build` and the SSR bundle to `bootstrap/ssr`. Dependencies are bundled in, so production only needs Node, not `node_modules`.
+- Set `INERTIA_SSR_ENABLED=true`. The Docker image, `start-render.sh` and `nixpacks.toml` then start `php artisan inertia:start-ssr` next to the web server. If the SSR server is down, pages fall back to client-side rendering.
+- Navigation, taxonomies, menus, layout settings and the sitemap are cached for an hour and flushed automatically whenever content changes in the admin.
+
 ---
 
 ## 🤝 Contributing & Community

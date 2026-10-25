@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsTaxonomy;
 use App\Models\CmsTaxonomyTerm;
+use App\Support\FrontCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -122,6 +123,7 @@ class TaxonomyTermController extends Controller
         foreach ($terms as $index => $term) {
             CmsTaxonomyTerm::where('id', $term['id'])->update(['position' => $index]);
         }
+        FrontCache::flush();
 
         return response()->json(['status' => 'success']);
     }

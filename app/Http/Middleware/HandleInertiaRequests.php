@@ -3,8 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\AdmMenu;
-use App\Models\CmsConfig;
-use App\Models\CmsMenu;
+use App\Support\FrontCache;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -42,16 +41,6 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        $menus = CmsMenu::with(['items' => function ($query): void {
-            $query->where('active', true)->orderBy('position')->with('article');
-        }])->where('active', true)->get();
-
-        $layoutConfigs = CmsConfig::where('alias', 'like', 'layout_%')->get();
-        $layoutSettings = [];
-        foreach ($layoutConfigs as $config) {
-            $layoutSettings[$config->alias] = $config->value;
-        }
-
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -68,8 +57,8 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'adm_menu' => fn (): array => $this->adminMenu($request),
-            'menus' => $menus,
-            'layout_settings' => $layoutSettings,
+            'menus' => fn (): array => FrontCache::menus(),
+            'layout_settings' => fn (): array => FrontCache::layoutSettings(),
         ];
     }
 

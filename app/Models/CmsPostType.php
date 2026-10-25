@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsPostType extends Model
 {
+    use FlushesFrontCache;
     use LogsAdminActivity;
 
     protected $table = 'cms_post_types';

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use App\Support\ContentSanitizer;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -10,6 +11,7 @@ use Rutorika\Sortable\SortableTrait;
 
 class CmsArticle extends Model
 {
+    use FlushesFrontCache;
     use LogsAdminActivity;
 
     /**

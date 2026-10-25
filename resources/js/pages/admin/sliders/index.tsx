@@ -35,7 +35,7 @@ export default function Index() {
 
     return (
         <ModuleLayout>
-            <div className="relative space-y-4 overflow-hidden">
+            <div className="relative space-y-4">
                 <div className="flex flex-col items-center justify-between gap-4 pb-2 md:flex-row">
                     <div className="w-full md:w-1/3">
                         <div className="relative">

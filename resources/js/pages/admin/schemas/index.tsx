@@ -43,7 +43,7 @@ export default function Index() {
 
     return (
         <ModuleLayout>
-            <div className="relative overflow-hidden">
+            <div className="relative">
                 {errors?.error && (
                     <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
                         {errors.error}
@@ -64,14 +64,14 @@ export default function Index() {
                                     autoFocus
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
-                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm focus-within:outline-2 focus-within:outline-gray-400"
+                                    className="block w-full rounded-md border border-gray-500 p-2 pl-10 text-sm"
                                     placeholder="Buscar"
                                 />
                             </div>
                             <label htmlFor="simple-search" className="sr-only">
                                 Group
                             </label>
-                            <div className="block rounded-md border border-gray-500 text-sm focus-within:outline-2 focus-within:outline-gray-400">
+                            <div className="block rounded-md border border-gray-500 text-sm">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="p-3">
