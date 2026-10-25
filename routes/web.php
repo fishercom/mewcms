@@ -21,9 +21,9 @@ require __DIR__.'/admin.php';
 // Home route (named 'home' for compatibility with frontend components)
 Route::get('/', [FrontController::class, 'show'])->name('home');
 
-// Taxonomy listing routes
-Route::get('category/{slug}', [FrontController::class, 'category'])->name('front.category');
+// Tag archives (old "/category/{slug}" URLs redirect to them)
 Route::get('tag/{slug}', [FrontController::class, 'tag'])->name('front.tag');
+Route::get('category/{slug}', [FrontController::class, 'category'])->name('front.category');
 
 // Public blog post routes
 Route::get('blog', [FrontController::class, 'blogIndex'])->name('front.blog.index');

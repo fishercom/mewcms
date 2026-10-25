@@ -15,8 +15,8 @@ export default function Create() {
         schema,
         schemas = [],
         parents = [],
-        taxonomies,
-    } = usePage<{ schema?: CmsSchema; schemas?: CmsSchema[]; parents?: CmsArticle[]; taxonomies?: import('@/types').CmsTaxonomy[] }>().props;
+        tags,
+    } = usePage<{ schema?: CmsSchema; schemas?: CmsSchema[]; parents?: CmsArticle[]; tags?: import('@/types').CmsTag[] }>().props;
 
     const initial: CmsArticleForm = {
         id: null,
@@ -28,10 +28,11 @@ export default function Create() {
         excerpt: '',
         featured_image: '',
         status: 'published',
+        published_at: '',
         metadata: {},
         slug: '',
         active: true,
-        term_ids: [],
+        tag_ids: [],
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
     const [activeSchema, setActiveSchema] = useState<CmsSchema | undefined>(schema);
@@ -65,10 +66,10 @@ export default function Create() {
     return (
         <ModuleLayout view="Crear">
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4">
+                <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-b pb-4">
                     <Link
                         href="/admin/articles"
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
                     >
                         ← Volver a Páginas
                     </Link>
@@ -77,7 +78,7 @@ export default function Create() {
                         <Button
                             type="button"
                             variant="outline"
-                            className="h-9 gap-1.5 rounded-xl border-border/70 text-xs font-medium shadow-2xs"
+                            className="border-border/70 h-9 gap-1.5 rounded-xl text-xs font-medium shadow-2xs"
                             onClick={() => setMediaOpen(true)}
                         >
                             <ImageIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
@@ -87,7 +88,7 @@ export default function Create() {
                         <Button
                             type="submit"
                             disabled={processing}
-                            className="h-9 gap-1.5 rounded-xl bg-violet-600 px-4 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 hover:bg-violet-700 active:scale-95 transition-all"
+                            className="h-9 gap-1.5 rounded-xl bg-violet-600 px-4 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 transition-all hover:bg-violet-700 active:scale-95"
                         >
                             <span>Guardar Página</span>
                         </Button>
@@ -103,23 +104,16 @@ export default function Create() {
                         schema={activeSchema}
                         schemas={schemas}
                         parents={parents}
-                        taxonomies={taxonomies}
+                        tags={tags}
                         onChangeSchema={handleChangeSchema}
                     />
                 </FormLayout>
 
                 {/* Sticky publication action bar */}
-                <div className="sticky bottom-4 z-10 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 p-4 shadow-lg backdrop-blur-md">
-                    <span className="text-xs text-muted-foreground">
-                        {processing ? 'Guardando cambios...' : 'Todos los cambios pendientes'}
-                    </span>
+                <div className="border-border/80 bg-background/90 sticky bottom-4 z-10 flex items-center justify-between rounded-2xl border p-4 shadow-lg backdrop-blur-md">
+                    <span className="text-muted-foreground text-xs">{processing ? 'Guardando cambios...' : 'Todos los cambios pendientes'}</span>
                     <div className="flex items-center gap-2.5">
-                        <Button
-                            variant="outline"
-                            type="button"
-                            asChild
-                            className="h-9 rounded-xl border-border/70 text-xs font-medium"
-                        >
+                        <Button variant="outline" type="button" asChild className="border-border/70 h-9 rounded-xl text-xs font-medium">
                             <Link href="/admin/articles">Cancelar</Link>
                         </Button>
                         <Button

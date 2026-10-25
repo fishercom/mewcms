@@ -9,15 +9,15 @@ use App\Models\CmsPostType;
 use App\Models\CmsRegister;
 use App\Models\CmsRegisterField;
 use App\Models\CmsSlider;
-use App\Models\CmsTaxonomy;
+use App\Models\CmsTag;
 use App\Support\FrontCache;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FrontController extends Controller
 {
@@ -26,7 +26,7 @@ class FrontController extends Controller
      *
      * @param  string|null  $slug
      */
-    public function show(Request $request, $slug = null): Response
+    public function show(Request $request, $slug = null): Response|RedirectResponse
     {
         if (! empty($slug)) {
             $parts = explode('/', $slug);
@@ -49,22 +49,32 @@ class FrontController extends Controller
             // Find the Home page article
             $article = CmsArticle::whereHas('schema', function ($query): void {
                 $query->whereIn('type', ['HOME', 'PAGE']);
-            })->where('slug', 'home')->where('active', 1)->first();
+            })->where('slug', 'home')->published()->first();
 
             if (! $article) {
                 $article = CmsArticle::whereHas('schema', function ($query): void {
                     $query->where('type', 'HOME');
-                })->where('active', 1)->first();
+                })->published()->first();
             }
 
-            // Fallback to first active article if still not found
+            // Fallback to first published article if still not found
             if (! $article) {
-                $article = CmsArticle::where('active', 1)->orderBy('position')->first();
+                $article = CmsArticle::published()->orderBy('position')->first();
             }
         } else {
             // Map URL slashes back to DB underscore separator format
             $dbSlug = str_replace('/', '_', $slug);
-            $article = CmsArticle::where('slug', $dbSlug)->where('active', 1)->first();
+            $article = CmsArticle::where('slug', $dbSlug)->published()->first();
+
+            // A page whose parent is unpublished or trashed is not reachable either
+            if ($article?->parent_id && ! CmsArticle::published()->whereKey($article->parent_id)->exists()) {
+                $article = null;
+            }
+
+            // Old taxonomy archives ("/categorias/{term}", "/news/{term}"...) now live at "/tag/{term}"
+            if (! $article && isset($parts) && count($parts) === 2 && CmsTag::where('slug', $parts[1])->where('active', true)->exists()) {
+                return redirect('/tag/'.$parts[1], 301);
+            }
         }
 
         if (! $article) {
@@ -72,8 +82,8 @@ class FrontController extends Controller
         }
 
         // Eager load schema to extract rendering templates
-        $article->load(['schema', 'terms.taxonomy', 'children' => function ($query): void {
-            $query->where('active', 1)->orderBy('position');
+        $article->load(['schema', 'tags', 'children' => function ($query): void {
+            $query->published()->orderBy('position');
         }]);
 
         // Get template name from schema
@@ -138,74 +148,53 @@ class FrontController extends Controller
     }
 
     /**
-     * Display posts associated with a specific category term.
+     * Archive of the published pages and posts tagged with a tag.
      */
-    public function category(Request $request, string $slug): Response
+    public function tag(string $slug): Response
     {
-        [$term, $articles, $taxonomy] = $this->getArticlesByTerm('categorias', $slug);
+        $tag = CmsTag::where('slug', $slug)->where('active', true)->firstOrFail();
 
-        return $this->renderTermList($term, $articles, $taxonomy);
-    }
+        $pages = $tag->articles()->published()->latest('cms_articles.published_at')->get()
+            ->map(fn (CmsArticle $article): array => [
+                'id' => 'page-'.$article->id,
+                'type' => 'Página',
+                'title' => $article->title,
+                'url' => '/'.str_replace('_', '/', $article->slug),
+                'excerpt' => $this->excerpt($article->excerpt ?: $article->content),
+                'date' => ($article->published_at ?? $article->created_at)?->toAtomString(),
+            ]);
 
-    /**
-     * Display posts associated with a specific tag term.
-     */
-    public function tag(Request $request, string $slug): Response
-    {
-        try {
-            [$term, $articles, $taxonomy] = $this->getArticlesByTerm('tags', $slug);
-        } catch (NotFoundHttpException) {
-            [$term, $articles, $taxonomy] = $this->getArticlesByTerm('etiquetas', $slug);
-        }
+        $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
+        $posts = $tag->posts()->published()->latest('cms_posts.published_at')->get()
+            ->map(fn (CmsPost $post): array => [
+                'id' => 'post-'.$post->id,
+                'type' => $cpts->get($post->post_type)?->singular_name ?? 'Entrada',
+                'title' => $post->title,
+                'url' => ($cpts->has($post->post_type) ? '/'.$post->post_type : '/blog').'/'.$post->slug,
+                'excerpt' => $this->excerpt($post->excerpt ?: $post->content),
+                'date' => ($post->published_at ?? $post->created_at)?->toAtomString(),
+            ]);
 
-        return $this->renderTermList($term, $articles, $taxonomy);
-    }
-
-    /**
-     * Resolve taxonomy term slug robustly and fetch related active articles.
-     */
-    protected function getArticlesByTerm(string $taxonomySlug, string $termSlug): array
-    {
-        $taxonomy = CmsTaxonomy::where('slug', $taxonomySlug)
-            ->orWhere('slug', Str::plural($taxonomySlug))
-            ->orWhere('slug', Str::singular($taxonomySlug))
-            ->first();
-
-        if (! $taxonomy) {
-            $taxonomy = CmsTaxonomy::where('name', 'like', '%'.$taxonomySlug.'%')->first();
-        }
-
-        if (! $taxonomy) {
-            abort(404, 'Taxonomy not found');
-        }
-
-        $term = $taxonomy->terms()->where('slug', $termSlug)->where('active', true)->first();
-        if (! $term) {
-            abort(404, 'Term not found');
-        }
-
-        $articles = $term->articles()
-            ->with(['terms.taxonomy', 'schema'])
-            ->where('active', true)
-            ->orderBy('position')
-            ->get();
-
-        return [$term, $articles, $taxonomy];
-    }
-
-    /**
-     * Render the taxonomy term listing page.
-     */
-    protected function renderTermList($term, $articles, $taxonomy): Response
-    {
-        $shared = FrontCache::shared();
-
-        return Inertia::render('front/templates/term-list', [
-            'term' => $term,
-            'taxonomy' => $taxonomy,
-            'articles' => $articles,
-            ...$shared,
+        return Inertia::render('front/tag', [
+            'tag' => $tag->only(['id', 'name', 'slug']),
+            'items' => $pages->concat($posts)->sortByDesc('date')->values(),
+            ...FrontCache::shared(),
         ]);
+    }
+
+    /**
+     * Old "/category/{term}" URLs: categories were merged into tags.
+     */
+    public function category(string $slug): RedirectResponse
+    {
+        abort_unless(CmsTag::where('slug', $slug)->where('active', true)->exists(), 404);
+
+        return redirect('/tag/'.$slug, 301);
+    }
+
+    protected function excerpt(?string $html): string
+    {
+        return Str::limit(trim(strip_tags((string) $html)), 160);
     }
 
     public function blogIndex(Request $request): Response
@@ -213,10 +202,9 @@ class FrontController extends Controller
         $shared = FrontCache::shared();
 
         // Load standard posts (post_type = 'post')
-        $posts = CmsPost::with(['user', 'terms.taxonomy'])
+        $posts = CmsPost::with(['user', 'tags'])
             ->where('post_type', 'post')
-            ->where('status', 'published')
-            ->where('active', true)
+            ->published()
             ->latest('published_at')
             ->paginate(6)
             ->withQueryString();
@@ -232,11 +220,10 @@ class FrontController extends Controller
     {
         $shared = FrontCache::shared();
 
-        $post = CmsPost::with(['user', 'terms.taxonomy', 'schema'])
+        $post = CmsPost::with(['user', 'tags', 'schema'])
             ->where('post_type', 'post')
             ->where('slug', $slug)
-            ->where('status', 'published')
-            ->where('active', true)
+            ->published()
             ->firstOrFail();
 
         return Inertia::render('front/blog/show', [
@@ -251,10 +238,9 @@ class FrontController extends Controller
         $shared = FrontCache::shared();
 
         // Load posts for this specific post type
-        $posts = CmsPost::with(['user', 'terms.taxonomy'])
+        $posts = CmsPost::with(['user', 'tags'])
             ->where('post_type', $cpt->slug)
-            ->where('status', 'published')
-            ->where('active', true)
+            ->published()
             ->latest('published_at')
             ->paginate(6)
             ->withQueryString();
@@ -270,11 +256,10 @@ class FrontController extends Controller
     {
         $shared = FrontCache::shared();
 
-        $post = CmsPost::with(['user', 'terms.taxonomy', 'schema'])
+        $post = CmsPost::with(['user', 'tags', 'schema'])
             ->where('post_type', $cpt->slug)
             ->where('slug', $postSlug)
-            ->where('status', 'published')
-            ->where('active', true)
+            ->published()
             ->firstOrFail();
 
         return Inertia::render('front/blog/show', [
@@ -405,7 +390,7 @@ class FrontController extends Controller
 
         if (! empty($query)) {
             // 1. Search in Articles (Pages)
-            $articles = CmsArticle::where('active', 1)
+            $articles = CmsArticle::published()
                 ->where('slug', '!=', 'home-page')
                 ->where(function ($q) use ($cleanQuery): void {
                     $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
@@ -426,8 +411,7 @@ class FrontController extends Controller
 
             // 2. Search in Posts & CPTs
             $posts = CmsPost::with('user')
-                ->where('active', 1)
-                ->where('status', 'published')
+                ->published()
                 ->where(function ($q) use ($cleanQuery): void {
                     $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
                         ->orWhere('content', 'LIKE', '%'.$cleanQuery.'%');
@@ -474,7 +458,7 @@ class FrontController extends Controller
             ];
 
             // 2. Add Pages (Articles)
-            $articles = CmsArticle::where('active', 1)->where('slug', '!=', 'home-page')->get();
+            $articles = CmsArticle::published()->where('slug', '!=', 'home-page')->get();
             foreach ($articles as $art) {
                 $urls[] = [
                     'loc' => $baseUrl.'/'.$art->slug,
@@ -493,7 +477,7 @@ class FrontController extends Controller
             ];
 
             // 4. Add Posts & dynamic CPTs
-            $posts = CmsPost::where('active', 1)->where('status', 'published')->get();
+            $posts = CmsPost::published()->get();
             $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
 
             foreach ($posts as $post) {
@@ -515,6 +499,18 @@ class FrontController extends Controller
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'daily',
                     'priority' => '0.8',
+                ];
+            }
+
+            // 6. Add tag archives that list published content
+            $tags = CmsTag::where('active', true)->withPublishedCounts()->get()
+                ->filter(fn (CmsTag $tag): bool => $tag->articles_count + $tag->posts_count > 0);
+            foreach ($tags as $tag) {
+                $urls[] = [
+                    'loc' => $baseUrl.'/tag/'.$tag->slug,
+                    'lastmod' => $tag->updated_at ? $tag->updated_at->toAtomString() : now()->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.5',
                 ];
             }
 

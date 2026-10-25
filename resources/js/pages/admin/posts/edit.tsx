@@ -3,24 +3,24 @@ import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
-import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { CmsTag } from '@/types/models/cms-tag';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import PostFields from './partials/fields';
 
 export default function Edit() {
-    const { item, schema, schemas, authors, taxonomies, cpt, post_type, lang_id } = usePage<{
-        item: CmsPost & { term_ids?: number[] };
+    const { item, schema, schemas, authors, tags, cpt, post_type, lang_id } = usePage<{
+        item: CmsPost & { tag_ids?: number[] };
         schema: CmsSchema | null;
         schemas: CmsSchema[];
         authors: { id: number; name: string; username: string }[];
-        taxonomies: CmsTaxonomy[];
+        tags: CmsTag[];
         cpt: CmsPostType | null;
         post_type: string;
         lang_id: number;
     }>().props;
 
-    const [data, setData] = useState<Partial<CmsPost> & { term_ids?: number[] }>({
+    const [data, setData] = useState<Partial<CmsPost> & { tag_ids?: number[] }>({
         id: item.id,
         user_id: item.user_id,
         lang_id: item.lang_id,
@@ -34,7 +34,7 @@ export default function Edit() {
         status: item.status,
         published_at: item.published_at,
         active: item.active,
-        term_ids: item.term_ids || [],
+        tag_ids: item.tag_ids || [],
     });
     const [activeSchema, setActiveSchema] = useState<CmsSchema | null>(schema);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -87,7 +87,7 @@ export default function Edit() {
                         processing={processing}
                         schemas={schemas}
                         authors={authors}
-                        taxonomies={taxonomies}
+                        tags={tags}
                         schema={activeSchema}
                         onChangeSchema={handleChangeSchema}
                         cptLabelSingular={singularName}

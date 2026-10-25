@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdmLog;
 use App\Models\CmsArticle;
 use App\Models\CmsRegister;
-use App\Models\CmsTaxonomyTerm;
+use App\Models\CmsTag;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +24,7 @@ class DashboardController extends Controller
         // 1. Key Metrics Summary
         $totalArticles = CmsArticle::count();
         $activeArticles = CmsArticle::where('active', '1')->count();
-        $totalTerms = CmsTaxonomyTerm::count();
+        $totalTags = CmsTag::count();
         $totalMessages = CmsRegister::count();
         $unreviewedMessages = CmsRegister::where(function ($query): void {
             $query->where('review', 0)->orWhereNull('review');
@@ -134,7 +134,7 @@ class DashboardController extends Controller
             'stats' => [
                 'total_articles' => $totalArticles,
                 'active_articles' => $activeArticles,
-                'total_terms' => $totalTerms,
+                'total_tags' => $totalTags,
                 'total_messages' => $totalMessages,
                 'unreviewed_messages' => $unreviewedMessages,
                 'file_count' => $fileCount,

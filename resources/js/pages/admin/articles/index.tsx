@@ -3,6 +3,15 @@ import { useEffect, useState } from 'react';
 import { deleteArticle, getArticles } from '@/services/articles';
 import { router, usePage } from '@inertiajs/react';
 
+import {
+    BulkActionsBar,
+    RowCheckbox,
+    ScheduledBadge,
+    SelectAllCheckbox,
+    TrashRowActions,
+    TrashToggle,
+    useRowSelection,
+} from '@/components/content-bulk-actions';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PaginationNav } from '@/components/ui/pagination-nav';
@@ -15,8 +24,15 @@ import { Check, ChevronDown, ChevronRight, Edit, FileText, ListOrdered, Plus, Se
 import SortableArticlesModal from './partials/SortableArticlesModal';
 
 export default function Index() {
-    const { items, paging } = usePage<{ items: CmsArticle[]; paging: Pagination<CmsArticle> }>().props;
-    const [query, setQuery] = useState({ s: '' });
+    const { items, paging, filters, trashCount } = usePage<{
+        items: CmsArticle[];
+        paging: Pagination<CmsArticle>;
+        filters: { s?: string; trash?: string };
+        trashCount: number;
+    }>().props;
+    const trash = filters.trash === '1';
+    const [query, setQuery] = useState({ s: filters.s ?? '' });
+    const selection = useRowSelection(paging.data.map((item) => item.id));
     const [isSortableModalOpen, setSortableModalOpen] = useState(false);
     const [collapsedPageIds, setCollapsedPageIds] = useState<number[]>([]);
 
@@ -39,14 +55,19 @@ export default function Index() {
 
     const handleCloseSortableModal = () => {
         setSortableModalOpen(false);
-        getArticles(query);
+        getArticles({ ...query, trash: trash ? 1 : undefined });
     };
 
     useEffect(() => {
         if (query.s) {
-            getArticles(query);
+            getArticles({ ...query, trash: trash ? 1 : undefined });
         }
-    }, [query]);
+    }, [query, trash]);
+
+    const handleTrashToggle = (showTrash: boolean) => {
+        selection.clear();
+        getArticles({ s: query.s || undefined, trash: showTrash ? 1 : undefined });
+    };
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = e.target;
@@ -66,26 +87,30 @@ export default function Index() {
             <div className="space-y-4">
                 {/* Search, Status Filter & Actions Toolbar */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="relative flex-1 max-w-md">
-                        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <div className="relative max-w-md flex-1">
+                        <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2" />
                         <Input
                             type="text"
                             value={query.s ?? ''}
                             onChange={handleSearch}
-                            className="h-10 w-full rounded-xl border border-border/70 bg-card pl-10 pr-4 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground shadow-2xs transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
+                            className="border-border/70 bg-card text-foreground placeholder:text-muted-foreground h-10 w-full rounded-xl border pr-4 pl-10 text-xs shadow-2xs transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden sm:text-sm"
                             placeholder="Buscar por título o slug..."
                         />
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2.5">
-                        <Button
-                            variant="outline"
-                            onClick={() => setSortableModalOpen(true)}
-                            className="h-10 gap-1.5 rounded-xl border-border/70 text-xs font-medium text-foreground hover:bg-muted/60 shadow-2xs"
-                        >
-                            <ListOrdered className="h-4 w-4 text-muted-foreground" />
-                            <span>Reordenar</span>
-                        </Button>
+                        <TrashToggle trash={trash} count={trashCount} onChange={handleTrashToggle} />
+
+                        {!trash && (
+                            <Button
+                                variant="outline"
+                                onClick={() => setSortableModalOpen(true)}
+                                className="border-border/70 text-foreground hover:bg-muted/60 h-10 gap-1.5 rounded-xl text-xs font-medium shadow-2xs"
+                            >
+                                <ListOrdered className="text-muted-foreground h-4 w-4" />
+                                <span>Reordenar</span>
+                            </Button>
+                        )}
 
                         <Button
                             onClick={handleCreateClick}
@@ -97,12 +122,17 @@ export default function Index() {
                     </div>
                 </div>
 
+                <BulkActionsBar routeName="articles.bulk" selected={selection.selected} trash={trash} onClear={selection.clear} />
+
                 {/* Modern Data Table Card */}
-                <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xs">
+                <div className="border-border/70 bg-card overflow-hidden rounded-2xl border shadow-2xs">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs text-muted-foreground">
-                            <thead className="border-b border-border/60 bg-muted/40 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        <table className="text-muted-foreground w-full text-left text-xs">
+                            <thead className="border-border/60 bg-muted/40 text-muted-foreground border-b text-[11px] font-semibold tracking-wider uppercase">
                                 <tr>
+                                    <th scope="col" className="w-10 py-3.5 pl-5">
+                                        <SelectAllCheckbox state={selection.allState} onToggle={selection.toggleAll} />
+                                    </th>
                                     <th scope="col" className="px-5 py-3.5">
                                         Nombre / Título
                                     </th>
@@ -119,33 +149,40 @@ export default function Index() {
                                         Activo
                                     </th>
                                     <th scope="col" className="px-4 py-3.5">
-                                        Fecha
+                                        {trash ? 'Eliminado' : 'Fecha'}
                                     </th>
                                     <th scope="col" className="px-5 py-3.5 text-right">
                                         Acciones
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-border/40">
+                            <tbody className="divide-border/40 divide-y">
                                 {paging.data.length > 0 ? (
                                     paging.data.map((item: CmsArticle) => {
-                                        if (!isRowVisible(item)) {
+                                        if (!trash && !isRowVisible(item)) {
                                             return null;
                                         }
                                         const hasChildren = items.some((p) => p.parent_id === item.id);
                                         const isCollapsed = collapsedPageIds.includes(item.id);
 
                                         return (
-                                            <tr key={item.id} className="group transition-colors hover:bg-muted/30">
-                                                <th scope="row" className="px-5 py-3.5 font-medium whitespace-nowrap text-foreground">
+                                            <tr key={item.id} className="group hover:bg-muted/30 transition-colors">
+                                                <td className="py-3.5 pl-5">
+                                                    <RowCheckbox
+                                                        checked={selection.isSelected(item.id)}
+                                                        onToggle={() => selection.toggle(item.id)}
+                                                        label={item.title}
+                                                    />
+                                                </td>
+                                                <th scope="row" className="text-foreground px-5 py-3.5 font-medium whitespace-nowrap">
                                                     <div style={{ paddingLeft: `${(item.depth || 0) * 1.5}rem` }} className="flex items-center gap-2">
-                                                        {hasChildren ? (
+                                                        {hasChildren && !trash ? (
                                                             <button
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     toggleCollapse(item.id);
                                                                 }}
-                                                                className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                                                className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1 transition-colors"
                                                             >
                                                                 {isCollapsed ? (
                                                                     <ChevronRight className="h-3.5 w-3.5" />
@@ -156,44 +193,52 @@ export default function Index() {
                                                         ) : (
                                                             <div className="w-5" />
                                                         )}
-                                                        {(item.depth || 0) > 0 && <span className="mr-1 text-muted-foreground/50">└</span>}
+                                                        {(item.depth || 0) > 0 && <span className="text-muted-foreground/50 mr-1">└</span>}
                                                         <div className="flex flex-col">
-                                                            <span className="font-semibold text-foreground text-sm leading-snug group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                                                            <span className="text-foreground text-sm leading-snug font-semibold transition-colors group-hover:text-violet-600 dark:group-hover:text-violet-400">
                                                                 {item.title}
                                                             </span>
-                                                            <span className="text-[11px] font-mono text-muted-foreground/70">
-                                                                /{item.slug}
-                                                            </span>
+                                                            <span className="text-muted-foreground/70 font-mono text-[11px]">/{item.slug}</span>
                                                         </div>
                                                     </div>
                                                 </th>
                                                 <td className="px-4 py-3.5">
                                                     {item.schema ? (
-                                                        <span className="inline-flex items-center rounded-md border border-border/60 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                                                        <span className="border-border/60 bg-muted/50 text-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium">
                                                             {item.schema.name}
                                                         </span>
                                                     ) : (
                                                         <span className="text-muted-foreground/60 italic">Por defecto</span>
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-3.5 text-muted-foreground">
-                                                    {item.parent ? item.parent.title : <span className="text-muted-foreground/40 italic">Raíz (Ninguna)</span>}
+                                                <td className="text-muted-foreground px-4 py-3.5">
+                                                    {item.parent ? (
+                                                        item.parent.title
+                                                    ) : (
+                                                        <span className="text-muted-foreground/40 italic">Raíz (Ninguna)</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-4 py-3.5">
-                                                    <span
-                                                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${
-                                                            item.status === 'published' || !item.status
-                                                                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                                                : 'border-border/60 bg-muted text-muted-foreground'
-                                                        }`}
-                                                    >
+                                                    {item.is_scheduled ? (
+                                                        <ScheduledBadge date={item.published_at} />
+                                                    ) : (
                                                         <span
-                                                            className={`h-1.5 w-1.5 rounded-full ${
-                                                                item.status === 'published' || !item.status ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'
+                                                            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${
+                                                                item.status === 'published' || !item.status
+                                                                    ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                                    : 'border-border/60 bg-muted text-muted-foreground'
                                                             }`}
-                                                        />
-                                                        {item.status === 'published' || !item.status ? 'Publicado' : 'Borrador'}
-                                                    </span>
+                                                        >
+                                                            <span
+                                                                className={`h-1.5 w-1.5 rounded-full ${
+                                                                    item.status === 'published' || !item.status
+                                                                        ? 'animate-pulse bg-emerald-500'
+                                                                        : 'bg-muted-foreground'
+                                                                }`}
+                                                            />
+                                                            {item.status === 'published' || !item.status ? 'Publicado' : 'Borrador'}
+                                                        </span>
+                                                    )}
                                                 </td>
                                                 <td className="px-4 py-3.5">
                                                     {item.active ? (
@@ -201,61 +246,76 @@ export default function Index() {
                                                             <Check className="h-3 w-3" />
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground/60 text-[10px]">
+                                                        <span className="bg-muted text-muted-foreground/60 inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px]">
                                                             —
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-3.5 text-muted-foreground text-[11px]">
-                                                    {item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy HH:mm') : '—'}
+                                                <td className="text-muted-foreground px-4 py-3.5 text-[11px]">
+                                                    {(() => {
+                                                        const date = trash ? item.deleted_at : (item.published_at ?? item.created_at);
+                                                        return date ? format(new Date(date), 'dd/MM/yyyy HH:mm') : '—';
+                                                    })()}
                                                 </td>
                                                 <td className="px-5 py-3.5 text-right">
-                                                    <div className="flex items-center justify-end gap-1.5">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-8 gap-1 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                            onClick={() => router.visit(route('articles.edit', item.id))}
-                                                        >
-                                                            <Edit className="h-3.5 w-3.5" />
-                                                            <span className="hidden sm:inline">Editar</span>
-                                                        </Button>
+                                                    {trash ? (
+                                                        <TrashRowActions routeName="articles.bulk" id={item.id} />
+                                                    ) : (
+                                                        <div className="flex items-center justify-end gap-1.5">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="text-muted-foreground hover:bg-muted hover:text-foreground h-8 gap-1 rounded-lg px-2 text-xs font-medium"
+                                                                onClick={() => router.visit(route('articles.edit', item.id))}
+                                                            >
+                                                                <Edit className="h-3.5 w-3.5" />
+                                                                <span className="hidden sm:inline">Editar</span>
+                                                            </Button>
 
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-8 gap-1 rounded-lg px-2 text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/20"
-                                                            onClick={() => deleteArticleHandler(item.id)}
-                                                        >
-                                                            <Trash2 className="h-3.5 w-3.5" />
-                                                            <span className="hidden sm:inline">Eliminar</span>
-                                                        </Button>
-                                                    </div>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-8 gap-1 rounded-lg px-2 text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/20"
+                                                                onClick={() => deleteArticleHandler(item.id)}
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                                <span className="hidden sm:inline">Papelera</span>
+                                                            </Button>
+                                                        </div>
+                                                    )}
                                                 </td>
                                             </tr>
                                         );
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={7} className="p-8">
-                                            <EmptyState
-                                                icon={FileText}
-                                                title={query.s ? 'No se encontraron páginas' : 'Aún no hay páginas creadas'}
-                                                description={
-                                                    query.s
-                                                        ? `No hay ninguna página que coincida con "${query.s}". Intenta con otro término de búsqueda.`
-                                                        : 'Comienza creando tu primera página para estructurar el contenido de tu sitio web.'
-                                                }
-                                                action={
-                                                    !query.s
-                                                        ? {
-                                                              label: 'Crear Primera Página',
-                                                              href: route('articles.create'),
-                                                              icon: Plus,
-                                                          }
-                                                        : undefined
-                                                }
-                                            />
+                                        <td colSpan={8} className="p-8">
+                                            {trash ? (
+                                                <EmptyState
+                                                    icon={Trash2}
+                                                    title="La papelera está vacía"
+                                                    description="Las páginas que muevas a la papelera aparecerán aquí hasta que las restaures o las elimines definitivamente."
+                                                />
+                                            ) : (
+                                                <EmptyState
+                                                    icon={FileText}
+                                                    title={query.s ? 'No se encontraron páginas' : 'Aún no hay páginas creadas'}
+                                                    description={
+                                                        query.s
+                                                            ? `No hay ninguna página que coincida con "${query.s}". Intenta con otro término de búsqueda.`
+                                                            : 'Comienza creando tu primera página para estructurar el contenido de tu sitio web.'
+                                                    }
+                                                    action={
+                                                        !query.s
+                                                            ? {
+                                                                  label: 'Crear Primera Página',
+                                                                  href: route('articles.create'),
+                                                                  icon: Plus,
+                                                              }
+                                                            : undefined
+                                                    }
+                                                />
+                                            )}
                                         </td>
                                     </tr>
                                 )}
@@ -270,4 +330,3 @@ export default function Index() {
         </ModuleLayout>
     );
 }
-

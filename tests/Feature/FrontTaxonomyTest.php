@@ -4,8 +4,7 @@ use App\Models\CmsArticle;
 use App\Models\CmsLang;
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
-use App\Models\CmsTaxonomy;
-use App\Models\CmsTaxonomyTerm;
+use App\Models\CmsTag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -36,18 +35,11 @@ beforeEach(function (): void {
     ]);
 });
 
-it('can render a category listing page with associated articles', function (): void {
-    $taxonomy = CmsTaxonomy::create([
-        'name' => 'Categorías',
-        'slug' => 'categorias',
-        'active' => 1,
-    ]);
-
-    $term = CmsTaxonomyTerm::create([
-        'taxonomy_id' => $taxonomy->id,
+it('can render a category listing page by redirecting to tag archive', function (): void {
+    $tag = CmsTag::create([
         'name' => 'Tecnología',
         'slug' => 'tecnologia',
-        'active' => 1,
+        'active' => true,
     ]);
 
     $article = CmsArticle::create([
@@ -59,32 +51,27 @@ it('can render a category listing page with associated articles', function (): v
         'metadata' => ['body' => 'Contenido de prueba'],
     ]);
 
-    $article->terms()->attach($term->id);
+    $article->tags()->attach($tag->id);
 
-    $response = $this->get('/category/tecnologia');
+    $this->get('/category/tecnologia')->assertRedirect('/tag/tecnologia')->assertStatus(301);
+
+    $response = $this->get('/tag/tecnologia');
 
     $response->assertStatus(200);
     $response->assertInertia(fn (Assert $page): AssertableInertia => $page
-        ->component('front/templates/term-list')
-        ->has('term')
-        ->where('term.name', 'Tecnología')
-        ->has('articles')
-        ->where('articles.0.title', 'Article 1')
+        ->component('front/tag')
+        ->has('tag')
+        ->where('tag.name', 'Tecnología')
+        ->has('items')
+        ->where('items.0.title', 'Article 1')
     );
 });
 
 it('can render a tag listing page with associated articles', function (): void {
-    $taxonomy = CmsTaxonomy::create([
-        'name' => 'Tags',
-        'slug' => 'tags',
-        'active' => 1,
-    ]);
-
-    $term = CmsTaxonomyTerm::create([
-        'taxonomy_id' => $taxonomy->id,
+    $tag = CmsTag::create([
         'name' => 'Laravel',
         'slug' => 'laravel',
-        'active' => 1,
+        'active' => true,
     ]);
 
     $article = CmsArticle::create([
@@ -96,32 +83,25 @@ it('can render a tag listing page with associated articles', function (): void {
         'metadata' => ['body' => 'Contenido de Laravel'],
     ]);
 
-    $article->terms()->attach($term->id);
+    $article->tags()->attach($tag->id);
 
     $response = $this->get('/tag/laravel');
 
     $response->assertStatus(200);
     $response->assertInertia(fn (Assert $page): AssertableInertia => $page
-        ->component('front/templates/term-list')
-        ->has('term')
-        ->where('term.name', 'Laravel')
-        ->has('articles')
-        ->where('articles.0.title', 'Article 2')
+        ->component('front/tag')
+        ->has('tag')
+        ->where('tag.name', 'Laravel')
+        ->has('items')
+        ->where('items.0.title', 'Article 2')
     );
 });
 
-it('eager loads taxonomy terms on post/page view', function (): void {
-    $taxonomy = CmsTaxonomy::create([
-        'name' => 'Categorías',
-        'slug' => 'categorias',
-        'active' => 1,
-    ]);
-
-    $term = CmsTaxonomyTerm::create([
-        'taxonomy_id' => $taxonomy->id,
+it('eager loads tags on post/page view', function (): void {
+    $tag = CmsTag::create([
         'name' => 'Tecnología',
         'slug' => 'tecnologia',
-        'active' => 1,
+        'active' => true,
     ]);
 
     $article = CmsArticle::create([
@@ -133,13 +113,13 @@ it('eager loads taxonomy terms on post/page view', function (): void {
         'metadata' => ['body' => 'Contenido de prueba'],
     ]);
 
-    $article->terms()->attach($term->id);
+    $article->tags()->attach($tag->id);
 
     $response = $this->get('/article-3');
 
     $response->assertStatus(200);
     $response->assertInertia(fn (Assert $page): AssertableInertia => $page
-        ->has('article.terms')
-        ->where('article.terms.0.name', 'Tecnología')
+        ->has('article.tags')
+        ->where('article.tags.0.name', 'Tecnología')
     );
 });

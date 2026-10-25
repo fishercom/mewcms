@@ -2,20 +2,26 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
 use App\Models\CmsArticle;
 use App\Models\CmsLang;
 use App\Models\CmsSchema;
-use App\Models\CmsTaxonomy;
+use App\Models\CmsTag;
 use App\Support\FrontCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ArticleController extends Controller
 {
+    use BulkContentActions;
+
     protected $lang_id;
 
     protected $parent_id;
@@ -45,17 +51,20 @@ class ArticleController extends Controller
     {
         $lang_id = $this->lang_id;
         $s = $request->get('s');
+        $trash = $request->boolean('trash');
 
-        $query = CmsArticle::with(['schema', 'parent'])
+        $query = ($trash ? CmsArticle::onlyTrashed() : CmsArticle::query())
+            ->with(['schema', 'parent' => fn ($query) => $query->withTrashed()])
             ->where('lang_id', $lang_id);
 
         if (! empty($s)) {
             $query->where('title', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
         }
 
-        $allArticles = $query->orderBy('position')->get();
+        $allArticles = $trash ? $query->latest('deleted_at')->get() : $query->orderBy('position')->get();
 
-        if (empty($s)) {
+        // The trash is a flat list: parents may not be in it
+        if (empty($s) && ! $trash) {
             $sortedArticles = [];
             $this->buildTree($allArticles, null, $sortedArticles);
             $items = collect($sortedArticles);
@@ -77,7 +86,8 @@ class ArticleController extends Controller
         return Inertia::render('admin/articles/index', [
             'items' => $items->values(),
             'paging' => $paginated,
-            'filters' => $request->only(['s', 'status', 'schema_id']),
+            'filters' => $request->only(['s', 'status', 'schema_id', 'trash']),
+            'trashCount' => CmsArticle::onlyTrashed()->where('lang_id', $lang_id)->count(),
         ]);
     }
 
@@ -108,6 +118,7 @@ class ArticleController extends Controller
             'excerpt' => '',
             'featured_image' => '',
             'status' => 'published',
+            'published_at' => null,
             'metadata' => new \stdClass,
             'slug' => '',
             'active' => true,
@@ -119,16 +130,12 @@ class ArticleController extends Controller
             ->filter(fn ($article): bool => ! $article->schema?->isUnique())
             ->values();
 
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
-            $query->where('active', true)->orderBy('position');
-        }])->where('active', true)->get();
-
         return Inertia::render('admin/articles/create', [
             'item' => $args,
             'schema' => $schema,
             'schemas' => $schemas,
             'parents' => $parents,
-            'taxonomies' => $taxonomies,
+            'tags' => CmsTag::options(),
         ]);
     }
 
@@ -156,15 +163,12 @@ class ArticleController extends Controller
             }
         }
 
-        $profile = new CmsArticle($data);
+        $profile = new CmsArticle(Arr::except($data, 'tag_ids'));
         $profile->save();
 
-        if ($request->has('term_ids')) {
-            $termIds = collect($request->input('term_ids'))->filter()->all();
-            $profile->terms()->sync($termIds);
-        }
+        $profile->tags()->sync($data['tag_ids'] ?? []);
 
-        // Term counts change with the pivot sync, which fires no model events
+        // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
 
         $args = [
@@ -180,7 +184,7 @@ class ArticleController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsArticle::with(['schema', 'terms'])->findOrFail($id);
+        $item = CmsArticle::with(['schema', 'tags'])->findOrFail($id);
         $descendantIds = $item->getAllDescendantIds();
 
         $schemas = CmsSchema::where('active', 1)->get()->map(function ($s) {
@@ -210,16 +214,12 @@ class ArticleController extends Controller
             })
             ->values();
 
-        $taxonomies = CmsTaxonomy::with(['terms' => function ($query): void {
-            $query->where('active', true)->orderBy('position');
-        }])->where('active', true)->get();
-
         return Inertia::render('admin/articles/edit', [
             'item' => $item,
             'schema' => $item?->schema,
             'schemas' => $schemas,
             'parents' => $parents,
-            'taxonomies' => $taxonomies,
+            'tags' => CmsTag::options(),
         ]);
     }
 
@@ -258,17 +258,12 @@ class ArticleController extends Controller
             }
         }
 
-        $item->fill($data);
+        $item->fill(Arr::except($data, 'tag_ids'));
         $item->save();
 
-        if ($request->has('term_ids')) {
-            $termIds = collect($request->input('term_ids'))->filter()->all();
-            $item->terms()->sync($termIds);
-        } else {
-            $item->terms()->sync([]);
-        }
+        $item->tags()->sync($data['tag_ids'] ?? []);
 
-        // Term counts change with the pivot sync, which fires no model events
+        // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
 
         $args = [
@@ -280,14 +275,64 @@ class ArticleController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Move the page to the trash.
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsArticle::find($id);
+        $item = CmsArticle::findOrFail($id);
+        $this->guardBulkAction('trash', $item->newCollection([$item]));
         $item->delete();
 
         return redirect('admin/articles');
+    }
+
+    /**
+     * Apply a bulk action (publish, draft, trash, restore, force_delete) to the selected pages.
+     */
+    public function bulk(Request $request): RedirectResponse
+    {
+        $this->applyBulkAction($request, CmsArticle::class, 'articles');
+
+        return back();
+    }
+
+    /**
+     * Keep the page tree consistent: a page goes to the trash only with its subpages,
+     * and comes back only after its parent.
+     *
+     * @param  Collection<int, CmsArticle>  $items
+     */
+    protected function guardBulkAction(string $action, Collection $items): void
+    {
+        $ids = $items->modelKeys();
+
+        if ($action === 'trash') {
+            $blocked = $items->filter(fn (CmsArticle $item): bool => CmsArticle::where('parent_id', $item->id)->whereKeyNot($ids)->exists());
+            if ($blocked->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'ids' => 'No se puede mover a la papelera una página con subpáginas: '.$blocked->pluck('title')->implode(', ').'. Mueve o elimina primero sus subpáginas, o selecciónalas también.',
+                ]);
+            }
+        }
+
+        if ($action === 'restore') {
+            $blocked = $items->filter(fn (CmsArticle $item): bool => $item->parent_id
+                && ! in_array($item->parent_id, $ids)
+                && CmsArticle::onlyTrashed()->whereKey($item->parent_id)->exists());
+            if ($blocked->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'ids' => 'Restaura primero la página superior de: '.$blocked->pluck('title')->implode(', ').'.',
+                ]);
+            }
+
+            $taken = $items->filter(fn (CmsArticle $item): bool => $item->schema?->isUnique()
+                && CmsArticle::where('schema_id', $item->schema_id)->exists());
+            if ($taken->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'ids' => 'La plantilla única ya está asignada a otra página: '.$taken->pluck('title')->implode(', ').'.',
+                ]);
+            }
+        }
     }
 
     public function sort(Request $request)
@@ -314,12 +359,13 @@ class ArticleController extends Controller
             'content' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'featured_image' => 'nullable|string|max:2048',
-            'status' => 'nullable|string|max:20',
+            'status' => 'nullable|string|in:draft,published',
+            'published_at' => 'nullable|date',
             'metadata' => 'nullable|array',
             'slug' => 'nullable|string|max:500',
             'active' => 'nullable|boolean',
-            'term_ids' => 'nullable|array',
-            'term_ids.*' => 'nullable|integer|exists:cms_taxonomy_terms,id',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => ['integer', CmsTag::existsRule()],
         ]);
     }
 

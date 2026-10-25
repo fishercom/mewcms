@@ -1,5 +1,5 @@
 import { CmsArticle } from '@/types/models/cms-article';
-import { CmsTaxonomy } from '@/types/models/cms-taxonomy';
+import { PopularTag } from './components/sidebar';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, Calendar, Search } from 'lucide-react';
 import React, { useState } from 'react';
@@ -19,11 +19,11 @@ interface Props {
     results: SearchResult[];
     query: string;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    allTaxonomies?: CmsTaxonomy[];
+    popularTags?: PopularTag[];
     recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-export default function SearchPage({ results, query, navigation, allTaxonomies = [], recentArticles = [] }: Props) {
+export default function SearchPage({ results, query, navigation, popularTags = [], recentArticles = [] }: Props) {
     const [searchText, setSearchText] = useState(query);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -126,7 +126,7 @@ export default function SearchPage({ results, query, navigation, allTaxonomies =
 
                 {/* Sidebar Column */}
                 <div className="lg:col-span-4">
-                    <FrontSidebar allTaxonomies={allTaxonomies} recentArticles={recentArticles} />
+                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
                 </div>
             </div>
         </FrontLayout>

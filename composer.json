@@ -1,11 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "fishercom/mewcms",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "MewCMS: a content management system built with Laravel, Inertia and React.",
     "keywords": [
         "laravel",
-        "framework"
+        "cms",
+        "inertia",
+        "react"
     ],
     "license": "MIT",
     "require": {

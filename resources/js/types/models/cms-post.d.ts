@@ -1,5 +1,5 @@
 import { CmsSchema } from './cms-schema';
-import { CmsTaxonomyTerm } from './cms-taxonomy';
+import { CmsTag } from './cms-tag';
 
 export interface CmsPostType {
     id: number;
@@ -29,11 +29,13 @@ export interface CmsPost {
     metadata: Record<string, unknown>;
     status: 'draft' | 'published';
     published_at: string;
+    is_scheduled?: boolean;
+    deleted_at?: string | null;
     active: boolean;
     created_at: string;
     updated_at: string;
     user?: { id: number; name: string; username: string };
     schema?: CmsSchema;
-    terms?: CmsTaxonomyTerm[];
-    term_ids?: number[];
+    tags?: CmsTag[];
+    tag_ids?: number[];
 }

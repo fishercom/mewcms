@@ -50,7 +50,7 @@ class ConfigController extends Controller
      */
     public function edit($id, Request $request): Response
     {
-        $item = CmsConfig::find($id);
+        $item = CmsConfig::findOrFail($id);
 
         return Inertia::render('admin/configs/edit', [
             'item' => $item,
@@ -74,7 +74,7 @@ class ConfigController extends Controller
      */
     public function destroy($id, Request $request): RedirectResponse
     {
-        $item = CmsConfig::find($id);
+        $item = CmsConfig::findOrFail($id);
         $item->delete();
 
         return redirect('admin/configs');
