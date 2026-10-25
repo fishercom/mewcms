@@ -12,6 +12,8 @@ export default function Create() {
         name: '',
         slug: '',
         description: '',
+        auto_add_pages: false,
+        auto_add_subpages: false,
         active: true,
     };
     const [data, setData] = useState<CmsMenuForm>(item);

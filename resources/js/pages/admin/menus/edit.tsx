@@ -32,6 +32,8 @@ export default function Edit() {
         name: item.name,
         slug: item.slug,
         description: item.description || '',
+        auto_add_pages: Boolean(item.auto_add_pages),
+        auto_add_subpages: Boolean(item.auto_add_subpages),
         active: item.active,
     });
     const [menuErrors, setMenuErrors] = useState<Record<string, string>>({});

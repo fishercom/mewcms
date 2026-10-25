@@ -56,6 +56,28 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
                 <InputError message={errors.description} />
             </div>
 
+            <div className="space-y-2">
+                <div className="flex items-center space-x-3">
+                    <Checkbox
+                        id="auto_add_pages"
+                        checked={Boolean(data.auto_add_pages)}
+                        onClick={() => setData({ ...data, auto_add_pages: !data.auto_add_pages })}
+                    />
+                    <Label htmlFor="auto_add_pages">Añadir automáticamente las páginas nuevas de primer nivel</Label>
+                </div>
+                <div className="flex items-center space-x-3">
+                    <Checkbox
+                        id="auto_add_subpages"
+                        checked={Boolean(data.auto_add_subpages)}
+                        onClick={() => setData({ ...data, auto_add_subpages: !data.auto_add_subpages })}
+                    />
+                    <Label htmlFor="auto_add_subpages">Añadir también las subpáginas, bajo su página superior (si está en este menú)</Label>
+                </div>
+                <p className="text-muted-foreground pl-7 text-xs">
+                    Al crear una página se marca este menú por defecto; puedes desmarcarlo en el editor de la página.
+                </p>
+            </div>
+
             <div className="flex items-center space-x-3">
                 <Checkbox
                     id="active"

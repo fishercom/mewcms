@@ -6,7 +6,7 @@ import React from 'react';
 
 interface LayoutProps {
     children: React.ReactNode;
-    navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
+    navigation: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'url'>[];
 }
 
 export default function FrontLayout({ children, navigation }: LayoutProps) {
@@ -31,10 +31,8 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
     const footerItems = footerMenu?.items || [];
 
     // Helper to format underscores back to slashes for URLs
-    const getUrl = (slug: string) => {
-        if (!slug || slug === 'home') return '/';
-        return '/' + slug.replace(/_/g, '/');
-    };
+    // The server sends each page's URL; the slug fallback covers older cached data
+    const getUrl = (item: { url?: string; slug: string }) => item.url ?? (!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
 
     const renderNavLinks = () => {
         if (menuItems.length > 0) {
@@ -91,7 +89,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                     .map((item) => (
                         <Link
                             key={item.id}
-                            href={getUrl(item.slug)}
+                            href={getUrl(item)}
                             className="text-sm font-medium capitalize transition-colors hover:text-[#f53003] dark:hover:text-[#FF4433]"
                         >
                             {item.title}

@@ -51,12 +51,7 @@ class CmsMenuItem extends Model
     public function getResolvedUrlAttribute()
     {
         if ($this->article_id && $this->article) {
-            $slug = $this->article->slug;
-            if (! $slug || $slug === 'home' || $slug === 'home-page') {
-                return '/';
-            }
-
-            return '/'.str_replace('_', '/', $slug);
+            return $this->article->url;
         }
 
         return $this->url;

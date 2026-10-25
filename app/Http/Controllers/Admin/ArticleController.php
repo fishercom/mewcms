@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
+use App\Models\AdmAction;
 use App\Models\CmsArticle;
 use App\Models\CmsLang;
 use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Support\FrontCache;
+use App\Support\PageMenus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -21,6 +23,9 @@ use Inertia\Response;
 class ArticleController extends Controller
 {
     use BulkContentActions;
+
+    /** Form fields saved through relations, not as page columns. */
+    protected const RELATION_FIELDS = ['tag_ids', 'menu_ids', 'menus_managed'];
 
     protected $lang_id;
 
@@ -127,6 +132,7 @@ class ArticleController extends Controller
             ...$options,
             'parents' => $parents,
             'tags' => CmsTag::options(),
+            'menus' => PageMenus::options(),
         ]);
     }
 
@@ -154,10 +160,11 @@ class ArticleController extends Controller
             }
         }
 
-        $profile = new CmsArticle(Arr::except($data, 'tag_ids'));
+        $profile = new CmsArticle(Arr::except($data, self::RELATION_FIELDS));
         $profile->save();
 
         $profile->tags()->sync($data['tag_ids'] ?? []);
+        $this->syncMenus($request, $profile, $data);
 
         // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
@@ -199,6 +206,8 @@ class ArticleController extends Controller
             ...$this->templateOptions($item),
             'parents' => $parents,
             'tags' => CmsTag::options(),
+            'menus' => PageMenus::options(),
+            'menuIds' => PageMenus::membership($item),
             'autosave' => $item->pendingAutosave($request->user()->id),
         ]);
     }
@@ -238,10 +247,15 @@ class ArticleController extends Controller
             }
         }
 
-        $item->fill(Arr::except($data, 'tag_ids'));
+        $oldTitle = $item->title;
+        $item->fill(Arr::except($data, self::RELATION_FIELDS));
         $item->save();
 
         $item->tags()->sync($data['tag_ids'] ?? []);
+        $this->syncMenus($request, $item, $data);
+        if ($oldTitle !== $item->title) {
+            PageMenus::followTitle($item, $oldTitle);
+        }
 
         // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
@@ -370,6 +384,21 @@ class ArticleController extends Controller
     }
 
     /**
+     * Apply the editor's "Menús" choices. Only users who can manage menus change them;
+     * for anyone else the page keeps its current menu items.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function syncMenus(Request $request, CmsArticle $page, array $data): void
+    {
+        if (empty($data['menus_managed']) || ! $request->user()?->hasAdminPermission('menus', AdmAction::MANAGE)) {
+            return;
+        }
+
+        PageMenus::sync($page, $data['menu_ids'] ?? []);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function validatedData(Request $request): array
@@ -387,18 +416,27 @@ class ArticleController extends Controller
             'metadata' => 'nullable|array',
             'slug' => 'nullable|string|max:500',
             'active' => 'nullable|boolean',
+            'menu_ids' => 'nullable|array',
+            'menu_ids.*' => 'integer|exists:cms_menus,id',
+            // Sent by the editor so an empty selection (not sent as a field) still means "no menus"
+            'menus_managed' => 'nullable|boolean',
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => ['integer', CmsTag::existsRule()],
         ]);
     }
 
-    protected function buildTree($elements, $parentId, &$sorted, $depth = 0)
+    /**
+     * Flatten pages parent-first with their depth. Children are grouped once, so this is
+     * linear in the number of pages instead of scanning the list for every node.
+     */
+    protected function buildTree($elements, $parentId, &$sorted, $depth = 0, $byParent = null)
     {
-        $children = $elements->where('parent_id', $parentId)->sortBy('position');
-        foreach ($children as $child) {
+        $byParent ??= $elements->groupBy(fn ($page) => (string) $page->parent_id);
+
+        foreach (($byParent->get((string) $parentId) ?? collect())->sortBy('position') as $child) {
             $child->depth = $depth;
             $sorted[] = $child;
-            $this->buildTree($elements, $child->id, $sorted, $depth + 1);
+            $this->buildTree($elements, $child->id, $sorted, $depth + 1, $byParent);
         }
     }
 }

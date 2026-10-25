@@ -45,6 +45,8 @@ class MenuController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:cms_menus,slug',
             'description' => 'nullable|string',
+            'auto_add_pages' => 'boolean',
+            'auto_add_subpages' => 'boolean',
             'active' => 'boolean',
         ]);
 
@@ -78,6 +80,8 @@ class MenuController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:cms_menus,slug,'.$id,
             'description' => 'nullable|string',
+            'auto_add_pages' => 'boolean',
+            'auto_add_subpages' => 'boolean',
             'active' => 'boolean',
         ]);
 

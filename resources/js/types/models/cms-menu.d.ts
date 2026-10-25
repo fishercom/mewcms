@@ -5,6 +5,8 @@ export interface CmsMenu {
     name: string;
     slug: string;
     description: string | null;
+    auto_add_pages?: boolean;
+    auto_add_subpages?: boolean;
     active: boolean;
     created_at: string;
     updated_at: string;
@@ -33,6 +35,8 @@ export interface CmsMenuForm {
     name: string;
     slug?: string;
     description?: string | null;
+    auto_add_pages?: boolean;
+    auto_add_subpages?: boolean;
     active: boolean;
     [key: string]: unknown;
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ParameterController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PostTypeController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\SchemaController;
 use App\Http\Controllers\Admin\SiteController;
@@ -71,6 +72,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::delete('menus/items/{item}', [MenuController::class, 'destroyItem'])->name('menus.items.destroy');
 
     Route::resource('templates', TemplateController::class)->except(['show']);
+    Route::resource('redirects', RedirectController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('media', [MediaController::class, 'index'])->name('media.index');
 
     Route::resource('sliders', SliderController::class);

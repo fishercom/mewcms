@@ -22,6 +22,10 @@ export interface CmsArticle {
     deleted_at?: string | null;
     metadata: Record<string, unknown>;
     slug: string;
+    /** Full path, e.g. "nosotros/historia". */
+    uri?: string;
+    /** Public URL ("/" for the home page). */
+    url?: string;
     active: boolean;
     depth?: number;
     updated_at: Date;
@@ -47,5 +51,7 @@ export interface CmsArticleForm {
     slug: string;
     active: boolean;
     tag_ids?: number[];
+    menu_ids?: number[];
+    menus_managed?: boolean;
     [key: string]: FormDataConvertible;
 }

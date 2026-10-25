@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin\Concerns;
 
 use App\Models\AdmAction;
+use App\Models\CmsArticle;
+use App\Models\CmsMenuItem;
 use App\Models\CmsRevision;
 use App\Support\AdminActivity;
 use App\Support\FrontCache;
+use App\Support\PageMenus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -82,6 +85,10 @@ trait BulkContentActions
     protected function forceDeleteWithRevisions(string $model, array $ids): int
     {
         CmsRevision::where('revisionable_type', (new $model)->getMorphClass())->whereIn('revisionable_id', $ids)->delete();
+
+        if ($model === CmsArticle::class) {
+            PageMenus::removeItems(CmsMenuItem::whereIn('article_id', $ids)->get());
+        }
 
         return $model::onlyTrashed()->whereKey($ids)->forceDelete();
     }
