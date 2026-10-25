@@ -9,15 +9,22 @@ import { CmsSchema } from '@/types/models/cms-schema';
 import { Link, usePage } from '@inertiajs/react';
 import { Image as ImageIcon } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
-import ArticleFields from './partials/fields';
+import ArticleFields, { PageTemplate } from './partials/fields';
 
 export default function Create() {
     const {
         schema,
         schemas = [],
+        templates = [],
         parents = [],
         tags,
-    } = usePage<{ schema?: CmsSchema; schemas?: CmsSchema[]; parents?: CmsArticle[]; tags?: import('@/types').CmsTag[] }>().props;
+    } = usePage<{
+        schema?: CmsSchema;
+        schemas?: CmsSchema[];
+        templates?: PageTemplate[];
+        parents?: CmsArticle[];
+        tags?: import('@/types').CmsTag[];
+    }>().props;
 
     const initial: CmsArticleForm = {
         id: null,
@@ -106,6 +113,7 @@ export default function Create() {
                         processing={processing}
                         schema={activeSchema}
                         schemas={schemas}
+                        templates={templates}
                         parents={parents}
                         tags={tags}
                         onChangeSchema={handleChangeSchema}

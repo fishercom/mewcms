@@ -93,19 +93,10 @@ class ArticleController extends Controller
 
     public function create(Request $request)
     {
-        $schemas = CmsSchema::where('active', 1)->get()->map(function ($s) {
-            $s->unique = $s->isUnique();
+        $options = $this->templateOptions();
 
-            return $s;
-        })->filter(function ($schema): bool {
-            if ($schema->unique) {
-                return ! CmsArticle::where('schema_id', $schema->id)->exists();
-            }
-
-            return true;
-        })->values();
-
-        $schemaId = $request->get('schema_id');
+        // New pages start with the standard page template
+        $schemaId = $request->get('schema_id') ?? $options['templates']->firstWhere('value', 'front/templates/page')['schema_ids'][0] ?? null;
         $schema = $schemaId ? CmsSchema::find($schemaId) : null;
 
         $args = [
@@ -133,7 +124,7 @@ class ArticleController extends Controller
         return Inertia::render('admin/articles/create', [
             'item' => $args,
             'schema' => $schema,
-            'schemas' => $schemas,
+            ...$options,
             'parents' => $parents,
             'tags' => CmsTag::options(),
         ]);
@@ -189,20 +180,6 @@ class ArticleController extends Controller
         $item = CmsArticle::with(['schema', 'tags'])->findOrFail($id);
         $descendantIds = $item->getAllDescendantIds();
 
-        $schemas = CmsSchema::where('active', 1)->get()->map(function ($s) {
-            $s->unique = $s->isUnique();
-
-            return $s;
-        })->filter(function ($schema) use ($id): bool {
-            if ($schema->unique) {
-                return ! CmsArticle::where('schema_id', $schema->id)
-                    ->where('id', '!=', $id)
-                    ->exists();
-            }
-
-            return true;
-        })->values();
-
         $parents = CmsArticle::where('lang_id', $this->lang_id)
             ->where('id', '!=', $id)
             ->where('active', 1)
@@ -219,7 +196,7 @@ class ArticleController extends Controller
         return Inertia::render('admin/articles/edit', [
             'item' => $item,
             'schema' => $item?->schema,
-            'schemas' => $schemas,
+            ...$this->templateOptions($item),
             'parents' => $parents,
             'tags' => CmsTag::options(),
             'autosave' => $item->pendingAutosave($request->user()->id),
@@ -349,6 +326,47 @@ class ArticleController extends Controller
         FrontCache::flush();
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * The page templates for the editor, each with the field groups (schemas) behind it,
+     * plus the flat list of those field groups. A single-use template already taken by
+     * another page carries that page in "used_by".
+     *
+     * @return array{templates: Collection<int, array<string, mixed>>, schemas: Collection<int, CmsSchema>}
+     */
+    protected function templateOptions(?CmsArticle $item = null): array
+    {
+        CmsSchema::ensureTemplateDefaults();
+
+        $schemas = CmsSchema::where('active', true)
+            // Keep the page's own field group listed even if it was deactivated
+            ->when($item?->schema_id, fn ($query) => $query->orWhere('id', $item->schema_id))
+            ->orderBy('position')
+            ->get()
+            ->each(fn (CmsSchema $schema) => $schema->unique = $schema->isUnique());
+
+        $templates = collect(CmsSchema::pageTemplates());
+        $current = $item?->schema;
+        if ($current && ! $templates->contains('value', (string) $current->front_view)) {
+            $templates->push(['name' => $current->name, 'value' => (string) $current->front_view, 'file' => basename((string) $current->front_view).'.tsx', 'unique' => false]);
+        }
+
+        $templates = $templates->map(function (array $template) use ($schemas, $item): array {
+            $usedBy = $template['unique']
+                ? CmsArticle::whereHas('schema', fn ($query) => $query->where('front_view', $template['value']))
+                    ->when($item, fn ($query) => $query->whereKeyNot($item->id))
+                    ->first(['id', 'title'])
+                : null;
+
+            return [
+                ...$template,
+                'used_by' => $usedBy?->only(['id', 'title']),
+                'schema_ids' => $schemas->filter(fn (CmsSchema $schema): bool => (string) $schema->front_view === $template['value'])->pluck('id')->values()->all(),
+            ];
+        })->values();
+
+        return ['templates' => $templates, 'schemas' => $schemas];
     }
 
     /**
