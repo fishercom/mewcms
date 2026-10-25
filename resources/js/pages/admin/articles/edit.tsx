@@ -1,3 +1,4 @@
+import ContentEditorTools, { RevisionData } from '@/components/content-editor-tools';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
@@ -17,12 +18,14 @@ export default function Edit() {
         schemas = [],
         parents = [],
         tags,
+        autosave,
     } = usePage<{
         item: CmsArticle;
         schema?: CmsSchema;
         schemas?: CmsSchema[];
         parents?: CmsArticle[];
         tags?: import('@/types').CmsTag[];
+        autosave?: (RevisionData & { updated_at?: string }) | null;
     }>().props;
 
     const initial: CmsArticleForm = {
@@ -97,6 +100,26 @@ export default function Edit() {
                         </Button>
                     </div>
                 </div>
+
+                <ContentEditorTools
+                    module="articles"
+                    id={item.id}
+                    data={data}
+                    initialData={initial}
+                    autosave={autosave}
+                    onApply={(revision: RevisionData) =>
+                        setData((prev) => ({
+                            ...prev,
+                            title: revision.title ?? prev.title,
+                            content: revision.content ?? '',
+                            excerpt: revision.excerpt ?? '',
+                            metadata: (revision.metadata ?? prev.metadata) as typeof prev.metadata,
+                            status: revision.status ?? prev.status ?? 'published',
+                            published_at: revision.published_at ?? '',
+                            tag_ids: revision.tag_ids ?? prev.tag_ids ?? [],
+                        }))
+                    }
+                />
 
                 <FormLayout>
                     <ArticleFields

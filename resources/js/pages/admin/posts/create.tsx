@@ -1,3 +1,4 @@
+import ContentEditorTools from '@/components/content-editor-tools';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
@@ -67,6 +68,14 @@ export default function Create() {
         <ModuleLayout view="Crear">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <ContentEditorTools
+                        module="posts"
+                        id={null}
+                        data={data}
+                        initialData={item}
+                        previewExtra={{ post_type }}
+                        onApply={() => undefined}
+                    />
                     <PostFields
                         data={data}
                         setData={setData}

@@ -35,6 +35,9 @@ Route::post('api/forms/submit', [FrontController::class, 'publicFormSubmit'])
     ->middleware('throttle:form-submissions')
     ->name('front.forms.submit');
 
+// Editor preview of unsaved pages and posts (temporary signed URL)
+Route::get('preview/{token}', [FrontController::class, 'preview'])->middleware('signed')->name('front.preview');
+
 // Public search route
 Route::get('search', [FrontController::class, 'search'])->name('front.search');
 

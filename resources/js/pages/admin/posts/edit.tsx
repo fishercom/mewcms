@@ -1,3 +1,4 @@
+import ContentEditorTools, { RevisionData } from '@/components/content-editor-tools';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
@@ -9,7 +10,7 @@ import { useState } from 'react';
 import PostFields from './partials/fields';
 
 export default function Edit() {
-    const { item, schema, schemas, authors, tags, cpt, post_type, lang_id } = usePage<{
+    const { item, schema, schemas, authors, tags, cpt, post_type, lang_id, autosave } = usePage<{
         item: CmsPost & { tag_ids?: number[] };
         schema: CmsSchema | null;
         schemas: CmsSchema[];
@@ -18,9 +19,10 @@ export default function Edit() {
         cpt: CmsPostType | null;
         post_type: string;
         lang_id: number;
+        autosave?: (RevisionData & { updated_at?: string }) | null;
     }>().props;
 
-    const [data, setData] = useState<Partial<CmsPost> & { tag_ids?: number[] }>({
+    const [initial] = useState<Partial<CmsPost> & { tag_ids?: number[] }>({
         id: item.id,
         user_id: item.user_id,
         lang_id: item.lang_id,
@@ -36,6 +38,7 @@ export default function Edit() {
         active: item.active,
         tag_ids: item.tag_ids || [],
     });
+    const [data, setData] = useState(initial);
     const [activeSchema, setActiveSchema] = useState<CmsSchema | null>(schema);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -80,6 +83,26 @@ export default function Edit() {
         <ModuleLayout view="Editar">
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <ContentEditorTools
+                        module="posts"
+                        id={item.id}
+                        data={data}
+                        initialData={initial}
+                        autosave={autosave}
+                        previewExtra={{ post_type }}
+                        onApply={(revision: RevisionData) =>
+                            setData((prev) => ({
+                                ...prev,
+                                title: revision.title ?? prev.title,
+                                content: revision.content ?? '',
+                                excerpt: revision.excerpt ?? '',
+                                metadata: (revision.metadata ?? prev.metadata) as typeof prev.metadata,
+                                status: (revision.status as CmsPost['status'] | null) ?? prev.status,
+                                published_at: revision.published_at ?? prev.published_at,
+                                tag_ids: revision.tag_ids ?? prev.tag_ids,
+                            }))
+                        }
+                    />
                     <PostFields
                         data={data}
                         setData={setData}

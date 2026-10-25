@@ -171,6 +171,8 @@ class ArticleController extends Controller
         // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
 
+        $profile->recordSave($request->user()?->id);
+
         $args = [
             'lang_id' => $this->lang_id,
             'parent_id' => null,
@@ -220,6 +222,7 @@ class ArticleController extends Controller
             'schemas' => $schemas,
             'parents' => $parents,
             'tags' => CmsTag::options(),
+            'autosave' => $item->pendingAutosave($request->user()->id),
         ]);
     }
 
@@ -265,6 +268,8 @@ class ArticleController extends Controller
 
         // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
+
+        $item->recordSave($request->user()?->id);
 
         $args = [
             'lang_id' => $this->lang_id,

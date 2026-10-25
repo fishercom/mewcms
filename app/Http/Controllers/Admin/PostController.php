@@ -160,6 +160,8 @@ class PostController extends Controller
         // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
 
+        $post->recordSave($request->user()?->id);
+
         return redirect()->route('posts.index', [
             'lang_id' => $this->lang_id,
             'post_type' => $this->post_type,
@@ -190,6 +192,7 @@ class PostController extends Controller
             'authors' => $authors,
             'tags' => CmsTag::options(),
             'cpt' => $cpt,
+            'autosave' => $item->pendingAutosave($request->user()->id),
         ]);
     }
 
@@ -231,6 +234,8 @@ class PostController extends Controller
 
         // Tag counts change with the pivot sync, which fires no model events
         FrontCache::flush();
+
+        $post->recordSave($request->user()?->id);
 
         return redirect()->route('posts.index', [
             'lang_id' => $this->lang_id,
