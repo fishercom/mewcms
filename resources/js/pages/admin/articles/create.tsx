@@ -1,3 +1,4 @@
+import ContentEditorTools from '@/components/content-editor-tools';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
@@ -94,6 +95,8 @@ export default function Create() {
                         </Button>
                     </div>
                 </div>
+
+                <ContentEditorTools module="articles" id={null} data={data} initialData={initial} onApply={() => undefined} />
 
                 <FormLayout>
                     <ArticleFields

@@ -10,14 +10,17 @@ use App\Models\CmsRegister;
 use App\Models\CmsRegisterField;
 use App\Models\CmsSlider;
 use App\Models\CmsTag;
+use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FrontController extends Controller
 {
@@ -85,6 +88,92 @@ class FrontController extends Controller
         $article->load(['schema', 'tags', 'children' => function ($query): void {
             $query->published()->orderBy('position');
         }]);
+
+        return $this->renderArticle($article);
+    }
+
+    /**
+     * Editor preview: render the unsaved data stored by the admin preview endpoint, behind
+     * a temporary signed URL. Drafts and scheduled items render too; nothing is cached
+     * and search engines are told not to index it.
+     */
+    public function preview(Request $request, string $token): SymfonyResponse
+    {
+        $payload = Cache::get('preview.'.$token);
+        abort_unless(is_array($payload), 404);
+
+        $response = $payload['module'] === 'posts'
+            ? $this->previewPost($payload['data'])
+            : $this->previewArticle($payload['data']);
+
+        return $response->toResponse($request)->withHeaders([
+            'X-Robots-Tag' => 'noindex, nofollow',
+            'Cache-Control' => 'no-store, private',
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function previewArticle(array $data): Response
+    {
+        $article = ! empty($data['id']) ? CmsArticle::withTrashed()->findOrFail($data['id']) : new CmsArticle;
+        $article->forceFill([
+            ...$this->previewFields($data, ['title', 'excerpt', 'featured_image', 'schema_id', 'parent_id', 'status', 'published_at']),
+            'content' => ContentSanitizer::html($data['content'] ?? null),
+            'metadata' => ContentSanitizer::metadata($data['metadata'] ?? []),
+        ]);
+        $article->created_at ??= now();
+
+        $article->load('schema');
+        $article->setRelation('tags', CmsTag::whereIn('cms_taxonomy_terms.id', $data['tag_ids'] ?? [])->get());
+        $article->setRelation('children', $article->exists
+            ? $article->children()->published()->orderBy('position')->get()
+            : $article->newCollection());
+
+        return $this->renderArticle($article);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function previewPost(array $data): Response
+    {
+        $post = ! empty($data['id']) ? CmsPost::withTrashed()->findOrFail($data['id']) : new CmsPost(['post_type' => 'post']);
+        $post->forceFill([
+            ...$this->previewFields($data, ['title', 'excerpt', 'featured_image', 'schema_id', 'status', 'published_at', 'post_type', 'user_id']),
+            'content' => ContentSanitizer::html($data['content'] ?? null),
+            'metadata' => ContentSanitizer::metadata($data['metadata'] ?? []),
+        ]);
+        $post->created_at ??= now();
+        $post->published_at ??= now();
+
+        $post->load(['user', 'schema']);
+        $post->setRelation('tags', CmsTag::whereIn('cms_taxonomy_terms.id', $data['tag_ids'] ?? [])->get());
+
+        return Inertia::render('front/blog/show', [
+            'post' => $post,
+            'cpt' => $post->post_type !== 'post' ? CmsPostType::where('slug', $post->post_type)->first() : null,
+            ...FrontCache::shared(),
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  list<string>  $fields
+     * @return array<string, mixed>
+     */
+    protected function previewFields(array $data, array $fields): array
+    {
+        return array_intersect_key($data, array_flip($fields));
+    }
+
+    /**
+     * Render a page with the template of its schema. Also used by the editor preview,
+     * with an unsaved article.
+     */
+    public function renderArticle(CmsArticle $article): Response
+    {
 
         // Get template name from schema
         $template = $article->schema?->front_view;

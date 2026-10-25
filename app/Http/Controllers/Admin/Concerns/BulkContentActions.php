@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Concerns;
 
 use App\Models\AdmAction;
+use App\Models\CmsRevision;
 use App\Support\AdminActivity;
 use App\Support\FrontCache;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,7 +61,7 @@ trait BulkContentActions
             'draft' => $model::whereKey($ids)->update(['status' => 'draft']),
             'trash' => $model::whereKey($ids)->delete(),
             'restore' => $model::onlyTrashed()->whereKey($ids)->restore(),
-            'force_delete' => $model::onlyTrashed()->whereKey($ids)->forceDelete(),
+            'force_delete' => $this->forceDeleteWithRevisions($model, $ids),
         };
 
         // Query-builder writes fire no model events
@@ -70,6 +71,19 @@ trait BulkContentActions
         AdminActivity::record($module, AdmAction::MANAGE, self::BULK_ACTIONS[$action], $subject);
 
         return $items;
+    }
+
+    /**
+     * Permanently delete records and their revision history (query-builder deletes fire no model events).
+     *
+     * @param  class-string<Model>  $model
+     * @param  array<int, int|string>  $ids
+     */
+    protected function forceDeleteWithRevisions(string $model, array $ids): int
+    {
+        CmsRevision::where('revisionable_type', (new $model)->getMorphClass())->whereIn('revisionable_id', $ids)->delete();
+
+        return $model::onlyTrashed()->whereKey($ids)->forceDelete();
     }
 
     /**

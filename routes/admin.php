@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ConfigController;
+use App\Http\Controllers\Admin\ContentRevisionController;
 use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\LangController;
 use App\Http\Controllers\Admin\LayoutController;
@@ -46,6 +47,18 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::resource('forms', FormController::class);
     Route::resource('registers', RegisterController::class);
     Route::resource('notifies', NotifyController::class);
+    // Revisions, autosave and preview of pages and posts (permissions follow each module)
+    foreach (['articles', 'posts'] as $contentModule) {
+        Route::prefix($contentModule)->name($contentModule.'.')->group(function () use ($contentModule): void {
+            Route::post('preview', [ContentRevisionController::class, 'preview'])->name('preview')->defaults('module', $contentModule);
+            Route::get('{id}/revisions', [ContentRevisionController::class, 'index'])->name('revisions.index')->defaults('module', $contentModule);
+            Route::get('{id}/revisions/{revisionId}', [ContentRevisionController::class, 'show'])->name('revisions.show')->defaults('module', $contentModule);
+            Route::post('{id}/revisions/{revisionId}/restore', [ContentRevisionController::class, 'restore'])->name('revisions.restore')->defaults('module', $contentModule);
+            Route::post('{id}/autosave', [ContentRevisionController::class, 'autosave'])->name('autosave')->defaults('module', $contentModule);
+            Route::delete('{id}/autosave', [ContentRevisionController::class, 'discardAutosave'])->name('autosave.destroy')->defaults('module', $contentModule);
+        });
+    }
+
     Route::post('articles/bulk', [ArticleController::class, 'bulk'])->name('articles.bulk');
     Route::resource('articles', ArticleController::class);
     Route::post('articles/sort', [ArticleController::class, 'sort'])->name('articles.sort');
