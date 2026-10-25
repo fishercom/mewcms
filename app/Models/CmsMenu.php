@@ -15,9 +15,11 @@ class CmsMenu extends Model
 
     protected $table = 'cms_menus';
 
-    protected $fillable = ['name', 'slug', 'description', 'active'];
+    protected $fillable = ['name', 'slug', 'description', 'auto_add_pages', 'auto_add_subpages', 'active'];
 
     protected $casts = [
+        'auto_add_pages' => 'boolean',
+        'auto_add_subpages' => 'boolean',
         'active' => 'boolean',
     ];
 

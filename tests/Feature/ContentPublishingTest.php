@@ -229,10 +229,11 @@ it('serves tag archives at /tag/{slug} and redirects legacy /category/{slug} URL
 
 it('lets a page take precedence over legacy taxonomy archive redirect', function (): void {
     CmsTag::create(['name' => 'Web', 'slug' => 'web', 'active' => 1]);
-    makePage(['title' => 'Web', 'slug' => 'servicios_web']);
+    $parent = makePage(['title' => 'Servicios', 'slug' => 'servicios']);
+    makePage(['title' => 'Web', 'slug' => 'web', 'parent_id' => $parent->id]);
 
     $this->get('/servicios/web')->assertOk()->assertInertia(fn (Assert $page): Assert => $page
         ->component('front/templates/page')
-        ->where('article.slug', 'servicios_web')
+        ->where('article.uri', 'servicios/web')
     );
 });

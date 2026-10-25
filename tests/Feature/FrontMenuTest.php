@@ -120,11 +120,20 @@ it('eager resolves cms article slug in public layout shared menus', function ():
         'active' => 1,
     ]);
 
+    $about = CmsArticle::create([
+        'schema_id' => $this->schema->id,
+        'lang_id' => $this->lang->id,
+        'title' => 'About',
+        'slug' => 'about',
+        'active' => 1,
+        'metadata' => [],
+    ]);
     $article = CmsArticle::create([
         'schema_id' => $this->schema->id,
         'lang_id' => $this->lang->id,
-        'title' => 'About Us Page',
-        'slug' => 'about_us_page',
+        'parent_id' => $about->id,
+        'title' => 'Us Page',
+        'slug' => 'us-page',
         'active' => 1,
         'metadata' => [],
     ]);
@@ -143,6 +152,6 @@ it('eager resolves cms article slug in public layout shared menus', function ():
     $response->assertInertia(fn (Assert $page): AssertableInertia => $page
         ->has('menus')
         ->where('menus.0.slug', 'header')
-        ->where('menus.0.items.0.resolved_url', '/about/us/page')
+        ->where('menus.0.items.0.resolved_url', '/about/us-page')
     );
 });

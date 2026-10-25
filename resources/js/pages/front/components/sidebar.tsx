@@ -14,16 +14,12 @@ export interface PopularTag {
 
 interface SidebarProps {
     popularTags?: PopularTag[];
-    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
+    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'url' | 'created_at'>[];
 }
 
 export default function FrontSidebar({ popularTags = [], recentArticles = [] }: SidebarProps) {
     // Helper to format URLs
-    const getArticleUrl = (slug: string) => {
-        if (!slug || slug === 'home') return '/';
-        return '/' + slug.replace(/_/g, '/');
-    };
-
+    const getArticleUrl = (item: { url?: string; slug: string }) => item.url ?? (!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
 
     return (
         <aside className="space-y-8 lg:sticky lg:top-24">
@@ -37,7 +33,7 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
                     <ul className="space-y-4">
                         {recentArticles.map((art) => (
                             <li key={art.id} className="group">
-                                <Link href={getArticleUrl(art.slug)} className="block space-y-1">
+                                <Link href={getArticleUrl(art)} className="block space-y-1">
                                     <h4 className="line-clamp-2 text-sm leading-snug font-medium text-[#1b1b18] capitalize transition-colors group-hover:text-[#f53003] dark:text-[#EDEDEC] dark:group-hover:text-[#FF4433]">
                                         {art.title}
                                     </h4>

@@ -31,7 +31,7 @@ class FrontCache
             'navigation' => CmsArticle::published()
                 ->whereNull('parent_id')
                 ->orderBy('position')
-                ->get(['id', 'title', 'slug'])
+                ->get(['id', 'lang_id', 'title', 'slug', 'uri'])
                 ->toArray(),
             // Most used tags across published pages and posts
             'popularTags' => CmsTag::where('active', true)
@@ -48,7 +48,7 @@ class FrontCache
                 ->where('slug', '!=', 'home-page')
                 ->latest()
                 ->take(5)
-                ->get(['id', 'title', 'slug', 'created_at'])
+                ->get(['id', 'lang_id', 'title', 'slug', 'uri', 'created_at'])
                 ->toArray(),
         ]);
     }

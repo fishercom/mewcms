@@ -65,13 +65,17 @@ class FrontController extends Controller
                 $article = CmsArticle::published()->orderBy('position')->first();
             }
         } else {
-            // Map URL slashes back to DB underscore separator format
-            $dbSlug = str_replace('/', '_', $slug);
-            $article = CmsArticle::where('slug', $dbSlug)->published()->first();
+            // Pages are found by their full path
+            $uri = trim($slug, '/');
+            $article = CmsArticle::where('uri', $uri)->published()->first();
 
-            // A page whose parent is unpublished or trashed is not reachable either
-            if ($article?->parent_id && ! CmsArticle::published()->whereKey($article->parent_id)->exists()) {
-                $article = null;
+            // Every page above it must be published too (one query for all ancestors)
+            $segments = explode('/', $uri);
+            if ($article && count($segments) > 1) {
+                $ancestors = collect(range(1, count($segments) - 1))->map(fn (int $depth): string => implode('/', array_slice($segments, 0, $depth)));
+                if (CmsArticle::published()->where('lang_id', $article->lang_id)->whereIn('uri', $ancestors)->count() !== $ancestors->count()) {
+                    $article = null;
+                }
             }
 
             // Old taxonomy archives ("/categorias/{term}", "/news/{term}"...) now live at "/tag/{term}"
@@ -248,7 +252,7 @@ class FrontController extends Controller
                 'id' => 'page-'.$article->id,
                 'type' => 'Página',
                 'title' => $article->title,
-                'url' => '/'.str_replace('_', '/', $article->slug),
+                'url' => $article->url,
                 'excerpt' => $this->excerpt($article->excerpt ?: $article->content),
                 'date' => ($article->published_at ?? $article->created_at)?->toAtomString(),
             ]);
@@ -492,7 +496,7 @@ class FrontController extends Controller
                     'id' => $art->id,
                     'title' => $art->title,
                     'excerpt' => $art->excerpt ?: strip_tags(substr($art->content ?? '', 0, 200)),
-                    'url' => '/'.$art->slug,
+                    'url' => $art->url,
                     'type' => 'Página',
                     'date' => $art->created_at ? $art->created_at->format('d/m/Y') : '',
                 ];
@@ -549,8 +553,12 @@ class FrontController extends Controller
             // 2. Add Pages (Articles)
             $articles = CmsArticle::published()->where('slug', '!=', 'home-page')->get();
             foreach ($articles as $art) {
+                // The home page is already listed as the site root
+                if ($art->url === '/') {
+                    continue;
+                }
                 $urls[] = [
-                    'loc' => $baseUrl.'/'.$art->slug,
+                    'loc' => $baseUrl.$art->url,
                     'lastmod' => $art->updated_at ? $art->updated_at->toAtomString() : now()->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.8',

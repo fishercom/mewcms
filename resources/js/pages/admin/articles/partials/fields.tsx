@@ -16,6 +16,22 @@ import { FileText, Globe, Image as ImageIcon, Settings, Sliders, Trash2 } from '
 import { useEffect, useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
 
+/** A menu the page can appear in. */
+export interface PageMenu {
+    id: number;
+    name: string;
+    auto_add_pages: boolean;
+    auto_add_subpages: boolean;
+    article_ids: number[];
+}
+
+/**
+ * Menus a new page joins by default: those that add new top-level pages, or, for a
+ * subpage, those that add subpages and already contain its parent.
+ */
+export const defaultMenuIds = (menus: PageMenu[], parentId: number | null): number[] =>
+    menus.filter((m) => (parentId ? m.auto_add_subpages && m.article_ids.includes(parentId) : m.auto_add_pages)).map((m) => m.id);
+
 /** A page template file, with the field groups (schemas) that use it. */
 export interface PageTemplate {
     name: string;
@@ -34,6 +50,7 @@ interface Props {
     schema?: CmsSchema & { unique?: boolean };
     schemas?: (CmsSchema & { unique?: boolean })[];
     templates?: PageTemplate[];
+    menus?: PageMenu[];
     parents?: CmsArticle[];
     tags?: CmsTag[];
     onChangeSchema?: (schemaId: number) => void;
@@ -47,6 +64,7 @@ export default function ArticleFields({
     schema,
     schemas = [],
     templates = [],
+    menus = [],
     parents = [],
     tags = [],
     onChangeSchema,
@@ -63,6 +81,11 @@ export default function ArticleFields({
     const hasSchemaFields = Boolean(schema?.fields && schema.fields.length > 0);
     const { auth } = usePage<{ auth?: { permissions?: { super_admin?: boolean; modules?: Record<string, string[]> } | null } }>().props;
     const canManageSchemas = Boolean(auth?.permissions?.super_admin || auth?.permissions?.modules?.schemas?.includes('administrar'));
+
+    const parentPrefix = `/${parents.find((p) => p.id === data.parent_id)?.uri ?? ''}${data.parent_id ? '/' : ''}`.replace('//', '/');
+
+    const canManageMenus = Boolean(auth?.permissions?.super_admin || auth?.permissions?.modules?.menus?.includes('administrar'));
+    const [menusTouched, setMenusTouched] = useState(false);
 
     const currentTemplate = templates.find((t) => data.schema_id !== null && t.schema_ids.includes(data.schema_id));
 
@@ -355,7 +378,13 @@ export default function ArticleFields({
                                     value={data.parent_id || 'root'}
                                     onChange={(e) => {
                                         const val = e.target.value;
-                                        setData({ ...data, parent_id: val === 'root' ? null : Number(val) });
+                                        const parentId = val === 'root' ? null : Number(val);
+                                        // A new page follows the menus' auto-add rules until the user picks menus
+                                        setData({
+                                            ...data,
+                                            parent_id: parentId,
+                                            ...(!data.id && !menusTouched ? { menu_ids: defaultMenuIds(menus, parentId) } : {}),
+                                        });
                                     }}
                                     className="border-input text-foreground h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-hidden"
                                 >
@@ -371,6 +400,25 @@ export default function ArticleFields({
                             </div>
                         )
                     )}
+
+                    {/* URL: the last segment; the parent path comes from the parent page */}
+                    <div className="space-y-1.5">
+                        <Label htmlFor="slug">URL</Label>
+                        <div className="border-input flex h-9 items-center overflow-hidden rounded-xl border text-xs focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/20">
+                            <span className="text-muted-foreground bg-muted/40 max-w-[55%] truncate px-2 font-mono" title={parentPrefix}>
+                                {parentPrefix}
+                            </span>
+                            <input
+                                id="slug"
+                                value={data.slug}
+                                onChange={(e) => setData({ ...data, slug: e.target.value })}
+                                placeholder={data.id ? '' : 'se genera del título'}
+                                className="text-foreground h-full min-w-0 flex-1 bg-transparent px-2 font-mono outline-none"
+                            />
+                        </div>
+                        {data.id && <p className="text-muted-foreground text-[11px]">Si la cambias, la dirección anterior redirige a la nueva.</p>}
+                        <InputError message={errors.slug} />
+                    </div>
 
                     {/* Active Checkbox */}
                     <div className="flex items-center space-x-2 pt-2">
@@ -434,6 +482,40 @@ export default function ArticleFields({
                     <TagField tags={tags} selected={data.tag_ids || []} onChange={(tagIds) => setData({ ...data, tag_ids: tagIds })} />
                     <InputError message={errors.tag_ids} />
                 </div>
+
+                {/* Menus */}
+                {menus.length > 0 && (
+                    <div className="border-border/70 bg-card space-y-3 rounded-2xl border p-4 shadow-2xs">
+                        <h3 className="border-border/60 text-muted-foreground border-b pb-2 text-xs font-bold tracking-wider uppercase">Menús</h3>
+                        <div className="space-y-2">
+                            {menus.map((menu) => {
+                                const checked = (data.menu_ids ?? []).includes(menu.id);
+                                return (
+                                    <div key={menu.id} className="flex items-center gap-2">
+                                        <Checkbox
+                                            id={`menu-${menu.id}`}
+                                            checked={checked}
+                                            disabled={!canManageMenus}
+                                            onCheckedChange={() => {
+                                                setMenusTouched(true);
+                                                const ids = data.menu_ids ?? [];
+                                                setData({ ...data, menu_ids: checked ? ids.filter((id) => id !== menu.id) : [...ids, menu.id] });
+                                            }}
+                                        />
+                                        <Label htmlFor={`menu-${menu.id}`} className="cursor-pointer text-xs font-normal">
+                                            Mostrar en {menu.name}
+                                        </Label>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <p className="text-muted-foreground text-[11px]">
+                            {canManageMenus
+                                ? 'Se añade al final del menú; el orden se cambia en Menús.'
+                                : 'Solo lectura: necesitas permiso para administrar Menús.'}
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );

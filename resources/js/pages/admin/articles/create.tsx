@@ -9,19 +9,21 @@ import { CmsSchema } from '@/types/models/cms-schema';
 import { Link, usePage } from '@inertiajs/react';
 import { Image as ImageIcon } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
-import ArticleFields, { PageTemplate } from './partials/fields';
+import ArticleFields, { defaultMenuIds, PageMenu, PageTemplate } from './partials/fields';
 
 export default function Create() {
     const {
         schema,
         schemas = [],
         templates = [],
+        menus = [],
         parents = [],
         tags,
     } = usePage<{
         schema?: CmsSchema;
         schemas?: CmsSchema[];
         templates?: PageTemplate[];
+        menus?: PageMenu[];
         parents?: CmsArticle[];
         tags?: import('@/types').CmsTag[];
     }>().props;
@@ -41,6 +43,8 @@ export default function Create() {
         slug: '',
         active: true,
         tag_ids: [],
+        menu_ids: defaultMenuIds(menus, null),
+        menus_managed: true,
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
     const [activeSchema, setActiveSchema] = useState<CmsSchema | undefined>(schema);
@@ -114,6 +118,7 @@ export default function Create() {
                         schema={activeSchema}
                         schemas={schemas}
                         templates={templates}
+                        menus={menus}
                         parents={parents}
                         tags={tags}
                         onChangeSchema={handleChangeSchema}

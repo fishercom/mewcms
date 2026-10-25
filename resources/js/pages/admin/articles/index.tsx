@@ -198,7 +198,9 @@ export default function Index() {
                                                             <span className="text-foreground text-sm leading-snug font-semibold transition-colors group-hover:text-violet-600 dark:group-hover:text-violet-400">
                                                                 {item.title}
                                                             </span>
-                                                            <span className="text-muted-foreground/70 font-mono text-[11px]">/{item.slug}</span>
+                                                            <span className="text-muted-foreground/70 font-mono text-[11px]">
+                                                                /{item.uri ?? item.slug}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </th>

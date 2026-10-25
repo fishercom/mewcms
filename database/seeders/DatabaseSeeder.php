@@ -198,6 +198,15 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'menu_id' => $menuCms->id,
+                'name' => 'Redirecciones',
+                'url' => '/admin/redirects',
+                'route' => 'redirects.index',
+                'icon' => 'corner-up-right',
+                'position' => 5,
+                'visible' => true,
+            ],
+            [
+                'menu_id' => $menuCms->id,
                 'name' => 'Tipos de Contenido',
                 'url' => '/admin/post-types',
                 'route' => 'post-types.index',

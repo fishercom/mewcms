@@ -21,9 +21,7 @@ export default function Page({ article, navigation }: PageProps) {
     const meta = (article.metadata || {}) as PageMetadata;
 
     // Helpers to format URL
-    const getUrl = (slug: string) => {
-        return '/' + slug.replace(/_/g, '/');
-    };
+    const getUrl = (item: { url?: string; slug: string }) => item.url ?? '/' + item.slug;
 
     const tags = article.tags ?? [];
 
@@ -159,7 +157,7 @@ export default function Page({ article, navigation }: PageProps) {
                             {article.children.map((child) => (
                                 <li key={child.id}>
                                     <Link
-                                        href={getUrl(child.slug)}
+                                        href={getUrl(child)}
                                         className="block rounded-lg border border-[#19140015] bg-white p-4 shadow-sm transition-all hover:border-[#f53003]/50 dark:border-[#3E3E3A]/40 dark:bg-[#161615] dark:hover:border-[#FF4433]/50"
                                     >
                                         <h4 className="text-sm font-semibold capitalize">{child.title}</h4>

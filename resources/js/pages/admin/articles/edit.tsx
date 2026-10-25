@@ -9,7 +9,7 @@ import { CmsSchema } from '@/types/models/cms-schema';
 import { Link, usePage } from '@inertiajs/react';
 import { Image as ImageIcon } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
-import ArticleFields, { PageTemplate } from './partials/fields';
+import ArticleFields, { PageMenu, PageTemplate } from './partials/fields';
 
 export default function Edit() {
     const {
@@ -17,6 +17,8 @@ export default function Edit() {
         schema,
         schemas = [],
         templates = [],
+        menus = [],
+        menuIds = [],
         parents = [],
         tags,
         autosave,
@@ -25,6 +27,8 @@ export default function Edit() {
         schema?: CmsSchema;
         schemas?: CmsSchema[];
         templates?: PageTemplate[];
+        menus?: PageMenu[];
+        menuIds?: number[];
         parents?: CmsArticle[];
         tags?: import('@/types').CmsTag[];
         autosave?: (RevisionData & { updated_at?: string }) | null;
@@ -45,6 +49,8 @@ export default function Edit() {
         slug: item.slug,
         active: item.active,
         tag_ids: item.tags?.map((t) => t.id) || [],
+        menu_ids: menuIds,
+        menus_managed: true,
     };
     const [data, setData] = useState<CmsArticleForm>(initial);
     const [activeSchema, setActiveSchema] = useState<CmsSchema | undefined>(schema);
@@ -132,6 +138,7 @@ export default function Edit() {
                         schema={activeSchema}
                         schemas={schemas}
                         templates={templates}
+                        menus={menus}
                         parents={parents}
                         tags={tags}
                         onChangeSchema={handleChangeSchema}
