@@ -10,6 +10,7 @@ use App\Models\CmsRegister;
 use App\Models\CmsRegisterField;
 use App\Models\CmsSlider;
 use App\Models\CmsTaxonomy;
+use App\Support\FrontCache;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -90,45 +91,36 @@ class FrontController extends Controller
             }
         }
 
-        // Fetch root navigation links (all active top-level pages)
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
+        $shared = FrontCache::shared();
 
-        // Fetch active taxonomies with active terms and their articles count
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        // Fetch recent active articles (except home page)
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
-
-        // Resolve slider if present in article metadata (recursively searches root and nested structures)
+        // Resolve slider from article metadata: any short string (root or nested) may be a slider key
         $slider = null;
-        if ($article->metadata && is_array($article->metadata)) {
-            $findSlider = function ($data) use (&$findSlider) {
-                if (is_string($data) && ! empty($data) && strlen($data) < 100) {
-                    $potentialSlider = CmsSlider::getSlider($data);
-                    if ($potentialSlider) {
-                        return $potentialSlider;
-                    }
-                } elseif (is_array($data)) {
-                    foreach ($data as $item) {
-                        $res = $findSlider($item);
-                        if ($res) {
-                            return $res;
-                        }
+        $metadata = $article->metadata;
+        if ($metadata && is_array($metadata)) {
+            $candidates = [];
+            array_walk_recursive($metadata, function ($value) use (&$candidates): void {
+                if (is_string($value) && $value !== '' && strlen($value) < 100) {
+                    $candidates[] = $value;
+                }
+            });
+
+            if ($candidates !== []) {
+                $candidates = array_values(array_unique($candidates));
+                $sliders = CmsSlider::whereIn('key', $candidates)
+                    ->with(['slides' => function ($query): void {
+                        $query->where('active', true)->orderBy('position');
+                    }])
+                    ->get()
+                    ->keyBy('key');
+
+                // Keep metadata order: the first matching key wins
+                foreach ($candidates as $candidate) {
+                    if ($sliders->has($candidate)) {
+                        $slider = $sliders->get($candidate);
+                        break;
                     }
                 }
-
-                return null;
-            };
-            $slider = $findSlider($article->metadata);
+            }
         }
 
         // Fallback to default or home slider if template is home and no slider was found in metadata
@@ -140,9 +132,7 @@ class FrontController extends Controller
 
         return Inertia::render($template, [
             'article' => $article,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
             'slider' => $slider,
         ]);
     }
@@ -208,47 +198,19 @@ class FrontController extends Controller
      */
     protected function renderTermList($term, $articles, $taxonomy): Response
     {
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
-
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
+        $shared = FrontCache::shared();
 
         return Inertia::render('front/templates/term-list', [
             'term' => $term,
             'taxonomy' => $taxonomy,
             'articles' => $articles,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
         ]);
     }
 
     public function blogIndex(Request $request): Response
     {
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
-
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
+        $shared = FrontCache::shared();
 
         // Load standard posts (post_type = 'post')
         $posts = CmsPost::with(['user', 'terms.taxonomy'])
@@ -262,28 +224,13 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => null,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
         ]);
     }
 
     public function blogShow(Request $request, $slug): Response
     {
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
-
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
+        $shared = FrontCache::shared();
 
         $post = CmsPost::with(['user', 'terms.taxonomy', 'schema'])
             ->where('post_type', 'post')
@@ -295,28 +242,13 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => null,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
         ]);
     }
 
     protected function cptIndex(Request $request, $cpt): Response
     {
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
-
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
+        $shared = FrontCache::shared();
 
         // Load posts for this specific post type
         $posts = CmsPost::with(['user', 'terms.taxonomy'])
@@ -330,28 +262,13 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => $cpt,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
         ]);
     }
 
     protected function cptShow(Request $request, $cpt, $postSlug): Response
     {
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
-
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
+        $shared = FrontCache::shared();
 
         $post = CmsPost::with(['user', 'terms.taxonomy', 'schema'])
             ->where('post_type', $cpt->slug)
@@ -363,9 +280,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => $cpt,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
         ]);
     }
 
@@ -484,20 +399,7 @@ class FrontController extends Controller
         $query = $request->get('q', '');
         $cleanQuery = str_replace(' ', '%', trim($query));
 
-        $navigation = CmsArticle::whereNull('parent_id')
-            ->where('active', 1)
-            ->orderBy('position')
-            ->get(['id', 'title', 'slug']);
-
-        $allTaxonomies = CmsTaxonomy::with(['terms' => function ($q): void {
-            $q->where('active', true)->orderBy('position')->withCount('articles');
-        }])->where('active', true)->get();
-
-        $recentArticles = CmsArticle::where('active', 1)
-            ->where('slug', '!=', 'home-page')
-            ->latest()
-            ->take(5)
-            ->get(['id', 'title', 'slug', 'created_at']);
+        $shared = FrontCache::shared();
 
         $results = [];
 
@@ -553,82 +455,84 @@ class FrontController extends Controller
         return Inertia::render('front/search', [
             'results' => $results,
             'query' => $query,
-            'navigation' => $navigation,
-            'allTaxonomies' => $allTaxonomies,
-            'recentArticles' => $recentArticles,
+            ...$shared,
         ]);
     }
 
     public function sitemap(): \Illuminate\Http\Response
     {
-        $urls = [];
-        $baseUrl = url('/');
+        $xml = FrontCache::sitemap(function (): string {
+            $urls = [];
+            $baseUrl = url('/');
 
-        // 1. Add Homepage
-        $urls[] = [
-            'loc' => $baseUrl,
-            'lastmod' => now()->toAtomString(),
-            'changefreq' => 'daily',
-            'priority' => '1.0',
-        ];
-
-        // 2. Add Pages (Articles)
-        $articles = CmsArticle::where('active', 1)->where('slug', '!=', 'home-page')->get();
-        foreach ($articles as $art) {
+            // 1. Add Homepage
             $urls[] = [
-                'loc' => $baseUrl.'/'.$art->slug,
-                'lastmod' => $art->updated_at ? $art->updated_at->toAtomString() : now()->toAtomString(),
-                'changefreq' => 'weekly',
-                'priority' => '0.8',
-            ];
-        }
-
-        // 3. Add Blog Index
-        $urls[] = [
-            'loc' => $baseUrl.'/blog',
-            'lastmod' => now()->toAtomString(),
-            'changefreq' => 'daily',
-            'priority' => '0.9',
-        ];
-
-        // 4. Add Posts & dynamic CPTs
-        $posts = CmsPost::where('active', 1)->where('status', 'published')->get();
-        $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
-
-        foreach ($posts as $post) {
-            $cpt = $cpts->get($post->post_type);
-            $path = $cpt ? '/'.$cpt->slug.'/'.$post->slug : '/blog/'.$post->slug;
-
-            $urls[] = [
-                'loc' => $baseUrl.$path,
-                'lastmod' => $post->updated_at ? $post->updated_at->toAtomString() : now()->toAtomString(),
-                'changefreq' => 'weekly',
-                'priority' => '0.7',
-            ];
-        }
-
-        // 5. Add dynamic CPT archive pages
-        foreach ($cpts as $cpt) {
-            $urls[] = [
-                'loc' => $baseUrl.'/'.$cpt->slug,
+                'loc' => $baseUrl,
                 'lastmod' => now()->toAtomString(),
                 'changefreq' => 'daily',
-                'priority' => '0.8',
+                'priority' => '1.0',
             ];
-        }
 
-        // Render XML sitemap
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        foreach ($urls as $url) {
-            $xml .= '<url>';
-            $xml .= '<loc>'.htmlspecialchars($url['loc']).'</loc>';
-            $xml .= '<lastmod>'.$url['lastmod'].'</lastmod>';
-            $xml .= '<changefreq>'.$url['changefreq'].'</changefreq>';
-            $xml .= '<priority>'.$url['priority'].'</priority>';
-            $xml .= '</url>';
-        }
-        $xml .= '</urlset>';
+            // 2. Add Pages (Articles)
+            $articles = CmsArticle::where('active', 1)->where('slug', '!=', 'home-page')->get();
+            foreach ($articles as $art) {
+                $urls[] = [
+                    'loc' => $baseUrl.'/'.$art->slug,
+                    'lastmod' => $art->updated_at ? $art->updated_at->toAtomString() : now()->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.8',
+                ];
+            }
+
+            // 3. Add Blog Index
+            $urls[] = [
+                'loc' => $baseUrl.'/blog',
+                'lastmod' => now()->toAtomString(),
+                'changefreq' => 'daily',
+                'priority' => '0.9',
+            ];
+
+            // 4. Add Posts & dynamic CPTs
+            $posts = CmsPost::where('active', 1)->where('status', 'published')->get();
+            $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
+
+            foreach ($posts as $post) {
+                $cpt = $cpts->get($post->post_type);
+                $path = $cpt ? '/'.$cpt->slug.'/'.$post->slug : '/blog/'.$post->slug;
+
+                $urls[] = [
+                    'loc' => $baseUrl.$path,
+                    'lastmod' => $post->updated_at ? $post->updated_at->toAtomString() : now()->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.7',
+                ];
+            }
+
+            // 5. Add dynamic CPT archive pages
+            foreach ($cpts as $cpt) {
+                $urls[] = [
+                    'loc' => $baseUrl.'/'.$cpt->slug,
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'daily',
+                    'priority' => '0.8',
+                ];
+            }
+
+            // Render XML sitemap
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            foreach ($urls as $url) {
+                $xml .= '<url>';
+                $xml .= '<loc>'.htmlspecialchars($url['loc']).'</loc>';
+                $xml .= '<lastmod>'.$url['lastmod'].'</lastmod>';
+                $xml .= '<changefreq>'.$url['changefreq'].'</changefreq>';
+                $xml .= '<priority>'.$url['priority'].'</priority>';
+                $xml .= '</url>';
+            }
+            $xml .= '</urlset>';
+
+            return $xml;
+        });
 
         return response($xml, 200, [
             'Content-Type' => 'application/xml',

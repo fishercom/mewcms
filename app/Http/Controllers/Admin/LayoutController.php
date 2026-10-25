@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CmsConfig;
 use App\Rules\SafeUrl;
 use App\Support\ContentSanitizer;
+use App\Support\FrontCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -57,6 +58,9 @@ class LayoutController extends Controller
         foreach ($data as $alias => $value) {
             CmsConfig::where('alias', $alias)->update(['value' => $value ?? '']);
         }
+
+        // Query-builder updates fire no model events
+        FrontCache::flush();
 
         return redirect()->route('layout.index')->with('success', 'Configuraciones de layout guardadas.');
     }

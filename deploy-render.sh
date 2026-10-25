@@ -12,8 +12,8 @@ composer install --no-dev --optimize-autoloader --no-interaction
 echo "📦 Installing Node dependencies..."
 npm ci
 
-# Build frontend assets
-echo "🏗️ Building frontend assets with Vite..."
-npm run build
+# Build frontend assets and the SSR bundle
+echo "🏗️ Building frontend assets and SSR bundle with Vite..."
+npm run build:ssr
 
 echo "✅ Build completed successfully!"

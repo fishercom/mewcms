@@ -41,6 +41,12 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+# Start the Inertia SSR server for public pages
+if [ "$INERTIA_SSR_ENABLED" = "true" ] && [ -f bootstrap/ssr/ssr.js ]; then
+  echo "🖥️ Starting Inertia SSR server..."
+  php artisan inertia:start-ssr &
+fi
+
 # Start web server
 echo "🌐 Starting web server on 0.0.0.0:${PORT:-8080}..."
 exec php -S 0.0.0.0:${PORT:-8080} -t public server.php

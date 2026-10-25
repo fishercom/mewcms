@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Rutorika\Sortable\SortableTrait;
 
 class CmsTaxonomyTerm extends Model
 {
+    use FlushesFrontCache;
     use LogsAdminActivity;
     use Sluggable;
     use SortableTrait;

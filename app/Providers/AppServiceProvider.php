@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\AdmAction;
 use App\Support\AdminActivity;
+use App\Support\PublicSsrGateway;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Inertia\Ssr\Gateway;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Only public pages are server-rendered
+        $this->app->singleton(Gateway::class, PublicSsrGateway::class);
     }
 
     /**

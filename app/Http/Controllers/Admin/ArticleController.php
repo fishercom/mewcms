@@ -7,6 +7,7 @@ use App\Models\CmsArticle;
 use App\Models\CmsLang;
 use App\Models\CmsSchema;
 use App\Models\CmsTaxonomy;
+use App\Support\FrontCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -163,6 +164,9 @@ class ArticleController extends Controller
             $profile->terms()->sync($termIds);
         }
 
+        // Term counts change with the pivot sync, which fires no model events
+        FrontCache::flush();
+
         $args = [
             'lang_id' => $this->lang_id,
             'parent_id' => null,
@@ -264,6 +268,9 @@ class ArticleController extends Controller
             $item->terms()->sync([]);
         }
 
+        // Term counts change with the pivot sync, which fires no model events
+        FrontCache::flush();
+
         $args = [
             'lang_id' => $this->lang_id,
             'parent_id' => null,
@@ -289,6 +296,7 @@ class ArticleController extends Controller
         foreach ($articles as $index => $article) {
             CmsArticle::where('id', $article['id'])->update(['position' => $index]);
         }
+        FrontCache::flush();
 
         return response()->json(['status' => 'success']);
     }

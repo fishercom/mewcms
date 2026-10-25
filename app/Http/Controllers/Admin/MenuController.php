@@ -7,6 +7,7 @@ use App\Models\CmsArticle;
 use App\Models\CmsMenu;
 use App\Models\CmsMenuItem;
 use App\Rules\SafeUrl;
+use App\Support\FrontCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -147,6 +148,7 @@ class MenuController extends Controller
                     'parent_id' => $itemData['parent_id'] ?? null,
                 ]);
         }
+        FrontCache::flush();
 
         return response()->json(['message' => 'Items sorted successfully.']);
     }

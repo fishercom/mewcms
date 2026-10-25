@@ -9,6 +9,7 @@ use App\Models\CmsRegister;
 use App\Models\CmsTaxonomyTerm;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,24 +30,28 @@ class DashboardController extends Controller
             $query->where('review', 0)->orWhereNull('review');
         })->count();
 
-        // 2. Scan Disk Usage on 'public' Storage Disk
-        $fileCount = 0;
-        $totalSize = 0;
-        try {
-            $disk = Storage::disk('public');
-            // Recursively get all files
-            $files = $disk->allFiles();
-            $fileCount = count($files);
-            foreach ($files as $file) {
-                try {
-                    $totalSize += $disk->size($file);
-                } catch (\Exception) {
-                    // Ignore individual file size check failures
+        // 2. Scan Disk Usage on 'public' Storage Disk (cached: a full scan is slow on large media libraries)
+        [$fileCount, $totalSize] = Cache::remember('admin.disk_usage', 600, function (): array {
+            $fileCount = 0;
+            $totalSize = 0;
+            try {
+                $disk = Storage::disk('public');
+                // Recursively get all files
+                $files = $disk->allFiles();
+                $fileCount = count($files);
+                foreach ($files as $file) {
+                    try {
+                        $totalSize += $disk->size($file);
+                    } catch (\Exception) {
+                        // Ignore individual file size check failures
+                    }
                 }
+            } catch (\Exception) {
+                // Fallback if public disk storage issues exist
             }
-        } catch (\Exception) {
-            // Fallback if public disk storage issues exist
-        }
+
+            return [$fileCount, $totalSize];
+        });
 
         // Format size
         if ($totalSize >= 1073741824) {

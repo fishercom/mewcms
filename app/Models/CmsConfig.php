@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use App\Support\ContentSanitizer;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsConfig extends Model
 {
+    use FlushesFrontCache;
     use LogsAdminActivity;
 
     /**

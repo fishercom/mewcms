@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsTaxonomy extends Model
 {
+    use FlushesFrontCache;
     use LogsAdminActivity;
     use Sluggable;
 

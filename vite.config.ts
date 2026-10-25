@@ -14,6 +14,10 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    ssr: {
+        // Bundle dependencies into the SSR build so production only needs Node, not node_modules
+        noExternal: true,
+    },
     esbuild: {
         jsx: 'automatic',
     },

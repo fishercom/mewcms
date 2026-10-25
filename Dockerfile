@@ -27,9 +27,11 @@ RUN npm ci
 COPY resources ./resources
 COPY vite.config.ts tsconfig.json components.json ./
 
-# Build assets to public/build
+# Build client assets to public/build and the SSR bundle to bootstrap/ssr
+ARG VITE_APP_NAME=MewCMS
+ENV VITE_APP_NAME=${VITE_APP_NAME}
 ENV NODE_ENV=production
-RUN npm run build
+RUN npm run build:ssr
 
 
 # --- Stage 3: Runtime (PHP built-in server) ---
@@ -40,6 +42,7 @@ WORKDIR /var/www/html
 RUN apk add --no-cache \
     bash \
     curl \
+    nodejs \
     icu-dev \
     oniguruma-dev \
     ca-certificates \
@@ -58,10 +61,16 @@ COPY . .
 COPY --from=vendor /usr/bin/composer /usr/bin/composer
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=asset-builder /app/public/build ./public/build
+COPY --from=asset-builder /app/bootstrap/ssr ./bootstrap/ssr
 
 # Ensure writable dirs
 RUN mkdir -p storage bootstrap/cache && \
     chown -R www-data:www-data storage bootstrap/cache
+
+# Server-render public pages; the SSR bundle has its dependencies inlined, so only Node is needed
+ENV INERTIA_SSR_ENABLED=true
+# Let the built-in server handle concurrent requests
+ENV PHP_CLI_SERVER_WORKERS=4
 
 # Render provides PORT env
 ENV PORT=8080
