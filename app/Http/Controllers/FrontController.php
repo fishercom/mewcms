@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Blocks\BlockRegistry;
 use App\Models\CmsArticle;
 use App\Models\CmsForm;
 use App\Models\CmsPost;
@@ -126,7 +127,7 @@ class FrontController extends Controller
         $article = ! empty($data['id']) ? CmsArticle::withTrashed()->findOrFail($data['id']) : new CmsArticle;
         $article->forceFill([
             ...$this->previewFields($data, ['title', 'excerpt', 'featured_image', 'schema_id', 'parent_id', 'status', 'published_at']),
-            'content' => ContentSanitizer::html($data['content'] ?? null),
+            ...$this->previewContent($data),
             'metadata' => ContentSanitizer::metadata($data['metadata'] ?? []),
         ]);
         $article->created_at ??= now();
@@ -148,7 +149,7 @@ class FrontController extends Controller
         $post = ! empty($data['id']) ? CmsPost::withTrashed()->findOrFail($data['id']) : new CmsPost(['post_type' => 'post']);
         $post->forceFill([
             ...$this->previewFields($data, ['title', 'excerpt', 'featured_image', 'schema_id', 'status', 'published_at', 'post_type', 'user_id']),
-            'content' => ContentSanitizer::html($data['content'] ?? null),
+            ...$this->previewContent($data),
             'metadata' => ContentSanitizer::metadata($data['metadata'] ?? []),
         ]);
         $post->created_at ??= now();
@@ -162,6 +163,24 @@ class FrontController extends Controller
             'cpt' => $post->post_type !== 'post' ? CmsPostType::where('slug', $post->post_type)->first() : null,
             ...FrontCache::shared(),
         ]);
+    }
+
+    /**
+     * The previewed blocks (cleaned) and the content built from them, or the plain content
+     * of an editor that sends no blocks.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function previewContent(array $data): array
+    {
+        if (isset($data['blocks']) && is_array($data['blocks'])) {
+            $blocks = BlockRegistry::sanitize($data['blocks']);
+
+            return ['blocks' => $blocks, 'content' => BlockRegistry::toContent($blocks)];
+        }
+
+        return ['blocks' => null, 'content' => ContentSanitizer::html($data['content'] ?? null)];
     }
 
     /**
@@ -303,7 +322,18 @@ class FrontController extends Controller
     {
         $item->setAttribute('content', MediaLibrary::enrichHtml($item->getAttribute('content')));
 
-        return MediaLibrary::lookup(MediaLibrary::collectUrls($item->getAttribute('featured_image'), $fields));
+        $blocks = $item->getAttribute('blocks');
+        if (is_array($blocks)) {
+            $item->setAttribute('blocks', array_map(function (array $block): array {
+                if ($block['type'] === 'rich_text') {
+                    $block['data']['html'] = MediaLibrary::enrichHtml($block['data']['html'] ?? '');
+                }
+
+                return $block;
+            }, $blocks));
+        }
+
+        return MediaLibrary::lookup(MediaLibrary::collectUrls($item->getAttribute('featured_image'), $fields, $blocks));
     }
 
     public function blogIndex(Request $request): Response

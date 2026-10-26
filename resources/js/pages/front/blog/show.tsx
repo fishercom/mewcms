@@ -1,4 +1,4 @@
-import ContentRenderer from '@/components/content-renderer';
+import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
 import { tagUrl } from '@/lib/tag-url';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -81,9 +81,10 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                     {/* Content body */}
                     <div className="pt-2">
                         {post.content ? (
-                            <ContentRenderer
+                            <Blocks
+                                blocks={post.blocks}
                                 html={post.content}
-                                className="prose-red prose-sm sm:prose-base leading-relaxed text-zinc-800 dark:text-[#EDEDEC]"
+                                textClassName="prose-red prose-sm sm:prose-base leading-relaxed text-zinc-800 dark:text-[#EDEDEC]"
                             />
                         ) : (
                             <p className="py-6 text-center text-xs text-zinc-400 italic">Sin contenido disponible.</p>

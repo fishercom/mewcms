@@ -1,3 +1,4 @@
+import { blocksFromContent } from '@/blocks/types';
 import ContentEditorTools, { RevisionData } from '@/components/content-editor-tools';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,7 @@ export default function Edit() {
         lang_id: item.lang_id,
         title: item.title,
         content: item.content || '',
+        blocks: item.blocks ?? blocksFromContent(item.content),
         excerpt: item.excerpt || '',
         featured_image: item.featured_image || '',
         status: item.status || 'published',
@@ -120,6 +122,7 @@ export default function Edit() {
                             ...prev,
                             title: revision.title ?? prev.title,
                             content: revision.content ?? '',
+                            blocks: revision.blocks ?? blocksFromContent(revision.content),
                             excerpt: revision.excerpt ?? '',
                             metadata: (revision.metadata ?? prev.metadata) as typeof prev.metadata,
                             status: revision.status ?? prev.status ?? 'published',

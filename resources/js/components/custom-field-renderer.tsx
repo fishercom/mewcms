@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import type { CustomField } from '@/types';
 import axios from 'axios';
@@ -273,6 +274,8 @@ interface CustomFieldRendererProps {
     fields: CustomField[];
     values: Record<string, JsonValue>;
     onChange: (key: string, value: JsonValue) => void;
+    /** Prefix for the input ids, so two forms on one page don't share ids */
+    idPrefix?: string;
 }
 
 interface RepeaterFieldProps {
@@ -396,19 +399,43 @@ function ContainerField({ field, values, onChange }: ContainerFieldProps) {
     );
 }
 
-export default function CustomFieldRenderer({ fields, values, onChange }: CustomFieldRendererProps) {
+export default function CustomFieldRenderer({ fields, values, onChange, idPrefix = '' }: CustomFieldRendererProps) {
     const renderSimpleField = (field: CustomField) => {
         const value = (values?.[field.key] as JsonValue) ?? '';
         const common = {
-            id: field.key,
+            id: idPrefix + field.key,
             value: typeof value === 'string' || typeof value === 'number' ? String(value) : '',
             onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(field.key, e.target.value),
             className: 'w-full',
+            placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,
         };
 
         switch (field.type) {
             case 'number':
-                return <Input type="number" {...common} />;
+                return (
+                    <Input
+                        type="number"
+                        {...common}
+                        min={typeof field.min === 'number' ? field.min : undefined}
+                        max={typeof field.max === 'number' ? field.max : undefined}
+                        onChange={(e) => onChange(field.key, e.target.value === '' ? null : Number(e.target.value))}
+                    />
+                );
+            case 'select':
+                return (
+                    <Select value={typeof value === 'string' ? value : ''} onValueChange={(next) => onChange(field.key, next)}>
+                        <SelectTrigger id={idPrefix + field.key} className="w-full">
+                            <SelectValue placeholder="Elige una opción" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {(field.options ?? []).map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                );
             case 'date':
                 return (
                     <Popover>
@@ -434,11 +461,11 @@ export default function CustomFieldRenderer({ fields, values, onChange }: Custom
             case 'url':
                 return <Input type="url" {...common} />;
             case 'textarea':
-                return <textarea {...common} rows={4} />;
+                return <Textarea {...common} rows={4} />;
             case 'html_editor':
                 return <Tiptap value={typeof value === 'string' ? value : ''} onChange={(html) => onChange(field.key, html)} />;
             case 'embed':
-                return <textarea {...common} rows={4} />;
+                return <Textarea {...common} rows={4} />;
             case 'image':
                 return (
                     <ImageFieldRenderer field={field} value={typeof value === 'string' ? value : ''} onChange={(val) => onChange(field.key, val)} />
@@ -457,7 +484,7 @@ export default function CustomFieldRenderer({ fields, values, onChange }: Custom
         <div className="space-y-4">
             {fields?.map((field) => (
                 <div key={field.key} className="space-y-2">
-                    {field.type !== 'container' && field.type !== 'repeater' && <Label htmlFor={field.key}>{field.label}</Label>}
+                    {field.type !== 'container' && field.type !== 'repeater' && <Label htmlFor={idPrefix + field.key}>{field.label}</Label>}
                     {field.type === 'container' && <ContainerField field={field} values={values} onChange={onChange} />}
                     {field.type === 'repeater' && <RepeaterField field={field} values={values} onChange={onChange} />}
                     {field.type !== 'container' && field.type !== 'repeater' && renderSimpleField(field)}

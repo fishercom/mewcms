@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
 use App\Models\CmsLang;
@@ -110,6 +111,7 @@ class PostController extends Controller
             'title' => '',
             'slug' => '',
             'content' => '',
+            'blocks' => [],
             'excerpt' => '',
             'featured_image' => '',
             'metadata' => new \stdClass,
@@ -120,6 +122,7 @@ class PostController extends Controller
         ];
 
         return Inertia::render('admin/posts/create', [
+            'blockTypes' => BlockRegistry::definitions(),
             'item' => $args,
             'schema' => $schema,
             'schemas' => $schemas,
@@ -140,6 +143,8 @@ class PostController extends Controller
             'user_id' => 'required|integer|exists:users,id',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
+            'blocks' => 'nullable|array|max:'.BlockRegistry::MAX_BLOCKS,
+            'blocks.*' => 'array',
             'featured_image' => 'nullable|string|max:500',
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => ['integer', CmsTag::existsRule()],
@@ -186,6 +191,7 @@ class PostController extends Controller
         $item->tag_ids = $item->tags->pluck('id')->all();
 
         return Inertia::render('admin/posts/edit', [
+            'blockTypes' => BlockRegistry::definitions(),
             'item' => $item,
             'schema' => $schema,
             'schemas' => $schemas,
@@ -209,6 +215,8 @@ class PostController extends Controller
             'user_id' => 'required|integer|exists:users,id',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
+            'blocks' => 'nullable|array|max:'.BlockRegistry::MAX_BLOCKS,
+            'blocks.*' => 'array',
             'featured_image' => 'nullable|string|max:500',
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => ['integer', CmsTag::existsRule()],

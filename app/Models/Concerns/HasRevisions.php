@@ -2,6 +2,7 @@
 
 namespace App\Models\Concerns;
 
+use App\Blocks\BlockRegistry;
 use App\Models\CmsRevision;
 use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
@@ -18,7 +19,7 @@ trait HasRevisions
     public const REVISIONS_KEPT = 25;
 
     /** Fields a revision stores and restores. */
-    public const REVISION_FIELDS = ['title', 'content', 'excerpt', 'metadata', 'status', 'published_at'];
+    public const REVISION_FIELDS = ['title', 'content', 'blocks', 'excerpt', 'metadata', 'status', 'published_at'];
 
     public static function bootHasRevisions(): void
     {
@@ -73,9 +74,14 @@ trait HasRevisions
             ...Arr::only($data, self::REVISION_FIELDS),
             'title' => (string) ($data['title'] ?? $this->title),
             'content' => ContentSanitizer::html($data['content'] ?? null),
+            'blocks' => isset($data['blocks']) && is_array($data['blocks']) ? BlockRegistry::sanitize($data['blocks']) : null,
             'metadata' => ContentSanitizer::metadata($data['metadata'] ?? null),
             'tag_ids' => array_values(array_map('intval', $data['tag_ids'] ?? [])),
         ];
+
+        if ($state['blocks'] !== null) {
+            $state['content'] = BlockRegistry::toContent($state['blocks']);
+        }
 
         $revision = $this->revisions()->firstOrNew(['user_id' => $userId, 'is_autosave' => true]);
         $revision->fill($state)->save();
@@ -140,6 +146,7 @@ trait HasRevisions
         }
 
         return $revision->metadata == $state['metadata']
+            && $revision->blocks == $state['blocks']
             && $revision->published_at?->timestamp === $state['published_at']?->timestamp
             && collect($revision->tag_ids ?? [])->sort()->values()->all() === $state['tag_ids'];
     }

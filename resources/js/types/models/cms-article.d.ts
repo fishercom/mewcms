@@ -1,3 +1,4 @@
+import { type BlockData } from '@/blocks/types';
 // import type { CustomField } from './custom-field';
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
@@ -14,6 +15,7 @@ export interface CmsArticle {
     lang_id: number;
     title: string;
     content?: string | null;
+    blocks?: BlockData[] | null;
     excerpt?: string | null;
     featured_image?: string | null;
     status?: string | null;
@@ -43,6 +45,7 @@ export interface CmsArticleForm {
     lang_id: number;
     title: string;
     content?: string | null;
+    blocks?: BlockData[] | null;
     excerpt?: string | null;
     featured_image?: string | null;
     status?: string | null;
