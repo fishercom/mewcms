@@ -38,7 +38,9 @@ class CmsConfig extends Model
     protected static function booted(): void
     {
         static::saving(function (self $config): void {
-            if ($config->alias === 'layout_custom_css') {
+            if ($config->alias === 'layout_copyright') {
+                $config->value = ContentSanitizer::inline($config->value);
+            } elseif ($config->alias === 'layout_custom_css') {
                 $config->value = ContentSanitizer::css($config->value);
             } elseif ($config->alias === SocialLinks::ALIAS) {
                 $config->value = json_encode(SocialLinks::decode($config->value), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

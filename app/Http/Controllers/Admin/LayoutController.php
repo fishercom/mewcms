@@ -72,6 +72,11 @@ class LayoutController extends Controller
             SocialLinks::save($socialLinks);
         }
 
+        // The footer credit may hold simple links; nothing else survives
+        if (array_key_exists('layout_copyright', $data)) {
+            $data['layout_copyright'] = ContentSanitizer::inline($data['layout_copyright']);
+        }
+
         if (array_key_exists('layout_custom_css', $data)) {
             $data['layout_custom_css'] = ContentSanitizer::css($data['layout_custom_css']);
         }

@@ -18,6 +18,8 @@ class ContentSanitizer
 
     protected static ?HtmlSanitizer $sanitizer = null;
 
+    protected static ?HtmlSanitizer $inlineSanitizer = null;
+
     public static function html(?string $html): ?string
     {
         if ($html === null || $html === '') {
@@ -90,6 +92,34 @@ class ContentSanitizer
         return $scheme === null
             ? ! str_contains(strtok($url, '/?#') ?: '', ':')
             : in_array(strtolower($scheme), ['http', 'https', 'mailto', 'tel'], true);
+    }
+
+    /**
+     * Short text with simple links, e.g. the footer credit: only links and basic inline
+     * formatting are kept, and links always get rel="noopener noreferrer".
+     */
+    public static function inline(?string $html): ?string
+    {
+        if ($html === null || $html === '') {
+            return $html;
+        }
+
+        self::$inlineSanitizer ??= new HtmlSanitizer(
+            (new HtmlSanitizerConfig)
+                ->allowElement('a', ['href', 'target', 'title'])
+                ->allowElement('strong')
+                ->allowElement('em')
+                ->allowElement('b')
+                ->allowElement('i')
+                ->allowElement('span')
+                ->allowElement('br')
+                ->allowRelativeLinks()
+                ->allowLinkSchemes(['http', 'https', 'mailto', 'tel'])
+                ->forceAttribute('a', 'rel', 'noopener noreferrer')
+                ->withMaxInputLength(-1)
+        );
+
+        return self::$inlineSanitizer->sanitize($html);
     }
 
     protected static function sanitizer(): HtmlSanitizer

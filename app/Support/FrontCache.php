@@ -76,9 +76,16 @@ class FrontCache
      */
     public static function layoutSettings(): array
     {
-        return Cache::remember('front.layout', self::TTL, fn (): array => CmsConfig::where('alias', 'like', 'layout_%')
-            ->pluck('value', 'alias')
-            ->all());
+        return Cache::remember('front.layout', self::TTL, function (): array {
+            $settings = CmsConfig::where('alias', 'like', 'layout_%')->pluck('value', 'alias')->all();
+
+            // Rendered as HTML in the footer: sanitize again in case it was written around the model
+            if (isset($settings['layout_copyright'])) {
+                $settings['layout_copyright'] = ContentSanitizer::inline($settings['layout_copyright']);
+            }
+
+            return $settings;
+        });
     }
 
     /**
