@@ -7,7 +7,8 @@
 |
 | Set AI_MODEL and AI_API_KEY in .env; the provider is told from the model name
 | (claude-..., gpt-..., deepseek-..., gemini-...). AI_FAST_MODEL, from the same provider,
-| optionally answers the small frequent tasks (metadata, rewrites) for less.
+| optionally answers the small frequent tasks (metadata, rewrites) for less, and
+| AI_FALLBACK_MODEL (comma-separated, same provider) answers when a model is busy.
 |
 | AI_BASE_URL points any other OpenAI-compatible service (Mistral, Groq, a local
 | Ollama...) at the chat completions API; its models have no price, so add them below
@@ -20,6 +21,9 @@ return [
     'model' => env('AI_MODEL', 'claude-opus-5-5'),
 
     'fast_model' => env('AI_FAST_MODEL'),
+
+    // Comma-separated models of the same provider that answer when the chosen one is busy
+    'fallback_models' => env('AI_FALLBACK_MODEL'),
 
     'key' => env('AI_API_KEY'),
 

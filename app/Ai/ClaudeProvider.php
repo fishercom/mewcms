@@ -47,9 +47,14 @@ class ClaudeProvider implements AiProvider
         try {
             $message = (new Client(apiKey: $this->apiKey))->messages->create(...$request);
         } catch (APIStatusException $e) {
-            throw new AiException(__('Claude respondió con un error (:status).', ['status' => $e->type?->value ?? $e->getCode()]), previous: $e);
+            $type = $e->type?->value;
+            throw new AiException(
+                __('Claude respondió con un error (:status).', ['status' => $type ?? $e->getCode()]),
+                retryable: in_array($type, ['overloaded_error', 'rate_limit_error', 'api_error'], true),
+                previous: $e,
+            );
         } catch (Throwable $e) {
-            throw new AiException(__('No se pudo conectar con :provider.', ['provider' => 'Claude']), previous: $e);
+            throw new AiException(__('No se pudo conectar con :provider.', ['provider' => 'Claude']), retryable: true, previous: $e);
         }
 
         if ($message->stopReason === 'refusal') {

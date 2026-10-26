@@ -377,6 +377,7 @@ test('a busy provider is retried and its error message reaches the editor', func
         ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503)
         ->push(['choices' => [['message' => ['content' => json_encode(suggestionReply())]]], 'usage' => ['prompt_tokens' => 10, 'completion_tokens' => 5]])
         ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503)
+        ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503)
         ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503),
     ]);
     $this->actingAs(User::factory()->superAdmin()->create());
@@ -387,5 +388,35 @@ test('a busy provider is retried and its error message reaches the editor', func
         ->assertUnprocessable()
         ->assertJsonPath('message', 'Gemini respondió con un error (503). The model is overloaded.');
 
+    // Two tries for the first call, three for the second
+    Http::assertSentCount(5);
+});
+
+test('a busy model hands the call to the fallback model', function (): void {
+    Sleep::fake();
+    config(['ai.model' => 'gemini-4-argon', 'ai.fast_model' => 'gemini-3.8-flash', 'ai.fallback_models' => 'gemini-3.1-flash-lite']);
+    $busy = [['error' => ['code' => 503, 'message' => 'High demand.']]];
+    Http::fake(['generativelanguage.googleapis.com/*' => Http::sequence()
+        ->push($busy, 503)->push($busy, 503)->push($busy, 503)
+        ->push(['choices' => [['message' => ['content' => json_encode(suggestionReply())]]], 'usage' => ['prompt_tokens' => 10, 'completion_tokens' => 5]]),
+    ]);
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.metadata'), metadataRequest())
+        ->assertOk();
+
     Http::assertSentCount(4);
+    expect(CmsAiUsage::sole()->model)->toBe('gemini-3.1-flash-lite');
+});
+
+test('an error that is not about load does not try the fallback', function (): void {
+    config(['ai.model' => 'gemini-4-argon', 'ai.fast_model' => 'gemini-3.8-flash', 'ai.fallback_models' => 'gemini-3.1-flash-lite']);
+    Http::fake(['generativelanguage.googleapis.com/*' => Http::response([['error' => ['code' => 400, 'message' => 'Please pass a valid API key']]], 400)]);
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.metadata'), metadataRequest())
+        ->assertUnprocessable()
+        ->assertJsonPath('message', 'Gemini respondió con un error (400). Please pass a valid API key');
+
+    Http::assertSentCount(1);
 });

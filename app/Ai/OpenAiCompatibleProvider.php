@@ -5,6 +5,7 @@ namespace App\Ai;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -14,6 +15,9 @@ use Throwable;
  */
 class OpenAiCompatibleProvider implements AiProvider
 {
+    /** Busy, rate-limited or failing service: worth another try */
+    protected const RETRYABLE = [429, 500, 502, 503, 504];
+
     /**
      * @param  bool  $jsonSchema  the service enforces a JSON schema; otherwise JSON mode is used
      *                            and the answer is retried once when it is not valid JSON
@@ -92,17 +96,22 @@ class OpenAiCompatibleProvider implements AiProvider
             $response = Http::withToken($this->apiKey)
                 ->acceptJson()
                 ->timeout($this->timeout)
-                ->retry(2, 2000, fn (Throwable $e): bool => $e instanceof RequestException && in_array($e->response->status(), [429, 500, 502, 503, 504], true), throw: false)
+                ->retry([2000, 5000], fn (Throwable $e): bool => $e instanceof RequestException && in_array($e->response->status(), self::RETRYABLE, true), throw: false)
                 ->post(rtrim($this->baseUrl, '/').'/chat/completions', $request);
         } catch (ConnectionException $e) {
-            throw new AiException(__('No se pudo conectar con :provider.', ['provider' => $this->name]), previous: $e);
+            // Timeout, DNS or TLS failure: keep the real cause in the log
+            Log::warning($this->name.' connection failed: '.$e->getMessage());
+            throw new AiException(__('No se pudo conectar con :provider.', ['provider' => $this->name]), retryable: true, previous: $e);
         }
 
         if ($response->failed()) {
             // OpenAI-style {"error": {"message"}}; Gemini may wrap it in a list
             $message = $response->json('error.message') ?? $response->json('0.error.message');
-            throw new AiException(__(':provider respondió con un error (:status).', ['provider' => $this->name, 'status' => $response->status()])
-                .(is_string($message) && $message !== '' ? ' '.Str::limit(strip_tags($message), 200) : ''));
+            throw new AiException(
+                __(':provider respondió con un error (:status).', ['provider' => $this->name, 'status' => $response->status()])
+                    .(is_string($message) && $message !== '' ? ' '.Str::limit(strip_tags($message), 200) : ''),
+                retryable: in_array($response->status(), self::RETRYABLE, true),
+            );
         }
 
         $choice = $response->json('choices.0');

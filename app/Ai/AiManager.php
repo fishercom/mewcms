@@ -47,6 +47,16 @@ class AiManager
     }
 
     /**
+     * Models that answer, in order, when the main one is busy (AI_FALLBACK_MODEL, comma-separated).
+     *
+     * @return list<string>
+     */
+    public function fallbackModels(): array
+    {
+        return array_values(array_filter(array_map('trim', explode(',', (string) config('ai.fallback_models')))));
+    }
+
+    /**
      * The provider a model belongs to, told from its name; any other model goes to the
      * OpenAI-compatible service at AI_BASE_URL when one is set.
      */
@@ -100,15 +110,24 @@ class AiManager
             throw new AiException(__('Se alcanzó el presupuesto mensual del asistente IA.'));
         }
 
-        // PHP's default 30 seconds is less than a slow model can take (plus one retry)
-        set_time_limit(2 * (int) config('ai.timeout', 180) + 30);
+        // A busy model hands the call to the next one (AI_FALLBACK_MODEL), same key
+        $models = array_values(array_unique([$this->model($task), ...$this->fallbackModels()]));
+        foreach ($models as $index => $model) {
+            // PHP's default 30 seconds is less than a slow model can take (plus its retries)
+            set_time_limit(3 * (int) config('ai.timeout', 180) + 30);
+            $providerKey = $this->providerKey($model) ?? 'custom';
 
-        $model = $this->model($task);
-        $providerKey = $this->providerKey($model) ?? 'custom';
-
-        $response = $schema === null
-            ? $this->provider($providerKey)->text($model, $system, $prompt, $maxTokens)
-            : $this->provider($providerKey)->structured($model, $system, $prompt, $schema, $maxTokens);
+            try {
+                $response = $schema === null
+                    ? $this->provider($providerKey)->text($model, $system, $prompt, $maxTokens)
+                    : $this->provider($providerKey)->structured($model, $system, $prompt, $schema, $maxTokens);
+                break;
+            } catch (AiException $e) {
+                if (! $e->retryable || $index === count($models) - 1) {
+                    throw $e;
+                }
+            }
+        }
 
         $price = $this->price($model) ?? ['input' => 0, 'output' => 0];
         CmsAiUsage::create([
