@@ -3,6 +3,7 @@ import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import SeoReview, { useSeoReview } from '@/components/seo-review';
 import TagField from '@/components/tag-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
     const { blockTypes = [] } = usePage<{ blockTypes?: BlockDefinition[] }>().props;
     useStarterLayout(!data.id, schema, data.blocks ?? [], (blocks) => setData({ ...data, blocks }));
     const [mediaDrawerOpen, setMediaDrawerOpen] = useState(false);
+    const seo = useSeoReview('posts', data);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const titleVal = e.target.value;
@@ -165,7 +167,8 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                     </div>
                 )}
 
-                <div className="border-border border-t pt-5">
+                <div id="seo" className="border-border space-y-6 border-t pt-5">
+                    <SeoReview result={seo.result} loading={seo.loading} />
                     <SeoFields
                         values={
                             (data.metadata as { seo_title?: string; seo_description?: string; seo_keywords?: string; seo_og_image?: string }) || {}

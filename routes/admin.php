@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\SchemaController;
+use App\Http\Controllers\Admin\SeoReviewController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TagController;
@@ -53,6 +54,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     foreach (['articles', 'posts'] as $contentModule) {
         Route::prefix($contentModule)->name($contentModule.'.')->group(function () use ($contentModule): void {
             Route::post('preview', [ContentRevisionController::class, 'preview'])->name('preview')->defaults('module', $contentModule);
+            Route::post('seo-review', [SeoReviewController::class, 'review'])->name('seo-review')->defaults('module', $contentModule);
             Route::get('{id}/revisions', [ContentRevisionController::class, 'index'])->name('revisions.index')->defaults('module', $contentModule);
             Route::get('{id}/revisions/{revisionId}', [ContentRevisionController::class, 'show'])->name('revisions.show')->defaults('module', $contentModule);
             Route::post('{id}/revisions/{revisionId}/restore', [ContentRevisionController::class, 'restore'])->name('revisions.restore')->defaults('module', $contentModule);

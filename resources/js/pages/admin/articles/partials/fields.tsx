@@ -3,6 +3,7 @@ import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import SeoReview, { SeoScoreBadge, useSeoReview } from '@/components/seo-review';
 import TagField from '@/components/tag-field';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -73,7 +74,11 @@ export default function ArticleFields({
     onChangeSchema,
 }: Props) {
     const [mediaOpen, setMediaOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'content' | 'schema' | 'seo'>('content');
+    // The dashboard links here with ?tab=seo to open the review directly
+    const [activeTab, setActiveTab] = useState<'content' | 'schema' | 'seo'>(() =>
+        typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tab') === 'seo' ? 'seo' : 'content',
+    );
+    const seo = useSeoReview('articles', data);
 
     useEffect(() => {
         if (schema?.unique && data.parent_id !== null) {
@@ -169,6 +174,7 @@ export default function ArticleFields({
                     >
                         <Globe className="h-3.5 w-3.5" />
                         <span>{t('SEO & Metadatos')}</span>
+                        <SeoScoreBadge result={seo.result} className={activeTab === 'seo' ? 'bg-white/25' : ''} />
                     </button>
                 </div>
 
@@ -264,6 +270,7 @@ export default function ArticleFields({
                 {/* Tab 3: SEO & Social Metadata */}
                 {activeTab === 'seo' && (
                     <div className="animate-in fade-in space-y-6 duration-200">
+                        <SeoReview result={seo.result} loading={seo.loading} />
                         <SeoFields
                             values={
                                 (data.metadata as {
