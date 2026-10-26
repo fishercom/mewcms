@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\AdmMenu;
 use App\Support\FrontCache;
+use App\Support\SocialLinks;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -59,6 +60,7 @@ class HandleInertiaRequests extends Middleware
             'adm_menu' => fn (): array => $this->adminMenu($request),
             'menus' => fn (): array => FrontCache::menus(),
             'layout_settings' => fn (): array => FrontCache::layoutSettings(),
+            'social_links' => fn (): array => SocialLinks::decode(FrontCache::layoutSettings()[SocialLinks::ALIAS] ?? null),
         ];
     }
 
