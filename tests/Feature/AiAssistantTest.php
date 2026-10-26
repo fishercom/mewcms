@@ -8,6 +8,7 @@ use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Fakes\FakeAiProvider;
 
@@ -367,4 +368,24 @@ test('drafting needs the content module', function (): void {
     grantPermissions($user, ['ai' => 'administrar', 'articles' => 'listar']);
 
     $this->actingAs($user)->postJson(route('ai.outline'), draftBrief())->assertForbidden();
+});
+
+test('a busy provider is retried and its error message reaches the editor', function (): void {
+    Sleep::fake();
+    config(['ai.model' => 'gemini-4-argon', 'ai.fast_model' => 'gemini-3.1-flash-lite']);
+    Http::fake(['generativelanguage.googleapis.com/*' => Http::sequence()
+        ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503)
+        ->push(['choices' => [['message' => ['content' => json_encode(suggestionReply())]]], 'usage' => ['prompt_tokens' => 10, 'completion_tokens' => 5]])
+        ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503)
+        ->push([['error' => ['code' => 503, 'message' => 'The model is overloaded.']]], 503),
+    ]);
+    $this->actingAs(User::factory()->superAdmin()->create());
+
+    $this->postJson(route('ai.metadata'), metadataRequest())->assertOk();
+
+    $this->postJson(route('ai.metadata'), metadataRequest())
+        ->assertUnprocessable()
+        ->assertJsonPath('message', 'Gemini respondió con un error (503). The model is overloaded.');
+
+    Http::assertSentCount(4);
 });

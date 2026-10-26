@@ -100,6 +100,9 @@ class AiManager
             throw new AiException(__('Se alcanzó el presupuesto mensual del asistente IA.'));
         }
 
+        // PHP's default 30 seconds is less than a slow model can take (plus one retry)
+        set_time_limit(2 * (int) config('ai.timeout', 180) + 30);
+
         $model = $this->model($task);
         $providerKey = $this->providerKey($model) ?? 'custom';
 
