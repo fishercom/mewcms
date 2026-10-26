@@ -51,6 +51,8 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
         Route::post('ai/test', [AiController::class, 'test'])->name('ai.test');
         Route::post('ai/metadata', [AiController::class, 'metadata'])->name('ai.metadata');
         Route::post('ai/improve-block', [AiController::class, 'improveBlock'])->name('ai.improve-block');
+        Route::post('ai/outline', [AiController::class, 'outline'])->name('ai.outline');
+        Route::post('ai/draft', [AiController::class, 'draft'])->name('ai.draft');
     });
 
     Route::resource('sites', SiteController::class);

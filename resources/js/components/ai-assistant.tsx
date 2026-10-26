@@ -1,3 +1,4 @@
+import AiDraftPanel, { type AiDraft } from '@/components/ai-draft';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -14,6 +15,7 @@ export type AiMetadataField = 'seo_title' | 'seo_description' | 'slug';
 interface AssistantInput {
     id?: number | null;
     lang_id?: number | null;
+    schema_id?: number | null;
     title?: string | null;
     content?: string | null;
     blocks?: unknown;
@@ -34,18 +36,20 @@ function focusKeyword(metadata: unknown): string {
 }
 
 /**
- * Sparkle button and side panel of the AI assistant. Suggestions are previews: "Aplicar"
- * only fills the form, and nothing is stored until the editor saves.
+ * Sparkle button and side panel of the AI assistant: draft content and suggest metadata.
+ * Suggestions are previews that only fill the form; nothing is stored until the editor saves.
  */
 export default function AiAssistant({
     module,
     input,
     onApply,
+    onDraft,
     className,
 }: {
     module: 'articles' | 'posts';
     input: AssistantInput;
     onApply: (field: AiMetadataField, value: string) => void;
+    onDraft: (draft: AiDraft, mode: 'replace' | 'append') => void;
     className?: string;
 }) {
     const { ai_assistant } = usePage<{ ai_assistant?: boolean }>().props;
@@ -119,6 +123,17 @@ export default function AiAssistant({
                     </SheetHeader>
 
                     <div className="space-y-5 px-4 pb-6">
+                        <AiDraftPanel
+                            module={module}
+                            langId={input.lang_id}
+                            schemaId={input.schema_id}
+                            hasContent={Array.isArray(input.blocks) && input.blocks.length > 0}
+                            onDraft={(draft, mode) => {
+                                onDraft(draft, mode);
+                                setOpen(false);
+                            }}
+                        />
+
                         <div className="border-border/70 bg-card space-y-3 rounded-2xl border p-4">
                             <h3 className="text-foreground flex items-center gap-1.5 text-sm font-bold">
                                 <Wand2 className="h-4 w-4" />

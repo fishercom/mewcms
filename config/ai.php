@@ -102,6 +102,6 @@ return [
     // Calls per user per hour
     'rate_limit' => (int) env('AI_RATE_LIMIT', 30),
 
-    'timeout' => (int) env('AI_TIMEOUT', 60),
+    'timeout' => (int) env('AI_TIMEOUT', 180),
 
 ];

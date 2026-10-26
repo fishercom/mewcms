@@ -4,6 +4,8 @@ use App\Ai\AiException;
 use App\Ai\AiManager;
 use App\Ai\AiSettings;
 use App\Models\CmsAiUsage;
+use App\Models\CmsSchema;
+use App\Models\CmsSchemaGroup;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -291,4 +293,77 @@ test('improving a block needs the assistant module', function (): void {
     $this->actingAs($user)
         ->postJson(route('ai.improve-block'), ['block' => ['type' => 'rich_text', 'data' => ['html' => '<p>Hola</p>']], 'action' => 'fix'])
         ->assertForbidden();
+});
+
+/**
+ * @return array<string, mixed>
+ */
+function draftBrief(array $overrides = []): array
+{
+    return ['module' => 'articles', 'topic' => 'Diseño web para restaurantes', 'keyword' => 'diseño web', 'length' => 'short', ...$overrides];
+}
+
+test('an outline is proposed from the brief with the main model', function (): void {
+    $fake = fakeAi([
+        'title' => 'Diseño web para restaurantes',
+        'sections' => [
+            ['heading' => 'Por qué tu restaurante necesita una web', 'summary' => 'Clientes que buscan en Google.'],
+            ['heading' => '', 'summary' => 'Sin título: se descarta.'],
+            ['heading' => 'Hablemos', 'summary' => 'Contacto.'],
+        ],
+    ]);
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.outline'), draftBrief())
+        ->assertOk()
+        ->assertJsonPath('title', 'Diseño web para restaurantes')
+        ->assertJsonCount(2, 'sections');
+
+    expect($fake->calls[0]['model'])->toBe('claude-opus-5-5')
+        ->and($fake->calls[0]['prompt'])->toContain('<topic>Diseño web para restaurantes</topic>');
+});
+
+test('a draft becomes clean blocks of the allowed types', function (): void {
+    $fake = fakeAi(['blocks' => [
+        ['type' => 'hero', 'eyebrow' => '', 'title' => 'Tu restaurante, lleno', 'subtitle' => 'Webs que abren el apetito.'],
+        ['type' => 'rich_text', 'html' => '<h2>Por qué</h2><p>Porque sí.</p><script>x</script>'],
+        ['type' => 'features', 'title' => 'Ventajas', 'intro' => '', 'items' => [['title' => 'Menú online', 'text' => 'Siempre al día.']]],
+        ['type' => 'video', 'url' => 'https://youtu.be/x'],
+        ['type' => 'cta', 'title' => 'Hablemos', 'text' => 'Escríbenos.'],
+    ]]);
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.draft'), [...draftBrief(), 'outline' => ['title' => 'Diseño web para restaurantes', 'sections' => [['heading' => 'Por qué', 'summary' => '']]]])
+        ->assertOk()
+        ->assertJsonPath('title', 'Diseño web para restaurantes')
+        ->assertJsonCount(4, 'blocks')
+        ->assertJsonPath('blocks.0.type', 'hero')
+        ->assertJsonPath('blocks.0.data.overlay', 45)
+        ->assertJsonPath('blocks.2.data.items.0.icon', 'sparkles')
+        ->assertJsonPath('blocks.3.type', 'cta');
+
+    $schema = $fake->calls[0]['schema']['properties']['blocks']['items']['anyOf'];
+    expect(array_column(array_column(array_column($schema, 'properties'), 'type'), 'enum'))->toBe([['hero'], ['rich_text'], ['features'], ['cta']])
+        ->and(array_keys($schema[0]['properties']))->toBe(['type', 'eyebrow', 'title', 'subtitle'])
+        ->and(CmsAiUsage::sole()->action)->toBe('draft');
+});
+
+test('the draft only offers the blocks the template allows', function (): void {
+    $fake = fakeAi(['blocks' => [['type' => 'rich_text', 'html' => '<p>Hola</p>']]]);
+    $group = CmsSchemaGroup::create(['name' => 'Default', 'layout' => 'layout', 'default' => 1, 'active' => 1]);
+    $schema = CmsSchema::create(['group_id' => $group->id, 'name' => 'Landing', 'active' => 1, 'fields' => [], 'front_view' => 'front/templates/page', 'allowed_blocks' => ['rich_text', 'image']]);
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.draft'), [...draftBrief(['schema_id' => $schema->id]), 'outline' => ['title' => 'T', 'sections' => [['heading' => 'A']]]])
+        ->assertOk();
+
+    expect($fake->calls[0]['schema']['properties']['blocks']['items']['anyOf'])->toHaveCount(1);
+});
+
+test('drafting needs the content module', function (): void {
+    fakeAi(['title' => 'T', 'sections' => [['heading' => 'A', 'summary' => '']]]);
+    $user = User::factory()->create();
+    grantPermissions($user, ['ai' => 'administrar', 'articles' => 'listar']);
+
+    $this->actingAs($user)->postJson(route('ai.outline'), draftBrief())->assertForbidden();
 });

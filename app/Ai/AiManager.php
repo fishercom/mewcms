@@ -146,7 +146,7 @@ class AiManager
                 apiKey: $apiKey,
                 jsonSchema: (bool) ($config['json_schema'] ?? true),
                 maxTokensParam: $config['max_tokens_param'] ?? 'max_tokens',
-                timeout: (int) config('ai.timeout', 60),
+                timeout: (int) config('ai.timeout', 180),
             ),
         };
     }
