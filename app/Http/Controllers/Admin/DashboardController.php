@@ -5,146 +5,279 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AdmLog;
 use App\Models\CmsArticle;
+use App\Models\CmsPost;
 use App\Models\CmsRegister;
-use App\Models\CmsTag;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * The admin home: what needs attention today (unread messages, drafts, scheduled
+ * items, pages missing SEO), what the site produced, and where to pick work up again.
+ * Each section only appears to users who may open the module behind it.
+ */
 class DashboardController extends Controller
 {
-    /**
-     * Render the admin dashboard home page.
-     */
+    /** Pages and posts are counted together as "content" */
+    private const CONTENT = [CmsArticle::class => 'articles', CmsPost::class => 'posts'];
+
     public function index(Request $request): Response
     {
-        // 1. Key Metrics Summary
-        $totalArticles = CmsArticle::count();
-        $activeArticles = CmsArticle::where('active', '1')->count();
-        $totalTags = CmsTag::count();
-        $totalMessages = CmsRegister::count();
-        $unreviewedMessages = CmsRegister::where(function ($query): void {
-            $query->where('review', 0)->orWhereNull('review');
-        })->count();
+        /** @var User $user */
+        $user = $request->user();
+        $can = fn (string $module): bool => $user->hasAdminPermission($module);
 
-        // 2. Scan Disk Usage on 'public' Storage Disk (cached: a full scan is slow on large media libraries)
-        [$fileCount, $totalSize] = Cache::remember('admin.disk_usage', 600, function (): array {
-            $fileCount = 0;
-            $totalSize = 0;
+        $contentModels = array_keys(array_filter(self::CONTENT, $can));
+        $canMessages = $can('registers');
+
+        return Inertia::render('admin', [
+            'can' => [
+                'articles' => $can('articles'),
+                'posts' => $can('posts'),
+                'registers' => $canMessages,
+                'media' => $can('media'),
+                'logs' => $can('logs'),
+            ],
+            'kpis' => [
+                'messages' => $canMessages ? $this->messageKpi() : null,
+                'published' => $contentModels ? $this->publishedKpi($contentModels) : null,
+                'pipeline' => $contentModels ? $this->pipelineKpi($contentModels) : null,
+                'seo' => $contentModels ? $this->seoKpi($contentModels) : null,
+            ],
+            'inbox' => $canMessages ? $this->inbox() : [],
+            'recentContent' => $contentModels ? $this->recentContent($contentModels) : [],
+            'trend' => $this->trend($contentModels, $canMessages),
+            'recentLogs' => $can('logs') ? $this->recentLogs() : [],
+            'storage' => $can('media') ? $this->storageUsage() : null,
+        ]);
+    }
+
+    /**
+     * @return array{unread: int, this_week: int, last_week: int}
+     */
+    protected function messageKpi(): array
+    {
+        $weekStart = Carbon::now()->startOfWeek();
+
+        return [
+            'unread' => CmsRegister::where(fn (Builder $q) => $q->where('review', 0)->orWhereNull('review'))->count(),
+            'this_week' => CmsRegister::where('created_at', '>=', $weekStart)->count(),
+            'last_week' => CmsRegister::whereBetween('created_at', [$weekStart->copy()->subWeek(), $weekStart])->count(),
+        ];
+    }
+
+    /**
+     * @param  list<class-string<Model>>  $models
+     * @return array{total: int, this_month: int, last_month: int}
+     */
+    protected function publishedKpi(array $models): array
+    {
+        $monthStart = Carbon::now()->startOfMonth();
+        $sum = fn (callable $scope): int => array_sum(array_map(fn (string $model): int => $scope($model::published())->count(), $models));
+
+        return [
+            'total' => $sum(fn (Builder $q) => $q),
+            'this_month' => $sum(fn (Builder $q) => $q->where('published_at', '>=', $monthStart)),
+            'last_month' => $sum(fn (Builder $q) => $q->whereBetween('published_at', [$monthStart->copy()->subMonth(), $monthStart])),
+        ];
+    }
+
+    /**
+     * Drafts waiting to go out, and what is scheduled next.
+     *
+     * @param  list<class-string<Model>>  $models
+     * @return array{drafts: int, scheduled: int, next: array<string, mixed>|null}
+     */
+    protected function pipelineKpi(array $models): array
+    {
+        $drafts = 0;
+        $scheduled = 0;
+        $next = null;
+        foreach ($models as $model) {
+            $drafts += $model::where('status', 'draft')->count();
+            $upcoming = $model::where('status', 'published')->where('published_at', '>', now());
+            $scheduled += (clone $upcoming)->count();
+            $first = $upcoming->orderBy('published_at')->first();
+            if ($first && (! $next || $first->published_at->lt($next['at']))) {
+                $next = ['title' => $first->title, 'at' => $first->published_at, 'edit_url' => $this->editUrl($first)];
+            }
+        }
+
+        if ($next) {
+            $next['at'] = $next['at']->toISOString();
+        }
+
+        return ['drafts' => $drafts, 'scheduled' => $scheduled, 'next' => $next];
+    }
+
+    /**
+     * Published items without a meta description: search engines then make one up.
+     *
+     * @param  list<class-string<Model>>  $models
+     * @return array{missing: int, total: int, items: list<array<string, mixed>>}
+     */
+    protected function seoKpi(array $models): array
+    {
+        $missing = collect();
+        $total = 0;
+        foreach ($models as $model) {
+            $items = $model::published()->get(['id', 'title', 'metadata', 'updated_at', ...($model === CmsPost::class ? ['post_type', 'lang_id'] : [])]);
+            $total += $items->count();
+            $missing = $missing->concat($items->filter(fn (Model $item): bool => trim((string) ($item->metadata['seo_description'] ?? '')) === ''));
+        }
+
+        return [
+            'missing' => $missing->count(),
+            'total' => $total,
+            'items' => $missing->sortByDesc('updated_at')->take(5)
+                ->map(fn (Model $item): array => ['title' => $item->title, 'edit_url' => $this->editUrl($item)])->values()->all(),
+        ];
+    }
+
+    /**
+     * The latest unread messages, newest first.
+     *
+     * @return list<array<string, mixed>>
+     */
+    protected function inbox(): array
+    {
+        return CmsRegister::with('form:id,name')
+            ->where(fn (Builder $q) => $q->where('review', 0)->orWhereNull('review'))
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn (CmsRegister $message): array => [
+                'id' => $message->id,
+                'name' => $message->name ?: ($message->email ?: 'Sin nombre'),
+                'email' => $message->email,
+                'form' => $message->form?->name,
+                'excerpt' => Str::limit(trim(strip_tags((string) $message->message)), 90),
+                'created_at' => $message->created_at?->toISOString(),
+            ])->all();
+    }
+
+    /**
+     * Pages and posts edited most recently, to pick work up where it was left.
+     *
+     * @param  list<class-string<Model>>  $models
+     * @return list<array<string, mixed>>
+     */
+    protected function recentContent(array $models): array
+    {
+        return collect($models)
+            ->flatMap(fn (string $model): Collection => $model::latest('updated_at')->take(6)->get())
+            ->sortByDesc('updated_at')
+            ->take(6)
+            ->map(fn (Model $item): array => [
+                'key' => class_basename($item).'-'.$item->getKey(),
+                'title' => $item->title ?: 'Sin título',
+                'type' => $item instanceof CmsPost ? 'Entrada' : 'Página',
+                'state' => match (true) {
+                    $item->status === 'draft' => 'draft',
+                    (bool) $item->is_scheduled => 'scheduled',
+                    ! $item->active => 'hidden',
+                    default => 'published',
+                },
+                'updated_at' => $item->updated_at?->toISOString(),
+                'edit_url' => $this->editUrl($item),
+            ])->values()->all();
+    }
+
+    /**
+     * Content published and messages received per month (last 6 months).
+     *
+     * @param  list<class-string<Model>>  $models
+     * @return list<array{label: string, published: int|null, messages: int|null}>
+     */
+    protected function trend(array $models, bool $withMessages): array
+    {
+        if (! $models && ! $withMessages) {
+            return [];
+        }
+
+        $from = Carbon::now()->subMonths(5)->startOfMonth();
+        // Grouped in PHP so it runs the same on MySQL and SQLite
+        $byMonth = fn (Collection $dates): Collection => $dates->filter()->countBy(fn (Carbon $date): string => $date->format('Y-m'));
+
+        $published = $byMonth(collect($models)->flatMap(fn (string $model): Collection => $model::published()->where('published_at', '>=', $from)->pluck('published_at')));
+        $messages = $withMessages ? $byMonth(CmsRegister::where('created_at', '>=', $from)->pluck('created_at')) : collect();
+
+        $trend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $key = $month->format('Y-m');
+            $trend[] = [
+                'label' => $month->translatedFormat('M'),
+                'published' => $models ? (int) $published->get($key, 0) : null,
+                'messages' => $withMessages ? (int) $messages->get($key, 0) : null,
+            ];
+        }
+
+        return $trend;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    protected function recentLogs(): array
+    {
+        return AdmLog::with('user')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn (AdmLog $log): array => [
+                'id' => $log->id,
+                'comment' => $log->comment,
+                'user_name' => $log->user?->name ?? 'Sistema',
+                'created_at' => $log->created_at?->toISOString(),
+            ])->all();
+    }
+
+    /**
+     * Files and space used in the public disk (cached: a full scan is slow on large libraries).
+     *
+     * @return array{files: int, size: string}
+     */
+    protected function storageUsage(): array
+    {
+        [$files, $bytes] = Cache::remember('admin.disk_usage', 600, function (): array {
+            $files = 0;
+            $bytes = 0;
             try {
                 $disk = Storage::disk('public');
-                // Recursively get all files
-                $files = $disk->allFiles();
-                $fileCount = count($files);
-                foreach ($files as $file) {
+                foreach ($disk->allFiles() as $file) {
+                    $files++;
                     try {
-                        $totalSize += $disk->size($file);
+                        $bytes += $disk->size($file);
                     } catch (\Exception) {
-                        // Ignore individual file size check failures
+                        // A file that vanished mid-scan is skipped
                     }
                 }
             } catch (\Exception) {
-                // Fallback if public disk storage issues exist
+                // The disk is unavailable: report it as empty
             }
 
-            return [$fileCount, $totalSize];
+            return [$files, $bytes];
         });
 
-        // Format size
-        if ($totalSize >= 1073741824) {
-            $formattedSize = round($totalSize / 1073741824, 2).' GB';
-        } elseif ($totalSize >= 1048576) {
-            $formattedSize = round($totalSize / 1048576, 2).' MB';
-        } elseif ($totalSize >= 1024) {
-            $formattedSize = round($totalSize / 1024, 2).' KB';
-        } else {
-            $formattedSize = $totalSize.' B';
-        }
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $power = $bytes > 0 ? min((int) floor(log($bytes, 1024)), count($units) - 1) : 0;
 
-        // 3. Recent Activity logs
-        $recentLogs = AdmLog::with(['user', 'event.action', 'event.module'])
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get()
-            ->map(fn ($log): array => [
-                'id' => $log->id,
-                'comment' => $log->comment,
-                'user_name' => $log->user ? $log->user->name : 'System',
-                'created_at' => $log->created_at ? $log->created_at->toISOString() : null,
-            ]);
+        return ['files' => $files, 'size' => round($bytes / (1024 ** $power), $power > 1 ? 2 : 0).' '.$units[$power]];
+    }
 
-        // 4. Monthly Articles created (last 6 months) - Computed in PHP for SQLite/Pest safety
-        $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
-        $articles = CmsArticle::where('created_at', '>=', $sixMonthsAgo)->get();
-        $articlesByMonth = $articles->groupBy(fn ($item) => $item->created_at ? $item->created_at->format('Y-m') : '');
-
-        $articlesChart = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $monthDate = Carbon::now()->subMonths($i);
-            $key = $monthDate->format('Y-m');
-            $articlesChart[] = [
-                'label' => $monthDate->translatedFormat('M Y'),
-                'value' => isset($articlesByMonth[$key]) ? $articlesByMonth[$key]->count() : 0,
-            ];
-        }
-
-        // 5. Monthly Contact submissions (last 6 months)
-        $messages = CmsRegister::where('created_at', '>=', $sixMonthsAgo)->get();
-        $messagesByMonth = $messages->groupBy(fn ($item) => $item->created_at ? $item->created_at->format('Y-m') : '');
-
-        $messagesChart = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $monthDate = Carbon::now()->subMonths($i);
-            $key = $monthDate->format('Y-m');
-            $messagesChart[] = [
-                'label' => $monthDate->translatedFormat('M Y'),
-                'value' => isset($messagesByMonth[$key]) ? $messagesByMonth[$key]->count() : 0,
-            ];
-        }
-
-        // 6. System Activity trends (daily log entries last 15 days)
-        $fifteenDaysAgo = Carbon::now()->subDays(14)->startOfDay();
-        $logs = AdmLog::where('created_at', '>=', $fifteenDaysAgo)->get();
-        $logsByDay = $logs->groupBy(fn ($item) => $item->created_at ? $item->created_at->format('Y-m-d') : '');
-
-        $activityChart = [];
-        for ($i = 14; $i >= 0; $i--) {
-            $dayDate = Carbon::now()->subDays($i);
-            $key = $dayDate->format('Y-m-d');
-            $activityChart[] = [
-                'label' => $dayDate->translatedFormat('d M'),
-                'value' => isset($logsByDay[$key]) ? $logsByDay[$key]->count() : 0,
-            ];
-        }
-
-        // 7. Calculate month-over-month growth for articles
-        $thisMonthCount = CmsArticle::where('created_at', '>=', Carbon::now()->startOfMonth())->count();
-        $lastMonthCount = CmsArticle::whereBetween('created_at', [
-            Carbon::now()->subMonth()->startOfMonth(),
-            Carbon::now()->subMonth()->endOfMonth(),
-        ])->count();
-        $articleGrowth = $lastMonthCount > 0
-            ? round((($thisMonthCount - $lastMonthCount) / $lastMonthCount) * 100, 1)
-            : ($thisMonthCount > 0 ? 100.0 : 0.0);
-
-        return Inertia::render('admin', [
-            'stats' => [
-                'total_articles' => $totalArticles,
-                'active_articles' => $activeArticles,
-                'total_tags' => $totalTags,
-                'total_messages' => $totalMessages,
-                'unreviewed_messages' => $unreviewedMessages,
-                'file_count' => $fileCount,
-                'disk_usage' => $formattedSize,
-                'article_growth' => $articleGrowth,
-            ],
-            'recentLogs' => $recentLogs,
-            'articlesChart' => $articlesChart,
-            'messagesChart' => $messagesChart,
-            'activityChart' => $activityChart,
-        ]);
+    protected function editUrl(Model $item): string
+    {
+        return $item instanceof CmsPost
+            ? "/admin/posts/{$item->getKey()}/edit?post_type={$item->post_type}&lang_id={$item->lang_id}"
+            : "/admin/articles/{$item->getKey()}/edit";
     }
 }

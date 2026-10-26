@@ -48,7 +48,7 @@ export default function ModuleLayout({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head />
+            <Head title={title} />
             <section className="mx-auto w-full max-w-7xl p-4 antialiased sm:p-6 lg:p-8">
                 <div className="mb-6">
                     <Heading title={title} description={module.description} />
