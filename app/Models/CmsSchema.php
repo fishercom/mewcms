@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Blocks\BlockRegistry;
 use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
@@ -19,7 +20,7 @@ class CmsSchema extends Model
 
     protected $table = 'cms_schemas';
 
-    protected $fillable = ['group_id', 'name', 'fields', 'front_view', 'active'];
+    protected $fillable = ['group_id', 'name', 'fields', 'allowed_blocks', 'default_blocks', 'front_view', 'active'];
 
     protected static $sortableField = 'position';
 
@@ -27,7 +28,25 @@ class CmsSchema extends Model
 
     protected $casts = [
         'fields' => 'array',
+        'allowed_blocks' => 'array',
+        'default_blocks' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $schema): void {
+            // Known block keys only; none or every one of them means "no limit"
+            if ($schema->isDirty('allowed_blocks')) {
+                $keys = array_keys(BlockRegistry::types());
+                $allowed = array_values(array_intersect($keys, is_array($schema->allowed_blocks) ? $schema->allowed_blocks : []));
+                $schema->allowed_blocks = $allowed === [] || count($allowed) === count($keys) ? null : $allowed;
+            }
+            if ($schema->isDirty('default_blocks')) {
+                $blocks = BlockRegistry::sanitize($schema->default_blocks ?? []);
+                $schema->default_blocks = $blocks === [] ? null : $blocks;
+            }
+        });
+    }
 
     public function parent()
     {
