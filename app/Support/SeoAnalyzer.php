@@ -41,10 +41,7 @@ class SeoAnalyzer
         $description = trim((string) ($metadata['seo_description'] ?? ''));
         $keyword = self::keyword($metadata['seo_keywords'] ?? null);
 
-        $html = is_array($item['blocks'] ?? null) && $item['blocks'] !== []
-            ? BlockRegistry::toHtml(BlockRegistry::sanitize($item['blocks']))
-            : (string) ($item['content'] ?? '');
-        $page = self::parse($html);
+        $page = self::parse(self::html($item));
         $words = self::words($page['text']);
 
         $checks = [
@@ -74,6 +71,28 @@ class SeoAnalyzer
             'words' => count($words),
             'checks' => $checks,
         ];
+    }
+
+    /**
+     * Readable text of the item's blocks (or legacy content), for prompts and summaries.
+     *
+     * @param  array{content?: ?string, blocks?: mixed}  $item
+     */
+    public static function plainText(array $item): string
+    {
+        $text = html_entity_decode(self::parse(self::html($item))['text'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return trim(preg_replace('/\s+/u', ' ', $text));
+    }
+
+    /**
+     * @param  array{content?: ?string, blocks?: mixed}  $item
+     */
+    protected static function html(array $item): string
+    {
+        return is_array($item['blocks'] ?? null) && $item['blocks'] !== []
+            ? BlockRegistry::toHtml(BlockRegistry::sanitize($item['blocks']))
+            : (string) ($item['content'] ?? '');
     }
 
     /**

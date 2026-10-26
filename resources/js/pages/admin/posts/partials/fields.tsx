@@ -1,4 +1,5 @@
 import { type BlockDefinition } from '@/blocks/types';
+import AiAssistant from '@/components/ai-assistant';
 import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
@@ -168,6 +169,17 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                 )}
 
                 <div id="seo" className="border-border space-y-6 border-t pt-5">
+                    <div className="flex justify-end">
+                        <AiAssistant
+                            module="posts"
+                            input={data}
+                            onApply={(field, value) =>
+                                field === 'slug'
+                                    ? setData({ ...data, slug: value })
+                                    : setData({ ...data, metadata: { ...data.metadata, [field]: value } as CmsPost['metadata'] })
+                            }
+                        />
+                    </div>
                     <SeoReview result={seo.result} loading={seo.loading} />
                     <SeoFields
                         values={

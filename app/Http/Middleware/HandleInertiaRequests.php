@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Ai\AiManager;
+use App\Models\AdmAction;
 use App\Models\AdmMenu;
 use App\Support\FrontCache;
 use App\Support\SocialLinks;
@@ -54,6 +56,9 @@ class HandleInertiaRequests extends Middleware
                     'modules' => $request->user()->adminPermissions(),
                 ] : null,
             ],
+            // The sparkle icon shows only to users with the assistant and a provider with a key
+            'ai_assistant' => fn (): bool => (bool) $request->user()?->hasAdminPermission('ai', AdmAction::MANAGE)
+                && app(AiManager::class)->enabled(),
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

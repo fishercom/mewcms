@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Ai\AiManager;
 use App\Models\AdmAction;
 use App\Support\AdminActivity;
 use App\Support\PublicSsrGateway;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Only public pages are server-rendered
         $this->app->singleton(Gateway::class, PublicSsrGateway::class);
+        $this->app->singleton(AiManager::class);
     }
 
     /**
@@ -41,6 +43,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Public contact forms: limit spam bursts per visitor
+        // Each AI call costs money: a per-user hourly cap on top of the monthly budget
+        RateLimiter::for('ai', fn (Request $request): Limit => Limit::perHour(max(1, (int) config('ai.rate_limit')))
+            ->by('ai:'.$request->user()?->id)
+            ->response(fn () => response()->json(['message' => __('Has hecho muchas solicitudes al asistente IA. Inténtalo de nuevo en un rato.')], 429)));
+
         RateLimiter::for('form-submissions', fn (Request $request): array => [
             Limit::perMinute(5)->by($request->ip()),
             Limit::perDay(50)->by($request->ip()),
