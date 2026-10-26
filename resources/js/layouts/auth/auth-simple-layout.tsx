@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import { BrandLockup } from '@/components/app-logo';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
@@ -19,11 +19,12 @@ export default function AuthSimpleLayout({ children, title, description }: Props
             <div className="relative w-full max-w-sm">
                 <div className="border-border/70 bg-card flex flex-col gap-8 rounded-2xl border p-6 shadow-sm sm:p-8">
                     <div className="flex flex-col items-center gap-4">
-                        <Link href={route('home')} className="flex flex-col items-center gap-2 font-medium">
-                            <div className="bg-primary text-primary-foreground shadow-primary/25 ring-primary/20 flex size-11 items-center justify-center rounded-xl shadow-md ring-1">
-                                <AppLogoIcon className="size-6 fill-current" />
-                            </div>
-                            <span className="sr-only">MewCMS — ir al sitio</span>
+                        <Link
+                            href={route('home')}
+                            className="text-foreground rounded-lg transition-opacity hover:opacity-85"
+                            aria-label="MewCMS — ir al sitio"
+                        >
+                            <BrandLockup stacked />
                         </Link>
 
                         <div className="space-y-1.5 text-center">

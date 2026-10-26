@@ -1,3 +1,4 @@
+import { BrandLockup } from '@/components/app-logo';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
@@ -123,11 +124,11 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     {/* Logo */}
                     <div className="flex items-center gap-2">
-                        <Link href="/" className="text-primary text-xl font-bold tracking-tight hover:opacity-85">
+                        <Link href="/" className="text-[#1b1b18] hover:opacity-85 dark:text-[#EDEDEC]" aria-label={`${name} — inicio`}>
                             {layout_settings?.layout_header_logo ? (
                                 <img src={layout_settings.layout_header_logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
                             ) : (
-                                'MewCMS'
+                                <BrandLockup />
                             )}
                         </Link>
                     </div>
@@ -155,11 +156,13 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
             {/* Footer */}
             <footer className="mt-16 border-t border-[#19140010] bg-[#FDFDFC] py-8 transition-colors dark:border-[#3E3E3A]/20 dark:bg-[#0a0a0a]">
                 <div className="mx-auto max-w-7xl space-y-4 px-4 text-center text-xs text-[#706f6c] sm:px-6 lg:px-8 dark:text-[#A1A09A]">
-                    {layout_settings?.layout_footer_logo && (
-                        <div className="mb-4 flex justify-center">
+                    <div className="mb-4 flex justify-center">
+                        {layout_settings?.layout_footer_logo ? (
                             <img src={layout_settings.layout_footer_logo} alt="Footer Logo" className="h-8 max-w-[200px] object-contain" />
-                        </div>
-                    )}
+                        ) : (
+                            <BrandLockup className="text-[#1b1b18] dark:text-[#EDEDEC]" />
+                        )}
+                    </div>
 
                     {footerItems.length > 0 && (
                         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-medium">

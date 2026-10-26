@@ -1,3 +1,5 @@
+import '@fontsource/sora/latin-500.css';
+import '@fontsource/sora/latin-700.css';
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
