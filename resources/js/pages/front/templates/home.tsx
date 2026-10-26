@@ -2,7 +2,7 @@
  * Template Name: Home Page
  * Unique: true
  */
-import ContentRenderer from '@/components/content-renderer';
+import Blocks from '@/components/blocks';
 import FrontSlider from '@/components/front-slider';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsSlider } from '@/types/models/cms-slider';
@@ -94,8 +94,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
     const meta = (article.metadata || {}) as HomeMetadata;
 
     const heroTitle = meta.hero_title || article.title;
-    const heroSubtitle =
-        meta.hero_subtitle || 'Un CMS ágil, potente y elegante con React, Inertia.js y Laravel 11.';
+    const heroSubtitle = meta.hero_subtitle || 'Un CMS ágil, potente y elegante con React, Inertia.js y Laravel 11.';
     const heroDescription =
         meta.hero_description ||
         'Personaliza cada sección, gestiona taxonomías y administra contenidos con esquemas dinámicos directamente desde el panel de control.';
@@ -115,8 +114,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
         {
             icon: 'Cpu',
             title: 'Arquitectura SPA Unificada',
-            description:
-                'Combina la robustez de Laravel 11 con la velocidad instantánea de Inertia.js v2 y React 19 sin recargas de página.',
+            description: 'Combina la robustez de Laravel 11 con la velocidad instantánea de Inertia.js v2 y React 19 sin recargas de página.',
             badge: 'Alto Rendimiento',
             color: 'violet',
         },
@@ -139,37 +137,32 @@ export default function Home({ article, navigation, slider }: HomeProps) {
         {
             icon: 'Command',
             title: 'Paleta de Comandos ⌘K',
-            description:
-                'Navegación ultra rápida por teclado para saltar a cualquier módulo, editar páginas o realizar acciones al vuelo.',
+            description: 'Navegación ultra rápida por teclado para saltar a cualquier módulo, editar páginas o realizar acciones al vuelo.',
             badge: 'Productividad',
             color: 'emerald',
         },
         {
             icon: 'FileText',
             title: 'Editor Enriquecido TipTap',
-            description:
-                'Crea y maqueta publicaciones, blogs y artículos con un editor de texto enriquecido moderno, potente e intuitivo.',
+            description: 'Crea y maqueta publicaciones, blogs y artículos con un editor de texto enriquecido moderno, potente e intuitivo.',
             badge: 'Edición Ágil',
             color: 'rose',
         },
         {
             icon: 'Lock',
             title: 'Seguridad y Roles Granulares',
-            description:
-                'Control de acceso detallado por módulos y acciones, auditoría de eventos y protección integrada de datos.',
+            description: 'Control de acceso detallado por módulos y acciones, auditoría de eventos y protección integrada de datos.',
             badge: 'Enterprise',
             color: 'indigo',
         },
     ];
 
-    const rawFeatures: FeatureItem[] =
-        Array.isArray(meta.features) && meta.features.length > 0 ? meta.features : defaultFeatures;
+    const rawFeatures: FeatureItem[] = Array.isArray(meta.features) && meta.features.length > 0 ? meta.features : defaultFeatures;
 
     const features = rawFeatures.map((feature) => {
         const IconComponent = (feature.icon && ICON_MAP[feature.icon]) || Sparkles;
         const colorClass =
-            (feature.color && COLOR_MAP[feature.color.toLowerCase()]) ||
-            (feature.color?.startsWith('from-') ? feature.color : COLOR_MAP.violet);
+            (feature.color && COLOR_MAP[feature.color.toLowerCase()]) || (feature.color?.startsWith('from-') ? feature.color : COLOR_MAP.violet);
 
         return {
             ...feature,
@@ -194,31 +187,27 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 {slider && slider.slides && slider.slides.length > 0 ? (
                     <FrontSlider slider={slider} />
                 ) : (
-                    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-violet-500/10 via-background to-amber-500/5 px-6 py-20 text-center shadow-2xl sm:px-12 sm:py-28 dark:from-violet-950/20 dark:via-background dark:to-background">
+                    <div className="border-border/60 via-background dark:via-background dark:to-background relative overflow-hidden rounded-3xl border bg-gradient-to-br from-violet-500/10 to-amber-500/5 px-6 py-20 text-center shadow-2xl sm:px-12 sm:py-28 dark:from-violet-950/20">
                         <div className="mx-auto max-w-3xl space-y-6">
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300 backdrop-blur-md">
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3.5 py-1 text-xs font-semibold text-violet-700 backdrop-blur-md dark:text-violet-300">
                                 <Sparkles className="h-3.5 w-3.5" />
                                 <span>{badgeText}</span>
                             </span>
 
-                            <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-6xl md:text-7xl leading-tight">
+                            <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight sm:text-6xl md:text-7xl">
                                 <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-amber-600 bg-clip-text text-transparent dark:from-violet-400 dark:via-purple-300 dark:to-amber-400">
                                     {heroTitle}
                                 </span>
                             </h1>
 
-                            <p className="text-lg font-medium text-foreground/80 sm:text-xl leading-relaxed">
-                                {heroSubtitle}
-                            </p>
+                            <p className="text-foreground/80 text-lg leading-relaxed font-medium sm:text-xl">{heroSubtitle}</p>
 
-                            <p className="mx-auto max-w-2xl text-sm text-muted-foreground leading-relaxed">
-                                {heroDescription}
-                            </p>
+                            <p className="text-muted-foreground mx-auto max-w-2xl text-sm leading-relaxed">{heroDescription}</p>
 
                             <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
                                 <Link
                                     href="/admin"
-                                    className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:bg-violet-700 hover:scale-[1.02] active:scale-95"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:bg-violet-700 active:scale-95 sm:text-sm"
                                 >
                                     <LayoutDashboard className="h-4 w-4" />
                                     <span>Ir al Panel Administrativo</span>
@@ -227,7 +216,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
 
                                 <a
                                     href="#caracteristicas"
-                                    className="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-background px-5 py-3 text-xs sm:text-sm font-semibold text-foreground transition-all hover:bg-muted active:scale-95 shadow-2xs"
+                                    className="border-border/80 bg-background text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-semibold shadow-2xs transition-all active:scale-95 sm:text-sm"
                                 >
                                     <span>Ver Características</span>
                                 </a>
@@ -243,14 +232,14 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                         return (
                             <div
                                 key={idx}
-                                className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:p-5 shadow-2xs transition-all hover:border-border hover:shadow-xs"
+                                className="border-border/60 bg-card hover:border-border flex items-center gap-3 rounded-2xl border p-4 shadow-2xs transition-all hover:shadow-xs sm:p-5"
                             >
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
                                     <StatIcon className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="text-base sm:text-lg font-bold text-foreground">{stat.value}</p>
-                                    <p className="text-[11px] font-medium text-muted-foreground">{stat.label}</p>
+                                    <p className="text-foreground text-base font-bold sm:text-lg">{stat.value}</p>
+                                    <p className="text-muted-foreground text-[11px] font-medium">{stat.label}</p>
                                 </div>
                             </div>
                         );
@@ -258,17 +247,13 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 </div>
 
                 {/* 3. Graphical Features Grid */}
-                <div id="caracteristicas" className="space-y-8 scroll-mt-20">
-                    <div className="text-center space-y-3 max-w-2xl mx-auto">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/50 px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <div id="caracteristicas" className="scroll-mt-20 space-y-8">
+                    <div className="mx-auto max-w-2xl space-y-3 text-center">
+                        <span className="border-border/70 bg-muted/50 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold tracking-wider uppercase">
                             Potencia & Modularidad
                         </span>
-                        <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-                            {sectionFeaturesTitle}
-                        </h2>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                            {sectionFeaturesSubtitle}
-                        </p>
+                        <h2 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl">{sectionFeaturesTitle}</h2>
+                        <p className="text-muted-foreground text-sm leading-relaxed">{sectionFeaturesSubtitle}</p>
                     </div>
 
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -277,28 +262,26 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                             return (
                                 <div
                                     key={feature._id || idx}
-                                    className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-6 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-md dark:hover:border-violet-500/30"
+                                    className="group border-border/70 bg-card relative overflow-hidden rounded-2xl border p-6 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-md dark:hover:border-violet-500/30"
                                 >
-                                    <div className="flex items-center justify-between mb-4">
+                                    <div className="mb-4 flex items-center justify-between">
                                         <div
                                             className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.colorClass} shadow-2xs`}
                                         >
                                             <FeatureIcon className="h-6 w-6 stroke-[1.8]" />
                                         </div>
                                         {feature.badge && (
-                                            <span className="rounded-full border border-border/60 bg-muted/60 px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                            <span className="border-border/60 bg-muted/60 text-muted-foreground rounded-full border px-2.5 py-0.5 text-[10px] font-semibold">
                                                 {feature.badge}
                                             </span>
                                         )}
                                     </div>
 
-                                    <h3 className="text-base font-bold text-foreground group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                                    <h3 className="text-foreground text-base font-bold transition-colors group-hover:text-violet-600 dark:group-hover:text-violet-400">
                                         {feature.title}
                                     </h3>
                                     {feature.description && (
-                                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                                            {feature.description}
-                                        </p>
+                                        <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{feature.description}</p>
                                     )}
                                 </div>
                             );
@@ -308,23 +291,23 @@ export default function Home({ article, navigation, slider }: HomeProps) {
 
                 {/* 4. Editorial Content Showcase (if article content is set) */}
                 {article.content && article.content.trim().length > 0 && (
-                    <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-card via-card to-violet-500/5 p-8 sm:p-12 shadow-2xs dark:to-violet-950/20">
+                    <div className="border-border/70 from-card via-card relative overflow-hidden rounded-3xl border bg-gradient-to-br to-violet-500/5 p-8 shadow-2xs sm:p-12 dark:to-violet-950/20">
                         <div className="mx-auto max-w-3xl space-y-6">
                             <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
                                 <Sparkles className="h-5 w-5" />
-                                <span className="text-xs font-bold uppercase tracking-wider">Presentación Editorial</span>
+                                <span className="text-xs font-bold tracking-wider uppercase">Presentación Editorial</span>
                             </div>
-                            <ContentRenderer html={article.content} className="text-foreground/90 leading-relaxed font-normal" />
+                            <Blocks blocks={article.blocks} html={article.content} textClassName="text-foreground/90 leading-relaxed font-normal" />
                         </div>
                     </div>
                 )}
 
                 {/* 5. Custom Metadata Blocks (if extra fields are set in admin) */}
                 {Object.keys(meta).length > 4 && (
-                    <div className="space-y-6 rounded-3xl border border-border/60 bg-muted/10 p-6 sm:p-10">
+                    <div className="border-border/60 bg-muted/10 space-y-6 rounded-3xl border p-6 sm:p-10">
                         <div className="flex items-center gap-2">
                             <Layers className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                            <h3 className="text-lg font-bold text-foreground">Campos Personalizados del Esquema</h3>
+                            <h3 className="text-foreground text-lg font-bold">Campos Personalizados del Esquema</h3>
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -354,16 +337,11 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                                 .map(([key, val]) => {
                                     if (typeof val !== 'object' && val) {
                                         return (
-                                            <div
-                                                key={key}
-                                                className="rounded-xl border border-border/60 bg-card p-4 shadow-2xs space-y-1.5"
-                                            >
-                                                <h4 className="text-[11px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">
+                                            <div key={key} className="border-border/60 bg-card space-y-1.5 rounded-xl border p-4 shadow-2xs">
+                                                <h4 className="text-[11px] font-bold tracking-wider text-violet-600 uppercase dark:text-violet-400">
                                                     {key.replace(/_/g, ' ')}
                                                 </h4>
-                                                <p className="text-xs text-foreground/80 leading-relaxed break-words">
-                                                    {String(val)}
-                                                </p>
+                                                <p className="text-foreground/80 text-xs leading-relaxed break-words">{String(val)}</p>
                                             </div>
                                         );
                                     }
@@ -374,21 +352,17 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 )}
 
                 {/* 6. Call to Action Banner */}
-                <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-r from-violet-900/90 via-purple-900/90 to-zinc-950 p-8 sm:p-12 text-white shadow-2xl">
+                <div className="border-border/80 relative overflow-hidden rounded-3xl border bg-gradient-to-r from-violet-900/90 via-purple-900/90 to-zinc-950 p-8 text-white shadow-2xl sm:p-12">
                     <div className="relative z-10 max-w-2xl space-y-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur-md uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wider text-white/90 uppercase backdrop-blur-md">
                             Control Total
                         </span>
-                        <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
-                            {ctaTitle}
-                        </h2>
-                        <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                            {ctaDescription}
-                        </p>
+                        <h2 className="text-2xl leading-tight font-black tracking-tight sm:text-4xl">{ctaTitle}</h2>
+                        <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">{ctaDescription}</p>
                         <div className="pt-2">
                             <Link
                                 href={ctaButtonUrl}
-                                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs sm:text-sm font-bold text-zinc-950 shadow-lg transition-all hover:bg-zinc-100 hover:scale-[1.02] active:scale-95"
+                                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs font-bold text-zinc-950 shadow-lg transition-all hover:scale-[1.02] hover:bg-zinc-100 active:scale-95 sm:text-sm"
                             >
                                 <span>{ctaButtonText}</span>
                                 <ArrowRight className="h-4 w-4" />
@@ -397,8 +371,8 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                     </div>
 
                     {/* Decorative Background Accents */}
-                    <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
-                    <div className="pointer-events-none absolute -bottom-20 right-40 h-60 w-60 rounded-full bg-amber-500/15 blur-2xl" />
+                    <div className="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
+                    <div className="pointer-events-none absolute right-40 -bottom-20 h-60 w-60 rounded-full bg-amber-500/15 blur-2xl" />
                 </div>
             </div>
         </FrontLayout>

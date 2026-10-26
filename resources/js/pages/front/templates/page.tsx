@@ -2,7 +2,7 @@ import { MediaImage } from '@/components/media-image';
 /**
  * Template Name: Standard Page
  */
-import ContentRenderer from '@/components/content-renderer';
+import Blocks from '@/components/blocks';
 import { tagUrl } from '@/lib/tag-url';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
@@ -63,7 +63,7 @@ export default function Page({ article, navigation }: PageProps) {
                     </p>
                 )}
 
-                {article.content && <ContentRenderer html={article.content} className="text-sm leading-relaxed" />}
+                <Blocks blocks={article.blocks} html={article.content} textClassName="text-sm leading-relaxed" />
 
                 {/* Custom Metadata Render */}
                 <div className="space-y-6">

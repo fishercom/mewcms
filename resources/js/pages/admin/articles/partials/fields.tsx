@@ -1,8 +1,9 @@
+import { type BlockDefinition } from '@/blocks/types';
+import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import TagField from '@/components/tag-field';
-import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -80,6 +81,7 @@ export default function ArticleFields({
 
     const hasSchemaFields = Boolean(schema?.fields && schema.fields.length > 0);
     const { auth } = usePage<{ auth?: { permissions?: { super_admin?: boolean; modules?: Record<string, string[]> } | null } }>().props;
+    const { blockTypes = [] } = usePage<{ blockTypes?: BlockDefinition[] }>().props;
     const canManageSchemas = Boolean(auth?.permissions?.super_admin || auth?.permissions?.modules?.schemas?.includes('administrar'));
 
     const parentPrefix = `/${parents.find((p) => p.id === data.parent_id)?.uri ?? ''}${data.parent_id ? '/' : ''}`.replace('//', '/');
@@ -190,16 +192,14 @@ export default function ArticleFields({
                             <InputError message={errors.title} />
                         </div>
 
-                        {/* Rich Text Editor */}
+                        {/* Block editor */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="content" className="text-foreground font-semibold">
-                                    Cuerpo del Contenido
-                                </Label>
-                                <span className="text-muted-foreground text-[11px]">Editor enriquecido interactivo</span>
+                                <Label className="text-foreground font-semibold">Contenido</Label>
+                                <span className="text-muted-foreground text-[11px]">Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos</span>
                             </div>
-                            <TiptapEditor value={data.content || ''} onChange={(value) => setData({ ...data, content: value })} />
-                            <InputError message={errors.content} />
+                            <BlockEditor value={data.blocks ?? []} onChange={(blocks) => setData({ ...data, blocks })} types={blockTypes} />
+                            <InputError message={errors.blocks ?? errors.content} />
                         </div>
 
                         {/* Excerpt */}

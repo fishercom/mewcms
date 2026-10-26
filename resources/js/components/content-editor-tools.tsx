@@ -1,3 +1,4 @@
+import { type BlockData } from '@/blocks/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -18,6 +19,7 @@ type ContentModule = 'articles' | 'posts';
 export interface RevisionData {
     title?: string | null;
     content?: string | null;
+    blocks?: BlockData[] | null;
     excerpt?: string | null;
     metadata?: unknown;
     status?: string | null;

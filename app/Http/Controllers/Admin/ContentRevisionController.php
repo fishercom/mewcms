@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Controller;
 use App\Models\AdmAction;
 use App\Models\CmsArticle;
@@ -47,7 +48,7 @@ class ContentRevisionController extends Controller
     {
         $revision = $this->find($module, $id)->revisions()->findOrFail($revisionId);
 
-        return response()->json($revision->only(['id', 'title', 'content', 'excerpt', 'metadata', 'status', 'published_at', 'tag_ids', 'is_autosave']));
+        return response()->json($revision->only(['id', 'title', 'content', 'blocks', 'excerpt', 'metadata', 'status', 'published_at', 'tag_ids', 'is_autosave']));
     }
 
     public function restore(Request $request, $id, $revisionId, string $module): RedirectResponse
@@ -121,6 +122,8 @@ class ContentRevisionController extends Controller
         return [
             'title' => 'nullable|string|max:255',
             'content' => 'nullable|string',
+            'blocks' => 'nullable|array|max:'.BlockRegistry::MAX_BLOCKS,
+            'blocks.*' => 'array',
             'excerpt' => 'nullable|string',
             'metadata' => 'nullable|array',
             'status' => 'nullable|string|in:draft,published',

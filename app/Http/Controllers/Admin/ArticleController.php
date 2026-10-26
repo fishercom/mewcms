@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
 use App\Models\AdmAction;
@@ -111,6 +112,7 @@ class ArticleController extends Controller
             'schema_id' => $schemaId,
             'title' => '',
             'content' => '',
+            'blocks' => [],
             'excerpt' => '',
             'featured_image' => '',
             'status' => 'published',
@@ -127,6 +129,7 @@ class ArticleController extends Controller
             ->values();
 
         return Inertia::render('admin/articles/create', [
+            'blockTypes' => BlockRegistry::definitions(),
             'item' => $args,
             'schema' => $schema,
             ...$options,
@@ -201,6 +204,7 @@ class ArticleController extends Controller
             ->values();
 
         return Inertia::render('admin/articles/edit', [
+            'blockTypes' => BlockRegistry::definitions(),
             'item' => $item,
             'schema' => $item?->schema,
             ...$this->templateOptions($item),
@@ -409,6 +413,8 @@ class ArticleController extends Controller
             'parent_id' => 'nullable|integer|exists:cms_articles,id',
             'lang_id' => 'nullable|integer|exists:cms_langs,id',
             'content' => 'nullable|string',
+            'blocks' => 'nullable|array|max:'.BlockRegistry::MAX_BLOCKS,
+            'blocks.*' => 'array',
             'excerpt' => 'nullable|string',
             'featured_image' => 'nullable|string|max:2048',
             'status' => 'nullable|string|in:draft,published',

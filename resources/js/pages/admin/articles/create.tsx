@@ -35,6 +35,7 @@ export default function Create() {
         lang_id: 1, // Assuming default lang_id
         title: '',
         content: '',
+        blocks: [],
         excerpt: '',
         featured_image: '',
         status: 'published',

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\FlushesFrontCache;
+use App\Models\Concerns\HasBlocks;
 use App\Models\Concerns\HasPublishing;
 use App\Models\Concerns\HasRevisions;
 use App\Models\Concerns\LogsAdminActivity;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CmsPost extends Model
 {
     use FlushesFrontCache;
+    use HasBlocks;
     use HasPublishing;
     use HasRevisions;
     use LogsAdminActivity;

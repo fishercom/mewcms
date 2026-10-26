@@ -1,3 +1,4 @@
+import { blocksFromContent } from '@/blocks/types';
 import ContentEditorTools, { RevisionData } from '@/components/content-editor-tools';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
@@ -30,6 +31,7 @@ export default function Edit() {
         title: item.title,
         slug: item.slug,
         content: item.content,
+        blocks: item.blocks ?? blocksFromContent(item.content),
         excerpt: item.excerpt,
         featured_image: item.featured_image,
         metadata: item.metadata || {},
@@ -95,6 +97,7 @@ export default function Edit() {
                                 ...prev,
                                 title: revision.title ?? prev.title,
                                 content: revision.content ?? '',
+                                blocks: revision.blocks ?? blocksFromContent(revision.content),
                                 excerpt: revision.excerpt ?? '',
                                 metadata: (revision.metadata ?? prev.metadata) as typeof prev.metadata,
                                 status: (revision.status as CmsPost['status'] | null) ?? prev.status,

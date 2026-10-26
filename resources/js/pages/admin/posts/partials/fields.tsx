@@ -1,14 +1,16 @@
+import { type BlockDefinition } from '@/blocks/types';
+import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import TagField from '@/components/tag-field';
-import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CmsPost } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
+import { usePage } from '@inertiajs/react';
 import { Calendar, Eye, Image as ImageIcon, Settings, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
@@ -28,6 +30,7 @@ interface Props {
 }
 
 export default function PostFields({ data, setData, errors, processing, schemas, authors, tags, schema, onChangeSchema, cptLabelSingular }: Props) {
+    const { blockTypes = [] } = usePage<{ blockTypes?: BlockDefinition[] }>().props;
     const [mediaDrawerOpen, setMediaDrawerOpen] = useState(false);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,13 +110,12 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="content" className="text-sm font-semibold">
-                        Cuerpo / Contenido
-                    </Label>
-                    <div className="border-input bg-background overflow-hidden rounded-md border">
-                        <TiptapEditor value={data.content || ''} onChange={(html) => setData({ ...data, content: html })} />
+                    <div className="flex items-center justify-between">
+                        <Label className="text-sm font-semibold">Contenido</Label>
+                        <span className="text-muted-foreground text-[11px]">Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos</span>
                     </div>
-                    <InputError message={errors.content} />
+                    <BlockEditor value={data.blocks ?? []} onChange={(blocks) => setData({ ...data, blocks })} types={blockTypes} />
+                    <InputError message={errors.blocks ?? errors.content} />
                 </div>
 
                 <div className="grid gap-2">

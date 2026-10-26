@@ -1,3 +1,4 @@
+import { type BlockData } from '@/blocks/types';
 import { CmsSchema } from './cms-schema';
 import { CmsTag } from './cms-tag';
 
@@ -24,6 +25,7 @@ export interface CmsPost {
     title: string;
     slug: string;
     content: string | null;
+    blocks?: BlockData[] | null;
     excerpt: string | null;
     featured_image: string | null;
     metadata: Record<string, unknown>;
