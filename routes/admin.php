@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\BlockPatternController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\ContentRevisionController;
 use App\Http\Controllers\Admin\FormController;
@@ -78,6 +79,9 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::resource('media', MediaController::class)->only(['index', 'store', 'update', 'destroy'])->parameters(['media' => 'medium']);
 
     Route::resource('sliders', SliderController::class);
+
+    Route::post('block-patterns/quick', [BlockPatternController::class, 'quickStore'])->name('block-patterns.quick');
+    Route::resource('block-patterns', BlockPatternController::class)->except(['show']);
 
     Route::resource('post-types', PostTypeController::class);
     Route::post('posts/bulk', [PostController::class, 'bulk'])->name('posts.bulk');

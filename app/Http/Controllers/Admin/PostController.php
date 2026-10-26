@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
+use App\Models\CmsBlockPattern;
 use App\Models\CmsLang;
 use App\Models\CmsPost;
 use App\Models\CmsPostType;
@@ -123,6 +124,7 @@ class PostController extends Controller
 
         return Inertia::render('admin/posts/create', [
             'blockTypes' => BlockRegistry::definitions(),
+            'blockPatterns' => CmsBlockPattern::forEditor(),
             'item' => $args,
             'schema' => $schema,
             'schemas' => $schemas,
@@ -192,6 +194,7 @@ class PostController extends Controller
 
         return Inertia::render('admin/posts/edit', [
             'blockTypes' => BlockRegistry::definitions(),
+            'blockPatterns' => CmsBlockPattern::forEditor(),
             'item' => $item,
             'schema' => $schema,
             'schemas' => $schemas,

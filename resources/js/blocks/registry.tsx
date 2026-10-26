@@ -6,6 +6,7 @@ import FormRender from './form/render';
 import GalleryRender from './gallery/render';
 import HeroRender from './hero/render';
 import ImageRender from './image/render';
+import PatternRender from './pattern/render';
 import QuoteRender from './quote/render';
 import RichTextRender from './rich-text/render';
 import SliderRender from './slider/render';
@@ -30,4 +31,5 @@ export const BLOCK_RENDERERS: Record<string, ComponentType<BlockRenderProps>> = 
     columns: ColumnsRender,
     form: FormRender,
     slider: SliderRender,
+    pattern: PatternRender,
 };
