@@ -2,6 +2,8 @@
 
 namespace App\Blocks;
 
+use App\Support\MediaLibrary;
+
 class RichTextBlock extends BlockType
 {
     public function key(): string
@@ -27,6 +29,11 @@ class RichTextBlock extends BlockType
     public function fields(): array
     {
         return [['key' => 'html', 'label' => 'Contenido', 'type' => 'html_editor']];
+    }
+
+    public function resolve(array $data): array
+    {
+        return ['html' => MediaLibrary::enrichHtml($data['html'] ?? '') ?? ''] + $data;
     }
 
     public function toHtml(array $data): string

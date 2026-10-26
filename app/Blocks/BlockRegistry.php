@@ -15,7 +15,15 @@ class BlockRegistry
         RichTextBlock::class,
         HeroBlock::class,
         ImageBlock::class,
+        GalleryBlock::class,
+        VideoBlock::class,
         CtaBlock::class,
+        FeaturesBlock::class,
+        StatsBlock::class,
+        QuoteBlock::class,
+        ColumnsBlock::class,
+        FormBlock::class,
+        SliderBlock::class,
     ];
 
     public const MAX_BLOCKS = 200;
@@ -56,11 +64,12 @@ class BlockRegistry
 
     /**
      * Clean a list of blocks: unknown types and malformed entries are dropped, each block
-     * keeps an id and only the fields its type declares.
+     * keeps an id and only the fields its type declares. Inside another block ($depth > 0)
+     * only nestable types are kept.
      *
      * @return list<array{id: string, type: string, version: int, data: array<string, mixed>}>
      */
-    public static function sanitize(mixed $blocks): array
+    public static function sanitize(mixed $blocks, int $depth = 0): array
     {
         if (! is_array($blocks)) {
             return [];
@@ -69,7 +78,7 @@ class BlockRegistry
         $clean = [];
         foreach (array_slice(array_values($blocks), 0, self::MAX_BLOCKS) as $block) {
             $type = is_array($block) && is_string($block['type'] ?? null) ? self::get($block['type']) : null;
-            if (! $type) {
+            if (! $type || ($depth > 0 && ! $type->nestable())) {
                 continue;
             }
 
@@ -92,12 +101,38 @@ class BlockRegistry
      */
     public static function toContent(array $blocks): string
     {
+        return (string) ContentSanitizer::html(self::toHtml($blocks));
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $blocks
+     */
+    public static function toHtml(array $blocks): string
+    {
         $html = '';
         foreach ($blocks as $block) {
             $html .= self::get($block['type'] ?? '')?->toHtml($block['data'] ?? []) ?? '';
         }
 
-        return (string) ContentSanitizer::html($html);
+        return $html;
+    }
+
+    /**
+     * Blocks as the public page needs them (see BlockType::resolve).
+     *
+     * @param  list<array<string, mixed>>  $blocks
+     * @return list<array<string, mixed>>
+     */
+    public static function resolve(array $blocks): array
+    {
+        return array_map(function (array $block): array {
+            $type = self::get($block['type'] ?? '');
+            if ($type) {
+                $block['data'] = $type->resolve($block['data'] ?? []);
+            }
+
+            return $block;
+        }, $blocks);
     }
 
     /**
