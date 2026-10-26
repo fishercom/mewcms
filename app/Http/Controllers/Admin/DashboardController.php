@@ -138,7 +138,7 @@ class DashboardController extends Controller
             'missing' => $missing->count(),
             'total' => $total,
             'items' => $missing->sortByDesc('updated_at')->take(5)
-                ->map(fn (Model $item): array => ['title' => $item->title, 'edit_url' => $this->editUrl($item)])->values()->all(),
+                ->map(fn (Model $item): array => ['title' => $item->title, 'edit_url' => $this->seoUrl($item)])->values()->all(),
         ];
     }
 
@@ -279,5 +279,13 @@ class DashboardController extends Controller
         return $item instanceof CmsPost
             ? "/admin/posts/{$item->getKey()}/edit?post_type={$item->post_type}&lang_id={$item->lang_id}"
             : "/admin/articles/{$item->getKey()}/edit";
+    }
+
+    /**
+     * The editor opened on its SEO review.
+     */
+    protected function seoUrl(Model $item): string
+    {
+        return $item instanceof CmsPost ? $this->editUrl($item).'#seo' : $this->editUrl($item).'?tab=seo';
     }
 }
