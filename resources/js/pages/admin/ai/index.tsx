@@ -45,6 +45,7 @@ type Props = {
 
 const ACTIONS: Record<string, string> = {
     metadata: 'Sugerir metadatos',
+    improve_block: 'Mejorar bloque',
     test: 'Prueba de conexión',
 };
 

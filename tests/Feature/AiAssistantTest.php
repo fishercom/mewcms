@@ -214,3 +214,81 @@ test('DeepSeek answers in JSON mode and a bad answer is retried once', function 
         && str_contains($request['messages'][1]['content'], 'JSON Schema'));
     expect(CmsAiUsage::sole()->input_tokens)->toBe(20);
 });
+
+test('a block is rewritten text by text and its other fields are kept', function (): void {
+    $fake = fakeAi([
+        'title' => 'Diseño web que vende',
+        'intro' => '',
+        'items' => [['title' => 'Rápido', 'text' => 'Carga en un segundo.'], ['title' => 'Claro', 'text' => '<b>Fácil</b> de leer.']],
+        'extra' => 'ignorado',
+    ]);
+    $block = ['type' => 'features', 'data' => [
+        'title' => 'Diseño web',
+        'intro' => 'Lo que hacemos.',
+        'columns' => '2',
+        'items' => [
+            ['_id' => 'a1', 'icon' => 'zap', 'title' => 'Velocidad', 'text' => 'Sitios rápidos.'],
+            ['_id' => 'b2', 'icon' => 'heart', 'title' => 'Claridad', 'text' => 'Textos claros.'],
+        ],
+    ]];
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.improve-block'), ['block' => $block, 'action' => 'rewrite'])
+        ->assertOk()
+        ->assertJsonPath('data.title', 'Diseño web que vende')
+        // An empty answer keeps the original
+        ->assertJsonPath('data.intro', 'Lo que hacemos.')
+        ->assertJsonPath('data.columns', '2')
+        ->assertJsonPath('data.items.0._id', 'a1')
+        ->assertJsonPath('data.items.0.icon', 'zap')
+        ->assertJsonPath('data.items.0.text', 'Carga en un segundo.')
+        // Cleaned like a save
+        ->assertJsonPath('data.items.1.text', 'Fácil de leer.')
+        ->assertJsonMissingPath('data.extra');
+
+    $call = $fake->calls[0];
+    expect($call['model'])->toBe('claude-haiku-5-5')
+        ->and($call['schema']['required'])->toBe(['title', 'intro', 'items'])
+        ->and($call['schema']['properties']['items']['items']['required'])->toBe(['title', 'text'])
+        ->and($call['prompt'])->toContain('"title":"Diseño web"')
+        ->and($call['prompt'])->not->toContain('zap');
+    expect(CmsAiUsage::sole()->action)->toBe('improve_block');
+});
+
+test('rich text stays sanitized HTML', function (): void {
+    $fake = fakeAi(['html' => '<p>Hello <a href="/contact">contact</a></p><script>alert(1)</script>']);
+
+    $html = $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.improve-block'), [
+            'block' => ['type' => 'rich_text', 'data' => ['html' => '<p>Hola <a href="/contact">contacto</a></p>']],
+            'action' => 'translate',
+            'option' => 'en',
+        ])
+        ->assertOk()
+        ->json('data.html');
+
+    expect($html)->toContain('Hello')->toContain('href="/contact"')->not->toContain('<script');
+
+    expect($fake->calls[0]['prompt'])->toContain('Traduce los textos al inglés');
+});
+
+test('blocks without text are refused before calling the model', function (): void {
+    $fake = fakeAi(['url' => 'x']);
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->postJson(route('ai.improve-block'), ['block' => ['type' => 'video', 'data' => ['url' => 'https://youtu.be/abc']], 'action' => 'rewrite'])
+        ->assertUnprocessable()
+        ->assertJsonPath('message', 'Este bloque no tiene texto que mejorar.');
+
+    expect($fake->calls)->toBe([]);
+});
+
+test('improving a block needs the assistant module', function (): void {
+    fakeAi(['html' => '<p>Hola</p>']);
+    $user = User::factory()->create();
+    grantPermissions($user, ['articles' => 'administrar']);
+
+    $this->actingAs($user)
+        ->postJson(route('ai.improve-block'), ['block' => ['type' => 'rich_text', 'data' => ['html' => '<p>Hola</p>']], 'action' => 'fix'])
+        ->assertForbidden();
+});

@@ -1,5 +1,6 @@
 import { BLOCK_RENDERERS } from '@/blocks/registry';
 import { type BlockData, type BlockDefinition, type BlockPattern, type BlockValues, newBlockId, str, withNewIds } from '@/blocks/types';
+import AiBlockMenu, { hasAiText } from '@/components/ai-block-menu';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
@@ -325,6 +326,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                                 <Settings2 className="h-4 w-4" />
                                             </IconButton>
                                         )}
+                                        {!isPattern && hasAiText(type) && <AiBlockMenu block={block} onApply={(data) => update(block.id, data)} />}
                                         {canSavePatterns && !isPattern && (
                                             <IconButton label={t('Guardar como bloque reutilizable')} onClick={() => setPatternDialogIndex(index)}>
                                                 <Bookmark className="h-4 w-4" />
