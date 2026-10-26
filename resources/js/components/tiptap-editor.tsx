@@ -1,4 +1,5 @@
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import { type CmsMedia } from '@/types/models/cms-media';
 import ImageExtension from '@tiptap/extension-image';
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -196,9 +197,13 @@ const Tiptap: React.FC<TiptapProps> = ({ value, onChange }) => {
         }
     }, [value, editor]);
 
-    const handleSelectImage = (url: string) => {
+    const handleSelectImage = (url: string, media?: CmsMedia) => {
         if (editor) {
-            editor.chain().focus().setImage({ src: url }).run();
+            editor
+                .chain()
+                .focus()
+                .setImage({ src: url, alt: media?.alt ?? '', title: media?.title ?? undefined })
+                .run();
         }
         setMediaOpen(false);
     };

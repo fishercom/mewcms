@@ -1,452 +1,314 @@
+import { formatBytes, MediaThumb, uploadMedia, type UploadProgress } from '@/components/media-library';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { type Pagination } from '@/types';
+import { type CmsMedia } from '@/types/models/cms-media';
 import axios from 'axios';
-import { ArrowLeft, Check, ChevronRight, Copy, FileText, Folder, FolderPlus, Loader2, Trash2, UploadCloud, X } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import { AlertTriangle, Check, Loader2, Search, UploadCloud, X } from 'lucide-react';
+import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 interface QuickMediaDrawerProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelect?: (url: string) => void;
+    /** Receives the file URL and its library entry (alt text, size…) */
+    onSelect?: (url: string, media?: CmsMedia) => void;
     initialType?: 'Images' | 'Files';
 }
 
-interface LfmItem {
-    name: string;
-    url: string;
-    size: string;
-    time: number;
-    thumb: string;
-    is_file: boolean;
-    icon?: string;
-}
+type PickerType = 'image' | 'document';
 
-const isImageFile = (filename: string) => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    return ext ? ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(ext) : false;
-};
-
+/**
+ * Pick a file from the media library (or upload one) without leaving the editor.
+ */
 export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialType = 'Images' }: QuickMediaDrawerProps) {
-    const [type, setType] = useState<'Images' | 'Files'>(initialType);
-    const [workingDir, setWorkingDir] = useState<string>('');
-    const [items, setItems] = useState<LfmItem[]>([]);
-
-    const filteredItems = items.filter((item) => {
-        if (!item.is_file) return true;
-        const isImg = isImageFile(item.name);
-        return type === 'Images' ? isImg : !isImg;
-    });
+    const [type, setType] = useState<PickerType>(initialType === 'Files' ? 'document' : 'image');
+    const [search, setSearch] = useState('');
+    const [items, setItems] = useState<CmsMedia[]>([]);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [selected, setSelected] = useState<CmsMedia | null>(null);
+    const [alt, setAlt] = useState('');
+    const [uploads, setUploads] = useState<UploadProgress[]>([]);
+    const [dragging, setDragging] = useState(false);
+    const [inserting, setInserting] = useState(false);
+    const fileInput = useRef<HTMLInputElement>(null);
 
-    // Folder creation state
-    const [newFolderName, setNewFolderName] = useState('');
-    const [creatingFolder, setCreatingFolder] = useState(false);
-
-    // Upload state
-    const [uploadingFiles, setUploadingFiles] = useState<{ name: string; progress: number }[]>([]);
-
-    // Copy state feedback
-    const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-
-    // Fetch files and folders
-    const fetchItems = useCallback(async () => {
-        if (!isOpen) return;
-        setLoading(true);
-        try {
-            const response = await axios.get('/laravel-filemanager/jsonitems', {
-                params: {
-                    type: type,
-                    working_dir: workingDir,
-                },
-            });
-            if (response.data) {
-                if (response.data.items) {
-                    setItems(response.data.items);
-                }
-                if (response.data.working_dir && !workingDir) {
-                    setWorkingDir(response.data.working_dir);
-                }
+    const load = useCallback(
+        async (pageToLoad: number) => {
+            setLoading(true);
+            try {
+                const { data } = await axios.get<Pagination<CmsMedia>>(route('media.picker'), {
+                    params: { type, s: search || undefined, page: pageToLoad },
+                });
+                setItems((prev) => (pageToLoad === 1 ? data.data : [...prev, ...data.data]));
+                setPage(data.current_page);
+                setLastPage(data.last_page);
+            } catch (error) {
+                console.error('Error loading the media library:', error);
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error('Error fetching file manager items:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, [isOpen, type, workingDir]);
+        },
+        [type, search],
+    );
 
     useEffect(() => {
-        fetchItems();
-    }, [fetchItems]);
+        if (!isOpen) return;
+        const timer = setTimeout(() => load(1), search ? 250 : 0);
+        return () => clearTimeout(timer);
+    }, [isOpen, load, search]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setSelected(null);
+            setUploads([]);
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        setAlt(selected?.alt ?? '');
+    }, [selected]);
 
     if (!isOpen) return null;
 
-    // Handle Directory Creation
-    const handleCreateFolder = async (e: React.FormEvent) => {
+    const upload = async (files: File[]) => {
+        if (files.length === 0) return;
+        const stored = await uploadMedia(files, setUploads);
+        if (stored.length > 0) {
+            await load(1);
+            setSelected(stored[stored.length - 1]);
+        }
+        setTimeout(() => setUploads((list) => list.filter((u) => u.error)), 1500);
+    };
+
+    const onDrop = (e: DragEvent) => {
         e.preventDefault();
-        if (!newFolderName.trim()) return;
-
-        setCreatingFolder(true);
-        try {
-            const response = await axios.get('/laravel-filemanager/newfolder', {
-                params: {
-                    name: newFolderName,
-                    working_dir: workingDir,
-                    type: type,
-                },
-            });
-            if (response.data === 'OK') {
-                setNewFolderName('');
-                fetchItems();
-            } else {
-                alert(response.data.error || 'Error al crear carpeta');
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            console.error('Folder creation error:', error);
-            const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al crear carpeta.';
-            alert(`Error: ${typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg}`);
-        } finally {
-            setCreatingFolder(false);
-        }
+        setDragging(false);
+        upload(Array.from(e.dataTransfer.files));
     };
 
-    // Handle Bulk File Upload
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
-        const uploadQueue = Array.from(files);
-        const progressList = uploadQueue.map((f) => ({ name: f.name, progress: 0 }));
-        setUploadingFiles(progressList);
-
-        for (let i = 0; i < uploadQueue.length; i++) {
-            const file = uploadQueue[i];
-            const formData = new FormData();
-            formData.append('upload', file);
-            formData.append('working_dir', workingDir);
-            formData.append('type', type);
-            // Get CSRF token from Laravel meta tag or cookie if needed
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            if (csrfToken) {
-                formData.append('_token', csrfToken);
-            }
-
+    // Save a changed alt text to the library, then hand the file to the editor
+    const insert = async () => {
+        if (!selected) return;
+        let media = selected;
+        if (selected.type === 'image' && alt.trim() !== (selected.alt ?? '')) {
+            setInserting(true);
             try {
-                await axios.post('/laravel-filemanager/upload', formData, {
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    onUploadProgress: (progressEvent) => {
-                        const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
-                        setUploadingFiles((prev) => prev.map((item, idx) => (idx === i ? { ...item, progress: percentCompleted } : item)));
-                    },
+                const { data } = await axios.put<CmsMedia>(route('media.update', selected.id), {
+                    alt: alt.trim(),
+                    title: selected.title,
+                    caption: selected.caption,
                 });
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (error: any) {
-                console.error(`Upload failed for ${file.name}:`, error);
-                const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al subir el archivo.';
-                alert(`Error al subir ${file.name}: ${typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg}`);
+                media = data;
+            } catch (error) {
+                console.error('Could not save the alt text:', error);
+            } finally {
+                setInserting(false);
             }
         }
-
-        // Clear upload display and refresh
-        setTimeout(() => setUploadingFiles([]), 1500);
-        fetchItems();
-    };
-
-    // Navigate to Subfolder
-    const handleFolderClick = (folderName: string) => {
-        const separator = workingDir.endsWith('/') || workingDir === '' ? '' : '/';
-        const nextDir = workingDir === '' ? `/${folderName}` : `${workingDir}${separator}${folderName}`;
-        setWorkingDir(nextDir);
-    };
-
-    // Navigate Back / Parent Folder
-    const handleGoBack = () => {
-        if (!workingDir || workingDir === '/') {
-            setWorkingDir('');
-            return;
-        }
-        const parts = workingDir.split('/');
-        parts.pop(); // Remove last segment
-        const parentDir = parts.join('/') || '/';
-        setWorkingDir(parentDir === '/' ? '' : parentDir);
-    };
-
-    // Copy URL to clipboard
-    const handleCopyUrl = (url: string) => {
-        navigator.clipboard.writeText(url);
-        setCopiedUrl(url);
-        setTimeout(() => setCopiedUrl(null), 2000);
-    };
-
-    const handleDeleteItem = async (itemName: string) => {
-        if (!window.confirm(`¿Estás seguro de que deseas eliminar "${itemName}"?`)) {
-            return;
-        }
-
-        try {
-            const response = await axios.get('/laravel-filemanager/delete', {
-                params: {
-                    type: type,
-                    working_dir: workingDir,
-                    items: [itemName],
-                },
-            });
-            if (response.data === 'OK') {
-                fetchItems();
-            } else {
-                alert('Error al eliminar el elemento');
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            console.error('Delete item error:', error);
-            const errMsg = error.response?.data?.[0] || error.response?.data || error.message || 'Error al eliminar el elemento.';
-            alert(`Error: ${typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg}`);
-        }
+        onSelect?.(media.url, media);
     };
 
     return (
-        <div className="animate-in fade-in fixed inset-0 z-50 flex justify-end duration-200">
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity" onClick={onClose} />
+        <div
+            className="animate-in fade-in fixed inset-0 z-50 flex justify-end duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Biblioteca de medios"
+        >
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
 
-            {/* Sidebar drawer content */}
-            <div className="animate-in slide-in-from-right border-border bg-card relative z-10 flex h-full w-full max-w-md flex-col border-l shadow-2xl duration-300">
+            <div
+                className="animate-in slide-in-from-right border-border bg-card relative z-10 flex h-full w-full max-w-lg flex-col border-l shadow-2xl duration-300"
+                onDragOver={(e) => {
+                    if (!e.dataTransfer.types.includes('Files')) return;
+                    e.preventDefault();
+                    setDragging(true);
+                }}
+                onDragLeave={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false);
+                }}
+                onDrop={onDrop}
+            >
                 {/* Header */}
                 <div className="border-border flex items-center justify-between border-b p-5">
                     <div>
-                        <h2 className="text-foreground text-base font-bold">Gestor de Medios Rápido</h2>
-                        <p className="text-muted-foreground text-xs">Sube, crea carpetas e inserta archivos</p>
+                        <h2 className="text-foreground text-base font-bold">Biblioteca de medios</h2>
+                        <p className="text-muted-foreground text-xs">Elige un archivo o sube uno nuevo</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} aria-label="Cerrar">
                         <X className="h-4.5 w-4.5" />
                     </Button>
                 </div>
 
-                {/* Tab selector Images / Files */}
-                <div className="border-border bg-muted/50 grid grid-cols-2 border-b dark:bg-black/10">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setType('Images');
-                            setWorkingDir('');
-                        }}
-                        className={`border-b-2 py-3 text-center text-xs font-semibold transition-colors ${
-                            type === 'Images' ? 'border-primary text-primary' : 'text-muted-foreground hover:text-foreground border-transparent'
-                        }`}
-                    >
-                        Imágenes / Fotos
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setType('Files');
-                            setWorkingDir('');
-                        }}
-                        className={`border-b-2 py-3 text-center text-xs font-semibold transition-colors ${
-                            type === 'Files' ? 'border-primary text-primary' : 'text-muted-foreground hover:text-foreground border-transparent'
-                        }`}
-                    >
-                        Documentos / Files
-                    </button>
+                {/* Type tabs */}
+                <div className="border-border bg-muted/50 grid grid-cols-2 border-b dark:bg-black/10" role="tablist">
+                    {(
+                        [
+                            ['image', 'Imágenes'],
+                            ['document', 'Documentos'],
+                        ] as const
+                    ).map(([value, label]) => (
+                        <button
+                            key={value}
+                            type="button"
+                            role="tab"
+                            aria-selected={type === value}
+                            onClick={() => {
+                                setType(value);
+                                setSelected(null);
+                            }}
+                            className={cn(
+                                'border-b-2 py-3 text-center text-xs font-semibold transition-colors',
+                                type === value ? 'border-primary text-primary' : 'text-muted-foreground hover:text-foreground border-transparent',
+                            )}
+                        >
+                            {label}
+                        </button>
+                    ))}
                 </div>
 
-                {/* Main Scrollable Area */}
-                <div className="flex-1 space-y-6 overflow-y-auto p-5">
-                    {/* Action Block 1: Folder Creation */}
-                    <form onSubmit={handleCreateFolder} className="border-border bg-muted/50 space-y-3 rounded-xl border p-4 dark:bg-black/15">
-                        <Label htmlFor="drawer-folder-name" className="flex items-center gap-1 text-xs font-semibold">
-                            <FolderPlus className="text-primary h-4 w-4" />
-                            <span>Crear Carpeta en: {workingDir || '/'}</span>
-                        </Label>
-                        <div className="flex gap-2">
-                            <Input
-                                id="drawer-folder-name"
-                                type="text"
-                                placeholder="Nombre de carpeta"
-                                value={newFolderName}
-                                onChange={(e) => setNewFolderName(e.target.value)}
-                                className="h-9 text-xs"
-                                disabled={creatingFolder}
-                            />
-                            <Button size="sm" className="h-9 shrink-0 px-4" disabled={creatingFolder}>
-                                {creatingFolder ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Crear'}
+                {/* Search + upload */}
+                <div className="border-border flex gap-2 border-b p-4">
+                    <div className="relative flex-1">
+                        <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                        <Input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar..."
+                            className="h-9 pl-9 text-xs"
+                            aria-label="Buscar en la biblioteca"
+                        />
+                    </div>
+                    <Button type="button" className="h-9 gap-1.5" onClick={() => fileInput.current?.click()}>
+                        <UploadCloud className="h-4 w-4" />
+                        Subir
+                    </Button>
+                    <input
+                        ref={fileInput}
+                        type="file"
+                        multiple
+                        accept={type === 'image' ? 'image/jpeg,image/png,image/gif,image/webp' : undefined}
+                        className="hidden"
+                        onChange={(e) => {
+                            upload(Array.from(e.target.files ?? []));
+                            e.target.value = '';
+                        }}
+                    />
+                </div>
+
+                {uploads.length > 0 && (
+                    <ul className="border-border space-y-1.5 border-b px-4 py-3 text-xs" aria-live="polite">
+                        {uploads.map((u, i) => (
+                            <li key={`${u.name}-${i}`} className="flex items-center gap-2">
+                                <span className="text-foreground min-w-0 flex-1 truncate">{u.name}</span>
+                                {u.error ? (
+                                    <span className="text-destructive flex items-center gap-1">
+                                        <AlertTriangle className="h-3.5 w-3.5" />
+                                        {u.error}
+                                    </span>
+                                ) : u.progress === 100 ? (
+                                    <Check className="text-success h-3.5 w-3.5" />
+                                ) : (
+                                    <span className="text-muted-foreground">{u.progress}%</span>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+
+                {/* Items */}
+                <div className="relative flex-1 overflow-y-auto p-4">
+                    {items.length === 0 && !loading ? (
+                        <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-center text-xs">
+                            <UploadCloud className="h-8 w-8" />
+                            {search ? 'No hay archivos que coincidan.' : 'Aún no hay archivos. Arrastra uno aquí o pulsa Subir.'}
+                        </div>
+                    ) : (
+                        <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                            {items.map((item) => (
+                                <li key={item.id}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelected(item)}
+                                        onDoubleClick={() => onSelect?.(item.url, item)}
+                                        aria-pressed={selected?.id === item.id}
+                                        title={item.title || item.filename}
+                                        className={cn(
+                                            'border-border/70 bg-muted/30 focus-visible:ring-primary/40 relative block aspect-square w-full overflow-hidden rounded-lg border focus-visible:ring-2 focus-visible:outline-none',
+                                            selected?.id === item.id && 'ring-primary ring-2 ring-offset-1',
+                                        )}
+                                    >
+                                        <MediaThumb item={item} iconClassName="h-6 w-6" />
+                                        {selected?.id === item.id && (
+                                            <span className="bg-primary text-primary-foreground absolute top-1 right-1 rounded-full p-0.5">
+                                                <Check className="h-3 w-3" />
+                                            </span>
+                                        )}
+                                    </button>
+                                    {item.type !== 'image' && <p className="text-muted-foreground mt-1 truncate text-[10px]">{item.filename}</p>}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    {loading && (
+                        <div className="flex justify-center py-4">
+                            <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+                        </div>
+                    )}
+                    {!loading && page < lastPage && (
+                        <div className="flex justify-center pt-4">
+                            <Button variant="outline" size="sm" onClick={() => load(page + 1)}>
+                                Cargar más
                             </Button>
                         </div>
-                    </form>
+                    )}
 
-                    {/* Action Block 2: Bulk Upload */}
-                    <div className="border-border bg-muted/50 space-y-3 rounded-xl border p-4 dark:bg-black/15">
-                        <Label className="flex items-center gap-1 text-xs font-semibold">
-                            <UploadCloud className="text-primary h-4 w-4" />
-                            <span>Subida Múltiple de Archivos</span>
-                        </Label>
-                        <div className="border-border hover:bg-muted/50 relative cursor-pointer rounded-lg border border-dashed py-5 text-center transition-colors">
-                            <input
-                                type="file"
-                                multiple
-                                onChange={handleFileUpload}
-                                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                            />
-                            <UploadCloud className="text-muted-foreground mx-auto mb-1 h-8 w-8" />
-                            <span className="text-muted-foreground block text-xs font-medium">Clic aquí o arrastra archivos para subir</span>
-                            <span className="text-muted-foreground mt-1 block text-[10px]">
-                                {type === 'Images' ? 'JPG, PNG, GIF, WEBP' : 'PDF, DOC, XLS, PPT, MP3, MP4'}
-                            </span>
+                    {dragging && (
+                        <div className="border-primary bg-primary/5 pointer-events-none absolute inset-2 flex items-center justify-center rounded-xl border-2 border-dashed">
+                            <span className="bg-card text-foreground rounded-lg px-3 py-2 text-xs font-semibold shadow-sm">Suelta para subir</span>
                         </div>
-
-                        {/* Uploading list */}
-                        {uploadingFiles.length > 0 && (
-                            <div className="border-border space-y-2 border-t pt-2">
-                                {uploadingFiles.map((file, idx) => (
-                                    <div key={idx} className="space-y-1">
-                                        <div className="flex justify-between text-[10px]">
-                                            <span className="max-w-[200px] truncate">{file.name}</span>
-                                            <span className="font-semibold">{file.progress}%</span>
-                                        </div>
-                                        <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
-                                            <div className="bg-primary h-full transition-all duration-300" style={{ width: `${file.progress}%` }} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Action Block 3: Browser List */}
-                    <div className="space-y-3">
-                        {/* Navigation Breadcrumb */}
-                        <div className="border-border flex items-center gap-2 border-b py-1.5 text-xs">
-                            {workingDir && (
-                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleGoBack}>
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Button>
-                            )}
-                            <div className="text-muted-foreground flex items-center gap-1 truncate font-medium">
-                                <span>{type === 'Images' ? 'photos' : 'files'}</span>
-                                <ChevronRight className="h-3.5 w-3.5" />
-                                <span className="text-foreground truncate font-semibold">{workingDir || '/'}</span>
-                            </div>
-                        </div>
-
-                        {/* Files and Folders list */}
-                        {loading ? (
-                            <div className="text-muted-foreground flex items-center justify-center gap-2 py-16 text-xs">
-                                <Loader2 className="text-primary h-4 w-4 animate-spin" />
-                                <span>Cargando archivos...</span>
-                            </div>
-                        ) : filteredItems.length > 0 ? (
-                            <div className="grid grid-cols-2 gap-3">
-                                {filteredItems.map((item, idx) => {
-                                    if (!item.is_file) {
-                                        // Directory view
-                                        const isSystemFolder = !workingDir || workingDir === '/' || ['1', 'shares'].includes(item.name);
-                                        return (
-                                            <div key={idx} className="group/folder relative">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleFolderClick(item.name)}
-                                                    className="group border-border bg-card hover:border-primary/40 hover:bg-muted flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border p-3 text-center transition-all"
-                                                >
-                                                    <Folder className="text-warning h-8 w-8 transition-transform duration-200 group-hover:scale-105" />
-                                                    <span className="text-foreground w-full truncate text-xs font-semibold capitalize">
-                                                        {item.name}
-                                                    </span>
-                                                </button>
-                                                {!isSystemFolder && (
-                                                    <Button
-                                                        size="icon"
-                                                        variant="ghost"
-                                                        type="button"
-                                                        className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive absolute top-1.5 right-1.5 h-6 w-6 rounded-full opacity-0 transition-opacity group-hover/folder:opacity-100"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteItem(item.name);
-                                                        }}
-                                                        title="Eliminar carpeta"
-                                                    >
-                                                        <Trash2 className="h-3 w-3" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        );
-                                    }
-
-                                    // File view
-                                    const isImg = isImageFile(item.name);
-                                    return (
-                                        <div
-                                            key={idx}
-                                            className="group border-border bg-card relative flex flex-col overflow-hidden rounded-xl border shadow-sm"
-                                        >
-                                            {/* Preview/Icon */}
-                                            <div className="border-border bg-muted/50 flex aspect-[4/3] items-center justify-center overflow-hidden border-b dark:bg-black/10">
-                                                {isImg ? (
-                                                    <img
-                                                        src={item.url}
-                                                        alt={item.name}
-                                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                                    />
-                                                ) : (
-                                                    <FileText className="text-primary h-8 w-8" />
-                                                )}
-                                            </div>
-
-                                            {/* Info & Copy button */}
-                                            <div className="flex flex-1 flex-col justify-between space-y-1 p-2">
-                                                <span className="text-foreground block truncate text-[10px] font-medium">{item.name}</span>
-
-                                                <div className="border-border flex gap-1 border-t pt-1.5">
-                                                    {onSelect && (
-                                                        <Button
-                                                            size="sm"
-                                                            type="button"
-                                                            className="h-6 w-full px-1 text-[9px]"
-                                                            onClick={() => onSelect(item.url)}
-                                                        >
-                                                            Seleccionar
-                                                        </Button>
-                                                    )}
-                                                    <Button
-                                                        size="icon"
-                                                        variant="outline"
-                                                        type="button"
-                                                        className="h-6 w-6 shrink-0"
-                                                        onClick={() => handleCopyUrl(item.url)}
-                                                        title="Copiar URL"
-                                                    >
-                                                        {copiedUrl === item.url ? (
-                                                            <Check className="text-success h-3.5 w-3.5" />
-                                                        ) : (
-                                                            <Copy className="h-3.5 w-3.5" />
-                                                        )}
-                                                    </Button>
-                                                    <Button
-                                                        size="icon"
-                                                        variant="ghost"
-                                                        type="button"
-                                                        className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 shrink-0"
-                                                        onClick={() => handleDeleteItem(item.name)}
-                                                        title="Eliminar elemento"
-                                                    >
-                                                        <Trash2 className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className="border-border bg-muted/50 rounded-xl border-2 border-dashed py-16 text-center">
-                                <p className="text-muted-foreground text-xs italic">Esta carpeta está vacía.</p>
-                            </div>
-                        )}
-                    </div>
+                    )}
                 </div>
+
+                {/* Selection */}
+                {selected && (
+                    <div className="border-border bg-muted/30 space-y-3 border-t p-4">
+                        <div className="flex items-center gap-3">
+                            <span className="border-border/70 h-12 w-12 shrink-0 overflow-hidden rounded-md border">
+                                <MediaThumb item={selected} iconClassName="h-5 w-5" />
+                            </span>
+                            <div className="min-w-0 text-xs">
+                                <p className="text-foreground truncate font-semibold">{selected.title || selected.filename}</p>
+                                <p className="text-muted-foreground">
+                                    {selected.width && selected.height ? `${selected.width}×${selected.height} · ` : ''}
+                                    {formatBytes(selected.size)}
+                                </p>
+                            </div>
+                        </div>
+                        {selected.type === 'image' && (
+                            <div className="space-y-1">
+                                <Label htmlFor="picker-alt" className="text-xs">
+                                    Texto alternativo
+                                </Label>
+                                <Input
+                                    id="picker-alt"
+                                    value={alt}
+                                    onChange={(e) => setAlt(e.target.value)}
+                                    placeholder="Describe la imagen"
+                                    className="bg-card h-9 text-xs"
+                                />
+                            </div>
+                        )}
+                        <Button type="button" className="w-full" onClick={insert} disabled={inserting}>
+                            {inserting && <Loader2 className="h-4 w-4 animate-spin" />}
+                            {selected.type === 'image' ? 'Insertar imagen' : 'Usar archivo'}
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );
