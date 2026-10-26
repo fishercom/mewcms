@@ -16,7 +16,38 @@ interface Props {
     value: BlockData[];
     onChange: (blocks: BlockData[]) => void;
     types: BlockDefinition[];
+    /** Inside a columns block: compact, and its own drag handles */
+    nested?: boolean;
 }
+
+interface ColumnData {
+    blocks: BlockData[];
+}
+
+/** Column spans (out of 12) per layout; keep in sync with App\Blocks\ColumnsBlock::LAYOUTS */
+const COLUMN_SPANS: Record<string, number[]> = {
+    '50-50': [6, 6],
+    '33-67': [4, 8],
+    '67-33': [8, 4],
+    '33-33-33': [4, 4, 4],
+    '25-50-25': [3, 6, 3],
+    '25-25-25-25': [3, 3, 3, 3],
+};
+const SPAN_CLASSES: Record<number, string> = { 3: 'md:col-span-3', 4: 'md:col-span-4', 6: 'md:col-span-6', 8: 'md:col-span-8' };
+
+const columnsOf = (data: BlockValues): ColumnData[] => (Array.isArray(data.columns) ? (data.columns as unknown as ColumnData[]) : []);
+
+/** A new layout for a columns block: empty columns are added, removed ones hand their blocks to the last column */
+const withLayout = (data: BlockValues, layout: string): BlockValues => {
+    const count = (COLUMN_SPANS[layout] ?? COLUMN_SPANS['50-50']).length;
+    const columns = columnsOf(data).map((column) => ({ blocks: [...(column.blocks ?? [])] }));
+    while (columns.length < count) columns.push({ blocks: [] });
+    while (columns.length > count) {
+        const removed = columns.pop();
+        columns[columns.length - 1].blocks.push(...(removed?.blocks ?? []));
+    }
+    return { ...data, layout, columns: columns as unknown as BlockValues[string] };
+};
 
 const CATEGORY_LABELS: Record<string, string> = {
     basic: 'Básicos',
@@ -27,7 +58,24 @@ const CATEGORY_LABELS: Record<string, string> = {
 /** Short text that identifies a block when it is collapsed */
 const summaryOf = (block: BlockData): string => {
     const data = block.data;
-    const text = str(data.title) || str(data.caption) || str(data.alt) || str(data.html).replace(/<[^>]+>/g, ' ');
+    const count = (key: string, one: string, many: string) => {
+        const n = Array.isArray(data[key]) ? (data[key] as unknown[]).length : 0;
+        return n === 0 ? '' : `${n} ${n === 1 ? one : many}`;
+    };
+    const nestedCount = columnsOf(data).reduce((n, column) => n + (column.blocks?.length ?? 0), 0);
+    const text =
+        str(data.title) ||
+        str(data.text) ||
+        str(data.caption) ||
+        str(data.alt) ||
+        str(data.alias) ||
+        str(data.key) ||
+        str(data.url) ||
+        str(data.file) ||
+        count('images', 'imagen', 'imágenes') ||
+        count('items', 'elemento', 'elementos') ||
+        (nestedCount > 0 ? `${nestedCount} ${nestedCount === 1 ? 'bloque' : 'bloques'} en columnas` : '') ||
+        str(data.html).replace(/<[^>]+>/g, ' ');
     return text.replace(/\s+/g, ' ').trim().slice(0, 90);
 };
 
@@ -36,11 +84,15 @@ const summaryOf = (block: BlockData): string => {
  * reorder, duplicate, collapse and delete. Text blocks are edited in place; the other
  * blocks show their public preview and open their settings in a side panel.
  */
-export default function BlockEditor({ value, onChange, types }: Props) {
+export default function BlockEditor({ value, onChange, types, nested = false }: Props) {
     const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
     const [editingId, setEditingId] = useState<string | null>(null);
     const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
     const typeByKey = useMemo(() => Object.fromEntries(types.map((t) => [t.key, t])), [types]);
+    // Inside a column only blocks that may nest are offered (no columns in columns)
+    const pickerTypes = useMemo(() => (nested ? types.filter((t) => t.nestable !== false) : types), [nested, types]);
+    // Separate handles, so dragging inside a column doesn't also drag the columns block
+    const handleClass = nested ? 'block-drag-nested' : 'block-drag';
 
     const editing = value.find((block) => block.id === editingId) ?? null;
     const editingType = editing ? typeByKey[editing.type] : null;
@@ -50,8 +102,8 @@ export default function BlockEditor({ value, onChange, types }: Props) {
         const next = [...value];
         next.splice(index, 0, block);
         onChange(next);
-        // Blocks other than text are configured right away
-        if (type.key !== 'rich_text') setEditingId(block.id);
+        // Blocks with settings are configured right away (text and columns are edited in place)
+        if (type.key !== 'rich_text' && type.key !== 'columns') setEditingId(block.id);
     };
 
     const update = (id: string, data: BlockValues) => onChange(value.map((block) => (block.id === id ? { ...block, data } : block)));
@@ -96,6 +148,14 @@ export default function BlockEditor({ value, onChange, types }: Props) {
         }
     };
 
+    if (value.length === 0 && nested) {
+        return (
+            <div className="border-border/80 flex min-h-24 items-center justify-center rounded-lg border border-dashed p-3">
+                <BlockPicker types={pickerTypes} onPick={(type) => insert(type, 0)} label="Añadir" variant="outline" />
+            </div>
+        );
+    }
+
     if (value.length === 0) {
         return (
             <div className="border-border/80 bg-muted/20 flex flex-col items-center rounded-xl border border-dashed px-6 py-12 text-center">
@@ -106,14 +166,14 @@ export default function BlockEditor({ value, onChange, types }: Props) {
                 <p className="text-muted-foreground mt-1 mb-4 max-w-sm text-xs">
                     Construye la página con bloques: texto, portadas, imágenes y llamadas a la acción.
                 </p>
-                <BlockPicker types={types} onPick={(type) => insert(type, 0)} label="Añadir el primer bloque" variant="default" />
+                <BlockPicker types={pickerTypes} onPick={(type) => insert(type, 0)} label="Añadir el primer bloque" variant="default" />
             </div>
         );
     }
 
     return (
         <div className="space-y-1">
-            <ReactSortable list={value} setList={onChange} handle=".block-drag" animation={150} ghostClass="opacity-40" className="space-y-1">
+            <ReactSortable list={value} setList={onChange} handle={`.${handleClass}`} animation={150} ghostClass="opacity-40" className="space-y-1">
                 {value.map((block, index) => {
                     const type = typeByKey[block.type];
                     const Render = BLOCK_RENDERERS[block.type];
@@ -133,10 +193,13 @@ export default function BlockEditor({ value, onChange, types }: Props) {
                                 data-testid="block-card"
                             >
                                 {/* Toolbar */}
-                                <div className="border-border/70 flex items-center gap-1.5 border-b px-2 py-1.5">
+                                <div className="border-border/70 flex flex-wrap items-center gap-1.5 border-b px-2 py-1.5">
                                     <button
                                         type="button"
-                                        className="block-drag text-muted-foreground hover:text-foreground hover:bg-muted flex h-8 w-6 cursor-grab items-center justify-center rounded active:cursor-grabbing"
+                                        className={cn(
+                                            handleClass,
+                                            'text-muted-foreground hover:text-foreground hover:bg-muted flex h-8 w-6 cursor-grab items-center justify-center rounded active:cursor-grabbing',
+                                        )}
                                         aria-label="Arrastrar para ordenar"
                                         title="Arrastrar para ordenar"
                                     >
@@ -180,6 +243,30 @@ export default function BlockEditor({ value, onChange, types }: Props) {
                                                 onChange={(html) => update(block.id, { ...block.data, html })}
                                             />
                                         </div>
+                                    ) : block.type === 'columns' ? (
+                                        // Each column is its own (nested) block list
+                                        <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-12">
+                                            {(COLUMN_SPANS[str(block.data.layout)] ?? COLUMN_SPANS['50-50']).map((span, columnIndex) => {
+                                                const columns = columnsOf(block.data);
+                                                return (
+                                                    <div key={columnIndex} className={cn('bg-muted/30 min-w-0 rounded-lg p-2', SPAN_CLASSES[span])}>
+                                                        <p className="text-muted-foreground mb-1.5 px-1 text-[10px] font-semibold tracking-wider uppercase">
+                                                            Columna {columnIndex + 1}
+                                                        </p>
+                                                        <BlockEditor
+                                                            nested
+                                                            types={types}
+                                                            value={columns[columnIndex]?.blocks ?? []}
+                                                            onChange={(blocks) => {
+                                                                const next = columnsOf(withLayout(block.data, str(block.data.layout) || '50-50'));
+                                                                next[columnIndex] = { blocks };
+                                                                update(block.id, { ...block.data, columns: next as unknown as BlockValues[string] });
+                                                            }}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     ) : (
                                         <button
                                             type="button"
@@ -203,7 +290,7 @@ export default function BlockEditor({ value, onChange, types }: Props) {
 
                             {/* Insert between blocks */}
                             <div className="flex h-7 items-center justify-center opacity-0 transition-opacity group-hover/block:opacity-100 focus-within:opacity-100">
-                                <BlockPicker types={types} onPick={(t) => insert(t, index + 1)} label="Insertar bloque aquí" variant="inline" />
+                                <BlockPicker types={pickerTypes} onPick={(t) => insert(t, index + 1)} label="Insertar bloque aquí" variant="inline" />
                             </div>
                         </div>
                     );
@@ -211,7 +298,12 @@ export default function BlockEditor({ value, onChange, types }: Props) {
             </ReactSortable>
 
             <div className="flex justify-center pt-1">
-                <BlockPicker types={types} onPick={(t) => insert(t, value.length)} label="Añadir bloque" variant="outline" />
+                <BlockPicker
+                    types={pickerTypes}
+                    onPick={(t) => insert(t, value.length)}
+                    label={nested ? 'Añadir' : 'Añadir bloque'}
+                    variant={nested ? 'ghost' : 'outline'}
+                />
             </div>
 
             <Sheet open={!!editing} onOpenChange={(open) => !open && setEditingId(null)}>
@@ -230,7 +322,15 @@ export default function BlockEditor({ value, onChange, types }: Props) {
                                     idPrefix={`block-${editing.id}-`}
                                     fields={editingType.fields}
                                     values={editing.data as never}
-                                    onChange={(key, fieldValue) => update(editing.id, { ...editing.data, [key]: fieldValue as BlockValues[string] })}
+                                    onChange={(key, fieldValue) =>
+                                        update(
+                                            editing.id,
+                                            // A new column layout adds or merges columns
+                                            editing.type === 'columns' && key === 'layout' && typeof fieldValue === 'string'
+                                                ? withLayout(editing.data, fieldValue)
+                                                : { ...editing.data, [key]: fieldValue as BlockValues[string] },
+                                        )
+                                    }
                                 />
                             </div>
                             <div className="bg-card sticky bottom-0 mt-auto border-t p-4">
@@ -284,7 +384,7 @@ function BlockPicker({
     types: BlockDefinition[];
     onPick: (type: BlockDefinition) => void;
     label: string;
-    variant: 'default' | 'outline' | 'inline';
+    variant: 'default' | 'outline' | 'ghost' | 'inline';
 }) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');

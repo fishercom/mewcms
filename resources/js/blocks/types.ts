@@ -25,6 +25,8 @@ export interface BlockDefinition {
     version: number;
     fields: CustomField[];
     defaults: BlockValues;
+    /** False for blocks that can't go inside columns */
+    nestable?: boolean;
 }
 
 export interface BlockRenderProps<T = BlockValues> {

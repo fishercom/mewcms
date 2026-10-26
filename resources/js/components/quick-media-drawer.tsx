@@ -14,16 +14,16 @@ interface QuickMediaDrawerProps {
     onClose: () => void;
     /** Receives the file URL and its library entry (alt text, size…) */
     onSelect?: (url: string, media?: CmsMedia) => void;
-    initialType?: 'Images' | 'Files';
+    initialType?: 'Images' | 'Files' | 'Videos';
 }
 
-type PickerType = 'image' | 'document';
+type PickerType = 'image' | 'document' | 'video';
 
 /**
  * Pick a file from the media library (or upload one) without leaving the editor.
  */
 export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialType = 'Images' }: QuickMediaDrawerProps) {
-    const [type, setType] = useState<PickerType>(initialType === 'Files' ? 'document' : 'image');
+    const [type, setType] = useState<PickerType>(initialType === 'Files' ? 'document' : initialType === 'Videos' ? 'video' : 'image');
     const [search, setSearch] = useState('');
     const [items, setItems] = useState<CmsMedia[]>([]);
     const [page, setPage] = useState(1);
@@ -145,11 +145,12 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                 </div>
 
                 {/* Type tabs */}
-                <div className="border-border bg-muted/50 grid grid-cols-2 border-b dark:bg-black/10" role="tablist">
+                <div className="border-border bg-muted/50 grid grid-cols-3 border-b dark:bg-black/10" role="tablist">
                     {(
                         [
                             ['image', 'Imágenes'],
                             ['document', 'Documentos'],
+                            ['video', 'Videos'],
                         ] as const
                     ).map(([value, label]) => (
                         <button
@@ -191,7 +192,9 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                         ref={fileInput}
                         type="file"
                         multiple
-                        accept={type === 'image' ? 'image/jpeg,image/png,image/gif,image/webp' : undefined}
+                        accept={
+                            type === 'image' ? 'image/jpeg,image/png,image/gif,image/webp' : type === 'video' ? 'video/mp4,video/webm' : undefined
+                        }
                         className="hidden"
                         onChange={(e) => {
                             upload(Array.from(e.target.files ?? []));

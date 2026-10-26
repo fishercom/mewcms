@@ -324,13 +324,8 @@ class FrontController extends Controller
 
         $blocks = $item->getAttribute('blocks');
         if (is_array($blocks)) {
-            $item->setAttribute('blocks', array_map(function (array $block): array {
-                if ($block['type'] === 'rich_text') {
-                    $block['data']['html'] = MediaLibrary::enrichHtml($block['data']['html'] ?? '');
-                }
-
-                return $block;
-            }, $blocks));
+            $blocks = BlockRegistry::resolve($blocks);
+            $item->setAttribute('blocks', $blocks);
         }
 
         return MediaLibrary::lookup(MediaLibrary::collectUrls($item->getAttribute('featured_image'), $fields, $blocks));

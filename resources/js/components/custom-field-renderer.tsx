@@ -1,3 +1,4 @@
+import IconPicker from '@/components/icon-picker';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import Tiptap from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
@@ -132,9 +133,11 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
 interface DocumentFieldRendererProps {
     value: string;
     onChange: (value: string) => void;
+    /** Which library tab the picker opens on */
+    media?: 'Files' | 'Videos';
 }
 
-function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) {
+function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFieldRendererProps) {
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const [showManualUrl, setShowManualUrl] = React.useState(false);
 
@@ -218,7 +221,7 @@ function DocumentFieldRenderer({ value, onChange }: DocumentFieldRendererProps) 
                     onChange(url);
                     setIsDrawerOpen(false);
                 }}
-                initialType="Files"
+                initialType={media}
             />
         </div>
     );
@@ -282,9 +285,10 @@ interface RepeaterFieldProps {
     field: CustomField;
     values: Record<string, JsonValue>;
     onChange: (key: string, value: JsonValue) => void;
+    idPrefix?: string;
 }
 
-function RepeaterField({ field, values, onChange }: RepeaterFieldProps) {
+function RepeaterField({ field, values, onChange, idPrefix = '' }: RepeaterFieldProps) {
     const rawItems = values?.[field.key] as JsonArray as JsonObject[] | undefined;
 
     // Ensure all items in the repeater have a stable unique _id key
@@ -362,6 +366,7 @@ function RepeaterField({ field, values, onChange }: RepeaterFieldProps) {
                                     </Button>
                                 </div>
                                 <CustomFieldRenderer
+                                    idPrefix={`${idPrefix}${field.key}-${idx}-`}
                                     fields={field.fields || []}
                                     values={(item as JsonObject) || {}}
                                     onChange={(subKey, subValue) => updateItem(idx, subKey, subValue)}
@@ -383,9 +388,10 @@ interface ContainerFieldProps {
     field: CustomField;
     values: Record<string, JsonValue>;
     onChange: (key: string, value: JsonValue) => void;
+    idPrefix?: string;
 }
 
-function ContainerField({ field, values, onChange }: ContainerFieldProps) {
+function ContainerField({ field, values, onChange, idPrefix = '' }: ContainerFieldProps) {
     const containerValues = (values?.[field.key] as JsonObject) || {};
     const updateContainer = (subKey: string, subValue: JsonValue) => {
         const next: JsonObject = { ...containerValues, [subKey]: subValue };
@@ -394,7 +400,12 @@ function ContainerField({ field, values, onChange }: ContainerFieldProps) {
     return (
         <div className="border-border bg-muted/50 relative space-y-4 rounded-xl border p-5">
             <div className="border-border text-foreground border-b pb-2.5 text-sm font-semibold">{field.label}</div>
-            <CustomFieldRenderer fields={field.fields || []} values={containerValues} onChange={updateContainer} />
+            <CustomFieldRenderer
+                idPrefix={`${idPrefix}${field.key}-`}
+                fields={field.fields || []}
+                values={containerValues}
+                onChange={updateContainer}
+            />
         </div>
     );
 }
@@ -419,6 +430,14 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
                         min={typeof field.min === 'number' ? field.min : undefined}
                         max={typeof field.max === 'number' ? field.max : undefined}
                         onChange={(e) => onChange(field.key, e.target.value === '' ? null : Number(e.target.value))}
+                    />
+                );
+            case 'icon':
+                return (
+                    <IconPicker
+                        id={idPrefix + field.key}
+                        value={typeof value === 'string' ? value : ''}
+                        onChange={(icon) => onChange(field.key, icon)}
                     />
                 );
             case 'select':
@@ -471,7 +490,13 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
                     <ImageFieldRenderer field={field} value={typeof value === 'string' ? value : ''} onChange={(val) => onChange(field.key, val)} />
                 );
             case 'document':
-                return <DocumentFieldRenderer value={typeof value === 'string' ? value : ''} onChange={(val) => onChange(field.key, val)} />;
+                return (
+                    <DocumentFieldRenderer
+                        value={typeof value === 'string' ? value : ''}
+                        onChange={(val) => onChange(field.key, val)}
+                        media={field.media === 'video' ? 'Videos' : 'Files'}
+                    />
+                );
             case 'slider':
                 return <SliderFieldRenderer value={typeof value === 'string' ? value : ''} onChange={(val) => onChange(field.key, val)} />;
             case 'text':
@@ -485,8 +510,8 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
             {fields?.map((field) => (
                 <div key={field.key} className="space-y-2">
                     {field.type !== 'container' && field.type !== 'repeater' && <Label htmlFor={idPrefix + field.key}>{field.label}</Label>}
-                    {field.type === 'container' && <ContainerField field={field} values={values} onChange={onChange} />}
-                    {field.type === 'repeater' && <RepeaterField field={field} values={values} onChange={onChange} />}
+                    {field.type === 'container' && <ContainerField field={field} values={values} onChange={onChange} idPrefix={idPrefix} />}
+                    {field.type === 'repeater' && <RepeaterField field={field} values={values} onChange={onChange} idPrefix={idPrefix} />}
                     {field.type !== 'container' && field.type !== 'repeater' && renderSimpleField(field)}
                 </div>
             ))}
