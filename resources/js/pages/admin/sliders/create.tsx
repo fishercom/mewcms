@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { createSlider } from '@/services/sliders';
 import { Link } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
@@ -67,14 +68,14 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear Slider">
+        <ModuleLayout view={t('Crear Slider')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-4">
-                        <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">Información General</h3>
+                        <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">{t('Información General')}</h3>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Nombre del Slider</Label>
+                                <Label htmlFor="name">{t('Nombre del Slider')}</Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -83,14 +84,14 @@ export default function Create() {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     disabled={processing}
-                                    placeholder="e.g. Carrusel de Inicio"
+                                    placeholder={t('e.g. Carrusel de Inicio')}
                                     className="bg-card"
                                 />
                                 {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="key">Clave (Key identificadora)</Label>
+                                <Label htmlFor="key">{t('Clave (Key identificadora)')}</Label>
                                 <Input
                                     id="key"
                                     type="text"
@@ -98,25 +99,25 @@ export default function Create() {
                                     value={key}
                                     onChange={(e) => setKey(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
                                     disabled={processing}
-                                    placeholder="e.g. carrusel_inicio"
+                                    placeholder={t('e.g. carrusel_inicio')}
                                     className="bg-card font-mono text-sm"
                                 />
                                 <span className="text-muted-foreground text-[10px]">
-                                    Usada para cargar este slider en el código/plantillas. Caracteres alfanuméricos y guiones.
+                                    {t('Usada para cargar este slider en el código/plantillas. Caracteres alfanuméricos y guiones.')}
                                 </span>
                                 {errors.key && <span className="text-destructive text-xs">{errors.key}</span>}
                             </div>
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="description">Descripción</Label>
+                            <Label htmlFor="description">{t('Descripción')}</Label>
                             <Input
                                 id="description"
                                 type="text"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 disabled={processing}
-                                placeholder="Describa dónde se utiliza este slider o su propósito..."
+                                placeholder={t('Describa dónde se utiliza este slider o su propósito...')}
                                 className="bg-card"
                             />
                             {errors.description && <span className="text-destructive text-xs">{errors.description}</span>}
@@ -126,24 +127,24 @@ export default function Create() {
                     <hr className="border-border" />
 
                     <div className="space-y-4">
-                        <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">Configuración del Slider</h3>
+                        <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">{t('Configuración del Slider')}</h3>
 
                         <div className="grid gap-4 md:grid-cols-3">
                             <div className="grid gap-2">
-                                <Label htmlFor="effect">Efecto de Transición</Label>
+                                <Label htmlFor="effect">{t('Efecto de Transición')}</Label>
                                 <Select value={effect} onValueChange={(val: 'slide' | 'fade') => setEffect(val)} disabled={processing}>
                                     <SelectTrigger className="bg-card">
-                                        <SelectValue placeholder="Efecto" />
+                                        <SelectValue placeholder={t('Efecto')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="slide">Slide (Deslizar)</SelectItem>
-                                        <SelectItem value="fade">Fade (Desvanecer)</SelectItem>
+                                        <SelectItem value="slide">{t('Slide (Deslizar)')}</SelectItem>
+                                        <SelectItem value="fade">{t('Fade (Desvanecer)')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="autoplaySpeed">Tiempo por Diapositiva (ms)</Label>
+                                <Label htmlFor="autoplaySpeed">{t('Tiempo por Diapositiva (ms)')}</Label>
                                 <Input
                                     id="autoplaySpeed"
                                     type="number"
@@ -157,7 +158,7 @@ export default function Create() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="transitionSpeed">Velocidad de Transición (ms)</Label>
+                                <Label htmlFor="transitionSpeed">{t('Velocidad de Transición (ms)')}</Label>
                                 <Input
                                     id="transitionSpeed"
                                     type="number"
@@ -181,9 +182,9 @@ export default function Create() {
                                 />
                                 <div className="grid gap-0.5 leading-none">
                                     <Label htmlFor="autoplay" className="cursor-pointer">
-                                        Autoplay (Reproducción Automática)
+                                        {t('Autoplay (Reproducción Automática)')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">Las diapositivas avanzarán automáticamente.</span>
+                                    <span className="text-muted-foreground text-[10px]">{t('Las diapositivas avanzarán automáticamente.')}</span>
                                 </div>
                             </div>
 
@@ -191,9 +192,9 @@ export default function Create() {
                                 <Checkbox id="loop" checked={loop} onCheckedChange={(checked) => setLoop(Boolean(checked))} disabled={processing} />
                                 <div className="grid gap-0.5 leading-none">
                                     <Label htmlFor="loop" className="cursor-pointer">
-                                        Loop Infinito
+                                        {t('Loop Infinito')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">El slider volverá a empezar al llegar al final.</span>
+                                    <span className="text-muted-foreground text-[10px]">{t('El slider volverá a empezar al llegar al final.')}</span>
                                 </div>
                             </div>
 
@@ -201,10 +202,10 @@ export default function Create() {
                                 <Checkbox id="dots" checked={dots} onCheckedChange={(checked) => setDots(Boolean(checked))} disabled={processing} />
                                 <div className="grid gap-0.5 leading-none">
                                     <Label htmlFor="dots" className="cursor-pointer">
-                                        Mostrar Paginación (Puntos)
+                                        {t('Mostrar Paginación (Puntos)')}
                                     </Label>
                                     <span className="text-muted-foreground text-[10px]">
-                                        Muestra pequeños puntos indicadores en la parte inferior.
+                                        {t('Muestra pequeños puntos indicadores en la parte inferior.')}
                                     </span>
                                 </div>
                             </div>
@@ -218,9 +219,11 @@ export default function Create() {
                                 />
                                 <div className="grid gap-0.5 leading-none">
                                     <Label htmlFor="arrows" className="cursor-pointer">
-                                        Mostrar Flechas de Navegación
+                                        {t('Mostrar Flechas de Navegación')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">Muestra flechas laterales para avanzar o retroceder.</span>
+                                    <span className="text-muted-foreground text-[10px]">
+                                        {t('Muestra flechas laterales para avanzar o retroceder.')}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -228,10 +231,10 @@ export default function Create() {
 
                     <div className="flex items-center gap-4 pt-4">
                         <Button type="submit" disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
-                            {processing ? 'Guardando...' : 'Crear Slider'}
+                            {processing ? t('Guardando...') : t('Crear Slider')}
                         </Button>
                         <Button asChild variant="ghost" className="h-10 px-4">
-                            <Link href={route('sliders.index')}>Cancelar</Link>
+                            <Link href={route('sliders.index')}>{t('Cancelar')}</Link>
                         </Button>
                     </div>
                 </form>

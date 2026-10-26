@@ -88,7 +88,7 @@ class UserController extends Controller
     {
         $item = User::findOrFail($id);
         $this->authorizeSuperAdminChange($request, $item);
-        abort_if($item->is($request->user()), 422, 'No puede eliminar su propia cuenta.');
+        abort_if($item->is($request->user()), 422, __('No puede eliminar su propia cuenta.'));
         $item->delete();
 
         return redirect('admin/users');

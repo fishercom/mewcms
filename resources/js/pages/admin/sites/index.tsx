@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsSite } from '@/types/models/cms-site';
 import { Input } from '@headlessui/react';
@@ -46,7 +47,7 @@ export default function Index() {
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
                                     className="border-border-strong block w-full rounded-md border p-2 pl-10 text-sm"
-                                    placeholder="Buscar"
+                                    placeholder={t('Buscar')}
                                 />
                             </div>
                         </form>
@@ -57,13 +58,13 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Name
+                                    {t('Name')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Created Date
+                                    {t('Created Date')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Updated Date
+                                    {t('Updated Date')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -85,7 +86,7 @@ export default function Index() {
                                                 onClick={() => router.visit(route('sites.edit', item.id))}
                                             >
                                                 <Edit className="h-3.5 w-3.5" />
-                                                <span>Editar</span>
+                                                <span>{t('Editar')}</span>
                                             </Button>
                                             <Button
                                                 variant="ghost"
@@ -94,7 +95,7 @@ export default function Index() {
                                                 onClick={() => deleteSiteHandler(item.id)}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
-                                                <span>Eliminar</span>
+                                                <span>{t('Eliminar')}</span>
                                             </Button>
                                         </td>
                                     </tr>

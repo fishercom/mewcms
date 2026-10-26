@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { updateConfig } from '@/services/configs';
 import { CmsConfig, CmsConfigForm } from '@/types/models/cms-config';
 import ConfigFormFields from './partials/fields';
@@ -39,14 +40,14 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout title="Configuración" view="Editar">
+        <ModuleLayout title={t('Configuración')} view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={updateConfigHandler} className="space-y-6">
                     <ConfigFormFields data={data} setData={setData} errors={errors} processing={processing} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/configs">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/configs">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

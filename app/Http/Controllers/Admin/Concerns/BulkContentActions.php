@@ -53,7 +53,7 @@ trait BulkContentActions
         $items = $query->whereKey($data['ids'])->get();
 
         if ($items->isEmpty()) {
-            throw ValidationException::withMessages(['ids' => 'Ninguno de los registros seleccionados está disponible.']);
+            throw ValidationException::withMessages(['ids' => __('Ninguno de los registros seleccionados está disponible.')]);
         }
 
         $this->guardBulkAction($action, $items);

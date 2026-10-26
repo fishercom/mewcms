@@ -1,14 +1,15 @@
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { type CmsMedia, type CmsMediaType } from '@/types/models/cms-media';
 import axios from 'axios';
 import { FileArchive, FileAudio, FileImage, FileText, FileVideo, type LucideIcon } from 'lucide-react';
 
 export const MEDIA_TYPE_LABELS: Record<CmsMediaType, string> = {
-    image: 'Imagen',
-    document: 'Documento',
-    video: 'Vídeo',
-    audio: 'Audio',
-    other: 'Archivo',
+    image: t('Imagen'),
+    document: t('Documento'),
+    video: t('Vídeo'),
+    audio: t('Audio'),
+    other: t('Archivo'),
 };
 
 const TYPE_ICONS: Record<CmsMediaType, LucideIcon> = {
@@ -56,7 +57,7 @@ export async function uploadMedia(files: File[], onProgress: (list: UploadProgre
             update(index, { progress: 100 });
         } catch (error) {
             const response = axios.isAxiosError(error) ? error.response?.data : null;
-            const message = response?.errors?.file?.[0] ?? response?.message ?? 'No se pudo subir el archivo.';
+            const message = response?.errors?.file?.[0] ?? response?.message ?? t('No se pudo subir el archivo.');
             update(index, { error: message });
         }
     }

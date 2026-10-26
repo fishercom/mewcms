@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { updateUser } from '@/services/users';
 import { Profile } from '@/types/models/profile';
 import { User } from '@/types/models/user';
@@ -43,14 +44,14 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={updateUserHandler} className="space-y-6">
                     <UserFormFields data={data} setData={setData} errors={errors} processing={processing} profiles={profiles} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/users">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/users">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

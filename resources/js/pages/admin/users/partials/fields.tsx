@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
 import { Profile } from '@/types/models/profile';
 
 export interface UserForm {
@@ -33,7 +34,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -49,7 +50,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="lastname">Lastname</Label>
+                <Label htmlFor="lastname">{t('Lastname')}</Label>
                 <Input
                     id="lastname"
                     type="text"
@@ -63,7 +64,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t('Username')}</Label>
                 <Input
                     id="username"
                     type="text"
@@ -77,7 +78,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('Email')}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -92,7 +93,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('Password')}</Label>
                 <Input
                     id="password"
                     type="password"
@@ -106,14 +107,14 @@ export default function UserFormFields({ data, setData, errors, processing, prof
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="profile_id">Profile</Label>
+                <Label htmlFor="profile_id">{t('Profile')}</Label>
                 <Select
                     value={data.profile_id.toString()}
                     onValueChange={(value) => setData({ ...data, profile_id: Number(value) })}
                     disabled={processing}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a profile" />
+                        <SelectValue placeholder={t('Select a profile')} />
                     </SelectTrigger>
                     <SelectContent>
                         {profiles.map((profile) => (
@@ -127,7 +128,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="metadata">Metadata</Label>
+                <Label htmlFor="metadata">{t('Metadata')}</Label>
                 <Textarea
                     id="metadata"
                     tabIndex={7}
@@ -153,7 +154,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={8}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active">{t('Active')}</Label>
             </div>
 
             <div className="flex items-center space-x-3">
@@ -164,7 +165,7 @@ export default function UserFormFields({ data, setData, errors, processing, prof
                     onClick={() => setData({ ...data, default: !data.default })}
                     tabIndex={9}
                 />
-                <Label htmlFor="default">Default</Label>
+                <Label htmlFor="default">{t('Default')}</Label>
             </div>
         </>
     );

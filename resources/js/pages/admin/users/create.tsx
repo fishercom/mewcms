@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { createUser } from '@/services/users';
 import { Profile } from '@/types/models/profile';
 import UserFormFields, { UserForm } from './partials/fields';
@@ -44,14 +45,14 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={createUserHandler} className="space-y-6">
                     <UserFormFields data={data} setData={setData} errors={errors} processing={processing} profiles={profiles} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/users">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/users">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

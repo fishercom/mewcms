@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
 import { CmsConfigForm } from '@/types/models/cms-config';
 
 interface Props {
@@ -14,17 +15,17 @@ interface Props {
 
 export default function ConfigFormFields({ data, setData, errors, processing }: Props) {
     const configTypes = [
-        { value: 'string', label: 'String' },
-        { value: 'int', label: 'Integer' },
-        { value: 'text', label: 'Text' },
-        { value: 'date', label: 'Date' },
-        { value: 'boolean', label: 'Boolean' },
+        { value: 'string', label: t('String') },
+        { value: 'int', label: t('Integer') },
+        { value: 'text', label: t('Text') },
+        { value: 'date', label: t('Date') },
+        { value: 'boolean', label: t('Boolean') },
     ];
 
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -40,7 +41,7 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="alias">Alias</Label>
+                <Label htmlFor="alias">{t('Alias')}</Label>
                 <Input
                     id="alias"
                     type="text"
@@ -55,10 +56,10 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="type">Type</Label>
+                <Label htmlFor="type">{t('Type')}</Label>
                 <Select value={data.type as string} onValueChange={(value) => setData({ ...data, type: value })} disabled={processing}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a type" />
+                        <SelectValue placeholder={t('Select a type')} />
                     </SelectTrigger>
                     <SelectContent>
                         {configTypes.map((type) => (
@@ -72,17 +73,17 @@ export default function ConfigFormFields({ data, setData, errors, processing }: 
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="value">Value</Label>
+                <Label htmlFor="value">{t('Value')}</Label>
                 {data.type === 'text' ? (
                     <Textarea value={data.value as string} onChange={(e) => setData({ ...data, value: e.target.value })} disabled={processing} />
                 ) : data.type === 'boolean' ? (
                     <Select value={data.value as string} onValueChange={(value) => setData({ ...data, value: value })} disabled={processing}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select a value" />
+                            <SelectValue placeholder={t('Select a value')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="1">True</SelectItem>
-                            <SelectItem value="0">False</SelectItem>
+                            <SelectItem value="1">{t('True')}</SelectItem>
+                            <SelectItem value="0">{t('False')}</SelectItem>
                         </SelectContent>
                     </Select>
                 ) : (

@@ -55,7 +55,7 @@ class LayoutController extends Controller
             'social_links.*.url' => ['required', 'string', 'max:2048'],
             'social_links.*.label' => 'nullable|string|max:60',
         ], [
-            'social_links.*.url.required' => 'Cada red social necesita su enlace.',
+            'social_links.*.url.required' => __('Cada red social necesita su enlace.'),
         ]);
 
         // E-mail and phone accept a bare address or number; everything else must be a safe URL
@@ -63,7 +63,7 @@ class LayoutController extends Controller
         foreach ($socialLinks as $i => $link) {
             $url = SocialLinks::normalizeUrl($link['network'], trim($link['url']));
             if (! ContentSanitizer::isSafeUrl($url)) {
-                throw ValidationException::withMessages(["social_links.{$i}.url" => 'Enlace no válido: usa https://, mailto: o tel:.']);
+                throw ValidationException::withMessages(["social_links.{$i}.url" => __('Enlace no válido: usa https://, mailto: o tel:.')]);
             }
         }
         unset($data['social_links']);
@@ -91,6 +91,6 @@ class LayoutController extends Controller
             ? 'logos, textos y redes sociales ('.count(SocialLinks::all()).' enlaces)'
             : 'logos y textos');
 
-        return redirect()->route('layout.index')->with('success', 'Configuraciones de layout guardadas.');
+        return redirect()->route('layout.index')->with('success', __('Configuraciones de layout guardadas.'));
     }
 }

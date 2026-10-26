@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { deleteRegister } from '@/services/registers';
 import { Pagination } from '@/types';
 import { CmsRegister } from '@/types/models/cms-register';
@@ -44,7 +45,7 @@ export default function Index() {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('¿Eliminar este mensaje recibido?')) {
+        if (confirm(t('¿Eliminar este mensaje recibido?'))) {
             deleteRegister(id);
         }
     };
@@ -65,7 +66,7 @@ export default function Index() {
                             value={query.s}
                             onChange={handleSearch}
                             className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                            placeholder="Buscar por nombre o email..."
+                            placeholder={t('Buscar por nombre o email...')}
                         />
                     </div>
 
@@ -73,7 +74,7 @@ export default function Index() {
                     <div className="flex flex-wrap items-center gap-2">
                         <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
                             <SlidersHorizontal className="h-3.5 w-3.5" />
-                            <span className="font-medium">Filtros:</span>
+                            <span className="font-medium">{t('Filtros:')}</span>
                         </div>
 
                         <select
@@ -81,7 +82,7 @@ export default function Index() {
                             onChange={handleFormFilter}
                             className="border-border text-foreground focus-visible:ring-ring h-10 rounded-md border bg-transparent px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
                         >
-                            <option value="">Todos los formularios</option>
+                            <option value="">{t('Todos los formularios')}</option>
                             {forms.map((f) => (
                                 <option key={f.id} value={f.id}>
                                     {f.name}
@@ -94,15 +95,15 @@ export default function Index() {
                             onChange={handleReviewedFilter}
                             className="border-border text-foreground focus-visible:ring-ring h-10 rounded-md border bg-transparent px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
                         >
-                            <option value="">Todos los estados</option>
-                            <option value="0">Sin revisar</option>
-                            <option value="1">Revisados</option>
+                            <option value="">{t('Todos los estados')}</option>
+                            <option value="0">{t('Sin revisar')}</option>
+                            <option value="1">{t('Revisados')}</option>
                         </select>
                     </div>
 
                     {/* Counter badge */}
                     <span className="text-muted-foreground ml-auto shrink-0 text-xs">
-                        {items.total} mensaje{items.total !== 1 ? 's' : ''}
+                        {t(items.total === 1 ? ':count mensaje' : ':count mensajes', { count: items.total })}
                     </span>
                 </div>
 
@@ -112,19 +113,19 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Estado
+                                    {t('Estado')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Remitente
+                                    {t('Remitente')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Formulario
+                                    {t('Formulario')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Campos
+                                    {t('Campos')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Recibido
+                                    {t('Recibido')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -133,7 +134,7 @@ export default function Index() {
                             {items.data.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        No hay mensajes recibidos.
+                                        {t('No hay mensajes recibidos.')}
                                     </td>
                                 </tr>
                             )}
@@ -149,11 +150,11 @@ export default function Index() {
                                         <td className="px-4 py-3">
                                             {isNew ? (
                                                 <span className="bg-primary-soft text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
-                                                    <Clock className="h-2.5 w-2.5" /> Nuevo
+                                                    <Clock className="h-2.5 w-2.5" /> {t('Nuevo')}
                                                 </span>
                                             ) : (
                                                 <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
-                                                    <CheckCircle className="h-2.5 w-2.5" /> Revisado
+                                                    <CheckCircle className="h-2.5 w-2.5" /> {t('Revisado')}
                                                 </span>
                                             )}
                                         </td>
@@ -161,7 +162,7 @@ export default function Index() {
                                         {/* Sender */}
                                         <td className="px-4 py-3">
                                             <div className="text-foreground text-sm font-semibold">
-                                                {item.name || <span className="text-muted-foreground italic">Anónimo</span>}
+                                                {item.name || <span className="text-muted-foreground italic">{t('Anónimo')}</span>}
                                             </div>
                                             {item.email && (
                                                 <div className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
@@ -197,7 +198,7 @@ export default function Index() {
                                                 ))}
                                                 {(item.fields?.length ?? 0) > 2 && (
                                                     <span className="text-muted-foreground text-[10px] italic">
-                                                        +{(item.fields?.length ?? 0) - 2} más
+                                                        +{(item.fields?.length ?? 0) - 2} {t('más')}
                                                     </span>
                                                 )}
                                             </div>
@@ -218,7 +219,7 @@ export default function Index() {
                                                     onClick={() => router.visit(route('registers.show', item.id))}
                                                 >
                                                     <Eye className="h-3.5 w-3.5" />
-                                                    <span>Ver</span>
+                                                    <span>{t('Ver')}</span>
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
@@ -227,7 +228,7 @@ export default function Index() {
                                                     onClick={() => handleDelete(item.id)}
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
-                                                    <span>Eliminar</span>
+                                                    <span>{t('Eliminar')}</span>
                                                 </Button>
                                             </div>
                                         </td>

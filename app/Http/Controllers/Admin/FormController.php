@@ -65,7 +65,7 @@ class FormController extends Controller
             }
         }
 
-        return redirect()->route('forms.index')->with('success', 'Formulario creado con éxito.');
+        return redirect()->route('forms.index')->with('success', __('Formulario creado con éxito.'));
     }
 
     public function edit(int $id): Response
@@ -122,7 +122,7 @@ class FormController extends Controller
         // Delete removed fields
         $form->fields()->whereNotIn('id', $keepIds)->delete();
 
-        return redirect()->route('forms.index')->with('success', 'Formulario actualizado.');
+        return redirect()->route('forms.index')->with('success', __('Formulario actualizado.'));
     }
 
     public function destroy(int $id): RedirectResponse
@@ -130,6 +130,6 @@ class FormController extends Controller
         $form = CmsForm::findOrFail($id);
         $form->delete();
 
-        return redirect()->route('forms.index')->with('success', 'Formulario eliminado.');
+        return redirect()->route('forms.index')->with('success', __('Formulario eliminado.'));
     }
 }

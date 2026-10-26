@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Input } from '@headlessui/react';
@@ -97,7 +98,7 @@ export default function Index() {
                             value={query.s ?? ''}
                             onChange={handleSearch}
                             className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                            placeholder="Buscar por título o slug..."
+                            placeholder={t('Buscar por título o slug...')}
                         />
                     </div>
 
@@ -107,7 +108,7 @@ export default function Index() {
                         {!trash && (
                             <Button variant="outline" onClick={() => setSortableModalOpen(true)} className="flex items-center gap-1.5">
                                 <ListOrdered className="h-4 w-4" />
-                                <span>Reordenar</span>
+                                <span>{t('Reordenar')}</span>
                             </Button>
                         )}
 
@@ -116,7 +117,7 @@ export default function Index() {
                             className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Crear Página</span>
+                            <span>{t('Crear Página')}</span>
                         </Button>
                     </div>
                 </div>
@@ -132,22 +133,22 @@ export default function Index() {
                                         <SelectAllCheckbox state={selection.allState} onToggle={selection.toggleAll} />
                                     </th>
                                     <th scope="col" className="px-4 py-3">
-                                        Nombre / Título
+                                        {t('Nombre / Título')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 xl:table-cell">
-                                        Plantilla
+                                        {t('Plantilla')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 xl:table-cell">
-                                        Página Superior
+                                        {t('Página Superior')}
                                     </th>
                                     <th scope="col" className="px-4 py-3">
-                                        Estado
+                                        {t('Estado')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 xl:table-cell">
-                                        Activo
+                                        {t('Activo')}
                                     </th>
                                     <th scope="col" className="px-4 py-3">
-                                        {trash ? 'Eliminado' : 'Fecha'}
+                                        {trash ? t('Eliminado') : t('Fecha')}
                                     </th>
                                     <th scope="col" className="rounded-r-md px-4 py-3"></th>
                                 </tr>
@@ -204,14 +205,14 @@ export default function Index() {
                                                             {item.schema.name}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-muted-foreground/60 italic">Por defecto</span>
+                                                        <span className="text-muted-foreground/60 italic">{t('Por defecto')}</span>
                                                     )}
                                                 </td>
                                                 <td className="text-muted-foreground hidden px-4 py-3 xl:table-cell">
                                                     {item.parent ? (
                                                         item.parent.title
                                                     ) : (
-                                                        <span className="text-muted-foreground/40 italic">Raíz (Ninguna)</span>
+                                                        <span className="text-muted-foreground/40 italic">{t('Raíz (Ninguna)')}</span>
                                                     )}
                                                 </td>
                                                 <td className="px-4 py-3">
@@ -250,7 +251,7 @@ export default function Index() {
                                                                 onClick={() => router.visit(route('articles.edit', item.id))}
                                                             >
                                                                 <Edit className="h-3.5 w-3.5" />
-                                                                <span>Editar</span>
+                                                                <span>{t('Editar')}</span>
                                                             </Button>
 
                                                             <Button
@@ -260,7 +261,7 @@ export default function Index() {
                                                                 onClick={() => deleteArticleHandler(item.id)}
                                                             >
                                                                 <Trash2 className="h-3.5 w-3.5" />
-                                                                <span>Eliminar</span>
+                                                                <span>{t('Eliminar')}</span>
                                                             </Button>
                                                         </div>
                                                     )}
@@ -274,22 +275,27 @@ export default function Index() {
                                             {trash ? (
                                                 <EmptyState
                                                     icon={Trash2}
-                                                    title="La papelera está vacía"
-                                                    description="Las páginas que muevas a la papelera aparecerán aquí hasta que las restaures o las elimines definitivamente."
+                                                    title={t('La papelera está vacía')}
+                                                    description={t(
+                                                        'Las páginas que muevas a la papelera aparecerán aquí hasta que las restaures o las elimines definitivamente.',
+                                                    )}
                                                 />
                                             ) : (
                                                 <EmptyState
                                                     icon={FileText}
-                                                    title={query.s ? 'No se encontraron páginas' : 'Aún no hay páginas creadas'}
+                                                    title={query.s ? t('No se encontraron páginas') : t('Aún no hay páginas creadas')}
                                                     description={
                                                         query.s
-                                                            ? `No hay ninguna página que coincida con "${query.s}". Intenta con otro término de búsqueda.`
-                                                            : 'Comienza creando tu primera página para estructurar el contenido de tu sitio web.'
+                                                            ? t(
+                                                                  'No hay ninguna página que coincida con ":search". Intenta con otro término de búsqueda.',
+                                                                  { search: query.s },
+                                                              )
+                                                            : t('Comienza creando tu primera página para estructurar el contenido de tu sitio web.')
                                                     }
                                                     action={
                                                         !query.s
                                                             ? {
-                                                                  label: 'Crear Primera Página',
+                                                                  label: t('Crear Primera Página'),
                                                                   href: route('articles.create'),
                                                                   icon: Plus,
                                                               }

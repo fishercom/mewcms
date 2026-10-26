@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { deleteTemplate } from '@/services/templates';
 import { Pagination } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -64,7 +65,7 @@ export default function Index() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                placeholder="Buscar plantilla..."
+                                placeholder={t('Buscar plantilla...')}
                             />
                         </div>
                     </div>
@@ -73,7 +74,7 @@ export default function Index() {
                             <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                                 <Link href="/admin/templates/create">
                                     <Plus className="h-4 w-4" />
-                                    <span>Crear Plantilla</span>
+                                    <span>{t('Crear Plantilla')}</span>
                                 </Link>
                             </Button>
                         )}
@@ -85,16 +86,16 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre
+                                    {t('Nombre')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Archivo
+                                    {t('Archivo')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Ruta
+                                    {t('Ruta')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Tipo
+                                    {t('Tipo')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -113,11 +114,11 @@ export default function Index() {
                                             <td className="px-4 py-3">
                                                 {isCore ? (
                                                     <Badge variant="secondary" className="bg-muted text-foreground font-medium">
-                                                        Sistema
+                                                        {t('Sistema')}
                                                     </Badge>
                                                 ) : (
                                                     <Badge className="border-warning/30 bg-warning-soft text-warning font-medium">
-                                                        Personalizado
+                                                        {t('Personalizado')}
                                                     </Badge>
                                                 )}
                                             </td>
@@ -129,7 +130,7 @@ export default function Index() {
                                                     onClick={() => router.visit(route('templates.edit', item.file))}
                                                 >
                                                     <Edit className="h-3.5 w-3.5" />
-                                                    <span>{canEdit ? 'Editar' : 'Ver'}</span>
+                                                    <span>{canEdit ? t('Editar') : t('Ver')}</span>
                                                 </Button>
 
                                                 {canEdit && !isCore && (
@@ -140,7 +141,7 @@ export default function Index() {
                                                         onClick={() => handleDelete(item.file)}
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />
-                                                        <span>Eliminar</span>
+                                                        <span>{t('Eliminar')}</span>
                                                     </Button>
                                                 )}
                                             </td>
@@ -150,7 +151,7 @@ export default function Index() {
                             ) : (
                                 <tr>
                                     <td colSpan={5} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        No se encontraron plantillas.
+                                        {t('No se encontraron plantillas.')}
                                     </td>
                                 </tr>
                             )}

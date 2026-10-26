@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { CmsPostType } from '@/types/models/cms-post';
 import * as LucideIcons from 'lucide-react';
 
@@ -15,17 +16,17 @@ interface Props {
 }
 
 const AVAILABLE_ICONS = [
-    { value: 'book-open', label: 'Blog / Libro', desc: 'Ideal para blogs, documentación y guías' },
-    { value: 'briefcase', label: 'Servicios', desc: 'Servicios de empresa y ofertas profesionales' },
-    { value: 'calendar', label: 'Eventos', desc: 'Fechas, agendas, reuniones y efemérides' },
-    { value: 'image', label: 'Portafolio / Galería', desc: 'Trabajos visuales, diseños y fotografías' },
-    { value: 'users', label: 'Equipo / Miembros', desc: 'Perfiles de personal, socios y clientes' },
-    { value: 'map-pin', label: 'Ubicaciones', desc: 'Oficinas, sucursales y puntos de interés' },
-    { value: 'shopping-bag', label: 'Productos', desc: 'Catálogos de venta o demostraciones de producto' },
-    { value: 'award', label: 'Premios / Logros', desc: 'Reconocimientos y certificaciones' },
-    { value: 'star', label: 'Reseñas / Destacados', desc: 'Opiniones, testimonios y destacados' },
-    { value: 'message-square', label: 'Testimonios', desc: 'Citas de clientes y feedback' },
-    { value: 'newspaper', label: 'Noticias', desc: 'Novedades de prensa, anuncios o boletines' },
+    { value: 'book-open', label: t('Blog / Libro'), desc: t('Ideal para blogs, documentación y guías') },
+    { value: 'briefcase', label: t('Servicios'), desc: t('Servicios de empresa y ofertas profesionales') },
+    { value: 'calendar', label: t('Eventos'), desc: t('Fechas, agendas, reuniones y efemérides') },
+    { value: 'image', label: t('Portafolio / Galería'), desc: t('Trabajos visuales, diseños y fotografías') },
+    { value: 'users', label: t('Equipo / Miembros'), desc: t('Perfiles de personal, socios y clientes') },
+    { value: 'map-pin', label: t('Ubicaciones'), desc: t('Oficinas, sucursales y puntos de interés') },
+    { value: 'shopping-bag', label: t('Productos'), desc: t('Catálogos de venta o demostraciones de producto') },
+    { value: 'award', label: t('Premios / Logros'), desc: t('Reconocimientos y certificaciones') },
+    { value: 'star', label: t('Reseñas / Destacados'), desc: t('Opiniones, testimonios y destacados') },
+    { value: 'message-square', label: t('Testimonios'), desc: t('Citas de clientes y feedback') },
+    { value: 'newspaper', label: t('Noticias'), desc: t('Novedades de prensa, anuncios o boletines') },
 ];
 
 export default function PostTypeFormFields({ data, setData, errors, processing, schemas }: Props) {
@@ -59,14 +60,14 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
         <div className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
-                    <Label htmlFor="name">Nombre (Plural)</Label>
+                    <Label htmlFor="name">{t('Nombre (Plural)')}</Label>
                     <Input
                         id="name"
                         type="text"
                         required
                         autoFocus
                         value={data.name || ''}
-                        placeholder="Ej. Servicios, Eventos"
+                        placeholder={t('Ej. Servicios, Eventos')}
                         onChange={handleNameChange}
                         disabled={processing}
                     />
@@ -74,13 +75,13 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="singular_name">Nombre (Singular)</Label>
+                    <Label htmlFor="singular_name">{t('Nombre (Singular)')}</Label>
                     <Input
                         id="singular_name"
                         type="text"
                         required
                         value={data.singular_name || ''}
-                        placeholder="Ej. Servicio, Evento"
+                        placeholder={t('Ej. Servicio, Evento')}
                         onChange={(e) => setData({ ...data, singular_name: e.target.value })}
                         disabled={processing}
                     />
@@ -90,13 +91,13 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
-                    <Label htmlFor="slug">Slug (Prefijo de URL)</Label>
+                    <Label htmlFor="slug">{t('Slug (Prefijo de URL)')}</Label>
                     <Input
                         id="slug"
                         type="text"
                         required
                         value={data.slug || ''}
-                        placeholder="Ej. servicios, eventos"
+                        placeholder={t('Ej. servicios, eventos')}
                         onChange={(e) => setData({ ...data, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                         disabled={processing}
                     />
@@ -104,7 +105,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="default_schema_id">Campos Personalizados (Plantilla)</Label>
+                    <Label htmlFor="default_schema_id">{t('Campos Personalizados (Plantilla)')}</Label>
                     <select
                         id="default_schema_id"
                         value={data.default_schema_id || ''}
@@ -112,7 +113,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                         onChange={(e) => setData({ ...data, default_schema_id: e.target.value ? Number(e.target.value) : null })}
                         disabled={processing}
                     >
-                        <option value="">Ninguna - Sin campos dinámicos</option>
+                        <option value="">{t('Ninguna - Sin campos dinámicos')}</option>
                         {schemas.map((s) => (
                             <option key={s.id} value={s.id}>
                                 {s.name}
@@ -124,7 +125,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
             </div>
 
             <div className="grid gap-2">
-                <Label>Icono del Menú (Sidebar)</Label>
+                <Label>{t('Icono del Menú (Sidebar)')}</Label>
                 <div className="border-border bg-muted/50 grid max-h-[220px] grid-cols-1 gap-2 overflow-y-auto rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-3 dark:bg-transparent">
                     {AVAILABLE_ICONS.map((icon) => {
                         const isSelected = data.icon === icon.value || (!data.icon && icon.value === 'book-open');
@@ -150,12 +151,12 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="description">Descripción</Label>
+                <Label htmlFor="description">{t('Descripción')}</Label>
                 <textarea
                     id="description"
                     rows={3}
                     className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Descripción interna del tipo de contenido..."
+                    placeholder={t('Descripción interna del tipo de contenido...')}
                     value={data.description || ''}
                     onChange={(e) => setData({ ...data, description: e.target.value })}
                     disabled={processing}
@@ -171,7 +172,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                     onClick={() => setData({ ...data, active: data.active === false ? true : false })}
                 />
                 <Label htmlFor="active" className="cursor-pointer font-medium">
-                    Activo / Visible en Sidebar
+                    {t('Activo / Visible en Sidebar')}
                 </Label>
             </div>
         </div>

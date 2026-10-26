@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStarterLayout } from '@/hooks/use-starter-layout';
+import { t } from '@/lib/i18n';
 import { CmsPost } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
@@ -76,7 +77,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
             <div className="space-y-6 lg:col-span-8">
                 <div className="grid gap-2">
                     <Label htmlFor="title" className="text-sm font-semibold">
-                        Título del {cptLabelSingular}
+                        {t('Título del')} {cptLabelSingular}
                     </Label>
                     <Input
                         id="title"
@@ -87,14 +88,14 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                         onChange={handleTitleChange}
                         disabled={processing}
                         className="py-5 text-base"
-                        placeholder={`Escribe el título de tu ${cptLabelSingular.toLowerCase()}...`}
+                        placeholder={t('Escribe el título de tu :name...', { name: cptLabelSingular.toLowerCase() })}
                     />
                     <InputError message={errors.title} />
                 </div>
 
                 <div className="grid gap-2">
                     <Label htmlFor="slug" className="text-muted-foreground text-xs font-semibold">
-                        Enlace Permanente (Slug)
+                        {t('Enlace Permanente (Slug)')}
                     </Label>
                     <div className="flex items-center gap-1 text-xs">
                         <span className="text-muted-foreground font-mono">/{data.post_type !== 'post' ? `${data.post_type}/` : 'blog/'}</span>
@@ -113,8 +114,8 @@ export default function PostFields({ data, setData, errors, processing, schemas,
 
                 <div className="grid gap-2">
                     <div className="flex items-center justify-between">
-                        <Label className="text-sm font-semibold">Contenido</Label>
-                        <span className="text-muted-foreground text-[11px]">Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos</span>
+                        <Label className="text-sm font-semibold">{t('Contenido')}</Label>
+                        <span className="text-muted-foreground text-[11px]">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
                     </div>
                     <BlockEditor
                         value={data.blocks ?? []}
@@ -127,7 +128,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
 
                 <div className="grid gap-2">
                     <Label htmlFor="excerpt" className="text-sm font-semibold">
-                        Extracto / Resumen Corto
+                        {t('Extracto / Resumen Corto')}
                     </Label>
                     <textarea
                         id="excerpt"
@@ -136,7 +137,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                         onChange={(e) => setData({ ...data, excerpt: e.target.value })}
                         disabled={processing}
                         className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Escribe una pequeña introducción o resumen..."
+                        placeholder={t('Escribe una pequeña introducción o resumen...')}
                     />
                     <InputError message={errors.excerpt} />
                 </div>
@@ -146,7 +147,10 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                     <div className="border-border space-y-4 border-t pt-5">
                         <div className="text-foreground flex items-center gap-2 text-sm font-bold">
                             <Settings className="text-primary h-4 w-4" />
-                            <span>Campos Personalizados ({schema.name})</span>
+                            <span>
+                                {t('Campos Personalizados (')}
+                                {schema.name})
+                            </span>
                         </div>
                         <div className="border-border bg-muted/50 space-y-4 rounded-xl border p-5">
                             <CustomFieldRenderer
@@ -180,11 +184,11 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                 <div className="border-border bg-card space-y-4 rounded-xl border p-4">
                     <h3 className="border-border text-foreground flex items-center gap-1.5 border-b pb-2 text-sm font-bold">
                         <Eye className="text-muted-foreground h-4 w-4" />
-                        <span>Publicación</span>
+                        <span>{t('Publicación')}</span>
                     </h3>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="status">Estado</Label>
+                        <Label htmlFor="status">{t('Estado')}</Label>
                         <select
                             id="status"
                             value={data.status || 'draft'}
@@ -192,8 +196,8 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                             onChange={(e) => setData({ ...data, status: e.target.value })}
                             disabled={processing}
                         >
-                            <option value="draft">Borrador</option>
-                            <option value="published">Publicado</option>
+                            <option value="draft">{t('Borrador')}</option>
+                            <option value="published">{t('Publicado')}</option>
                         </select>
                         <InputError message={errors.status} />
                     </div>
@@ -201,7 +205,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                     <div className="grid gap-2">
                         <Label htmlFor="published_at" className="flex items-center gap-1">
                             <Calendar className="text-muted-foreground h-3.5 w-3.5" />
-                            <span>Fecha de publicación</span>
+                            <span>{t('Fecha de publicación')}</span>
                         </Label>
                         <input
                             id="published_at"
@@ -211,14 +215,14 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                             onChange={handlePublishedAtChange}
                             disabled={processing}
                         />
-                        <p className="text-muted-foreground text-[11px]">Una fecha futura programa la entrada.</p>
+                        <p className="text-muted-foreground text-[11px]">{t('Una fecha futura programa la entrada.')}</p>
                         <InputError message={errors.published_at} />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="user_id" className="flex items-center gap-1">
                             <User className="text-muted-foreground h-3.5 w-3.5" />
-                            <span>Autor</span>
+                            <span>{t('Autor')}</span>
                         </Label>
                         <select
                             id="user_id"
@@ -237,7 +241,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="schema_id">Campos Adicionales (Plantilla)</Label>
+                        <Label htmlFor="schema_id">{t('Campos Adicionales (Plantilla)')}</Label>
                         <select
                             id="schema_id"
                             value={data.schema_id || ''}
@@ -245,7 +249,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                             onChange={(e) => onChangeSchema(e.target.value ? Number(e.target.value) : 0)}
                             disabled={processing}
                         >
-                            <option value="">Sin Plantilla</option>
+                            <option value="">{t('Sin Plantilla')}</option>
                             {schemas.map((s) => (
                                 <option key={s.id} value={s.id}>
                                     {s.name}
@@ -260,16 +264,16 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                 <div className="border-border bg-card space-y-3 rounded-xl border p-4">
                     <h3 className="border-border text-foreground flex items-center gap-1.5 border-b pb-2 text-sm font-bold">
                         <ImageIcon className="text-muted-foreground h-4 w-4" />
-                        <span>Imagen Destacada</span>
+                        <span>{t('Imagen Destacada')}</span>
                     </h3>
 
                     {data.featured_image ? (
                         <div className="space-y-3">
                             <div className="group border-border bg-muted/50 relative aspect-[16/10] w-full overflow-hidden rounded-lg border">
-                                <img src={data.featured_image} alt="Imagen Destacada" className="h-full w-full object-cover" />
+                                <img src={data.featured_image} alt={t('Imagen Destacada')} className="h-full w-full object-cover" />
                                 <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                                     <Button type="button" variant="secondary" size="sm" onClick={() => setMediaDrawerOpen(true)}>
-                                        Reemplazar
+                                        {t('Reemplazar')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -290,7 +294,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                             className="group border-border hover:border-primary/40 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 transition-all"
                         >
                             <ImageIcon className="text-muted-foreground h-8 w-8 transition-transform group-hover:scale-105" />
-                            <span className="text-muted-foreground text-xs font-medium">Asignar imagen destacada</span>
+                            <span className="text-muted-foreground text-xs font-medium">{t('Asignar imagen destacada')}</span>
                         </button>
                     )}
                     <InputError message={errors.featured_image} />
@@ -298,7 +302,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
 
                 {/* Tags */}
                 <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-                    <h3 className="border-border text-foreground border-b pb-2 text-sm font-bold">Etiquetas</h3>
+                    <h3 className="border-border text-foreground border-b pb-2 text-sm font-bold">{t('Etiquetas')}</h3>
                     <TagField tags={tags} selected={data.tag_ids || []} onChange={(tagIds) => setData({ ...data, tag_ids: tagIds })} />
                     <InputError message={errors.tag_ids} />
                 </div>

@@ -2,6 +2,7 @@ import { formatBytes, MediaThumb, uploadMedia, type UploadProgress } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { type Pagination } from '@/types';
 import { type CmsMedia } from '@/types/models/cms-media';
@@ -117,7 +118,7 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
             className="animate-in fade-in fixed inset-0 z-50 flex justify-end duration-200"
             role="dialog"
             aria-modal="true"
-            aria-label="Biblioteca de medios"
+            aria-label={t('Biblioteca de medios')}
         >
             <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
 
@@ -136,10 +137,10 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                 {/* Header */}
                 <div className="border-border flex items-center justify-between border-b p-5">
                     <div>
-                        <h2 className="text-foreground text-base font-bold">Biblioteca de medios</h2>
-                        <p className="text-muted-foreground text-xs">Elige un archivo o sube uno nuevo</p>
+                        <h2 className="text-foreground text-base font-bold">{t('Biblioteca de medios')}</h2>
+                        <p className="text-muted-foreground text-xs">{t('Elige un archivo o sube uno nuevo')}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} aria-label="Cerrar">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} aria-label={t('Cerrar')}>
                         <X className="h-4.5 w-4.5" />
                     </Button>
                 </div>
@@ -148,9 +149,9 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                 <div className="border-border bg-muted/50 grid grid-cols-3 border-b dark:bg-black/10" role="tablist">
                     {(
                         [
-                            ['image', 'Imágenes'],
-                            ['document', 'Documentos'],
-                            ['video', 'Videos'],
+                            ['image', t('Imágenes')],
+                            ['document', t('Documentos')],
+                            ['video', t('Videos')],
                         ] as const
                     ).map(([value, label]) => (
                         <button
@@ -179,14 +180,14 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Buscar..."
+                            placeholder={t('Buscar...')}
                             className="h-9 pl-9 text-xs"
-                            aria-label="Buscar en la biblioteca"
+                            aria-label={t('Buscar en la biblioteca')}
                         />
                     </div>
                     <Button type="button" className="h-9 gap-1.5" onClick={() => fileInput.current?.click()}>
                         <UploadCloud className="h-4 w-4" />
-                        Subir
+                        {t('Subir')}
                     </Button>
                     <input
                         ref={fileInput}
@@ -228,7 +229,7 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                     {items.length === 0 && !loading ? (
                         <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-center text-xs">
                             <UploadCloud className="h-8 w-8" />
-                            {search ? 'No hay archivos que coincidan.' : 'Aún no hay archivos. Arrastra uno aquí o pulsa Subir.'}
+                            {search ? t('No hay archivos que coincidan.') : t('Aún no hay archivos. Arrastra uno aquí o pulsa Subir.')}
                         </div>
                     ) : (
                         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
@@ -265,14 +266,16 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                     {!loading && page < lastPage && (
                         <div className="flex justify-center pt-4">
                             <Button variant="outline" size="sm" onClick={() => load(page + 1)}>
-                                Cargar más
+                                {t('Cargar más')}
                             </Button>
                         </div>
                     )}
 
                     {dragging && (
                         <div className="border-primary bg-primary/5 pointer-events-none absolute inset-2 flex items-center justify-center rounded-xl border-2 border-dashed">
-                            <span className="bg-card text-foreground rounded-lg px-3 py-2 text-xs font-semibold shadow-sm">Suelta para subir</span>
+                            <span className="bg-card text-foreground rounded-lg px-3 py-2 text-xs font-semibold shadow-sm">
+                                {t('Suelta para subir')}
+                            </span>
                         </div>
                     )}
                 </div>
@@ -295,20 +298,20 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                         {selected.type === 'image' && (
                             <div className="space-y-1">
                                 <Label htmlFor="picker-alt" className="text-xs">
-                                    Texto alternativo
+                                    {t('Texto alternativo')}
                                 </Label>
                                 <Input
                                     id="picker-alt"
                                     value={alt}
                                     onChange={(e) => setAlt(e.target.value)}
-                                    placeholder="Describe la imagen"
+                                    placeholder={t('Describe la imagen')}
                                     className="bg-card h-9 text-xs"
                                 />
                             </div>
                         )}
                         <Button type="button" className="w-full" onClick={insert} disabled={inserting}>
                             {inserting && <Loader2 className="h-4 w-4 animate-spin" />}
-                            {selected.type === 'image' ? 'Insertar imagen' : 'Usar archivo'}
+                            {selected.type === 'image' ? t('Insertar imagen') : t('Usar archivo')}
                         </Button>
                     </div>
                 )}

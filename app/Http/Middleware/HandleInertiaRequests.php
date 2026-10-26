@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'locale' => app()->getLocale(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
@@ -89,11 +90,11 @@ class HandleInertiaRequests extends Middleware
                 if ($key !== 'admin' && ($key === null || ! $user->hasAdminPermission($key))) {
                     continue;
                 }
-                $items[] = ['id' => $module->id, 'title' => $module->name, 'description' => $module->description, 'url' => $module->url, 'icon' => $module->icon];
+                $items[] = ['id' => $module->id, 'title' => __($module->name), 'description' => $module->description ? __($module->description) : $module->description, 'url' => $module->url, 'icon' => $module->icon];
             }
 
             if ($items !== []) {
-                $adm_menu[] = ['id' => $group->id, 'title' => $group->name, 'items' => $items];
+                $adm_menu[] = ['id' => $group->id, 'title' => __($group->name), 'items' => $items];
             }
         }
 

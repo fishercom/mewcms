@@ -1,11 +1,12 @@
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type Status = 'published' | 'draft' | 'scheduled';
 
 const STYLES: Record<Status, { label: string; className: string; dot: string }> = {
-    published: { label: 'Publicado', className: 'bg-success-soft text-success', dot: 'bg-success' },
-    draft: { label: 'Borrador', className: 'bg-warning-soft text-warning', dot: 'bg-warning' },
-    scheduled: { label: 'Programado', className: 'bg-primary-soft text-primary-soft-foreground', dot: 'bg-primary' },
+    published: { label: t('Publicado'), className: 'bg-success-soft text-success', dot: 'bg-success' },
+    draft: { label: t('Borrador'), className: 'bg-warning-soft text-warning', dot: 'bg-warning' },
+    scheduled: { label: t('Programado'), className: 'bg-primary-soft text-primary-soft-foreground', dot: 'bg-primary' },
 };
 
 /**

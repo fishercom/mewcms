@@ -6,6 +6,7 @@ import { router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsConfig } from '@/types/models/cms-config';
 import { Input } from '@headlessui/react';
@@ -32,7 +33,7 @@ export default function Index() {
     };
 
     return (
-        <ModuleLayout title="Configuración">
+        <ModuleLayout title={t('Configuración')}>
             <div className="relative">
                 <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
                     <div className="w-full">
@@ -47,7 +48,7 @@ export default function Index() {
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
                                     className="border-border-strong block w-full rounded-md border p-2 pl-10 text-sm"
-                                    placeholder="Buscar"
+                                    placeholder={t('Buscar')}
                                 />
                             </div>
                         </form>
@@ -58,13 +59,13 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Alias
+                                    {t('Alias')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Creado
+                                    {t('Creado')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Actualizado
+                                    {t('Actualizado')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -86,7 +87,7 @@ export default function Index() {
                                                 onClick={() => router.visit(route('configs.edit', item.id))}
                                             >
                                                 <Edit className="h-3.5 w-3.5" />
-                                                <span>Editar</span>
+                                                <span>{t('Editar')}</span>
                                             </Button>
                                             <Button
                                                 variant="ghost"
@@ -95,7 +96,7 @@ export default function Index() {
                                                 onClick={() => deleteConfigHandler(item.id)}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
-                                                <span>Eliminar</span>
+                                                <span>{t('Eliminar')}</span>
                                             </Button>
                                         </td>
                                     </tr>

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { Globe, Link2, Mail, Phone, type LucideIcon } from 'lucide-react';
 import type { IconType } from 'react-icons';
 import {
@@ -50,10 +51,10 @@ export const SOCIAL_NETWORKS: SocialNetwork[] = [
     { id: 'spotify', name: 'Spotify', icon: FaSpotify, placeholder: 'https://open.spotify.com/artist/…' },
     { id: 'behance', name: 'Behance', icon: FaBehance, placeholder: 'https://behance.net/usuario' },
     { id: 'dribbble', name: 'Dribbble', icon: FaDribbble, placeholder: 'https://dribbble.com/usuario' },
-    { id: 'email', name: 'Email', icon: Mail, placeholder: 'contacto@tusitio.com', plain: true },
-    { id: 'phone', name: 'Teléfono', icon: Phone, placeholder: '+51 999 999 999', plain: true },
-    { id: 'website', name: 'Sitio web', icon: Globe, placeholder: 'https://tusitio.com' },
-    { id: 'custom', name: 'Personalizado', icon: Link2, placeholder: 'https://…' },
+    { id: 'email', name: t('Email'), icon: Mail, placeholder: 'contacto@tusitio.com', plain: true },
+    { id: 'phone', name: t('Teléfono'), icon: Phone, placeholder: '+51 999 999 999', plain: true },
+    { id: 'website', name: t('Sitio web'), icon: Globe, placeholder: 'https://tusitio.com' },
+    { id: 'custom', name: t('Personalizado'), icon: Link2, placeholder: 'https://…' },
 ];
 
 export const socialNetwork = (id: string): SocialNetwork => SOCIAL_NETWORKS.find((n) => n.id === id) ?? SOCIAL_NETWORKS[SOCIAL_NETWORKS.length - 1];

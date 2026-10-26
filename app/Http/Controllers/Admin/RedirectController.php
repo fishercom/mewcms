@@ -68,11 +68,11 @@ class RedirectController extends Controller
             'to_path' => ['required', 'string', 'max:1000', 'regex:#^(/|https?://)#i'],
             'status_code' => ['nullable', 'integer', Rule::in([301, 302])],
         ], [
-            'from_path.unique' => 'Ya existe una redirección desde esa dirección.',
+            'from_path.unique' => __('Ya existe una redirección desde esa dirección.'),
         ]);
 
         if ($data['from_path'] === '/' || $data['from_path'] === $data['to_path']) {
-            throw ValidationException::withMessages(['from_path' => 'La dirección de origen no puede ser la portada ni igual al destino.']);
+            throw ValidationException::withMessages(['from_path' => __('La dirección de origen no puede ser la portada ni igual al destino.')]);
         }
 
         return [...$data, 'status_code' => $data['status_code'] ?? 301];

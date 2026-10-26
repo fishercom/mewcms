@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
 import { CmsTranslateForm } from '@/types/models/cms-translate';
 
 interface Props {
@@ -14,15 +15,15 @@ interface Props {
 
 export default function TranslateFormFields({ data, setData, errors, processing }: Props) {
     const inputTypes = [
-        { value: 1, label: 'Text' },
-        { value: 2, label: 'Textarea' },
-        { value: 3, label: 'Rich Text' },
+        { value: 1, label: t('Text') },
+        { value: 2, label: t('Textarea') },
+        { value: 3, label: t('Rich Text') },
     ];
 
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="alias">Alias</Label>
+                <Label htmlFor="alias">{t('Alias')}</Label>
                 <Input
                     id="alias"
                     type="text"
@@ -38,14 +39,14 @@ export default function TranslateFormFields({ data, setData, errors, processing 
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="input_type">Input Type</Label>
+                <Label htmlFor="input_type">{t('Input Type')}</Label>
                 <Select
                     value={data.input_type.toString()}
                     onValueChange={(value) => setData({ ...data, input_type: Number(value) })}
                     disabled={processing}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Select an input type" />
+                        <SelectValue placeholder={t('Select an input type')} />
                     </SelectTrigger>
                     <SelectContent>
                         {inputTypes.map((type) => (
@@ -59,7 +60,7 @@ export default function TranslateFormFields({ data, setData, errors, processing 
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="metadata">Metadata</Label>
+                <Label htmlFor="metadata">{t('Metadata')}</Label>
                 <Textarea
                     id="metadata"
                     tabIndex={3}

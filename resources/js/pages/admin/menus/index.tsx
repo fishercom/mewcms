@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { deleteMenu, getMenus } from '@/services/menus';
 import { Pagination } from '@/types';
 import { CmsMenu } from '@/types/models/cms-menu';
@@ -45,7 +46,7 @@ export default function Index() {
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
                                     className="border-border-strong text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                    placeholder="Buscar menú"
+                                    placeholder={t('Buscar menú')}
                                 />
                             </div>
                         </form>
@@ -56,7 +57,7 @@ export default function Index() {
                             className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Agregar Menú</span>
+                            <span>{t('Agregar Menú')}</span>
                         </Link>
                     </div>
                 </div>
@@ -65,19 +66,19 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre / Name
+                                    {t('Nombre / Name')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Slug
+                                    {t('Slug')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Descripción
+                                    {t('Descripción')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Activo
+                                    {t('Activo')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Creado
+                                    {t('Creado')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -107,7 +108,7 @@ export default function Index() {
                                                 onClick={() => router.visit(`/admin/menus/${item.id}/edit`)}
                                             >
                                                 <List className="h-3.5 w-3.5" />
-                                                <span>Gestionar</span>
+                                                <span>{t('Gestionar')}</span>
                                             </Button>
                                             <Button
                                                 variant="outline"
@@ -116,7 +117,7 @@ export default function Index() {
                                                 onClick={() => router.visit(route('menus.edit', item.id))}
                                             >
                                                 <Edit className="h-3.5 w-3.5" />
-                                                <span>Editar</span>
+                                                <span>{t('Editar')}</span>
                                             </Button>
                                             <Button
                                                 variant="ghost"
@@ -125,7 +126,7 @@ export default function Index() {
                                                 onClick={() => deleteMenuHandler(item.id)}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
-                                                <span>Eliminar</span>
+                                                <span>{t('Eliminar')}</span>
                                             </Button>
                                         </td>
                                     </tr>
@@ -134,7 +135,7 @@ export default function Index() {
                             {items.data.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center">
-                                        No se encontraron menús.
+                                        {t('No se encontraron menús.')}
                                     </td>
                                 </tr>
                             )}

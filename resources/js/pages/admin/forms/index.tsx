@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsForm } from '@/types/models/cms-form';
 import { Input } from '@headlessui/react';
@@ -26,7 +27,7 @@ export default function Index() {
     };
 
     const handleDelete = (id: number, name: string) => {
-        if (window.confirm(`¿Estás seguro de que deseas eliminar el formulario "${name}"?`)) {
+        if (window.confirm(t('¿Estás seguro de que deseas eliminar el formulario ":name"?', { name }))) {
             router.delete(route('forms.destroy', id));
         }
     };
@@ -45,7 +46,7 @@ export default function Index() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                placeholder="Buscar formulario..."
+                                placeholder={t('Buscar formulario...')}
                             />
                         </div>
                     </div>
@@ -54,7 +55,7 @@ export default function Index() {
                         <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={route('forms.create')}>
                                 <Plus className="h-4 w-4" />
-                                <span>Crear Formulario</span>
+                                <span>{t('Crear Formulario')}</span>
                             </Link>
                         </Button>
                     </div>
@@ -65,19 +66,19 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre
+                                    {t('Nombre')}
                                 </th>
                                 <th scope="col" className="hidden px-4 py-3 xl:table-cell">
-                                    Alias
+                                    {t('Alias')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Shortcode (Copiar)
+                                    {t('Shortcode (Copiar)')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Campos
+                                    {t('Campos')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Estado
+                                    {t('Estado')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -98,7 +99,7 @@ export default function Index() {
                                                 {copiedId === item.id ? (
                                                     <>
                                                         <Check className="text-success h-3 w-3" />
-                                                        <span className="text-success">¡Copiado!</span>
+                                                        <span className="text-success">{t('¡Copiado!')}</span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -115,7 +116,7 @@ export default function Index() {
                                                     item.active ? 'bg-success-soft text-success' : 'bg-muted text-foreground'
                                                 }`}
                                             >
-                                                {item.active ? 'Activo' : 'Inactivo'}
+                                                {item.active ? t('Activo') : t('Inactivo')}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
@@ -127,7 +128,7 @@ export default function Index() {
                                                     onClick={() => router.visit(route('forms.edit', item.id))}
                                                 >
                                                     <Edit className="h-3.5 w-3.5" />
-                                                    <span>Editar</span>
+                                                    <span>{t('Editar')}</span>
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
@@ -136,7 +137,7 @@ export default function Index() {
                                                     onClick={() => handleDelete(item.id, item.name)}
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
-                                                    <span>Eliminar</span>
+                                                    <span>{t('Eliminar')}</span>
                                                 </Button>
                                             </div>
                                         </td>
@@ -145,7 +146,7 @@ export default function Index() {
                             ) : (
                                 <tr>
                                     <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        No se encontraron formularios.
+                                        {t('No se encontraron formularios.')}
                                     </td>
                                 </tr>
                             )}

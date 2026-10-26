@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { CmsForm, CmsFormField } from '@/types/models/cms-form';
 import { CircleDot, List, Plus, Settings, Trash2 } from 'lucide-react';
 
@@ -61,43 +62,43 @@ export default function FormFields({ data, setData, errors }: Props) {
                 <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                     <h3 className="border-border text-foreground flex items-center gap-1.5 border-b pb-3 text-sm font-bold">
                         <Settings className="text-primary h-4 w-4" />
-                        <span>Ajustes del Formulario</span>
+                        <span>{t('Ajustes del Formulario')}</span>
                     </h3>
 
                     <div className="space-y-1">
-                        <label className="text-muted-foreground text-xs font-semibold">Nombre</label>
+                        <label className="text-muted-foreground text-xs font-semibold">{t('Nombre')}</label>
                         <input
                             type="text"
                             required
                             value={data.name || ''}
                             onChange={(e) => handleFormChange('name', e.target.value)}
                             className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                            placeholder="Ej. Formulario de Contacto"
+                            placeholder={t('Ej. Formulario de Contacto')}
                         />
                         {errors.name && <p className="text-destructive text-[11px]">{errors.name}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-muted-foreground text-xs font-semibold">Alias (Clave única)</label>
+                        <label className="text-muted-foreground text-xs font-semibold">{t('Alias (Clave única)')}</label>
                         <input
                             type="text"
                             required
                             value={data.alias || ''}
                             onChange={(e) => handleFormChange('alias', e.target.value)}
                             className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 font-mono text-sm focus-visible:ring-2 focus-visible:outline-none"
-                            placeholder="Ej. contacto_general"
+                            placeholder={t('Ej. contacto_general')}
                         />
                         {errors.alias && <p className="text-destructive text-[11px]">{errors.alias}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-muted-foreground text-xs font-semibold">Información / Descripción</label>
+                        <label className="text-muted-foreground text-xs font-semibold">{t('Información / Descripción')}</label>
                         <textarea
                             value={data.info || ''}
                             onChange={(e) => handleFormChange('info', e.target.value)}
                             rows={3}
                             className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                            placeholder="Info de ayuda o descripción del propósito del formulario"
+                            placeholder={t('Info de ayuda o descripción del propósito del formulario')}
                         />
                         {errors.info && <p className="text-destructive text-[11px]">{errors.info}</p>}
                     </div>
@@ -111,7 +112,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             className="border-border text-primary focus:ring-primary/40 h-4 w-4 rounded-sm bg-transparent focus:ring-2"
                         />
                         <label htmlFor="form_active" className="text-muted-foreground cursor-pointer text-xs font-semibold">
-                            Formulario Activo
+                            {t('Formulario Activo')}
                         </label>
                     </div>
                 </div>
@@ -123,7 +124,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                     <div className="border-border flex items-center justify-between border-b pb-3">
                         <h3 className="text-foreground flex items-center gap-1.5 text-sm font-bold">
                             <List className="text-primary h-4 w-4" />
-                            <span>Campos del Formulario</span>
+                            <span>{t('Campos del Formulario')}</span>
                         </h3>
                         <Button
                             type="button"
@@ -133,7 +134,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs"
                         >
                             <Plus className="h-3.5 w-3.5" />
-                            <span>Añadir Campo</span>
+                            <span>{t('Añadir Campo')}</span>
                         </Button>
                     </div>
 
@@ -144,7 +145,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                         <div className="space-y-1">
                                             <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                                                Etiqueta
+                                                {t('Etiqueta')}
                                             </label>
                                             <input
                                                 type="text"
@@ -152,38 +153,40 @@ export default function FormFields({ data, setData, errors }: Props) {
                                                 value={field.name}
                                                 onChange={(e) => handleFieldChange(idx, 'name', e.target.value)}
                                                 className="border-border bg-card text-foreground focus:ring-primary/40 w-full rounded-lg border px-2.5 py-1.5 text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
-                                                placeholder="Ej. Correo Electrónico"
+                                                placeholder={t('Ej. Correo Electrónico')}
                                             />
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">Clave</label>
+                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                                                {t('Clave')}
+                                            </label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={field.alias}
                                                 onChange={(e) => handleFieldChange(idx, 'alias', e.target.value)}
                                                 className="border-border bg-card text-foreground focus:ring-primary/40 w-full rounded-lg border px-2.5 py-1.5 font-mono text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
-                                                placeholder="Ej. email"
+                                                placeholder={t('Ej. email')}
                                             />
                                         </div>
 
                                         <div className="space-y-1">
                                             <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                                                Tipo de Entrada
+                                                {t('Tipo de Entrada')}
                                             </label>
                                             <select
                                                 value={field.type}
                                                 onChange={(e) => handleFieldChange(idx, 'type', e.target.value as CmsFormField['type'])}
                                                 className="border-border bg-card text-foreground focus:ring-primary/40 h-8 w-full rounded-lg border px-2 text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
                                             >
-                                                <option value="text">Texto simple</option>
-                                                <option value="email">Email</option>
-                                                <option value="tel">Teléfono</option>
-                                                <option value="textarea">Área de Texto (Textarea)</option>
-                                                <option value="select">Selector (Dropdown)</option>
-                                                <option value="checkbox">Opción Múltiple (Checkboxes)</option>
-                                                <option value="radio">Opción Única (Radio Buttons)</option>
+                                                <option value="text">{t('Texto simple')}</option>
+                                                <option value="email">{t('Email')}</option>
+                                                <option value="tel">{t('Teléfono')}</option>
+                                                <option value="textarea">{t('Área de Texto (Textarea)')}</option>
+                                                <option value="select">{t('Selector (Dropdown)')}</option>
+                                                <option value="checkbox">{t('Opción Múltiple (Checkboxes)')}</option>
+                                                <option value="radio">{t('Opción Única (Radio Buttons)')}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -193,7 +196,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                         <div className="space-y-1">
                                             <label className="text-muted-foreground flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase">
                                                 <CircleDot className="text-primary h-3 w-3" />
-                                                <span>Opciones (Valores separados por coma)</span>
+                                                <span>{t('Opciones (Valores separados por coma)')}</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -207,7 +210,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                                     handleFieldChange(idx, 'options', arr);
                                                 }}
                                                 className="border-border bg-card text-foreground focus:ring-primary/40 w-full rounded-lg border px-2.5 py-1.5 text-xs focus:ring-1 focus:outline-none dark:bg-transparent"
-                                                placeholder="Opción 1, Opción 2, Opción 3"
+                                                placeholder={t('Opción 1, Opción 2, Opción 3')}
                                             />
                                         </div>
                                     )}
@@ -222,7 +225,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                                 className="border-border text-primary h-3.5 w-3.5 rounded-sm bg-transparent"
                                             />
                                             <label htmlFor={`field_active_${idx}`} className="cursor-pointer font-medium">
-                                                Campo Activo
+                                                {t('Campo Activo')}
                                             </label>
                                         </div>
 
@@ -232,7 +235,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                             className="text-destructive hover:text-destructive inline-flex items-center gap-1 transition-colors"
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
-                                            <span>Eliminar Campo</span>
+                                            <span>{t('Eliminar Campo')}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -241,7 +244,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                     ) : (
                         <div className="border-border text-muted-foreground rounded-xl border border-dashed py-12 text-center">
                             <List className="text-muted-foreground/70 mx-auto mb-2 h-8 w-8" />
-                            <p className="text-xs">No hay campos añadidos a este formulario. Haz clic en "Añadir Campo" para empezar.</p>
+                            <p className="text-xs">{t('No hay campos añadidos a este formulario. Haz clic en "Añadir Campo" para empezar.')}</p>
                         </div>
                     )}
                 </div>

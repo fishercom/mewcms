@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { createTemplate } from '@/services/templates';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
@@ -58,11 +59,11 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Nombre de la Plantilla</Label>
+                        <Label htmlFor="name">{t('Nombre de la Plantilla')}</Label>
                         <Input
                             id="name"
                             type="text"
@@ -71,13 +72,13 @@ export default function Create() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             disabled={processing}
-                            placeholder="e.g. Contacto Principal"
+                            placeholder={t('e.g. Contacto Principal')}
                         />
                         {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="filename">Nombre del Archivo</Label>
+                        <Label htmlFor="filename">{t('Nombre del Archivo')}</Label>
                         <div className="flex items-center gap-1">
                             <Input
                                 id="filename"
@@ -91,12 +92,12 @@ export default function Create() {
                             />
                             <span className="text-muted-foreground text-sm font-semibold">.tsx</span>
                         </div>
-                        <p className="text-muted-foreground text-xs">Debe constar de caracteres alfanuméricos, guiones o guiones bajos.</p>
+                        <p className="text-muted-foreground text-xs">{t('Debe constar de caracteres alfanuméricos, guiones o guiones bajos.')}</p>
                         {errors.filename && <span className="text-destructive text-xs">{errors.filename}</span>}
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="content">Código de la Plantilla (React / TypeScript)</Label>
+                        <Label htmlFor="content">{t('Código de la Plantilla (React / TypeScript)')}</Label>
                         <div className="border-border-strong bg-muted overflow-hidden rounded-md border">
                             <div className="border-border-strong bg-muted/60 text-muted-foreground flex items-center justify-between border-b px-4 py-2 font-mono text-xs">
                                 <span>{filename ? `${filename}.tsx` : 'template.tsx'}</span>
@@ -118,10 +119,10 @@ export default function Create() {
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            {processing ? 'Guardando...' : 'Guardar'}
+                            {processing ? t('Guardando...') : t('Guardar')}
                         </Button>
                         <Link href="/admin/templates" className="text-muted-foreground text-sm hover:underline">
-                            Cancelar
+                            {t('Cancelar')}
                         </Link>
                     </div>
                 </form>

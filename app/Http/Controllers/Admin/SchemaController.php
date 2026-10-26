@@ -164,7 +164,7 @@ class SchemaController extends Controller
         $item = CmsSchema::findOrFail($id);
 
         if ($item->articles()->exists()) {
-            return back()->withErrors(['error' => 'No se puede eliminar el esquema porque está asignado a uno o más artículos.']);
+            return back()->withErrors(['error' => __('No se puede eliminar el esquema porque está asignado a uno o más artículos.')]);
         }
 
         $item->delete();

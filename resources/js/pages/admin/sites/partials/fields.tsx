@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { CmsSiteForm } from '@/types/models/cms-site';
 
@@ -19,7 +20,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -35,7 +36,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="segment">Segment</Label>
+                <Label htmlFor="segment">{t('Segment')}</Label>
                 <Input
                     id="segment"
                     type="text"
@@ -49,7 +50,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="site_url">Site URL</Label>
+                <Label htmlFor="site_url">{t('Site URL')}</Label>
                 <Input
                     id="site_url"
                     type="url"
@@ -64,14 +65,14 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="schema_group_id">Schema Group</Label>
+                <Label htmlFor="schema_group_id">{t('Schema Group')}</Label>
                 <Select
                     value={data.schema_group_id.toString()}
                     onValueChange={(value) => setData({ ...data, schema_group_id: Number(value) })}
                     disabled={processing}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a schema group" />
+                        <SelectValue placeholder={t('Select a schema group')} />
                     </SelectTrigger>
                     <SelectContent>
                         {schemaGroups.map((group) => (
@@ -85,7 +86,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="metadata">Metadata</Label>
+                <Label htmlFor="metadata">{t('Metadata')}</Label>
                 <Textarea
                     id="metadata"
                     tabIndex={5}
@@ -112,7 +113,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
                     onClick={() => setData({ ...data, default: !data.default })}
                     tabIndex={6}
                 />
-                <Label htmlFor="default">Default</Label>
+                <Label htmlFor="default">{t('Default')}</Label>
             </div>
 
             <div className="flex items-center space-x-3">
@@ -123,7 +124,7 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={7}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active">{t('Active')}</Label>
             </div>
         </>
     );

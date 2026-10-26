@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { createProfile } from '@/services/profiles';
 import { ProfileForm } from '@/types';
 import { AdmModule } from '@/types/models/adm-module';
@@ -39,14 +40,14 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={createProfileHandler} className="space-y-6">
                     <ProfileFormFields data={data} setData={setData} errors={errors} processing={processing} modules={modules} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/profiles">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/profiles">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

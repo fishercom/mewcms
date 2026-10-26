@@ -11,6 +11,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Input } from '@headlessui/react';
@@ -67,17 +68,17 @@ export default function Index() {
     };
 
     const handleDelete = (id: number, title: string) => {
-        if (window.confirm(`¿Mover "${title}" a la papelera?`)) {
+        if (window.confirm(t('¿Mover ":title" a la papelera?', { title }))) {
             router.delete(route('posts.destroy', id), {
                 data: { post_type, lang_id },
                 preserveScroll: true,
-                onError: () => alert('Ocurrió un error al mover la entrada a la papelera.'),
+                onError: () => alert(t('Ocurrió un error al mover la entrada a la papelera.')),
             });
         }
     };
 
-    const singularName = cpt ? cpt.singular_name : 'Entrada';
-    const pluralName = cpt ? cpt.name : 'Entradas (Blog)';
+    const singularName = cpt ? cpt.singular_name : t('Entrada');
+    const pluralName = cpt ? cpt.name : t('Entradas (Blog)');
 
     return (
         <ModuleLayout>
@@ -94,7 +95,7 @@ export default function Index() {
                                 value={filters.s}
                                 onChange={handleSearch}
                                 className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                placeholder={`Buscar ${singularName.toLowerCase()}...`}
+                                placeholder={t('Buscar :name...', { name: singularName.toLowerCase() })}
                             />
                         </div>
 
@@ -103,9 +104,9 @@ export default function Index() {
                             onChange={handleStatusFilter}
                             className="border-border text-foreground focus-visible:ring-ring h-10 rounded-md border bg-transparent px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
                         >
-                            <option value="">Todos los estados</option>
-                            <option value="draft">Borradores</option>
-                            <option value="published">Publicados</option>
+                            <option value="">{t('Todos los estados')}</option>
+                            <option value="draft">{t('Borradores')}</option>
+                            <option value="published">{t('Publicados')}</option>
                         </select>
                     </div>
 
@@ -114,7 +115,9 @@ export default function Index() {
                         <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={`/admin/posts/create?post_type=${post_type}&lang_id=${lang_id}`}>
                                 <Plus className="h-4 w-4" />
-                                <span>Crear {singularName}</span>
+                                <span>
+                                    {t('Crear')} {singularName}
+                                </span>
                             </Link>
                         </Button>
                     </div>
@@ -132,19 +135,19 @@ export default function Index() {
                                     <SelectAllCheckbox state={selection.allState} onToggle={selection.toggleAll} />
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Título
+                                    {t('Título')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Autor
+                                    {t('Autor')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Etiquetas
+                                    {t('Etiquetas')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Estado
+                                    {t('Estado')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    {filters.trash ? 'Eliminado' : 'Fecha Publicación'}
+                                    {filters.trash ? t('Eliminado') : t('Fecha Publicación')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -172,7 +175,11 @@ export default function Index() {
                                             <div className="text-muted-foreground font-mono text-[11px]">/{item.slug}</div>
                                         </td>
                                         <td className="text-muted-foreground px-4 py-3">
-                                            {item.user ? item.user.name : <span className="text-muted-foreground text-xs italic">Desconocido</span>}
+                                            {item.user ? (
+                                                item.user.name
+                                            ) : (
+                                                <span className="text-muted-foreground text-xs italic">{t('Desconocido')}</span>
+                                            )}
                                         </td>
                                         <td className="max-w-xs px-4 py-3">
                                             {item.tags && item.tags.length > 0 ? (
@@ -222,7 +229,7 @@ export default function Index() {
                                                         }
                                                     >
                                                         <Edit className="h-3.5 w-3.5" />
-                                                        <span>Editar</span>
+                                                        <span>{t('Editar')}</span>
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
@@ -231,7 +238,7 @@ export default function Index() {
                                                         onClick={() => handleDelete(item.id, item.title)}
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />
-                                                        <span>Eliminar</span>
+                                                        <span>{t('Eliminar')}</span>
                                                     </Button>
                                                 </div>
                                             )}
@@ -241,7 +248,9 @@ export default function Index() {
                             ) : (
                                 <tr>
                                     <td colSpan={7} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        {filters.trash ? 'La papelera está vacía.' : `No se encontraron entradas de ${pluralName.toLowerCase()}.`}
+                                        {filters.trash
+                                            ? t('La papelera está vacía.')
+                                            : t('No se encontraron entradas de :name.', { name: pluralName.toLowerCase() })}
                                     </td>
                                 </tr>
                             )}

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { t } from '@/lib/i18n';
 import { GripVertical, Plus, Share2, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
@@ -47,7 +48,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
             <PopoverTrigger asChild>
                 <Button type="button" variant="outline" size="sm" className="gap-1.5">
                     <Plus className="h-4 w-4" />
-                    Añadir enlace
+                    {t('Añadir enlace')}
                 </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -62,7 +63,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                     }
                 }}
             >
-                <p className="text-muted-foreground px-1.5 pt-0.5 pb-2 text-xs">Elige una red o un tipo de enlace</p>
+                <p className="text-muted-foreground px-1.5 pt-0.5 pb-2 text-xs">{t('Elige una red o un tipo de enlace')}</p>
                 <div className="grid grid-cols-3 gap-1 sm:grid-cols-4">
                     {SOCIAL_NETWORKS.map((network) => (
                         <button
@@ -74,7 +75,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                             <SocialIcon network={network.id} className="h-5 w-5" />
                             <span className="text-center">{network.name}</span>
                             {used.has(network.id) && (
-                                <span className="bg-primary absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full" title="Ya añadido" />
+                                <span className="bg-primary absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full" title={t('Ya añadido')} />
                             )}
                         </button>
                     ))}
@@ -89,9 +90,9 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                 <div className="bg-primary-soft text-primary-soft-foreground mb-3 flex h-11 w-11 items-center justify-center rounded-xl">
                     <Share2 className="h-5 w-5" />
                 </div>
-                <p className="text-foreground text-sm font-semibold">Aún no hay enlaces</p>
+                <p className="text-foreground text-sm font-semibold">{t('Aún no hay enlaces')}</p>
                 <p className="text-muted-foreground mt-1 mb-4 max-w-xs text-xs">
-                    Añade tus redes sociales, un correo o un teléfono. Se mostrarán como íconos en el pie de página del sitio.
+                    {t('Añade tus redes sociales, un correo o un teléfono. Se mostrarán como íconos en el pie de página del sitio.')}
                 </p>
                 {picker}
             </div>
@@ -115,13 +116,13 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                                 type="button"
                                 className="social-drag text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-6 shrink-0 cursor-grab items-center justify-center rounded active:cursor-grabbing"
                                 aria-label={`Mover ${network.name}`}
-                                title="Arrastra para ordenar"
+                                title={t('Arrastra para ordenar')}
                             >
                                 <GripVertical className="h-4 w-4" />
                             </button>
 
                             <Select value={link.network} onValueChange={(value) => update(link.id, { network: value })}>
-                                <SelectTrigger className="h-9 min-w-0 flex-1 text-xs sm:w-44 sm:flex-none" aria-label="Red">
+                                <SelectTrigger className="h-9 min-w-0 flex-1 text-xs sm:w-44 sm:flex-none" aria-label={t('Red')}>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -140,7 +141,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                                 size="icon"
                                 className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive order-none h-9 w-9 shrink-0 rounded-lg sm:order-last"
                                 onClick={() => onChange(links.filter((row) => row.id !== link.id))}
-                                aria-label={`Eliminar ${network.name}`}
+                                aria-label={t('Eliminar :name', { name: network.name })}
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
@@ -154,7 +155,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                                     onChange={(e) => update(link.id, { url: e.target.value })}
                                     placeholder={network.placeholder}
                                     inputMode={network.id === 'phone' ? 'tel' : network.id === 'email' ? 'email' : 'url'}
-                                    aria-label={`Enlace de ${network.name}`}
+                                    aria-label={t('Enlace de :name', { name: network.name })}
                                     aria-invalid={!!urlError}
                                     className="h-9 text-xs"
                                 />
@@ -167,7 +168,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                                     onChange={(e) => update(link.id, { label: e.target.value })}
                                     placeholder={`Texto (${network.name})`}
                                     maxLength={60}
-                                    aria-label={`Texto alternativo de ${network.name}`}
+                                    aria-label={t('Texto alternativo de :name', { name: network.name })}
                                     className="h-9 text-xs"
                                 />
                                 {labelError && <p className="text-destructive mt-1 text-[11px]">{labelError}</p>}
@@ -179,7 +180,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
 
             <div className="flex flex-wrap items-center justify-between gap-2">
                 {picker}
-                <p className="text-muted-foreground text-[11px]">Arrastra los enlaces para cambiar el orden en el pie de página.</p>
+                <p className="text-muted-foreground text-[11px]">{t('Arrastra los enlaces para cambiar el orden en el pie de página.')}</p>
             </div>
         </div>
     );

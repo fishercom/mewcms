@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -20,7 +21,7 @@ const mainNavItems: NavItem[] = [
     {
         id: 1,
         title: 'admin',
-        description: 'Welcome to the admin dashboard',
+        description: t('Welcome to the admin dashboard'),
         url: '/admin',
         icon: 'layout-grid',
     },
@@ -29,15 +30,15 @@ const mainNavItems: NavItem[] = [
 const rightNavItems: NavItem[] = [
     {
         id: 2,
-        title: 'Repository',
-        description: 'GitHub Repository',
+        title: t('Repository'),
+        description: t('GitHub Repository'),
         url: 'https://github.com/laravel/react-starter-kit',
         icon: 'folder',
     },
     {
         id: 3,
-        title: 'Documentation',
-        description: 'Laravel Documentation',
+        title: t('Documentation'),
+        description: t('Laravel Documentation'),
         url: 'https://laravel.com/docs/starter-kits',
         icon: 'book-open',
     },
@@ -66,7 +67,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between">
-                                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                                <SheetTitle className="sr-only">{t('Navigation Menu')}</SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
                                     <AppLogoIcon className="text-primary h-7 w-7" />
                                 </SheetHeader>

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import AppLogoIcon from './app-logo-icon';
 
@@ -5,7 +6,8 @@ import AppLogoIcon from './app-logo-icon';
 export function AppWordmark({ className }: { className?: string }) {
     return (
         <span className={cn('font-brand font-bold tracking-tight', className)}>
-            Mew<span className="font-medium opacity-60">CMS</span>
+            Mew
+            <span className="font-medium opacity-60">CMS</span>
         </span>
     );
 }
@@ -32,7 +34,7 @@ export default function AppLogo() {
                         PRO
                     </span>
                 </div>
-                <span className="text-muted-foreground mt-0.5 text-[11px] font-medium">Content Studio</span>
+                <span className="text-muted-foreground mt-0.5 text-[11px] font-medium">{t('Content Studio')}</span>
             </div>
         </div>
     );

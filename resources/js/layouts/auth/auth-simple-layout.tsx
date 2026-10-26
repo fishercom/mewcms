@@ -1,4 +1,5 @@
 import { BrandLockup } from '@/components/app-logo';
+import { t } from '@/lib/i18n';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
@@ -22,7 +23,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                         <Link
                             href={route('home')}
                             className="text-foreground rounded-lg transition-opacity hover:opacity-85"
-                            aria-label="MewCMS — ir al sitio"
+                            aria-label={t('MewCMS — ir al sitio')}
                         >
                             <BrandLockup stacked />
                         </Link>

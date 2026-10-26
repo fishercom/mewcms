@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { diffWords, htmlToText } from '@/lib/word-diff';
 import apiClient from '@/services/api';
 import { router } from '@inertiajs/react';
@@ -96,7 +97,7 @@ export default function ContentEditorTools({ module, id, data, initialData, auto
         };
         window.addEventListener('beforeunload', onBeforeUnload);
         const removeInertiaGuard = router.on('before', (event) => {
-            if (event.detail.visit.method === 'get' && !window.confirm('Hay cambios sin guardar. ¿Salir de todos modos?')) {
+            if (event.detail.visit.method === 'get' && !window.confirm(t('Hay cambios sin guardar. ¿Salir de todos modos?'))) {
                 event.preventDefault();
             }
         });
@@ -116,7 +117,7 @@ export default function ContentEditorTools({ module, id, data, initialData, auto
             else window.open(result.url, '_blank');
         } catch {
             tab?.close();
-            alert('No se pudo generar la vista previa.');
+            alert(t('No se pudo generar la vista previa.'));
         } finally {
             setPreviewing(false);
         }
@@ -134,7 +135,7 @@ export default function ContentEditorTools({ module, id, data, initialData, auto
                 <div className="border-warning/30 bg-warning/10 text-warning flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-xs">
                     <span className="flex items-center gap-2">
                         <Save className="h-4 w-4" />
-                        Hay un borrador autoguardado más reciente
+                        {t('Hay un borrador autoguardado más reciente')}
                         {pendingAutosave.updated_at && ` (${format(new Date(pendingAutosave.updated_at), 'dd/MM/yyyy HH:mm')})`}.
                     </span>
                     <span className="flex gap-2">
@@ -147,26 +148,30 @@ export default function ContentEditorTools({ module, id, data, initialData, auto
                                 setPendingAutosave(null);
                             }}
                         >
-                            Restaurar
+                            {t('Restaurar')}
                         </Button>
                         <Button type="button" size="sm" variant="ghost" className="h-7 text-xs" onClick={discardAutosave}>
-                            Descartar
+                            {t('Descartar')}
                         </Button>
                     </span>
                 </div>
             )}
 
             <div className="text-muted-foreground flex flex-wrap items-center justify-end gap-2 text-xs">
-                {autosavedAt && <span>Autoguardado a las {format(new Date(autosavedAt), 'HH:mm')}</span>}
-                {dirty && !autosavedAt && <span>Cambios sin guardar</span>}
+                {autosavedAt && (
+                    <span>
+                        {t('Autoguardado a las')} {format(new Date(autosavedAt), 'HH:mm')}
+                    </span>
+                )}
+                {dirty && !autosavedAt && <span>{t('Cambios sin guardar')}</span>}
                 <Button type="button" variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={preview} disabled={previewing}>
                     {previewing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
-                    Vista previa
+                    {t('Vista previa')}
                 </Button>
                 {id && (
                     <Button type="button" variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => setHistoryOpen(true)}>
                         <History className="h-3.5 w-3.5" />
-                        Revisiones
+                        {t('Revisiones')}
                     </Button>
                 )}
             </div>
@@ -214,8 +219,8 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
 
     const restore = (revisionId: number) => {
         const message = dirty
-            ? 'Tienes cambios sin guardar que se perderán. ¿Restaurar esta revisión?'
-            : '¿Restaurar esta revisión? El estado actual se guardará como una revisión nueva.';
+            ? t('Tienes cambios sin guardar que se perderán. ¿Restaurar esta revisión?')
+            : t('¿Restaurar esta revisión? El estado actual se guardará como una revisión nueva.');
         if (!window.confirm(message)) return;
 
         // Reload the editor with the restored data
@@ -227,12 +232,12 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
             <Sheet open={open} onOpenChange={onOpenChange}>
                 <SheetContent className="w-full overflow-y-auto sm:max-w-md">
                     <SheetHeader>
-                        <SheetTitle>Revisiones</SheetTitle>
-                        <SheetDescription>Cada vez que guardas se crea una revisión. Se conservan las últimas 25.</SheetDescription>
+                        <SheetTitle>{t('Revisiones')}</SheetTitle>
+                        <SheetDescription>{t('Cada vez que guardas se crea una revisión. Se conservan las últimas 25.')}</SheetDescription>
                     </SheetHeader>
                     <div className="space-y-2 px-4 pb-6">
                         {revisions === null && <Loader2 className="text-muted-foreground mx-auto h-5 w-5 animate-spin" />}
-                        {revisions?.length === 0 && <p className="text-muted-foreground text-sm italic">Aún no hay revisiones.</p>}
+                        {revisions?.length === 0 && <p className="text-muted-foreground text-sm italic">{t('Aún no hay revisiones.')}</p>}
                         {revisions?.map((revision, index) => (
                             <div key={revision.id} className="border-border/70 space-y-2 rounded-lg border p-3">
                                 <div className="flex items-start justify-between gap-2">
@@ -244,9 +249,9 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
                                         </p>
                                     </div>
                                     <div className="flex shrink-0 gap-1">
-                                        {revision.is_autosave && <Badge variant="outline">Autoguardado</Badge>}
+                                        {revision.is_autosave && <Badge variant="outline">{t('Autoguardado')}</Badge>}
                                         {!revision.is_autosave && index === revisions.findIndex((r) => !r.is_autosave) && (
-                                            <Badge variant="secondary">Actual</Badge>
+                                            <Badge variant="secondary">{t('Actual')}</Badge>
                                         )}
                                     </div>
                                 </div>
@@ -259,7 +264,7 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
                                         onClick={() => compare(revision.id)}
                                     >
                                         <GitCompare className="h-3.5 w-3.5" />
-                                        Comparar
+                                        {t('Comparar')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -269,7 +274,7 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
                                         onClick={() => restore(revision.id)}
                                     >
                                         <RotateCcw className="h-3.5 w-3.5" />
-                                        Restaurar
+                                        {t('Restaurar')}
                                     </Button>
                                 </div>
                             </div>
@@ -281,17 +286,21 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
             <Dialog open={comparing !== null} onOpenChange={(isOpen) => !isOpen && setComparing(null)}>
                 <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
                     <DialogHeader>
-                        <DialogTitle>Comparar revisión</DialogTitle>
+                        <DialogTitle>{t('Comparar revisión')}</DialogTitle>
                         <DialogDescription>
-                            <span className="bg-destructive/15 text-destructive rounded px-1 line-through">Revisión</span> frente a{' '}
-                            <span className="bg-success/15 text-success rounded px-1">editor actual</span>
+                            <span className="bg-destructive/15 text-destructive rounded px-1 line-through">{t('Revisión')}</span> {t('frente a')}{' '}
+                            <span className="bg-success/15 text-success rounded px-1">{t('editor actual')}</span>
                         </DialogDescription>
                     </DialogHeader>
                     {comparing && (
                         <div className="space-y-4 text-sm">
-                            <DiffField label="Título" before={comparing.title ?? ''} after={String(current.title ?? '')} />
-                            <DiffField label="Extracto" before={comparing.excerpt ?? ''} after={String(current.excerpt ?? '')} />
-                            <DiffField label="Contenido" before={htmlToText(comparing.content)} after={htmlToText(String(current.content ?? ''))} />
+                            <DiffField label={t('Título')} before={comparing.title ?? ''} after={String(current.title ?? '')} />
+                            <DiffField label={t('Extracto')} before={comparing.excerpt ?? ''} after={String(current.excerpt ?? '')} />
+                            <DiffField
+                                label={t('Contenido')}
+                                before={htmlToText(comparing.content)}
+                                after={htmlToText(String(current.content ?? ''))}
+                            />
                         </div>
                     )}
                 </DialogContent>
@@ -307,10 +316,10 @@ function DiffField({ label, before, after }: { label: string; before: string; af
     return (
         <div className="space-y-1">
             <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                {label} {unchanged && <span className="font-normal normal-case">(sin cambios)</span>}
+                {label} {unchanged && <span className="font-normal normal-case">{t('(sin cambios)')}</span>}
             </p>
             <div className="border-border/70 bg-muted/20 rounded-md border p-3 leading-relaxed whitespace-pre-wrap">
-                {parts.length === 0 && <span className="text-muted-foreground italic">Vacío</span>}
+                {parts.length === 0 && <span className="text-muted-foreground italic">{t('Vacío')}</span>}
                 {parts.map((part, i) =>
                     part.type === 'same' ? (
                         <span key={i}>{part.text}</span>

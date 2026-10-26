@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { createMenuItem, deleteMenuItem, updateMenu } from '@/services/menus';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu, CmsMenuItem, CmsMenuItemForm } from '@/types/models/cms-menu';
@@ -131,7 +132,7 @@ export default function Edit() {
 
     // Sort handlers
     const saveSortOrder = (newItemsList: CmsMenuItem[]) => {
-        setSortNotice('Guardando orden...');
+        setSortNotice(t('Guardando orden...'));
         axios
             .post(route('menus.items.sort', item.id), {
                 items: newItemsList.map((it, idx) => ({
@@ -141,12 +142,12 @@ export default function Edit() {
                 })),
             })
             .then(() => {
-                setSortNotice('Orden guardado con éxito!');
+                setSortNotice(t('Orden guardado con éxito!'));
                 setTimeout(() => setSortNotice(null), 3000);
             })
             .catch((err) => {
                 console.error(err);
-                setSortNotice('Error al guardar el orden.');
+                setSortNotice(t('Error al guardar el orden.'));
             });
     };
 
@@ -166,7 +167,7 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view={`Editar Menú: ${item.name}`}>
+        <ModuleLayout view={t('Editar Menú: :name', { name: item.name })}>
             {/* Tab Navigation */}
             <div className="border-border mb-6 flex gap-6 border-b">
                 <button
@@ -178,7 +179,7 @@ export default function Edit() {
                     }`}
                 >
                     <Layers className="h-4 w-4" />
-                    <span>Constructor de Ítems</span>
+                    <span>{t('Constructor de Ítems')}</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('details')}
@@ -189,7 +190,7 @@ export default function Edit() {
                     }`}
                 >
                     <Settings className="h-4 w-4" />
-                    <span>Detalles del Menú</span>
+                    <span>{t('Detalles del Menú')}</span>
                 </button>
             </div>
 
@@ -198,9 +199,9 @@ export default function Edit() {
                     <form onSubmit={handleMenuSubmit} className="space-y-6">
                         <MenuFormFields data={menuData} setData={setMenuData} errors={menuErrors} processing={menuProcessing} />
                         <div className="flex items-center gap-4">
-                            <Button disabled={menuProcessing}>Guardar Detalles</Button>
+                            <Button disabled={menuProcessing}>{t('Guardar Detalles')}</Button>
                             <Link href="/admin/menus" className="text-muted-foreground text-sm hover:underline">
-                                Cancelar
+                                {t('Cancelar')}
                             </Link>
                         </div>
                     </form>
@@ -213,8 +214,8 @@ export default function Edit() {
                     <div className="space-y-4 lg:col-span-7">
                         <div className="border-border bg-muted/50 flex items-center justify-between rounded-xl border p-4">
                             <div>
-                                <h3 className="text-sm font-semibold">Estructura del Menú</h3>
-                                <p className="text-muted-foreground text-xs">Arrastra y suelta los ítems para ordenarlos.</p>
+                                <h3 className="text-sm font-semibold">{t('Estructura del Menú')}</h3>
+                                <p className="text-muted-foreground text-xs">{t('Arrastra y suelta los ítems para ordenarlos.')}</p>
                             </div>
                             {sortNotice && (
                                 <span className="bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400 border-primary-200/50 flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs">
@@ -249,7 +250,7 @@ export default function Edit() {
                                                         <div>
                                                             <span className="text-sm font-medium">{parent.title}</span>
                                                             <span className="bg-muted text-muted-foreground ml-2.5 rounded px-1.5 py-0.5 text-[10px] tracking-wider uppercase">
-                                                                {parent.article_id ? 'Artículo' : 'Enlace'}
+                                                                {parent.article_id ? t('Artículo') : t('Enlace')}
                                                             </span>
                                                             <span className="text-muted-foreground ml-1.5 block max-w-[200px] truncate text-xs sm:inline">
                                                                 {parent.resolved_url}
@@ -327,7 +328,7 @@ export default function Edit() {
                                                     </ReactSortable>
                                                     {subItems.length === 0 && (
                                                         <div className="text-muted-foreground pt-2 text-[11px] italic">
-                                                            No hay sub-elementos. Arrastra aquí para anidar o cambia su ítem padre.
+                                                            {t('No hay sub-elementos. Arrastra aquí para anidar o cambia su ítem padre.')}
                                                         </div>
                                                     )}
                                                 </div>
@@ -338,7 +339,7 @@ export default function Edit() {
                             </div>
                         ) : (
                             <div className="border-border bg-muted/50 rounded-xl border-2 border-dashed py-16 text-center">
-                                <p className="text-muted-foreground text-sm italic">No hay ítems en este menú.</p>
+                                <p className="text-muted-foreground text-sm italic">{t('No hay ítems en este menú.')}</p>
                             </div>
                         )}
                     </div>
@@ -348,13 +349,13 @@ export default function Edit() {
                         <div className="border-border bg-card space-y-5 rounded-xl border p-6 shadow-sm">
                             <h3 className="border-border flex items-center gap-1.5 border-b pb-3 text-sm font-semibold">
                                 <PlusCircle className="text-primary-700 h-4.5 w-4.5" />
-                                <span>{itemData.id ? 'Editar Ítem de Menú' : 'Agregar Ítem de Menú'}</span>
+                                <span>{itemData.id ? t('Editar Ítem de Menú') : t('Agregar Ítem de Menú')}</span>
                             </h3>
 
                             <form onSubmit={handleItemSubmit} className="space-y-4">
                                 {/* Link Type Selector */}
                                 <div className="grid gap-2">
-                                    <Label>Tipo de Enlace</Label>
+                                    <Label>{t('Tipo de Enlace')}</Label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <button
                                             type="button"
@@ -365,7 +366,7 @@ export default function Edit() {
                                                     : 'border-border text-muted-foreground hover:bg-muted'
                                             }`}
                                         >
-                                            Enlace Personalizado
+                                            {t('Enlace Personalizado')}
                                         </button>
                                         <button
                                             type="button"
@@ -376,19 +377,19 @@ export default function Edit() {
                                                     : 'border-border text-muted-foreground hover:bg-muted'
                                             }`}
                                         >
-                                            Artículo de CMS
+                                            {t('Artículo de CMS')}
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Title Label */}
                                 <div className="grid gap-1.5">
-                                    <Label htmlFor="item-title">Etiqueta / Label</Label>
+                                    <Label htmlFor="item-title">{t('Etiqueta / Label')}</Label>
                                     <Input
                                         id="item-title"
                                         type="text"
                                         required
-                                        placeholder="Ej. Acerca de"
+                                        placeholder={t('Ej. Acerca de')}
                                         value={itemData.title}
                                         onChange={(e) => setItemData({ ...itemData, title: e.target.value })}
                                         disabled={itemProcessing}
@@ -399,11 +400,11 @@ export default function Edit() {
                                 {/* Custom URL input */}
                                 {linkType === 'custom' && (
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="item-url">URL</Label>
+                                        <Label htmlFor="item-url">{t('URL')}</Label>
                                         <Input
                                             id="item-url"
                                             type="text"
-                                            placeholder="Ej. /servicios o https://google.com"
+                                            placeholder={t('Ej. /servicios o https://google.com')}
                                             value={itemData.url ?? ''}
                                             onChange={(e) => setItemData({ ...itemData, url: e.target.value })}
                                             disabled={itemProcessing}
@@ -415,7 +416,7 @@ export default function Edit() {
                                 {/* CMS Article Dropdown */}
                                 {linkType === 'article' && (
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="item-article">Selecciona Artículo</Label>
+                                        <Label htmlFor="item-article">{t('Selecciona Artículo')}</Label>
                                         <select
                                             id="item-article"
                                             className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring bg-card text-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -428,7 +429,7 @@ export default function Edit() {
                                             }
                                             disabled={itemProcessing}
                                         >
-                                            <option value="">-- Selecciona --</option>
+                                            <option value="">{t('-- Selecciona --')}</option>
                                             {articles.map((art) => (
                                                 <option key={art.id} value={art.id}>
                                                     {art.title} ({art.slug})
@@ -441,7 +442,7 @@ export default function Edit() {
 
                                 {/* Parent Item selection (Level 2 nesting) */}
                                 <div className="grid gap-1.5">
-                                    <Label htmlFor="item-parent">Nivel Padre (Opcional)</Label>
+                                    <Label htmlFor="item-parent">{t('Nivel Padre (Opcional)')}</Label>
                                     <select
                                         id="item-parent"
                                         className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring bg-card text-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -454,7 +455,7 @@ export default function Edit() {
                                         }
                                         disabled={itemProcessing}
                                     >
-                                        <option value="">Ninguno (Ítem de Nivel Superior)</option>
+                                        <option value="">{t('Ninguno (Ítem de Nivel Superior)')}</option>
                                         {/* List top level items that are not the current item itself to prevent self-parenting */}
                                         {topLevelItems
                                             .filter((parent) => parent.id !== itemData.id)
@@ -468,7 +469,7 @@ export default function Edit() {
 
                                 {/* Target/Open details */}
                                 <div className="grid gap-1.5">
-                                    <Label htmlFor="item-target">Destino / Target</Label>
+                                    <Label htmlFor="item-target">{t('Destino / Target')}</Label>
                                     <select
                                         id="item-target"
                                         className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring bg-card text-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -481,8 +482,8 @@ export default function Edit() {
                                         }
                                         disabled={itemProcessing}
                                     >
-                                        <option value="_self">Misma Pestaña (_self)</option>
-                                        <option value="_blank">Nueva Pestaña (_blank)</option>
+                                        <option value="_self">{t('Misma Pestaña (_self)')}</option>
+                                        <option value="_blank">{t('Nueva Pestaña (_blank)')}</option>
                                     </select>
                                 </div>
 
@@ -493,17 +494,17 @@ export default function Edit() {
                                         checked={Boolean(itemData.active)}
                                         onClick={() => setItemData({ ...itemData, active: !itemData.active })}
                                     />
-                                    <Label htmlFor="item-active">Ítem Activo</Label>
+                                    <Label htmlFor="item-active">{t('Ítem Activo')}</Label>
                                 </div>
 
                                 {/* Save Button */}
                                 <div className="flex items-center gap-3 pt-4">
                                     <Button className="w-full" disabled={itemProcessing}>
-                                        {itemData.id ? 'Guardar Cambios' : 'Agregar al Menú'}
+                                        {itemData.id ? t('Guardar Cambios') : t('Agregar al Menú')}
                                     </Button>
                                     {itemData.id && (
                                         <Button type="button" variant="outline" onClick={() => setItemData(initialItemForm)}>
-                                            Cancelar
+                                            {t('Cancelar')}
                                         </Button>
                                     )}
                                 </div>

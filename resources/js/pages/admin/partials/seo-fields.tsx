@@ -1,5 +1,6 @@
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { Globe, Image as ImageIcon, Trash2 } from 'lucide-react';
 import React from 'react';
 
@@ -21,28 +22,28 @@ export default function SeoFields({ values, onChange }: Props) {
         <div className="space-y-4">
             <div className="text-foreground flex items-center gap-2 text-sm font-bold">
                 <Globe className="text-primary h-4 w-4" />
-                <span>Metadatos SEO (Posicionamiento en Motores de Búsqueda)</span>
+                <span>{t('Metadatos SEO (Posicionamiento en Motores de Búsqueda)')}</span>
             </div>
 
             <div className="border-border bg-muted/50 space-y-4 rounded-xl border p-5">
                 <div className="space-y-1">
-                    <label className="text-muted-foreground text-xs font-semibold">Meta Título (Título de búsqueda)</label>
+                    <label className="text-muted-foreground text-xs font-semibold">{t('Meta Título (Título de búsqueda)')}</label>
                     <input
                         type="text"
                         value={values.seo_title || ''}
                         onChange={(e) => onChange('seo_title', e.target.value)}
                         className="border-border text-foreground focus-visible:ring-primary/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                        placeholder="Título optimizado para buscadores (deja vacío para usar título principal)"
+                        placeholder={t('Título optimizado para buscadores (deja vacío para usar título principal)')}
                     />
                 </div>
 
                 <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                        <label className="text-muted-foreground text-xs font-semibold">Meta Descripción</label>
+                        <label className="text-muted-foreground text-xs font-semibold">{t('Meta Descripción')}</label>
                         <span
                             className={`font-mono text-[10px] ${descLength >= 120 && descLength <= 160 ? 'text-success' : 'text-muted-foreground'}`}
                         >
-                            {descLength} / 160 caracteres (Recomendado: 120-160)
+                            {t(':count / 160 caracteres (Recomendado: 120-160)', { count: descLength })}
                         </span>
                     </div>
                     <textarea
@@ -50,27 +51,27 @@ export default function SeoFields({ values, onChange }: Props) {
                         onChange={(e) => onChange('seo_description', e.target.value)}
                         rows={3}
                         className="border-border text-foreground focus-visible:ring-primary/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                        placeholder="Descripción atractiva para resultados de Google..."
+                        placeholder={t('Descripción atractiva para resultados de Google...')}
                     />
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-muted-foreground text-xs font-semibold">Palabras Clave (Keywords - separadas por coma)</label>
+                    <label className="text-muted-foreground text-xs font-semibold">{t('Palabras Clave (Keywords - separadas por coma)')}</label>
                     <input
                         type="text"
                         value={values.seo_keywords || ''}
                         onChange={(e) => onChange('seo_keywords', e.target.value)}
                         className="border-border text-foreground focus-visible:ring-primary/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                        placeholder="Ej. blog, proyectos, servicios, mewcms"
+                        placeholder={t('Ej. blog, proyectos, servicios, mewcms')}
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-muted-foreground text-xs font-semibold">Imagen Open Graph (Facebook / Twitter Share preview)</label>
+                    <label className="text-muted-foreground text-xs font-semibold">{t('Imagen Open Graph (Facebook / Twitter Share preview)')}</label>
                     <div className="flex items-center gap-3">
                         <Button type="button" variant="outline" className="flex items-center gap-1 text-xs" onClick={() => setMediaOpen(true)}>
                             <ImageIcon className="h-4 w-4" />
-                            <span>Elegir Imagen OG</span>
+                            <span>{t('Elegir Imagen OG')}</span>
                         </Button>
                         <QuickMediaDrawer
                             isOpen={mediaOpen}
@@ -85,7 +86,7 @@ export default function SeoFields({ values, onChange }: Props) {
                                 type="button"
                                 onClick={() => onChange('seo_og_image', '')}
                                 className="text-muted-foreground hover:text-destructive transition-colors"
-                                title="Eliminar imagen"
+                                title={t('Eliminar imagen')}
                             >
                                 <Trash2 className="h-4.5 w-4.5" />
                             </button>
@@ -94,7 +95,7 @@ export default function SeoFields({ values, onChange }: Props) {
 
                     {values.seo_og_image && (
                         <div className="border-border bg-muted/50 aspect-[1.91/1] w-48 overflow-hidden rounded-lg border shadow-xs">
-                            <img src={values.seo_og_image} alt="OG Preview" className="h-full w-full object-cover" />
+                            <img src={values.seo_og_image} alt={t('OG Preview')} className="h-full w-full object-cover" />
                         </div>
                     )}
                 </div>

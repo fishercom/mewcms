@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import HeadingSmall from '@/components/heading-small';
 
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { t } from '@/lib/i18n';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -32,27 +33,28 @@ export default function DeleteUser() {
 
     return (
         <div className="space-y-6">
-            <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
+            <HeadingSmall title={t('Delete account')} description={t('Delete your account and all of its resources')} />
             <div className="border-destructive/30 bg-destructive-soft space-y-4 rounded-lg border p-4">
                 <div className="text-destructive relative space-y-0.5">
-                    <p className="font-medium">Warning</p>
-                    <p className="text-sm">Please proceed with caution, this cannot be undone.</p>
+                    <p className="font-medium">{t('Warning')}</p>
+                    <p className="text-sm">{t('Please proceed with caution, this cannot be undone.')}</p>
                 </div>
 
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="destructive">Delete account</Button>
+                        <Button variant="destructive">{t('Delete account')}</Button>
                     </DialogTrigger>
                     <DialogContent>
-                        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
+                        <DialogTitle>{t('Are you sure you want to delete your account?')}</DialogTitle>
                         <DialogDescription>
-                            Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password
-                            to confirm you would like to permanently delete your account.
+                            {t(
+                                'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
+                            )}
                         </DialogDescription>
                         <form className="space-y-6" onSubmit={deleteUser}>
                             <div className="grid gap-2">
                                 <Label htmlFor="password" className="sr-only">
-                                    Password
+                                    {t('Password')}
                                 </Label>
 
                                 <Input
@@ -62,7 +64,7 @@ export default function DeleteUser() {
                                     ref={passwordInput}
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Password"
+                                    placeholder={t('Password')}
                                     autoComplete="current-password"
                                 />
 
@@ -72,12 +74,12 @@ export default function DeleteUser() {
                             <DialogFooter className="gap-2">
                                 <DialogClose asChild>
                                     <Button variant="secondary" onClick={closeModal}>
-                                        Cancel
+                                        {t('Cancel')}
                                     </Button>
                                 </DialogClose>
 
                                 <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
+                                    <button type="submit">{t('Delete account')}</button>
                                 </Button>
                             </DialogFooter>
                         </form>

@@ -92,7 +92,7 @@ class TemplateController extends Controller
         }
 
         if (file_exists($filePath)) {
-            return back()->withErrors(['filename' => 'El archivo de la plantilla ya existe.']);
+            return back()->withErrors(['filename' => __('El archivo de la plantilla ya existe.')]);
         }
 
         // Inject template name directive if not present
@@ -188,14 +188,14 @@ class TemplateController extends Controller
         $baseName = basename($filename, '.tsx');
         $coreTemplates = ['home', 'page', 'post'];
         if (in_array($baseName, $coreTemplates)) {
-            return back()->withErrors(['error' => 'No se pueden eliminar las plantillas principales del sistema.']);
+            return back()->withErrors(['error' => __('No se pueden eliminar las plantillas principales del sistema.')]);
         }
 
         // Check if any schema uses it
         $frontViewPath = 'front/templates/'.$baseName;
         $inUse = CmsSchema::where('front_view', $frontViewPath)->exists();
         if ($inUse) {
-            return back()->withErrors(['error' => 'Esta plantilla está en uso por un esquema y no se puede eliminar.']);
+            return back()->withErrors(['error' => __('Esta plantilla está en uso por un esquema y no se puede eliminar.')]);
         }
 
         unlink($filePath);
@@ -240,6 +240,6 @@ class TemplateController extends Controller
 
     protected function ensureEditorEnabled(Request $request): void
     {
-        abort_unless($this->editorEnabled($request), 403, 'El editor de plantillas está deshabilitado.');
+        abort_unless($this->editorEnabled($request), 403, __('El editor de plantillas está deshabilitado.'));
     }
 }
