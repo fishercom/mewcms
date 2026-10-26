@@ -29,6 +29,18 @@ export interface BlockDefinition {
     nestable?: boolean;
 }
 
+/** A reusable block from the "Bloques reutilizables" module (sent as "blockPatterns") */
+export interface BlockPattern {
+    id: number;
+    name: string;
+    key: string;
+    description: string;
+    category: string;
+    /** Synced patterns are inserted as a reference; the others are copied */
+    synced: boolean;
+    blocks: BlockData[];
+}
+
 export interface BlockRenderProps<T = BlockValues> {
     data: T;
     /** Rendered inside the editor: links don't navigate */
@@ -43,6 +55,18 @@ export const newBlockId = (): string =>
 /** Plain content of an item saved before blocks existed: one rich text block */
 export const blocksFromContent = (html?: string | null): BlockData[] =>
     html && html.trim() !== '' ? [{ id: newBlockId(), type: 'rich_text', version: 1, data: { html } }] : [];
+
+/** Fresh ids for a copy of a pattern's blocks, so each insertion is independent */
+export const withNewIds = (blocks: BlockData[]): BlockData[] =>
+    blocks.map((block) => {
+        const data = structuredClone(block.data);
+        if (Array.isArray(data.columns)) {
+            data.columns = (data.columns as unknown as { blocks: BlockData[] }[]).map((column) => ({
+                blocks: withNewIds(column.blocks ?? []),
+            })) as unknown as BlockValues[string];
+        }
+        return { ...block, id: newBlockId(), data };
+    });
 
 export const str = (value: unknown): string => (typeof value === 'string' ? value : '');
 

@@ -24,6 +24,7 @@ class BlockRegistry
         ColumnsBlock::class,
         FormBlock::class,
         SliderBlock::class,
+        PatternBlock::class,
     ];
 
     public const MAX_BLOCKS = 200;

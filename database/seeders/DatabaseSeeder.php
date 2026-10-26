@@ -167,6 +167,15 @@ class DatabaseSeeder extends Seeder
                 'position' => 6,
                 'visible' => true,
             ],
+            [
+                'menu_id' => $menuContent->id,
+                'name' => 'Bloques reutilizables',
+                'url' => '/admin/block-patterns',
+                'route' => 'block-patterns.index',
+                'icon' => 'blocks',
+                'position' => 7,
+                'visible' => true,
+            ],
 
             // Estructura CMS
             [

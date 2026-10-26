@@ -1,13 +1,31 @@
 import { BLOCK_RENDERERS } from '@/blocks/registry';
-import { type BlockData, type BlockDefinition, type BlockValues, newBlockId, str } from '@/blocks/types';
+import { type BlockData, type BlockDefinition, type BlockPattern, type BlockValues, newBlockId, str, withNewIds } from '@/blocks/types';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { ArrowDown, ArrowUp, ChevronDown, Copy, GripVertical, LayoutTemplate, Plus, Search, Settings2, Trash2 } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import {
+    ArrowDown,
+    ArrowUp,
+    Bookmark,
+    ChevronDown,
+    Copy,
+    GripVertical,
+    LayoutTemplate,
+    Plus,
+    RefreshCw,
+    Search,
+    Settings2,
+    Trash2,
+} from 'lucide-react';
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
 import { KeyboardEvent, useMemo, useRef, useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
@@ -18,6 +36,8 @@ interface Props {
     types: BlockDefinition[];
     /** Inside a columns block: compact, and its own drag handles */
     nested?: boolean;
+    /** False inside the editor of a reusable block itself (no block inside a block) */
+    allowPatterns?: boolean;
 }
 
 interface ColumnData {
@@ -53,6 +73,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     basic: 'Básicos',
     layout: 'Diseño',
     media: 'Multimedia',
+    reusable: 'Reutilizables',
 };
 
 /** Short text that identifies a block when it is collapsed */
@@ -84,13 +105,32 @@ const summaryOf = (block: BlockData): string => {
  * reorder, duplicate, collapse and delete. Text blocks are edited in place; the other
  * blocks show their public preview and open their settings in a side panel.
  */
-export default function BlockEditor({ value, onChange, types, nested = false }: Props) {
+export default function BlockEditor({ value, onChange, types, nested = false, allowPatterns = true }: Props) {
     const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
     const [editingId, setEditingId] = useState<string | null>(null);
+    /** Index of the block being saved as a reusable block (its dialog is open) */
+    const [patternDialogIndex, setPatternDialogIndex] = useState<number | null>(null);
     const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const page = usePage<{
+        blockPatterns?: BlockPattern[];
+        auth?: { permissions?: { super_admin?: boolean; modules?: Record<string, string[]> } | null };
+    }>();
+    // Patterns saved from the editor are added to the ones the page was opened with
+    const [saved, setSaved] = useState<BlockPattern[]>([]);
+    const patterns = useMemo(
+        () => (allowPatterns ? [...(page.props.blockPatterns ?? []), ...saved] : []),
+        [allowPatterns, page.props.blockPatterns, saved],
+    );
+    const patternByKey = useMemo(() => Object.fromEntries(patterns.map((p) => [p.key, p])), [patterns]);
+    // Inside a column a synced reference is not offered (its content may hold columns): only copies
+    const pickerPatterns = useMemo(() => (nested ? patterns.filter((p) => !p.synced) : patterns), [nested, patterns]);
+    const canSavePatterns =
+        allowPatterns &&
+        Boolean(page.props.auth?.permissions?.super_admin || page.props.auth?.permissions?.modules?.['block-patterns']?.includes('administrar'));
     const typeByKey = useMemo(() => Object.fromEntries(types.map((t) => [t.key, t])), [types]);
-    // Inside a column only blocks that may nest are offered (no columns in columns)
-    const pickerTypes = useMemo(() => (nested ? types.filter((t) => t.nestable !== false) : types), [nested, types]);
+    // Inside a column only blocks that may nest are offered (no columns in columns).
+    // Synced blocks have their own section in the picker, so the type itself is hidden.
+    const pickerTypes = useMemo(() => types.filter((t) => t.key !== 'pattern' && (!nested || t.nestable !== false)), [nested, types]);
     // Separate handles, so dragging inside a column doesn't also drag the columns block
     const handleClass = nested ? 'block-drag-nested' : 'block-drag';
 
@@ -104,6 +144,38 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
         onChange(next);
         // Blocks with settings are configured right away (text and columns are edited in place)
         if (type.key !== 'rich_text' && type.key !== 'columns') setEditingId(block.id);
+    };
+
+    /** A synced pattern is inserted as a reference; an unsynced one is copied in */
+    const insertPattern = (pattern: BlockPattern, index: number) => {
+        const copied = withNewIds(pattern.blocks ?? []).filter((block) => !nested || typeByKey[block.type]?.nestable !== false);
+        const added: BlockData[] = pattern.synced
+            ? [{ id: newBlockId(), type: 'pattern', version: typeByKey.pattern?.version ?? 1, data: { pattern: pattern.key } }]
+            : copied;
+        const next = [...value];
+        next.splice(index, 0, ...added);
+        onChange(next);
+    };
+
+    /** Save one block as a reusable block; a synced one replaces the block with a reference */
+    const saveAsPattern = async (index: number, name: string, synced: boolean) => {
+        try {
+            const { data } = await axios.post<{ pattern: BlockPattern }>(route('block-patterns.quick'), {
+                name,
+                synced,
+                blocks: [value[index]],
+            });
+            setSaved((prev) => [...prev, data.pattern]);
+            if (synced) {
+                const next = [...value];
+                next[index] = { id: newBlockId(), type: 'pattern', version: typeByKey.pattern?.version ?? 1, data: { pattern: data.pattern.key } };
+                onChange(next);
+            }
+        } catch {
+            window.alert('No se pudo guardar el bloque reutilizable.');
+        } finally {
+            setPatternDialogIndex(null);
+        }
     };
 
     const update = (id: string, data: BlockValues) => onChange(value.map((block) => (block.id === id ? { ...block, data } : block)));
@@ -151,7 +223,14 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
     if (value.length === 0 && nested) {
         return (
             <div className="border-border/80 flex min-h-24 items-center justify-center rounded-lg border border-dashed p-3">
-                <BlockPicker types={pickerTypes} onPick={(type) => insert(type, 0)} label="Añadir" variant="outline" />
+                <BlockPicker
+                    types={pickerTypes}
+                    patterns={pickerPatterns}
+                    onPick={(type) => insert(type, 0)}
+                    onPickPattern={(pattern) => insertPattern(pattern, 0)}
+                    label="Añadir"
+                    variant="outline"
+                />
             </div>
         );
     }
@@ -166,7 +245,14 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
                 <p className="text-muted-foreground mt-1 mb-4 max-w-sm text-xs">
                     Construye la página con bloques: texto, portadas, imágenes y llamadas a la acción.
                 </p>
-                <BlockPicker types={pickerTypes} onPick={(type) => insert(type, 0)} label="Añadir el primer bloque" variant="default" />
+                <BlockPicker
+                    types={pickerTypes}
+                    patterns={pickerPatterns}
+                    onPick={(type) => insert(type, 0)}
+                    onPickPattern={(pattern) => insertPattern(pattern, 0)}
+                    label="Añadir el primer bloque"
+                    variant="default"
+                />
             </div>
         );
     }
@@ -179,6 +265,8 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
                     const Render = BLOCK_RENDERERS[block.type];
                     const isCollapsed = collapsed.has(block.id);
                     const isText = block.type === 'rich_text';
+                    const isPattern = block.type === 'pattern';
+                    const pattern = isPattern ? patternByKey[str(block.data.pattern)] : undefined;
 
                     return (
                         <div key={block.id} className="group/block">
@@ -208,12 +296,25 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
                                     <span className="bg-primary-soft text-primary-soft-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-md">
                                         <DynamicIcon name={(type?.icon ?? 'square') as IconName} className="h-4 w-4" />
                                     </span>
-                                    <span className="text-foreground text-xs font-semibold">{type?.name ?? block.type}</span>
+                                    <span className="text-foreground text-xs font-semibold">
+                                        {isPattern ? (pattern?.name ?? type?.name ?? block.type) : (type?.name ?? block.type)}
+                                    </span>
+                                    {isPattern && (
+                                        <span className="bg-primary-soft text-primary-soft-foreground inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                                            <RefreshCw className="h-3 w-3" />
+                                            Sincronizado
+                                        </span>
+                                    )}
                                     {isCollapsed && <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">{summaryOf(block)}</span>}
                                     <div className="ml-auto flex items-center gap-0.5">
                                         {!isText && type && (
                                             <IconButton label="Ajustes del bloque" onClick={() => setEditingId(block.id)}>
                                                 <Settings2 className="h-4 w-4" />
+                                            </IconButton>
+                                        )}
+                                        {canSavePatterns && !isPattern && (
+                                            <IconButton label="Guardar como bloque reutilizable" onClick={() => setPatternDialogIndex(index)}>
+                                                <Bookmark className="h-4 w-4" />
                                             </IconButton>
                                         )}
                                         <IconButton label="Subir" onClick={() => move(index, -1)} disabled={index === 0}>
@@ -255,6 +356,7 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
                                                         </p>
                                                         <BlockEditor
                                                             nested
+                                                            allowPatterns={allowPatterns}
                                                             types={types}
                                                             value={columns[columnIndex]?.blocks ?? []}
                                                             onChange={(blocks) => {
@@ -274,7 +376,14 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
                                             className="front-theme hover:bg-muted/30 block w-full overflow-hidden rounded-b-xl p-4 text-left transition-colors"
                                             aria-label={`Editar ${type?.name ?? block.type}`}
                                         >
-                                            {Render && summaryOf(block) !== '' ? (
+                                            {Render && isPattern ? (
+                                                <div className="pointer-events-none">
+                                                    <Render
+                                                        data={{ ...block.data, blocks: (pattern?.blocks ?? []) as unknown as BlockValues[string] }}
+                                                        editing
+                                                    />
+                                                </div>
+                                            ) : Render && summaryOf(block) !== '' ? (
                                                 <div className="pointer-events-none">
                                                     <Render data={block.data} editing />
                                                 </div>
@@ -290,7 +399,14 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
 
                             {/* Insert between blocks */}
                             <div className="flex h-7 items-center justify-center opacity-0 transition-opacity group-hover/block:opacity-100 focus-within:opacity-100">
-                                <BlockPicker types={pickerTypes} onPick={(t) => insert(t, index + 1)} label="Insertar bloque aquí" variant="inline" />
+                                <BlockPicker
+                                    types={pickerTypes}
+                                    patterns={pickerPatterns}
+                                    onPick={(t) => insert(t, index + 1)}
+                                    onPickPattern={(pattern) => insertPattern(pattern, index + 1)}
+                                    label="Insertar bloque aquí"
+                                    variant="inline"
+                                />
                             </div>
                         </div>
                     );
@@ -300,11 +416,20 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
             <div className="flex justify-center pt-1">
                 <BlockPicker
                     types={pickerTypes}
+                    patterns={pickerPatterns}
                     onPick={(t) => insert(t, value.length)}
+                    onPickPattern={(pattern) => insertPattern(pattern, value.length)}
                     label={nested ? 'Añadir' : 'Añadir bloque'}
                     variant={nested ? 'ghost' : 'outline'}
                 />
             </div>
+
+            <SavePatternDialog
+                open={patternDialogIndex !== null}
+                blockName={patternDialogIndex !== null ? (typeByKey[value[patternDialogIndex]?.type]?.name ?? '') : ''}
+                onCancel={() => setPatternDialogIndex(null)}
+                onSave={(name, synced) => patternDialogIndex !== null && saveAsPattern(patternDialogIndex, name, synced)}
+            />
 
             <Sheet open={!!editing} onOpenChange={(open) => !open && setEditingId(null)}>
                 <SheetContent className="w-full gap-0 overflow-y-auto sm:max-w-md">
@@ -333,6 +458,20 @@ export default function BlockEditor({ value, onChange, types, nested = false }: 
                                     }
                                 />
                             </div>
+                            {editing.type === 'pattern' && patternByKey[str(editing.data.pattern)] && (
+                                <div className="px-4 pb-2">
+                                    <a
+                                        href={route('block-patterns.edit', patternByKey[str(editing.data.pattern)].id)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-primary inline-flex items-center gap-1.5 text-xs font-medium hover:underline"
+                                    >
+                                        <Settings2 className="h-3.5 w-3.5" />
+                                        Editar este bloque reutilizable
+                                    </a>
+                                </div>
+                            )}
+
                             <div className="bg-card sticky bottom-0 mt-auto border-t p-4">
                                 <Button type="button" className="w-full" onClick={() => setEditingId(null)}>
                                     Listo
@@ -375,14 +514,93 @@ function IconButton({
     );
 }
 
+/** Name and sync mode of a block the editor saves as a reusable block */
+function SavePatternDialog({
+    open,
+    blockName,
+    onCancel,
+    onSave,
+}: {
+    open: boolean;
+    blockName: string;
+    onCancel: () => void;
+    onSave: (name: string, synced: boolean) => void;
+}) {
+    const [name, setName] = useState('');
+    const [synced, setSynced] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    // Each time the dialog opens it starts from the block's own name
+    const reset = (next: boolean) => {
+        if (!next) {
+            onCancel();
+            return;
+        }
+        setName(blockName);
+        setSynced(true);
+        setSaving(false);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={reset}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Guardar como bloque reutilizable</DialogTitle>
+                    <DialogDescription>Podrás insertarlo en cualquier página o entrada desde el buscador de bloques.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="pattern-name">Nombre</Label>
+                        <Input
+                            id="pattern-name"
+                            autoFocus
+                            value={name || blockName}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Ej. Aviso de horarios"
+                        />
+                    </div>
+                    <label className="flex items-start gap-3">
+                        <Checkbox checked={synced} onClick={() => setSynced(!synced)} className="mt-0.5" />
+                        <span>
+                            <span className="text-foreground block text-sm font-medium">Sincronizado</span>
+                            <span className="text-muted-foreground block text-xs">
+                                Al editarlo cambia en todas las páginas que lo usan. Sin sincronizar, cada inserción es una copia independiente.
+                            </span>
+                        </span>
+                    </label>
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="button"
+                        disabled={saving || (name || blockName).trim() === ''}
+                        onClick={() => {
+                            setSaving(true);
+                            onSave((name || blockName).trim(), synced);
+                        }}
+                    >
+                        {saving ? 'Guardando...' : 'Guardar'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 function BlockPicker({
     types,
+    patterns = [],
     onPick,
+    onPickPattern,
     label,
     variant,
 }: {
     types: BlockDefinition[];
+    patterns?: BlockPattern[];
     onPick: (type: BlockDefinition) => void;
+    onPickPattern?: (pattern: BlockPattern) => void;
     label: string;
     variant: 'default' | 'outline' | 'ghost' | 'inline';
 }) {
@@ -391,9 +609,16 @@ function BlockPicker({
     const q = query.trim().toLowerCase();
     const matches = types.filter((t) => !q || t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
     const categories = [...new Set(matches.map((t) => t.category))];
+    const patternMatches = patterns.filter((p) => !q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
 
     const pick = (type: BlockDefinition) => {
         onPick(type);
+        setOpen(false);
+        setQuery('');
+    };
+
+    const pickPattern = (pattern: BlockPattern) => {
+        onPickPattern?.(pattern);
         setOpen(false);
         setQuery('');
     };
@@ -435,7 +660,35 @@ function BlockPicker({
                         aria-label="Buscar bloque"
                     />
                 </div>
-                {matches.length === 0 && <p className="text-muted-foreground px-2 py-4 text-center text-xs">Ningún bloque coincide.</p>}
+                {matches.length === 0 && patternMatches.length === 0 && (
+                    <p className="text-muted-foreground px-2 py-4 text-center text-xs">Ningún bloque coincide.</p>
+                )}
+                {patternMatches.length > 0 && (
+                    <div className="mb-1">
+                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-[10px] font-semibold tracking-wider uppercase">Reutilizables</p>
+                        {patternMatches.map((pattern) => (
+                            <button
+                                key={pattern.key}
+                                type="button"
+                                onClick={() => pickPattern(pattern)}
+                                className="hover:bg-primary-soft focus-visible:bg-primary-soft flex w-full items-start gap-2.5 rounded-lg px-2 py-2 text-left focus-visible:outline-none"
+                            >
+                                <span className="bg-muted text-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-md">
+                                    {pattern.synced ? <RefreshCw className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                </span>
+                                <span className="min-w-0">
+                                    <span className="text-foreground block text-xs font-semibold">{pattern.name}</span>
+                                    <span className="text-muted-foreground block text-[11px] leading-snug">
+                                        {pattern.description ||
+                                            (pattern.synced
+                                                ? 'Sincronizado: se actualiza en todas las páginas.'
+                                                : 'Se inserta como una copia independiente.')}
+                                    </span>
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                )}
                 {categories.map((category) => (
                     <div key={category} className="mb-1">
                         <p className="text-muted-foreground px-2 pt-1 pb-1 text-[10px] font-semibold tracking-wider uppercase">

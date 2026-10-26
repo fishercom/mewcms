@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Controller;
+use App\Models\CmsBlockPattern;
 use App\Models\AdmAction;
 use App\Models\CmsArticle;
 use App\Models\CmsLang;
@@ -130,6 +131,7 @@ class ArticleController extends Controller
 
         return Inertia::render('admin/articles/create', [
             'blockTypes' => BlockRegistry::definitions(),
+            'blockPatterns' => CmsBlockPattern::forEditor(),
             'item' => $args,
             'schema' => $schema,
             ...$options,
@@ -205,6 +207,7 @@ class ArticleController extends Controller
 
         return Inertia::render('admin/articles/edit', [
             'blockTypes' => BlockRegistry::definitions(),
+            'blockPatterns' => CmsBlockPattern::forEditor(),
             'item' => $item,
             'schema' => $item?->schema,
             ...$this->templateOptions($item),
