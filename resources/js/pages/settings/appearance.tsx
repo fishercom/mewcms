@@ -13,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = generateBreadcrumb('Appearance settings', 
 export default function Appearance() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Appearance settings" />
+            <Head title="Apariencia" />
 
             <SettingsLayout>
                 <div className="space-y-6">

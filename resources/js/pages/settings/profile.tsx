@@ -38,7 +38,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Mi perfil" />
 
             <SettingsLayout>
                 <div className="space-y-6">
