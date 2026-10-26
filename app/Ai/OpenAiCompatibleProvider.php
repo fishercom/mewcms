@@ -3,7 +3,10 @@
 namespace App\Ai;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Any service with an OpenAI-style chat completions API: OpenAI, DeepSeek and Gemini
@@ -85,16 +88,21 @@ class OpenAiCompatibleProvider implements AiProvider
     protected function send(array $request): array
     {
         try {
+            // A busy or rate-limited service often answers on a second try
             $response = Http::withToken($this->apiKey)
                 ->acceptJson()
                 ->timeout($this->timeout)
+                ->retry(2, 2000, fn (Throwable $e): bool => $e instanceof RequestException && in_array($e->response->status(), [429, 500, 502, 503, 504], true), throw: false)
                 ->post(rtrim($this->baseUrl, '/').'/chat/completions', $request);
         } catch (ConnectionException $e) {
             throw new AiException(__('No se pudo conectar con :provider.', ['provider' => $this->name]), previous: $e);
         }
 
         if ($response->failed()) {
-            throw new AiException(__(':provider respondió con un error (:status).', ['provider' => $this->name, 'status' => $response->status()]));
+            // OpenAI-style {"error": {"message"}}; Gemini may wrap it in a list
+            $message = $response->json('error.message') ?? $response->json('0.error.message');
+            throw new AiException(__(':provider respondió con un error (:status).', ['provider' => $this->name, 'status' => $response->status()])
+                .(is_string($message) && $message !== '' ? ' '.Str::limit(strip_tags($message), 200) : ''));
         }
 
         $choice = $response->json('choices.0');

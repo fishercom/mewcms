@@ -121,7 +121,6 @@ class AiController extends Controller
     public function outline(Request $request, ContentAssistant $assistant): JsonResponse
     {
         $brief = $this->brief($request);
-        set_time_limit(180);
 
         try {
             return response()->json($assistant->outline($brief, $brief['module'], $request->user()));
@@ -143,7 +142,6 @@ class AiController extends Controller
             'outline.sections.*.heading' => 'required|string|max:255',
             'outline.sections.*.summary' => 'nullable|string|max:500',
         ])['outline'];
-        set_time_limit(300);
 
         try {
             return response()->json($assistant->draft($brief, $outline, $brief['module'], $request->user()));
