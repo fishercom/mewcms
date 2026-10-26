@@ -143,9 +143,10 @@ test('editors need the assistant module and the content module', function (): vo
 
     $this->actingAs($user)->postJson(route('ai.metadata'), metadataRequest())->assertForbidden();
 
+    // A fresh model: the user keeps its permissions in memory
     grantPermissions($user, ['ai' => 'administrar']);
-    $this->actingAs($user)->postJson(route('ai.metadata'), metadataRequest())->assertOk();
-    $this->actingAs($user)->postJson(route('ai.metadata'), metadataRequest(['module' => 'posts']))->assertForbidden();
+    $this->actingAs($user->fresh())->postJson(route('ai.metadata'), metadataRequest())->assertOk();
+    $this->actingAs($user->fresh())->postJson(route('ai.metadata'), metadataRequest(['module' => 'posts']))->assertForbidden();
 });
 
 test('editors see the settings but only Configuración managers change them', function (): void {
@@ -163,7 +164,7 @@ test('editors see the settings but only Configuración managers change them', fu
     $this->actingAs($user)->put(route('ai.update'), ['monthly_budget' => 50, 'tone' => 'cercano'])->assertForbidden();
 
     grantPermissions($user, ['configs' => 'administrar']);
-    $this->actingAs($user)->put(route('ai.update'), ['monthly_budget' => 50, 'tone' => 'cercano'])->assertRedirect();
+    $this->actingAs($user->fresh())->put(route('ai.update'), ['monthly_budget' => 50, 'tone' => 'cercano'])->assertRedirect();
 
     expect(AiSettings::all())->toMatchArray(['monthly_budget' => 50.0, 'tone' => 'cercano', 'audience' => '']);
 });
