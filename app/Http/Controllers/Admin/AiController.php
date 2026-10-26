@@ -12,6 +12,7 @@ use App\Models\CmsAiUsage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -112,6 +113,29 @@ class AiController extends Controller
         } catch (AiException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+    }
+
+    /**
+     * "Mejorar bloque": the block's texts rewritten, as a preview the editor accepts or discards.
+     */
+    public function improveBlock(Request $request, ContentAssistant $assistant): JsonResponse
+    {
+        $data = $request->validate([
+            'block.type' => 'required|string|max:60',
+            'block.data' => 'required|array',
+            'action' => ['required', Rule::in(ContentAssistant::BLOCK_ACTIONS)],
+            'option' => 'nullable|string|max:20',
+            'title' => 'nullable|string|max:255',
+            'lang_id' => 'nullable|integer',
+        ]);
+
+        try {
+            $result = $assistant->improveBlock($data['block'], $data['action'], $data['option'] ?? null, $data, $request->user());
+        } catch (AiException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['data' => $result]);
     }
 
     protected function canConfigure(Request $request): bool

@@ -50,6 +50,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::middleware('throttle:ai')->group(function (): void {
         Route::post('ai/test', [AiController::class, 'test'])->name('ai.test');
         Route::post('ai/metadata', [AiController::class, 'metadata'])->name('ai.metadata');
+        Route::post('ai/improve-block', [AiController::class, 'improveBlock'])->name('ai.improve-block');
     });
 
     Route::resource('sites', SiteController::class);

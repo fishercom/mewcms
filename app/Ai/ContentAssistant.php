@@ -2,6 +2,7 @@
 
 namespace App\Ai;
 
+use App\Blocks\BlockRegistry;
 use App\Models\CmsArticle;
 use App\Models\CmsLang;
 use App\Models\CmsPost;
@@ -17,6 +18,19 @@ class ContentAssistant
 {
     /** Characters of page text sent with a metadata request */
     protected const TEXT_LIMIT = 6000;
+
+    /** Characters of block text the assistant rewrites in one call */
+    protected const BLOCK_LIMIT = 20000;
+
+    /** What "Mejorar bloque" can do; "tone" and "translate" take an option */
+    public const BLOCK_ACTIONS = ['rewrite', 'shorten', 'expand', 'fix', 'tone', 'translate'];
+
+    public const TONES = ['formal' => 'formal', 'friendly' => 'cercano y amable', 'persuasive' => 'persuasivo', 'neutral' => 'neutral y profesional'];
+
+    public const LANGUAGES = ['es' => 'español', 'en' => 'inglés', 'pt' => 'portugués', 'fr' => 'francés', 'it' => 'italiano', 'de' => 'alemán'];
+
+    /** Field types the assistant writes; links, images, numbers and options stay as they are */
+    protected const TEXT_TYPES = ['text', 'textarea', 'html_editor'];
 
     public function __construct(protected AiManager $ai) {}
 
@@ -102,6 +116,128 @@ class ContentAssistant
         }
 
         return $result;
+    }
+
+    /**
+     * The block's texts rewritten: the other fields (links, images, options) are kept, and
+     * the result is cleaned like a save. Returns the new block data for the editor to preview.
+     *
+     * @param  array{type: string, data: array<string, mixed>}  $block
+     * @param  array{title?: ?string, lang_id?: mixed}  $context
+     * @return array<string, mixed>
+     *
+     * @throws AiException
+     */
+    public function improveBlock(array $block, string $action, ?string $option, array $context, ?User $user): array
+    {
+        $type = BlockRegistry::get($block['type']);
+        if (! $type) {
+            throw new AiException(__('Este bloque no tiene texto que mejorar.'));
+        }
+        $data = $type->sanitize($block['data']);
+
+        [$texts, $properties, $limits] = $this->blockTexts($type->fields(), $data);
+        if ($texts === []) {
+            throw new AiException(__('Este bloque no tiene texto que mejorar.'));
+        }
+        $json = json_encode($texts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (mb_strlen($json) > self::BLOCK_LIMIT) {
+            throw new AiException(__('El bloque es demasiado largo para mejorarlo de una vez.'));
+        }
+
+        $instruction = match ($action) {
+            'rewrite' => 'Reescribe los textos para que sean más claros y atractivos, con una extensión parecida y el mismo significado.',
+            'shorten' => 'Acorta los textos a cerca de la mitad, conservando lo esencial.',
+            'expand' => 'Amplía los textos con más detalle útil, hasta el doble de extensión, sin inventar datos concretos como cifras, precios, fechas o nombres.',
+            'fix' => 'Corrige solo la ortografía, la gramática y la puntuación. No cambies el estilo ni el contenido.',
+            'tone' => 'Cambia el tono de los textos a '.(self::TONES[$option] ?? self::TONES['neutral']).', sin cambiar el significado.',
+            'translate' => 'Traduce los textos al '.(self::LANGUAGES[$option] ?? self::LANGUAGES['en']).'. Mantén el sentido y adapta las expresiones con naturalidad.',
+            default => throw new AiException(__('Acción no válida.')),
+        };
+
+        $prompt = $instruction."\n"
+            ."Devuelve el mismo objeto JSON que está dentro de <block>, con las mismas claves y el mismo número de elementos en cada lista.\n"
+            ."Los campos con HTML deben seguir siendo HTML: conserva las etiquetas, los enlaces (<a>) y las imágenes (<img>) tal cual, y cambia solo el texto.\n"
+            .($limits !== [] ? 'Límites de caracteres: '.implode(', ', array_map(fn (string $key, int $max): string => "{$key} ≤ {$max}", array_keys($limits), $limits)).".\n" : '')
+            .(($context['title'] ?? '') !== '' ? 'La página se titula «'.str_replace(['<', '>'], '', (string) $context['title'])."».\n" : '')
+            ."\n<block>\n".str_replace(['</block', '<block'], ['&lt;/block', '&lt;block'], $json)."\n</block>";
+
+        $schema = ['type' => 'object', 'properties' => $properties, 'required' => array_keys($properties), 'additionalProperties' => false];
+
+        $response = $this->ai->run('fast', 'improve_block', $this->systemPrompt($context['lang_id'] ?? null), $prompt, $schema, $user, [], 8000);
+
+        return $type->sanitize($this->mergeTexts($data, $texts, $response->data ?? []));
+    }
+
+    /**
+     * The non-empty text fields of a block (repeater items keep their order), with the JSON
+     * schema of that shape and the length limits of each field.
+     *
+     * @param  list<array<string, mixed>>  $fields
+     * @param  array<string, mixed>  $data
+     * @return array{0: array<string, mixed>, 1: array<string, mixed>, 2: array<string, int>}
+     */
+    protected function blockTexts(array $fields, array $data): array
+    {
+        $texts = $properties = $limits = [];
+        foreach ($fields as $field) {
+            $value = $data[$field['key']] ?? null;
+            if (in_array($field['type'], self::TEXT_TYPES, true) && is_string($value) && trim(strip_tags($value)) !== '') {
+                $texts[$field['key']] = $value;
+                $properties[$field['key']] = ['type' => 'string'];
+                if (isset($field['max'])) {
+                    $limits[$field['key']] = (int) $field['max'];
+                }
+            } elseif ($field['type'] === 'repeater' && is_array($value) && $value !== []) {
+                $subFields = array_values(array_filter($field['fields'] ?? [], fn (array $sub): bool => in_array($sub['type'], self::TEXT_TYPES, true)));
+                if ($subFields === []) {
+                    continue;
+                }
+                $texts[$field['key']] = array_map(fn (array $item): array => collect($subFields)->mapWithKeys(fn (array $sub): array => [$sub['key'] => (string) ($item[$sub['key']] ?? '')])->all(), $value);
+                $itemProperties = collect($subFields)->mapWithKeys(fn (array $sub): array => [$sub['key'] => ['type' => 'string']])->all();
+                $properties[$field['key']] = ['type' => 'array', 'items' => ['type' => 'object', 'properties' => $itemProperties, 'required' => array_keys($itemProperties), 'additionalProperties' => false]];
+                foreach ($subFields as $sub) {
+                    if (isset($sub['max'])) {
+                        $limits[$field['key'].'[].'.$sub['key']] = (int) $sub['max'];
+                    }
+                }
+            }
+        }
+
+        return [$texts, $properties, $limits];
+    }
+
+    /**
+     * Put the rewritten texts back into the block, field by field and item by item; anything
+     * missing or of the wrong shape keeps the original.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $texts
+     * @param  array<string, mixed>  $answer
+     * @return array<string, mixed>
+     */
+    protected function mergeTexts(array $data, array $texts, array $answer): array
+    {
+        foreach ($texts as $key => $original) {
+            $new = $answer[$key] ?? null;
+            if (is_string($original)) {
+                if (is_string($new) && trim($new) !== '') {
+                    $data[$key] = $new;
+                }
+
+                continue;
+            }
+            foreach ($original as $index => $item) {
+                foreach (array_keys($item) as $subKey) {
+                    $value = $new[$index][$subKey] ?? null;
+                    if (is_string($value) && trim($value) !== '' && isset($data[$key][$index])) {
+                        $data[$key][$index][$subKey] = $value;
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
