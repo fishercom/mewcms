@@ -4,6 +4,7 @@ import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { updateArticle } from '@/services/articles';
 import { CmsArticle, CmsArticleForm, FormDataConvertible } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
@@ -80,14 +81,14 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-b pb-4">
                     <Link
                         href="/admin/articles"
                         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
                     >
-                        ← Volver a Páginas
+                        {t('← Volver a Páginas')}
                     </Link>
 
                     <div className="flex items-center gap-2.5">
@@ -98,7 +99,7 @@ export default function Edit() {
                             onClick={() => setMediaOpen(true)}
                         >
                             <ImageIcon className="text-primary h-4 w-4" />
-                            <span>Biblioteca de Medios</span>
+                            <span>{t('Biblioteca de Medios')}</span>
                         </Button>
 
                         <Button
@@ -106,7 +107,7 @@ export default function Edit() {
                             disabled={processing}
                             className="bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 h-9 gap-1.5 rounded-xl px-4 text-xs font-semibold shadow-sm transition-all active:scale-95"
                         >
-                            <span>Guardar Cambios</span>
+                            <span>{t('Guardar Cambios')}</span>
                         </Button>
                     </div>
                 </div>
@@ -151,18 +152,18 @@ export default function Edit() {
                 {/* Sticky publication action bar */}
                 <div className="border-border/80 bg-background/90 sticky bottom-4 z-10 flex items-center justify-between rounded-2xl border p-4 shadow-lg backdrop-blur-md">
                     <span className="text-muted-foreground text-xs">
-                        {processing ? 'Actualizando página...' : `Editando: ${data.title || 'Sin título'}`}
+                        {processing ? t('Actualizando página...') : `Editando: ${data.title || t('Sin título')}`}
                     </span>
                     <div className="flex items-center gap-2.5">
                         <Button variant="outline" type="button" asChild className="border-border/70 h-9 rounded-xl text-xs font-medium">
-                            <Link href="/admin/articles">Cancelar</Link>
+                            <Link href="/admin/articles">{t('Cancelar')}</Link>
                         </Button>
                         <Button
                             type="submit"
                             disabled={processing}
                             className="bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 h-9 rounded-xl px-5 text-xs font-semibold shadow-sm active:scale-95"
                         >
-                            {processing ? 'Guardando...' : 'Guardar Cambios'}
+                            {processing ? t('Guardando...') : t('Guardar Cambios')}
                         </Button>
                     </div>
                 </div>

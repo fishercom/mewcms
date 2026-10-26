@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { t } from '@/lib/i18n';
 import { CmsArticle } from '@/types/models/cms-article';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -37,8 +38,8 @@ export default function SortableArticlesModal({ isOpen, onClose, articles }: Sor
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Ordenar Artículos</DialogTitle>
-                    <DialogDescription>Arrastra y suelta los artículos para cambiar su orden.</DialogDescription>
+                    <DialogTitle>{t('Ordenar Artículos')}</DialogTitle>
+                    <DialogDescription>{t('Arrastra y suelta los artículos para cambiar su orden.')}</DialogDescription>
                 </DialogHeader>
                 <div className="p-4">
                     <ReactSortable list={sortedArticles} setList={handleSort}>
@@ -51,9 +52,9 @@ export default function SortableArticlesModal({ isOpen, onClose, articles }: Sor
                 </div>
                 <DialogFooter>
                     <Button onClick={onClose} variant="outline">
-                        Cancelar
+                        {t('Cancelar')}
                     </Button>
-                    <Button onClick={handleSave}>Guardar</Button>
+                    <Button onClick={handleSave}>{t('Guardar')}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

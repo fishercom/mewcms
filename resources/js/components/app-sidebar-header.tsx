@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CommandPalette } from '@/components/command-palette';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { t } from '@/lib/i18n';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { ExternalLink, Globe, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -39,7 +40,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         className="border-border/70 bg-muted/40 text-muted-foreground hover:border-border hover:bg-muted/70 hover:text-foreground hidden cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-1 text-xs shadow-2xs transition-all sm:inline-flex"
                     >
                         <Search className="text-muted-foreground h-3.5 w-3.5" />
-                        <span>Buscar o saltar a...</span>
+                        <span>{t('Buscar o saltar a...')}</span>
                         <kbd className="border-border/80 bg-background text-muted-foreground pointer-events-none ml-2 inline-flex h-4.5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-[10px] font-medium select-none">
                             <span>⌘</span>K
                         </kbd>
@@ -53,7 +54,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         className="text-muted-foreground hover:text-foreground h-8 w-8 sm:hidden"
                     >
                         <Search className="h-4 w-4" />
-                        <span className="sr-only">Buscar</span>
+                        <span className="sr-only">{t('Buscar')}</span>
                     </Button>
 
                     <Button
@@ -68,7 +69,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                 <span className="bg-success relative inline-flex h-2 w-2 rounded-full" />
                             </span>
                             <Globe className="h-3.5 w-3.5" />
-                            <span className="hidden md:inline">Ver Sitio Web</span>
+                            <span className="hidden md:inline">{t('Ver Sitio Web')}</span>
                             <ExternalLink className="h-3 w-3 opacity-60" />
                         </a>
                     </Button>

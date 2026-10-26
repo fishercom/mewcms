@@ -15,6 +15,7 @@ import { CalendarIcon, FileText, Plus, Trash2, UploadCloud } from 'lucide-react'
 import React from 'react';
 import { DayPicker } from 'react-day-picker';
 // react-day-picker base styles. If Tailwind purges them, consider importing via CSS entry.
+import { t } from '@/lib/i18n';
 import 'react-day-picker/style.css';
 // Using the core widget to avoid React peer dependency issues
 
@@ -71,7 +72,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
                         <Button type="button" variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => setIsDrawerOpen(true)}>
-                            Cambiar
+                            {t('Cambiar')}
                         </Button>
                         <Button
                             type="button"
@@ -90,8 +91,10 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                     className="group border-border hover:border-primary/40 hover:bg-muted/50 flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center transition-all"
                 >
                     <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-7 w-7 transition-colors" />
-                    <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">Seleccionar Imagen</span>
-                    <span className="text-muted-foreground mt-1 text-[10px]">Biblioteca de Medios Rápida</span>
+                    <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">
+                        {t('Seleccionar Imagen')}
+                    </span>
+                    <span className="text-muted-foreground mt-1 text-[10px]">{t('Biblioteca de Medios Rápida')}</span>
                 </div>
             )}
 
@@ -101,7 +104,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                     onClick={() => setShowManualUrl(!showManualUrl)}
                     className="text-muted-foreground hover:text-muted-foreground text-[10px] underline transition-colors focus:outline-none"
                 >
-                    {showManualUrl ? 'Ocultar edición manual' : 'Editar URL manualmente'}
+                    {showManualUrl ? t('Ocultar edición manual') : t('Editar URL manualmente')}
                 </button>
             </div>
 
@@ -166,7 +169,7 @@ function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFie
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
                         <Button type="button" variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => setIsDrawerOpen(true)}>
-                            Cambiar
+                            {t('Cambiar')}
                         </Button>
                         <Button
                             type="button"
@@ -186,9 +189,9 @@ function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFie
                 >
                     <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-7 w-7 transition-colors" />
                     <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">
-                        Seleccionar Archivo / Documento
+                        {t('Seleccionar Archivo / Documento')}
                     </span>
-                    <span className="text-muted-foreground mt-1 text-[10px]">Biblioteca de Medios Rápida</span>
+                    <span className="text-muted-foreground mt-1 text-[10px]">{t('Biblioteca de Medios Rápida')}</span>
                 </div>
             )}
 
@@ -198,7 +201,7 @@ function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFie
                     onClick={() => setShowManualUrl(!showManualUrl)}
                     className="text-muted-foreground hover:text-muted-foreground text-[10px] underline transition-colors focus:outline-none"
                 >
-                    {showManualUrl ? 'Ocultar edición manual' : 'Editar URL manualmente'}
+                    {showManualUrl ? t('Ocultar edición manual') : t('Editar URL manualmente')}
                 </button>
             </div>
 
@@ -254,7 +257,7 @@ function SliderFieldRenderer({ value, onChange }: SliderFieldRendererProps) {
     return (
         <Select value={value || ''} onValueChange={onChange}>
             <SelectTrigger className="bg-card w-full">
-                <SelectValue placeholder={loading ? 'Cargando sliders...' : 'Selecciona un slider'} />
+                <SelectValue placeholder={loading ? t('Cargando sliders...') : t('Selecciona un slider')} />
             </SelectTrigger>
             <SelectContent>
                 {sliders.length > 0 ? (
@@ -265,7 +268,7 @@ function SliderFieldRenderer({ value, onChange }: SliderFieldRendererProps) {
                     ))
                 ) : (
                     <SelectItem value="_none" disabled>
-                        No hay sliders creados
+                        {t('No hay sliders creados')}
                     </SelectItem>
                 )}
             </SelectContent>
@@ -338,7 +341,7 @@ function RepeaterField({ field, values, onChange, idPrefix = '' }: RepeaterField
                     className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-8 items-center gap-1.5 px-3"
                 >
                     <Plus className="h-4 w-4" />
-                    <span>Añadir</span>
+                    <span>{t('Añadir')}</span>
                 </Button>
             </div>
 
@@ -353,7 +356,7 @@ function RepeaterField({ field, values, onChange, idPrefix = '' }: RepeaterField
                             >
                                 <div className="border-border mb-4 flex items-center justify-between border-b pb-3">
                                     <span className="bg-muted text-muted-foreground inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
-                                        Elemento {idx + 1}
+                                        {t('Elemento')} {idx + 1}
                                     </span>
                                     <Button
                                         type="button"
@@ -377,7 +380,7 @@ function RepeaterField({ field, values, onChange, idPrefix = '' }: RepeaterField
                 </div>
             ) : (
                 <div className="border-border bg-muted/50 rounded-xl border border-dashed py-6 text-center">
-                    <p className="text-muted-foreground text-xs italic">No se han añadido elementos.</p>
+                    <p className="text-muted-foreground text-xs italic">{t('No se han añadido elementos.')}</p>
                 </div>
             )}
         </div>
@@ -444,7 +447,7 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
                 return (
                     <Select value={typeof value === 'string' ? value : ''} onValueChange={(next) => onChange(field.key, next)}>
                         <SelectTrigger id={idPrefix + field.key} className="w-full">
-                            <SelectValue placeholder="Elige una opción" />
+                            <SelectValue placeholder={t('Elige una opción')} />
                         </SelectTrigger>
                         <SelectContent>
                             {(field.options ?? []).map((option) => (
@@ -464,7 +467,7 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
                                 className={cn('w-full justify-start text-left font-normal', !value && 'text-muted-foreground')}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {value ? format(new Date(value as string), 'PPP') : <span>Pick a date</span>}
+                                {value ? format(new Date(value as string), 'PPP') : <span>{t('Pick a date')}</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">

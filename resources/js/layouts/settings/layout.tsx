@@ -1,6 +1,7 @@
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -9,22 +10,22 @@ import { type PropsWithChildren } from 'react';
 const sidebarNavItems: NavItem[] = [
     {
         id: 1,
-        title: 'Profile',
-        description: 'Edit your profile information',
+        title: t('Profile'),
+        description: t('Edit your profile information'),
         url: route('profile.edit'),
         icon: null,
     },
     {
         id: 2,
-        title: 'Password',
-        description: 'Change your password',
+        title: t('Password'),
+        description: t('Change your password'),
         url: route('password.edit'),
         icon: null,
     },
     {
         id: 3,
-        title: 'Appearance',
-        description: 'Customize the appearance',
+        title: t('Appearance'),
+        description: t('Customize the appearance'),
         url: route('appearance'),
         icon: null,
     },
@@ -40,7 +41,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Settings" description="Manage your profile and account settings" />
+            <Heading title={t('Settings')} description={t('Manage your profile and account settings')} />
 
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">

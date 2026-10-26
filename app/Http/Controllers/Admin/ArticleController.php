@@ -151,17 +151,17 @@ class ArticleController extends Controller
 
         if ($schema && $schema->isUnique()) {
             if (CmsArticle::where('schema_id', $schema->id)->exists()) {
-                return back()->withErrors(['schema_id' => 'Esta plantilla es única y ya está asignada a otra página.']);
+                return back()->withErrors(['schema_id' => __('Esta plantilla es única y ya está asignada a otra página.')]);
             }
             if ($parentId !== null) {
-                return back()->withErrors(['parent_id' => 'Una plantilla única no puede tener una página superior.']);
+                return back()->withErrors(['parent_id' => __('Una plantilla única no puede tener una página superior.')]);
             }
         }
 
         if ($parentId !== null) {
             $parent = CmsArticle::find($parentId);
             if ($parent && $parent->schema && $parent->schema->isUnique()) {
-                return back()->withErrors(['parent_id' => 'No se pueden crear subpáginas bajo una plantilla única.']);
+                return back()->withErrors(['parent_id' => __('No se pueden crear subpáginas bajo una plantilla única.')]);
             }
         }
 
@@ -233,24 +233,24 @@ class ArticleController extends Controller
 
         if ($schema && $schema->isUnique()) {
             if (CmsArticle::where('schema_id', $schema->id)->where('id', '!=', $id)->exists()) {
-                return back()->withErrors(['schema_id' => 'Esta plantilla es única y ya está asignada a otra página.']);
+                return back()->withErrors(['schema_id' => __('Esta plantilla es única y ya está asignada a otra página.')]);
             }
             if ($parentId !== null) {
-                return back()->withErrors(['parent_id' => 'Una plantilla única no puede tener una página superior.']);
+                return back()->withErrors(['parent_id' => __('Una plantilla única no puede tener una página superior.')]);
             }
         }
 
         if ($parentId !== null) {
             $parent = CmsArticle::find($parentId);
             if ($parent && $parent->schema && $parent->schema->isUnique()) {
-                return back()->withErrors(['parent_id' => 'No se pueden crear subpáginas bajo una plantilla única.']);
+                return back()->withErrors(['parent_id' => __('No se pueden crear subpáginas bajo una plantilla única.')]);
             }
             if ($parentId == $id) {
-                return back()->withErrors(['parent_id' => 'Una página no puede ser su propio padre.']);
+                return back()->withErrors(['parent_id' => __('Una página no puede ser su propio padre.')]);
             }
             $descendantIds = $item->getAllDescendantIds();
             if (in_array($parentId, $descendantIds)) {
-                return back()->withErrors(['parent_id' => 'No se puede seleccionar una subpágina como página superior.']);
+                return back()->withErrors(['parent_id' => __('No se puede seleccionar una subpágina como página superior.')]);
             }
         }
 
@@ -313,7 +313,7 @@ class ArticleController extends Controller
             $blocked = $items->filter(fn (CmsArticle $item): bool => CmsArticle::where('parent_id', $item->id)->whereKeyNot($ids)->exists());
             if ($blocked->isNotEmpty()) {
                 throw ValidationException::withMessages([
-                    'ids' => 'No se puede mover a la papelera una página con subpáginas: '.$blocked->pluck('title')->implode(', ').'. Mueve o elimina primero sus subpáginas, o selecciónalas también.',
+                    'ids' => __('No se puede mover a la papelera una página con subpáginas: :titles. Mueve o elimina primero sus subpáginas, o selecciónalas también.', ['titles' => $blocked->pluck('title')->implode(', ')]),
                 ]);
             }
         }
@@ -324,7 +324,7 @@ class ArticleController extends Controller
                 && CmsArticle::onlyTrashed()->whereKey($item->parent_id)->exists());
             if ($blocked->isNotEmpty()) {
                 throw ValidationException::withMessages([
-                    'ids' => 'Restaura primero la página superior de: '.$blocked->pluck('title')->implode(', ').'.',
+                    'ids' => __('Restaura primero la página superior de: :titles.', ['titles' => $blocked->pluck('title')->implode(', ')]),
                 ]);
             }
 
@@ -332,7 +332,7 @@ class ArticleController extends Controller
                 && CmsArticle::where('schema_id', $item->schema_id)->exists());
             if ($taken->isNotEmpty()) {
                 throw ValidationException::withMessages([
-                    'ids' => 'La plantilla única ya está asignada a otra página: '.$taken->pluck('title')->implode(', ').'.',
+                    'ids' => __('La plantilla única ya está asignada a otra página: :titles.', ['titles' => $taken->pluck('title')->implode(', ')]),
                 ]);
             }
         }

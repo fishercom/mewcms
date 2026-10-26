@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
 import { CmsForm } from '@/types/models/cms-form';
 import { CmsNotifyForm } from '@/types/models/cms-notify';
 import { User } from '@/types/models/user';
@@ -20,10 +21,10 @@ export default function NotifyFormFields({ data, setData, errors, processing, fo
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="form_id">Form</Label>
+                <Label htmlFor="form_id">{t('Form')}</Label>
                 <Select value={data.form_id.toString()} onValueChange={(value) => setData({ ...data, form_id: Number(value) })} disabled={processing}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a form" />
+                        <SelectValue placeholder={t('Select a form')} />
                     </SelectTrigger>
                     <SelectContent>
                         {forms.map((form) => (
@@ -37,10 +38,10 @@ export default function NotifyFormFields({ data, setData, errors, processing, fo
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="user_id">User</Label>
+                <Label htmlFor="user_id">{t('User')}</Label>
                 <Select value={data.user_id.toString()} onValueChange={(value) => setData({ ...data, user_id: Number(value) })} disabled={processing}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a user" />
+                        <SelectValue placeholder={t('Select a user')} />
                     </SelectTrigger>
                     <SelectContent>
                         {users.map((user) => (
@@ -54,7 +55,7 @@ export default function NotifyFormFields({ data, setData, errors, processing, fo
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="recipients">Recipients</Label>
+                <Label htmlFor="recipients">{t('Recipients')}</Label>
                 <Textarea
                     id="recipients"
                     tabIndex={3}
@@ -74,7 +75,7 @@ export default function NotifyFormFields({ data, setData, errors, processing, fo
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={4}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active">{t('Active')}</Label>
             </div>
         </>
     );

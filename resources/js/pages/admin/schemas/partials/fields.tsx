@@ -8,6 +8,7 @@ import CustomFieldManager from '@/components/custom-field-manager';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { t } from '@/lib/i18n';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { usePage } from '@inertiajs/react';
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
@@ -33,7 +34,7 @@ export default function SchemaFields({ data, setData, errors, processing, groups
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -49,14 +50,14 @@ export default function SchemaFields({ data, setData, errors, processing, groups
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="group_id">Group</Label>
+                <Label htmlFor="group_id">{t('Group')}</Label>
                 <Select
                     value={data.group_id.toString()}
                     onValueChange={(value) => setData({ ...data, group_id: Number(value) })}
                     disabled={processing}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a group" />
+                        <SelectValue placeholder={t('Select a group')} />
                     </SelectTrigger>
                     <SelectContent>
                         {groups.map((group) => (
@@ -72,10 +73,10 @@ export default function SchemaFields({ data, setData, errors, processing, groups
             <CustomFieldManager fields={data.fields || []} setFields={(newFields) => setData({ ...data, fields: newFields })} />
 
             <div className="grid gap-2">
-                <Label htmlFor="front_view">Plantilla Frontend (React View Path)</Label>
+                <Label htmlFor="front_view">{t('Plantilla Frontend (React View Path)')}</Label>
                 <Select value={data.front_view || ''} onValueChange={(value) => setData({ ...data, front_view: value })} disabled={processing}>
                     <SelectTrigger id="front_view">
-                        <SelectValue placeholder="Seleccione una plantilla" />
+                        <SelectValue placeholder={t('Seleccione una plantilla')} />
                     </SelectTrigger>
                     <SelectContent>
                         {templates &&
@@ -92,26 +93,27 @@ export default function SchemaFields({ data, setData, errors, processing, groups
             {blockTypes.length > 0 && (
                 <div className="grid gap-2">
                     <div className="flex items-center justify-between">
-                        <Label>Bloques permitidos</Label>
+                        <Label>{t('Bloques permitidos')}</Label>
                         <button
                             type="button"
                             className="text-primary text-xs font-medium hover:underline"
                             onClick={() => setData({ ...data, allowed_blocks: null })}
                             disabled={processing}
                         >
-                            Permitir todos
+                            {t('Permitir todos')}
                         </button>
                     </div>
                     <p className="text-muted-foreground text-xs">
-                        Los bloques que el editor ofrece en las páginas y entradas de esta plantilla. Los bloques ya colocados se pueden seguir
-                        editando.
+                        {t(
+                            'Los bloques que el editor ofrece en las páginas y entradas de esta plantilla. Los bloques ya colocados se pueden seguir editando.',
+                        )}
                     </p>
                     <div className="border-border grid grid-cols-1 gap-1 rounded-lg border p-2 sm:grid-cols-2 lg:grid-cols-3">
                         {blockTypes.map((type) => (
                             <label key={type.key} className="hover:bg-muted/50 flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5">
                                 <Checkbox checked={allowed.includes(type.key)} onClick={() => toggleBlock(type.key)} disabled={processing} />
                                 <DynamicIcon name={type.icon as IconName} className="text-muted-foreground h-4 w-4" />
-                                <span className="text-sm">{type.key === 'pattern' ? 'Bloques reutilizables' : type.name}</span>
+                                <span className="text-sm">{type.key === 'pattern' ? t('Bloques reutilizables') : type.name}</span>
                             </label>
                         ))}
                     </div>
@@ -121,8 +123,10 @@ export default function SchemaFields({ data, setData, errors, processing, groups
 
             {blockTypes.length > 0 && (
                 <div className="grid gap-2">
-                    <Label>Diseño inicial</Label>
-                    <p className="text-muted-foreground text-xs">Los bloques con los que empieza una página o entrada nueva de esta plantilla.</p>
+                    <Label>{t('Diseño inicial')}</Label>
+                    <p className="text-muted-foreground text-xs">
+                        {t('Los bloques con los que empieza una página o entrada nueva de esta plantilla.')}
+                    </p>
                     <BlockEditor
                         types={blockTypes}
                         allowedTypes={data.allowed_blocks ?? null}
@@ -141,7 +145,7 @@ export default function SchemaFields({ data, setData, errors, processing, groups
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={3}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active">{t('Active')}</Label>
             </div>
         </>
     );

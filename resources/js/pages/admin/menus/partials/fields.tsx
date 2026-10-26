@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { CmsMenuForm } from '@/types/models/cms-menu';
 
 interface Props {
@@ -15,7 +16,7 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Nombre / Name</Label>
+                <Label htmlFor="name">{t('Nombre / Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -30,13 +31,13 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="slug">Slug (Opcional)</Label>
+                <Label htmlFor="slug">{t('Slug (Opcional)')}</Label>
                 <Input
                     id="slug"
                     type="text"
                     tabIndex={2}
                     value={data.slug ?? ''}
-                    placeholder="Se auto-genera si se deja vacío"
+                    placeholder={t('Se auto-genera si se deja vacío')}
                     onChange={(e) => setData({ ...data, slug: e.target.value })}
                     disabled={processing}
                 />
@@ -44,7 +45,7 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="description">Descripción / Description</Label>
+                <Label htmlFor="description">{t('Descripción / Description')}</Label>
                 <textarea
                     id="description"
                     tabIndex={3}
@@ -63,7 +64,7 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
                         checked={Boolean(data.auto_add_pages)}
                         onClick={() => setData({ ...data, auto_add_pages: !data.auto_add_pages })}
                     />
-                    <Label htmlFor="auto_add_pages">Añadir automáticamente las páginas nuevas de primer nivel</Label>
+                    <Label htmlFor="auto_add_pages">{t('Añadir automáticamente las páginas nuevas de primer nivel')}</Label>
                 </div>
                 <div className="flex items-center space-x-3">
                     <Checkbox
@@ -71,10 +72,10 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
                         checked={Boolean(data.auto_add_subpages)}
                         onClick={() => setData({ ...data, auto_add_subpages: !data.auto_add_subpages })}
                     />
-                    <Label htmlFor="auto_add_subpages">Añadir también las subpáginas, bajo su página superior (si está en este menú)</Label>
+                    <Label htmlFor="auto_add_subpages">{t('Añadir también las subpáginas, bajo su página superior (si está en este menú)')}</Label>
                 </div>
                 <p className="text-muted-foreground pl-7 text-xs">
-                    Al crear una página se marca este menú por defecto; puedes desmarcarlo en el editor de la página.
+                    {t('Al crear una página se marca este menú por defecto; puedes desmarcarlo en el editor de la página.')}
                 </p>
             </div>
 
@@ -86,7 +87,7 @@ export default function MenuFormFields({ data, setData, errors, processing }: Pr
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={4}
                 />
-                <Label htmlFor="active">Activo / Active</Label>
+                <Label htmlFor="active">{t('Activo / Active')}</Label>
             </div>
         </>
     );

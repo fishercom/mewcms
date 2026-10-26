@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -72,10 +73,10 @@ const withLayout = (data: BlockValues, layout: string): BlockValues => {
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-    basic: 'Básicos',
-    layout: 'Diseño',
-    media: 'Multimedia',
-    reusable: 'Reutilizables',
+    basic: t('Básicos'),
+    layout: t('Diseño'),
+    media: t('Multimedia'),
+    reusable: t('Reutilizables'),
 };
 
 /** Short text that identifies a block when it is collapsed */
@@ -95,9 +96,9 @@ const summaryOf = (block: BlockData): string => {
         str(data.key) ||
         str(data.url) ||
         str(data.file) ||
-        count('images', 'imagen', 'imágenes') ||
-        count('items', 'elemento', 'elementos') ||
-        (nestedCount > 0 ? `${nestedCount} ${nestedCount === 1 ? 'bloque' : 'bloques'} en columnas` : '') ||
+        count('images', t('imagen'), t('imágenes')) ||
+        count('items', t('elemento'), t('elementos')) ||
+        (nestedCount > 0 ? t(nestedCount === 1 ? ':count bloque en columnas' : ':count bloques en columnas', { count: nestedCount }) : '') ||
         str(data.html).replace(/<[^>]+>/g, ' ');
     return text.replace(/\s+/g, ' ').trim().slice(0, 90);
 };
@@ -181,7 +182,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                 onChange(next);
             }
         } catch {
-            window.alert('No se pudo guardar el bloque reutilizable.');
+            window.alert(t('No se pudo guardar el bloque reutilizable.'));
         } finally {
             setPatternDialogIndex(null);
         }
@@ -209,7 +210,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
     const remove = (index: number) => {
         const block = value[index];
         const type = typeByKey[block.type];
-        if (summaryOf(block) && !window.confirm(`¿Eliminar el bloque "${type?.name ?? block.type}"?`)) return;
+        if (summaryOf(block) && !window.confirm(t('¿Eliminar el bloque ":name"?', { name: type?.name ?? block.type }))) return;
         onChange(value.filter((_, i) => i !== index));
     };
 
@@ -237,7 +238,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                     patterns={pickerPatterns}
                     onPick={(type) => insert(type, 0)}
                     onPickPattern={(pattern) => insertPattern(pattern, 0)}
-                    label="Añadir"
+                    label={t('Añadir')}
                     variant="outline"
                 />
             </div>
@@ -250,16 +251,16 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                 <div className="bg-primary-soft text-primary-soft-foreground mb-3 flex h-11 w-11 items-center justify-center rounded-xl">
                     <LayoutTemplate className="h-5 w-5" />
                 </div>
-                <p className="text-foreground text-sm font-semibold">Aún no hay contenido</p>
+                <p className="text-foreground text-sm font-semibold">{t('Aún no hay contenido')}</p>
                 <p className="text-muted-foreground mt-1 mb-4 max-w-sm text-xs">
-                    Construye la página con bloques: texto, portadas, imágenes y llamadas a la acción.
+                    {t('Construye la página con bloques: texto, portadas, imágenes y llamadas a la acción.')}
                 </p>
                 <BlockPicker
                     types={pickerTypes}
                     patterns={pickerPatterns}
                     onPick={(type) => insert(type, 0)}
                     onPickPattern={(pattern) => insertPattern(pattern, 0)}
-                    label="Añadir el primer bloque"
+                    label={t('Añadir el primer bloque')}
                     variant="default"
                 />
             </div>
@@ -285,7 +286,10 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                 }}
                                 tabIndex={0}
                                 onKeyDown={(e) => onCardKeyDown(e, index)}
-                                aria-label={`Bloque ${index + 1}: ${type?.name ?? block.type}. Alt + flechas para mover.`}
+                                aria-label={t('Bloque :number: :name. Alt + flechas para mover.', {
+                                    number: index + 1,
+                                    name: type?.name ?? block.type,
+                                })}
                                 className="border-border bg-card focus-visible:ring-primary/40 rounded-xl border shadow-2xs focus-visible:ring-2 focus-visible:outline-none"
                                 data-testid="block-card"
                             >
@@ -297,8 +301,8 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                             handleClass,
                                             'text-muted-foreground hover:text-foreground hover:bg-muted flex h-8 w-6 cursor-grab items-center justify-center rounded active:cursor-grabbing',
                                         )}
-                                        aria-label="Arrastrar para ordenar"
-                                        title="Arrastrar para ordenar"
+                                        aria-label={t('Arrastrar para ordenar')}
+                                        title={t('Arrastrar para ordenar')}
                                     >
                                         <GripVertical className="h-4 w-4" />
                                     </button>
@@ -311,34 +315,34 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                     {isPattern && (
                                         <span className="bg-primary-soft text-primary-soft-foreground inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                                             <RefreshCw className="h-3 w-3" />
-                                            Sincronizado
+                                            {t('Sincronizado')}
                                         </span>
                                     )}
                                     {isCollapsed && <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">{summaryOf(block)}</span>}
                                     <div className="ml-auto flex items-center gap-0.5">
                                         {!isText && type && (
-                                            <IconButton label="Ajustes del bloque" onClick={() => setEditingId(block.id)}>
+                                            <IconButton label={t('Ajustes del bloque')} onClick={() => setEditingId(block.id)}>
                                                 <Settings2 className="h-4 w-4" />
                                             </IconButton>
                                         )}
                                         {canSavePatterns && !isPattern && (
-                                            <IconButton label="Guardar como bloque reutilizable" onClick={() => setPatternDialogIndex(index)}>
+                                            <IconButton label={t('Guardar como bloque reutilizable')} onClick={() => setPatternDialogIndex(index)}>
                                                 <Bookmark className="h-4 w-4" />
                                             </IconButton>
                                         )}
-                                        <IconButton label="Subir" onClick={() => move(index, -1)} disabled={index === 0}>
+                                        <IconButton label={t('Subir')} onClick={() => move(index, -1)} disabled={index === 0}>
                                             <ArrowUp className="h-4 w-4" />
                                         </IconButton>
-                                        <IconButton label="Bajar" onClick={() => move(index, 1)} disabled={index === value.length - 1}>
+                                        <IconButton label={t('Bajar')} onClick={() => move(index, 1)} disabled={index === value.length - 1}>
                                             <ArrowDown className="h-4 w-4" />
                                         </IconButton>
-                                        <IconButton label="Duplicar" onClick={() => duplicate(index)}>
+                                        <IconButton label={t('Duplicar')} onClick={() => duplicate(index)}>
                                             <Copy className="h-4 w-4" />
                                         </IconButton>
-                                        <IconButton label="Eliminar" onClick={() => remove(index)} destructive>
+                                        <IconButton label={t('Eliminar')} onClick={() => remove(index)} destructive>
                                             <Trash2 className="h-4 w-4" />
                                         </IconButton>
-                                        <IconButton label={isCollapsed ? 'Expandir' : 'Contraer'} onClick={() => toggle(block.id)}>
+                                        <IconButton label={isCollapsed ? t('Expandir') : t('Contraer')} onClick={() => toggle(block.id)}>
                                             <ChevronDown className={cn('h-4 w-4 transition-transform', isCollapsed && '-rotate-90')} />
                                         </IconButton>
                                     </div>
@@ -361,7 +365,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                                 return (
                                                     <div key={columnIndex} className={cn('bg-muted/30 min-w-0 rounded-lg p-2', SPAN_CLASSES[span])}>
                                                         <p className="text-muted-foreground mb-1.5 px-1 text-[10px] font-semibold tracking-wider uppercase">
-                                                            Columna {columnIndex + 1}
+                                                            {t('Columna')} {columnIndex + 1}
                                                         </p>
                                                         <BlockEditor
                                                             nested
@@ -384,7 +388,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                             type="button"
                                             onClick={() => setEditingId(block.id)}
                                             className="front-theme hover:bg-muted/30 block w-full overflow-hidden rounded-b-xl p-4 text-left transition-colors"
-                                            aria-label={`Editar ${type?.name ?? block.type}`}
+                                            aria-label={t('Editar :name', { name: type?.name ?? block.type })}
                                         >
                                             {Render && isPattern ? (
                                                 <div className="pointer-events-none">
@@ -400,7 +404,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                             ) : (
                                                 <span className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-xs">
                                                     <Settings2 className="h-4 w-4" />
-                                                    Bloque vacío: pulsa para configurarlo
+                                                    {t('Bloque vacío: pulsa para configurarlo')}
                                                 </span>
                                             )}
                                         </button>
@@ -414,7 +418,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                     patterns={pickerPatterns}
                                     onPick={(t) => insert(t, index + 1)}
                                     onPickPattern={(pattern) => insertPattern(pattern, index + 1)}
-                                    label="Insertar bloque aquí"
+                                    label={t('Insertar bloque aquí')}
                                     variant="inline"
                                 />
                             </div>
@@ -429,7 +433,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                     patterns={pickerPatterns}
                     onPick={(t) => insert(t, value.length)}
                     onPickPattern={(pattern) => insertPattern(pattern, value.length)}
-                    label={nested ? 'Añadir' : 'Añadir bloque'}
+                    label={nested ? t('Añadir') : t('Añadir bloque')}
                     variant={nested ? 'ghost' : 'outline'}
                 />
             </div>
@@ -477,14 +481,14 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                         className="text-primary inline-flex items-center gap-1.5 text-xs font-medium hover:underline"
                                     >
                                         <Settings2 className="h-3.5 w-3.5" />
-                                        Editar este bloque reutilizable
+                                        {t('Editar este bloque reutilizable')}
                                     </a>
                                 </div>
                             )}
 
                             <div className="bg-card sticky bottom-0 mt-auto border-t p-4">
                                 <Button type="button" className="w-full" onClick={() => setEditingId(null)}>
-                                    Listo
+                                    {t('Listo')}
                                 </Button>
                             </div>
                         </>
@@ -555,33 +559,35 @@ function SavePatternDialog({
         <Dialog open={open} onOpenChange={reset}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Guardar como bloque reutilizable</DialogTitle>
-                    <DialogDescription>Podrás insertarlo en cualquier página o entrada desde el buscador de bloques.</DialogDescription>
+                    <DialogTitle>{t('Guardar como bloque reutilizable')}</DialogTitle>
+                    <DialogDescription>{t('Podrás insertarlo en cualquier página o entrada desde el buscador de bloques.')}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="pattern-name">Nombre</Label>
+                        <Label htmlFor="pattern-name">{t('Nombre')}</Label>
                         <Input
                             id="pattern-name"
                             autoFocus
                             value={name || blockName}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Ej. Aviso de horarios"
+                            placeholder={t('Ej. Aviso de horarios')}
                         />
                     </div>
                     <label className="flex items-start gap-3">
                         <Checkbox checked={synced} onClick={() => setSynced(!synced)} className="mt-0.5" />
                         <span>
-                            <span className="text-foreground block text-sm font-medium">Sincronizado</span>
+                            <span className="text-foreground block text-sm font-medium">{t('Sincronizado')}</span>
                             <span className="text-muted-foreground block text-xs">
-                                Al editarlo cambia en todas las páginas que lo usan. Sin sincronizar, cada inserción es una copia independiente.
+                                {t(
+                                    'Al editarlo cambia en todas las páginas que lo usan. Sin sincronizar, cada inserción es una copia independiente.',
+                                )}
                             </span>
                         </span>
                     </label>
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
-                        Cancelar
+                        {t('Cancelar')}
                     </Button>
                     <Button
                         type="button"
@@ -591,7 +597,7 @@ function SavePatternDialog({
                             onSave((name || blockName).trim(), synced);
                         }}
                     >
-                        {saving ? 'Guardando...' : 'Guardar'}
+                        {saving ? t('Guardando...') : t('Guardar')}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -665,17 +671,19 @@ function BlockPicker({
                                 pick(matches[0]);
                             }
                         }}
-                        placeholder="Buscar bloque..."
+                        placeholder={t('Buscar bloque...')}
                         className="h-8 pl-8 text-xs"
-                        aria-label="Buscar bloque"
+                        aria-label={t('Buscar bloque')}
                     />
                 </div>
                 {matches.length === 0 && patternMatches.length === 0 && (
-                    <p className="text-muted-foreground px-2 py-4 text-center text-xs">Ningún bloque coincide.</p>
+                    <p className="text-muted-foreground px-2 py-4 text-center text-xs">{t('Ningún bloque coincide.')}</p>
                 )}
                 {patternMatches.length > 0 && (
                     <div className="mb-1">
-                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-[10px] font-semibold tracking-wider uppercase">Reutilizables</p>
+                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-[10px] font-semibold tracking-wider uppercase">
+                            {t('Reutilizables')}
+                        </p>
                         {patternMatches.map((pattern) => (
                             <button
                                 key={pattern.key}
@@ -691,8 +699,8 @@ function BlockPicker({
                                     <span className="text-muted-foreground block text-[11px] leading-snug">
                                         {pattern.description ||
                                             (pattern.synced
-                                                ? 'Sincronizado: se actualiza en todas las páginas.'
-                                                : 'Se inserta como una copia independiente.')}
+                                                ? t('Sincronizado: se actualiza en todas las páginas.')
+                                                : t('Se inserta como una copia independiente.'))}
                                     </span>
                                 </span>
                             </button>

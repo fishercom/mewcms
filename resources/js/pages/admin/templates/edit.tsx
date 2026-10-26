@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { updateTemplate } from '@/services/templates';
 import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
@@ -56,17 +57,18 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {!canEdit && (
                         <div className="border-warning/30 bg-warning-soft text-warning rounded-lg border p-3 text-sm">
-                            El editor de plantillas está deshabilitado. Solo un super administrador puede guardar cambios cuando CMS_TEMPLATE_EDITOR
-                            está activo.
+                            {t(
+                                'El editor de plantillas está deshabilitado. Solo un super administrador puede guardar cambios cuando CMS_TEMPLATE_EDITOR está activo.',
+                            )}
                         </div>
                     )}
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Nombre de la Plantilla</Label>
+                        <Label htmlFor="name">{t('Nombre de la Plantilla')}</Label>
                         <Input
                             id="name"
                             type="text"
@@ -75,13 +77,13 @@ export default function Edit() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             disabled={processing}
-                            placeholder="e.g. Contacto Principal"
+                            placeholder={t('e.g. Contacto Principal')}
                         />
                         {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                     </div>
 
                     <div className="grid gap-2">
-                        <Label>Nombre del Archivo (Lectura únicamente)</Label>
+                        <Label>{t('Nombre del Archivo (Lectura únicamente)')}</Label>
                         <Input
                             type="text"
                             disabled
@@ -89,12 +91,12 @@ export default function Edit() {
                             className="bg-muted/50 text-muted-foreground cursor-not-allowed font-mono text-sm"
                         />
                         <p className="text-muted-foreground text-xs">
-                            Para cambiar el nombre del archivo, cámbielo en el sistema de archivos del servidor.
+                            {t('Para cambiar el nombre del archivo, cámbielo en el sistema de archivos del servidor.')}
                         </p>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="content">Código de la Plantilla (React / TypeScript)</Label>
+                        <Label htmlFor="content">{t('Código de la Plantilla (React / TypeScript)')}</Label>
                         <div className="border-border-strong bg-muted overflow-hidden rounded-md border">
                             <div className="border-border-strong bg-muted/60 text-muted-foreground flex items-center justify-between border-b px-4 py-2 font-mono text-xs">
                                 <span>{`${filename}.tsx`}</span>
@@ -116,10 +118,10 @@ export default function Edit() {
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing || !canEdit} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            {processing ? 'Guardando...' : 'Guardar Cambios'}
+                            {processing ? t('Guardando...') : t('Guardar Cambios')}
                         </Button>
                         <Link href="/admin/templates" className="text-muted-foreground text-sm hover:underline">
-                            Cancelar
+                            {t('Cancelar')}
                         </Link>
                     </div>
                 </form>

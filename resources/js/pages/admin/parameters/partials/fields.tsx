@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
 import { CmsParameter, CmsParameterForm } from '@/types/models/cms-parameter';
 import { CmsParameterGroup } from '@/types/models/cms-parameter-group';
 
@@ -20,7 +21,7 @@ export default function ParameterFormFields({ data, setData, errors, processing,
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -36,7 +37,7 @@ export default function ParameterFormFields({ data, setData, errors, processing,
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="value">Value</Label>
+                <Label htmlFor="value">{t('Value')}</Label>
                 <Textarea
                     id="value"
                     tabIndex={2}
@@ -49,14 +50,14 @@ export default function ParameterFormFields({ data, setData, errors, processing,
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="group_id">Group</Label>
+                <Label htmlFor="group_id">{t('Group')}</Label>
                 <Select
                     value={data.group_id.toString()}
                     onValueChange={(value) => setData({ ...data, group_id: Number(value) })}
                     disabled={processing}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a group" />
+                        <SelectValue placeholder={t('Select a group')} />
                     </SelectTrigger>
                     <SelectContent>
                         {groups.map((group) => (
@@ -70,14 +71,14 @@ export default function ParameterFormFields({ data, setData, errors, processing,
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="parent_id">Parent</Label>
+                <Label htmlFor="parent_id">{t('Parent')}</Label>
                 <Select
                     value={data.parent_id?.toString() || ''}
                     onValueChange={(value) => setData({ ...data, parent_id: Number(value) })}
                     disabled={processing}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Select a parent" />
+                        <SelectValue placeholder={t('Select a parent')} />
                     </SelectTrigger>
                     <SelectContent>
                         {parents.map((parent) => (
@@ -98,7 +99,7 @@ export default function ParameterFormFields({ data, setData, errors, processing,
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={5}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active">{t('Active')}</Label>
             </div>
         </>
     );

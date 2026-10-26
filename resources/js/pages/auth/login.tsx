@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { t } from '@/lib/i18n';
 
 type LoginForm = {
     email: string;
@@ -37,13 +38,13 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
     };
 
     return (
-        <AuthLayout title="Inicia sesión" description="Ingresa tu correo y contraseña para acceder al panel">
-            <Head title="Iniciar sesión" />
+        <AuthLayout title={t('Inicia sesión')} description={t('Ingresa tu correo y contraseña para acceder al panel')}>
+            <Head title={t('Iniciar sesión')} />
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Correo electrónico</Label>
+                        <Label htmlFor="email">{t('Correo electrónico')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -60,10 +61,10 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
 
                     <div className="grid gap-2">
                         <div className="flex items-center">
-                            <Label htmlFor="password">Contraseña</Label>
+                            <Label htmlFor="password">{t('Contraseña')}</Label>
                             {canResetPassword && (
                                 <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    ¿Olvidaste tu contraseña?
+                                    {t('¿Olvidaste tu contraseña?')}
                                 </TextLink>
                             )}
                         </div>
@@ -75,7 +76,7 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                             autoComplete="current-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Contraseña"
+                            placeholder={t('Contraseña')}
                         />
                         <InputError message={errors.password} />
                     </div>
@@ -88,20 +89,20 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                             onClick={() => setData('remember', !data.remember)}
                             tabIndex={3}
                         />
-                        <Label htmlFor="remember">Recordarme</Label>
+                        <Label htmlFor="remember">{t('Recordarme')}</Label>
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Iniciar sesión
+                        {t('Iniciar sesión')}
                     </Button>
                 </div>
 
                 {canRegister && (
                     <div className="text-muted-foreground text-center text-sm">
-                        ¿No tienes una cuenta?{' '}
+                        {t('¿No tienes una cuenta?')}{' '}
                         <TextLink href={route('register')} tabIndex={5}>
-                            Regístrate
+                            {t('Regístrate')}
                         </TextLink>
                     </div>
                 )}

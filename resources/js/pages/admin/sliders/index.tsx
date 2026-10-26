@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsSlider } from '@/types/models/cms-slider';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -28,7 +29,7 @@ export default function Index() {
     }, [debouncedSearch]);
 
     const handleDelete = (id: number, name: string) => {
-        if (window.confirm(`¿Estás seguro de que deseas eliminar el slider "${name}"? Se eliminarán también sus diapositivas.`)) {
+        if (window.confirm(t('¿Estás seguro de que deseas eliminar el slider ":name"? Se eliminarán también sus diapositivas.', { name }))) {
             router.delete(route('sliders.destroy', id));
         }
     };
@@ -48,7 +49,7 @@ export default function Index() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                placeholder="Buscar slider..."
+                                placeholder={t('Buscar slider...')}
                             />
                         </div>
                     </div>
@@ -56,7 +57,7 @@ export default function Index() {
                         <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={route('sliders.create')}>
                                 <Plus className="h-4 w-4" />
-                                <span>Crear Slider</span>
+                                <span>{t('Crear Slider')}</span>
                             </Link>
                         </Button>
                     </div>
@@ -67,16 +68,16 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre
+                                    {t('Nombre')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Diapositivas
+                                    {t('Diapositivas')}
                                 </th>
                                 <th scope="col" className="hidden px-4 py-3 xl:table-cell">
-                                    Configuración
+                                    {t('Configuración')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Actualizado
+                                    {t('Actualizado')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -95,14 +96,14 @@ export default function Index() {
                                         <td className="hidden px-4 py-3 xl:table-cell">
                                             <div className="flex max-w-[160px] flex-wrap gap-1">
                                                 <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px]">
-                                                    {item.settings?.autoplay ? `Autoplay ${item.settings.autoplaySpeed}ms` : 'Manual'}
+                                                    {item.settings?.autoplay ? `Autoplay ${item.settings.autoplaySpeed}ms` : t('Manual')}
                                                 </span>
                                                 <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px] capitalize">
                                                     {item.settings?.effect || 'slide'}
                                                 </span>
                                                 {item.settings?.loop && (
                                                     <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px]">
-                                                        Loop
+                                                        {t('Loop')}
                                                     </span>
                                                 )}
                                             </div>
@@ -117,7 +118,7 @@ export default function Index() {
                                                     onClick={() => router.visit(route('sliders.edit', item.id))}
                                                 >
                                                     <Edit className="h-3.5 w-3.5" />
-                                                    <span>Editar</span>
+                                                    <span>{t('Editar')}</span>
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
@@ -126,7 +127,7 @@ export default function Index() {
                                                     onClick={() => handleDelete(item.id, item.name)}
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
-                                                    <span>Eliminar</span>
+                                                    <span>{t('Eliminar')}</span>
                                                 </Button>
                                             </div>
                                         </td>
@@ -135,7 +136,7 @@ export default function Index() {
                             ) : (
                                 <tr>
                                     <td colSpan={5} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        No se encontraron sliders.
+                                        {t('No se encontraron sliders.')}
                                     </td>
                                 </tr>
                             )}

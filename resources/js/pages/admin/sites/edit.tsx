@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { updateSite } from '@/services/sites';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
 import { CmsSite, CmsSiteForm } from '@/types/models/cms-site';
@@ -42,14 +43,14 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={updateSiteHandler} className="space-y-6">
                     <SiteFormFields data={data} setData={setData} errors={errors} processing={processing} schemaGroups={schemaGroups} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/sites">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/sites">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsPostType } from '@/types/models/cms-post';
 import { Input } from '@headlessui/react';
@@ -34,12 +35,15 @@ export default function Index() {
     const handleDelete = (id: number, name: string) => {
         if (
             window.confirm(
-                `¿Estás seguro de que deseas eliminar el tipo de contenido "${name}"? Se eliminarán todas las entradas y módulos del menú asociados.`,
+                t(
+                    '¿Estás seguro de que deseas eliminar el tipo de contenido ":name"? Se eliminarán todas las entradas y módulos del menú asociados.',
+                    { name },
+                ),
             )
         ) {
             router.delete(route('post-types.destroy', id), {
                 preserveScroll: true,
-                onError: () => alert('Ocurrió un error al eliminar el tipo de contenido.'),
+                onError: () => alert(t('Ocurrió un error al eliminar el tipo de contenido.')),
             });
         }
     };
@@ -70,7 +74,7 @@ export default function Index() {
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
                                     className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                    placeholder="Buscar tipo de contenido..."
+                                    placeholder={t('Buscar tipo de contenido...')}
                                 />
                             </div>
                         </form>
@@ -79,7 +83,7 @@ export default function Index() {
                         <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href="/admin/post-types/create">
                                 <Plus className="h-4 w-4" />
-                                <span>Nuevo Tipo de Contenido</span>
+                                <span>{t('Nuevo Tipo de Contenido')}</span>
                             </Link>
                         </Button>
                     </div>
@@ -90,22 +94,22 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre
+                                    {t('Nombre')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Slug (Prefijo URL)
+                                    {t('Slug (Prefijo URL)')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Plantilla Predefinida
+                                    {t('Plantilla Predefinida')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Descripción
+                                    {t('Descripción')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Activo
+                                    {t('Activo')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Creado
+                                    {t('Creado')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -123,7 +127,7 @@ export default function Index() {
                                             {item.default_schema ? (
                                                 item.default_schema.name
                                             ) : (
-                                                <em className="text-muted-foreground text-xs">Ninguna</em>
+                                                <em className="text-muted-foreground text-xs">{t('Ninguna')}</em>
                                             )}
                                         </td>
                                         <td className="text-muted-foreground max-w-xs truncate px-4 py-3">{item.description || '-'}</td>
@@ -133,7 +137,7 @@ export default function Index() {
                                                     <Check className="h-3.5 w-3.5" />
                                                 </span>
                                             ) : (
-                                                <span className="text-muted-foreground text-xs">Inactivo</span>
+                                                <span className="text-muted-foreground text-xs">{t('Inactivo')}</span>
                                             )}
                                         </td>
                                         <td className="text-muted-foreground px-4 py-3 text-center">
@@ -148,7 +152,7 @@ export default function Index() {
                                                     onClick={() => router.visit(route('post-types.edit', item.id))}
                                                 >
                                                     <Edit className="h-3.5 w-3.5" />
-                                                    <span>Editar</span>
+                                                    <span>{t('Editar')}</span>
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
@@ -165,7 +169,7 @@ export default function Index() {
                             ) : (
                                 <tr>
                                     <td colSpan={7} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        No se encontraron tipos de contenido.
+                                        {t('No se encontraron tipos de contenido.')}
                                     </td>
                                 </tr>
                             )}

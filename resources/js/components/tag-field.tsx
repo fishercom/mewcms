@@ -1,4 +1,5 @@
 import { TagOption, TagsInput } from '@/components/ui/tags-input';
+import { t } from '@/lib/i18n';
 import apiClient from '@/services/api';
 import { usePage } from '@inertiajs/react';
 import { isAxiosError } from 'axios';
@@ -37,7 +38,7 @@ export default function TagField({ tags, selected, onChange }: Props) {
             return tag;
         } catch (err) {
             const errors = isAxiosError(err) ? err.response?.data?.errors : null;
-            throw new Error(errors ? (Object.values(errors)[0] as string[])[0] : 'No se pudo crear la etiqueta.');
+            throw new Error(errors ? (Object.values(errors)[0] as string[])[0] : t('No se pudo crear la etiqueta.'));
         }
     };
 
@@ -48,15 +49,17 @@ export default function TagField({ tags, selected, onChange }: Props) {
                 options={options}
                 onChange={(next) => onChange(next.map((tag) => tag.id))}
                 onCreate={canManage ? createTag : undefined}
-                placeholder={canManage ? 'Escribe una etiqueta...' : 'Busca una etiqueta...'}
+                placeholder={canManage ? t('Escribe una etiqueta...') : t('Busca una etiqueta...')}
             />
-            <p className="text-[11px] text-muted-foreground">
-                {canManage ? 'Pulsa Enter o escribe una coma para añadir. Las etiquetas nuevas se crean al momento.' : 'Elige entre las etiquetas existentes.'}
+            <p className="text-muted-foreground text-[11px]">
+                {canManage
+                    ? t('Pulsa Enter o escribe una coma para añadir. Las etiquetas nuevas se crean al momento.')
+                    : t('Elige entre las etiquetas existentes.')}
                 {canManage && (
                     <>
                         {' '}
-                        <a href="/admin/tags" target="_blank" rel="noreferrer" className="underline hover:text-foreground">
-                            Gestionar etiquetas
+                        <a href="/admin/tags" target="_blank" rel="noreferrer" className="hover:text-foreground underline">
+                            {t('Gestionar etiquetas')}
                         </a>
                     </>
                 )}

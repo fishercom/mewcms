@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { NavGroup, NavItem, SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -17,36 +18,36 @@ interface QuickAction {
 const defaultActions: QuickAction[] = [
     {
         id: 'create-article',
-        title: 'Crear nueva Página',
-        description: 'Redactar una nueva página en el CMS',
+        title: t('Crear nueva Página'),
+        description: t('Redactar una nueva página en el CMS'),
         url: '/admin/articles/create',
         icon: FilePlus,
     },
     {
         id: 'create-post',
-        title: 'Crear nuevo Post',
-        description: 'Publicar una nueva entrada de blog o noticia',
+        title: t('Crear nuevo Post'),
+        description: t('Publicar una nueva entrada de blog o noticia'),
         url: '/admin/posts/create',
         icon: PenTool,
     },
     {
         id: 'create-menu',
-        title: 'Crear nuevo Menú',
-        description: 'Configurar un nuevo menú de navegación',
+        title: t('Crear nuevo Menú'),
+        description: t('Configurar un nuevo menú de navegación'),
         url: '/admin/menus/create',
         icon: MenuIcon,
     },
     {
         id: 'customize-layout',
-        title: 'Personalizar Layout',
-        description: 'Ajustar logos, colores, redes sociales y footer',
+        title: t('Personalizar Layout'),
+        description: t('Ajustar logos, colores, redes sociales y footer'),
         url: '/admin/layout',
         icon: Sliders,
     },
     {
         id: 'view-site',
-        title: 'Ver Sitio Web',
-        description: 'Abrir el sitio público en una nueva pestaña',
+        title: t('Ver Sitio Web'),
+        description: t('Abrir el sitio público en una nueva pestaña'),
         url: '/',
         icon: Globe,
         external: true,
@@ -151,8 +152,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     onKeyDown={handleKeyDown}
                     className="border-border/70 bg-background/95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed top-[16%] left-1/2 z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border p-0 shadow-2xl backdrop-blur-xl transition-all duration-150 focus:outline-hidden"
                 >
-                    <Dialog.Title className="sr-only">Paleta de Comandos</Dialog.Title>
-                    <Dialog.Description className="sr-only">Buscar páginas, posts, menús y acciones en MewCMS</Dialog.Description>
+                    <Dialog.Title className="sr-only">{t('Paleta de Comandos')}</Dialog.Title>
+                    <Dialog.Description className="sr-only">{t('Buscar páginas, posts, menús y acciones en MewCMS')}</Dialog.Description>
 
                     {/* Search Input Box */}
                     <div className="border-border/60 relative flex items-center border-b px-4 py-3">
@@ -162,7 +163,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                             type="text"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Buscar sección, acción o atajo en MewCMS..."
+                            placeholder={t('Buscar sección, acción o atajo en MewCMS...')}
                             className="text-foreground placeholder:text-muted-foreground/70 w-full bg-transparent text-sm font-medium focus:outline-hidden"
                         />
                         {query && (
@@ -183,7 +184,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     <div className="max-h-80 overflow-y-auto p-2">
                         {totalResults === 0 ? (
                             <div className="text-muted-foreground py-10 text-center text-xs">
-                                No se encontraron resultados para &ldquo;<span className="text-foreground font-medium">{query}</span>&rdquo;
+                                {t('No se encontraron resultados para')} &ldquo;<span className="text-foreground font-medium">{query}</span>&rdquo;
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -191,7 +192,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 {filteredActions.length > 0 && (
                                     <div>
                                         <div className="text-muted-foreground/70 px-2 py-1 text-[10px] font-bold tracking-wider uppercase">
-                                            Acciones Rápidas
+                                            {t('Acciones Rápidas')}
                                         </div>
                                         <div className="mt-1 space-y-0.5">
                                             {filteredActions.map((action, idx) => {
@@ -249,7 +250,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 {filteredModules.length > 0 && (
                                     <div>
                                         <div className="text-muted-foreground/70 px-2 py-1 text-[10px] font-bold tracking-wider uppercase">
-                                            Módulos del Sistema
+                                            {t('Módulos del Sistema')}
                                         </div>
                                         <div className="mt-1 space-y-0.5">
                                             {filteredModules.map((mod, idx) => {
@@ -308,14 +309,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                             <span className="flex items-center gap-1">
                                 <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↑</kbd>
                                 <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↓</kbd>
-                                Navegar
+                                {t('Navegar')}
                             </span>
                             <span className="flex items-center gap-1">
                                 <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↵</kbd>
-                                Seleccionar
+                                {t('Seleccionar')}
                             </span>
                         </div>
-                        <span>MewCMS Quick Navigator</span>
+                        <span>{t('MewCMS Quick Navigator')}</span>
                     </div>
                 </Dialog.Content>
             </Dialog.Portal>

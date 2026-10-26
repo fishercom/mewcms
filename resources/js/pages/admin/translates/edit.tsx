@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { updateTranslate } from '@/services/translates';
 import { CmsTranslate, CmsTranslateForm } from '@/types/models/cms-translate';
 import TranslateFormFields from './partials/fields';
@@ -36,14 +37,14 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={updateTranslateHandler} className="space-y-6">
                     <TranslateFormFields data={data} setData={setData} errors={errors} processing={processing} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/translates">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/translates">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

@@ -41,8 +41,8 @@ class MediaController extends Controller
         $request->validate([
             'file' => ['required', 'file', 'max:'.MediaLibrary::MAX_UPLOAD_KB, 'mimetypes:'.implode(',', MediaLibrary::UPLOAD_MIMES)],
         ], [
-            'file.mimetypes' => 'Este tipo de archivo no está permitido.',
-            'file.max' => 'El archivo supera el tamaño máximo de '.(MediaLibrary::MAX_UPLOAD_KB / 1024).' MB.',
+            'file.mimetypes' => __('Este tipo de archivo no está permitido.'),
+            'file.max' => __('El archivo supera el tamaño máximo de :size MB.', ['size' => MediaLibrary::MAX_UPLOAD_KB / 1024]),
         ]);
 
         $media = MediaLibrary::store($request->file('file'), $request->user()?->id);

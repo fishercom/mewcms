@@ -2,6 +2,7 @@ import ContentEditorTools from '@/components/content-editor-tools';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
@@ -62,10 +63,10 @@ export default function Create() {
         );
     };
 
-    const singularName = cpt ? cpt.singular_name : 'Entrada';
+    const singularName = cpt ? cpt.singular_name : t('Entrada');
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <ContentEditorTools
@@ -91,13 +92,13 @@ export default function Create() {
 
                     <div className="border-border flex items-center gap-4 border-t pt-4">
                         <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            Publicar / Guardar
+                            {t('Publicar / Guardar')}
                         </Button>
                         <Link
                             href={`/admin/posts?post_type=${post_type}&lang_id=${lang_id}`}
                             className="text-muted-foreground hover:text-foreground text-sm font-medium"
                         >
-                            Cancelar
+                            {t('Cancelar')}
                         </Link>
                     </div>
                 </form>

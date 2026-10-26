@@ -156,7 +156,7 @@ class DashboardController extends Controller
             ->get()
             ->map(fn (CmsRegister $message): array => [
                 'id' => $message->id,
-                'name' => $message->name ?: ($message->email ?: 'Sin nombre'),
+                'name' => $message->name ?: ($message->email ?: __('Sin nombre')),
                 'email' => $message->email,
                 'form' => $message->form?->name,
                 'excerpt' => Str::limit(trim(strip_tags((string) $message->message)), 90),
@@ -178,7 +178,7 @@ class DashboardController extends Controller
             ->take(6)
             ->map(fn (Model $item): array => [
                 'key' => class_basename($item).'-'.$item->getKey(),
-                'title' => $item->title ?: 'Sin título',
+                'title' => $item->title ?: __('Sin título'),
                 'type' => $item instanceof CmsPost ? 'Entrada' : 'Página',
                 'state' => match (true) {
                     $item->status === 'draft' => 'draft',

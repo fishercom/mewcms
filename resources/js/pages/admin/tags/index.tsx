@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsTag } from '@/types/models/cms-tag';
 import { router, usePage } from '@inertiajs/react';
@@ -27,7 +28,7 @@ export default function Index() {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const showErrors = (errors: Record<string, string>) => setError(Object.values(errors)[0] ?? 'Ocurrió un error.');
+    const showErrors = (errors: Record<string, string>) => setError(Object.values(errors)[0] ?? t('Ocurrió un error.'));
 
     const create = (e: FormEvent) => {
         e.preventDefault();
@@ -62,7 +63,9 @@ export default function Index() {
     const destroy = (tag: CmsTag) => {
         const uses = (tag.articles_count ?? 0) + (tag.posts_count ?? 0);
         const message =
-            uses > 0 ? `"${tag.name}" se quitará de ${uses} contenido(s). ¿Eliminar la etiqueta?` : `¿Eliminar la etiqueta "${tag.name}"?`;
+            uses > 0
+                ? t('":name" se quitará de :count contenido(s). ¿Eliminar la etiqueta?', { name: tag.name, count: uses })
+                : t('¿Eliminar la etiqueta ":name"?', { name: tag.name });
         if (window.confirm(message)) {
             router.delete(route('tags.destroy', tag.id), { preserveScroll: true, onError: showErrors });
         }
@@ -74,14 +77,14 @@ export default function Index() {
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="relative w-full md:max-w-sm">
                         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-                        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar etiqueta..." className="pl-9" />
+                        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('Buscar etiqueta...')} className="pl-9" />
                     </div>
 
                     <form onSubmit={create} className="flex w-full gap-2 md:w-auto">
-                        <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nueva etiqueta" className="md:w-56" />
+                        <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('Nueva etiqueta')} className="md:w-56" />
                         <Button type="submit" disabled={!newName.trim()} className="gap-1.5">
                             <Plus className="h-4 w-4" />
-                            Crear
+                            {t('Crear')}
                         </Button>
                     </form>
                 </div>
@@ -93,19 +96,19 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Etiqueta
+                                    {t('Etiqueta')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Slug
+                                    {t('Slug')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Páginas
+                                    {t('Páginas')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Entradas
+                                    {t('Entradas')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Activa
+                                    {t('Activa')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -124,7 +127,7 @@ export default function Index() {
                                                         onChange={(e) => setEditing({ ...editing, name: e.target.value })}
                                                         onKeyDown={handleEditKey}
                                                         className="h-8"
-                                                        aria-label="Nombre"
+                                                        aria-label={t('Nombre')}
                                                     />
                                                 ) : (
                                                     <span className="text-foreground inline-flex items-center gap-1.5 font-medium">
@@ -140,7 +143,7 @@ export default function Index() {
                                                         onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
                                                         onKeyDown={handleEditKey}
                                                         className="h-8 font-mono text-xs"
-                                                        aria-label="Slug"
+                                                        aria-label={t('Slug')}
                                                     />
                                                 ) : (
                                                     <a
@@ -160,7 +163,7 @@ export default function Index() {
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleActive(tag)}
-                                                    title={tag.active ? 'Desactivar' : 'Activar'}
+                                                    title={tag.active ? t('Desactivar') : t('Activar')}
                                                     className="hover:bg-muted inline-flex h-6 w-6 items-center justify-center rounded-full"
                                                 >
                                                     {tag.active ? (
@@ -175,10 +178,10 @@ export default function Index() {
                                                     {isEditing ? (
                                                         <>
                                                             <Button size="sm" className="h-8" onClick={saveEdit}>
-                                                                Guardar
+                                                                {t('Guardar')}
                                                             </Button>
                                                             <Button size="sm" variant="ghost" className="h-8" onClick={() => setEditing(null)}>
-                                                                Cancelar
+                                                                {t('Cancelar')}
                                                             </Button>
                                                         </>
                                                     ) : (
@@ -190,14 +193,14 @@ export default function Index() {
                                                                 onClick={() => setEditing({ id: tag.id, name: tag.name, slug: tag.slug })}
                                                             >
                                                                 <Edit className="h-3.5 w-3.5" />
-                                                                <span>Renombrar</span>
+                                                                <span>{t('Renombrar')}</span>
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-8 w-8 rounded-lg"
                                                                 onClick={() => destroy(tag)}
-                                                                aria-label={`Eliminar ${tag.name}`}
+                                                                aria-label={t('Eliminar :name', { name: tag.name })}
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
@@ -212,8 +215,8 @@ export default function Index() {
                                 <tr>
                                     <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
                                         {search
-                                            ? `No hay etiquetas que coincidan con "${search}".`
-                                            : 'Aún no hay etiquetas. Crea la primera arriba o desde el editor de una página.'}
+                                            ? t('No hay etiquetas que coincidan con ":search".', { search })
+                                            : t('Aún no hay etiquetas. Crea la primera arriba o desde el editor de una página.')}
                                     </td>
                                 </tr>
                             )}

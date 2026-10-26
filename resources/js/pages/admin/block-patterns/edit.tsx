@@ -2,6 +2,7 @@ import { type BlockDefinition } from '@/blocks/types';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { CmsBlockPattern } from '@/types/models/cms-block-pattern';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -43,7 +44,7 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <BlockPatternFormFields
@@ -57,10 +58,10 @@ export default function Edit() {
 
                     <div className="border-border flex items-center gap-4 border-t pt-4">
                         <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            Guardar Cambios
+                            {t('Guardar Cambios')}
                         </Button>
                         <Link href={route('block-patterns.index')} className="text-muted-foreground hover:text-foreground text-sm font-medium">
-                            Cancelar
+                            {t('Cancelar')}
                         </Link>
                     </div>
                 </form>

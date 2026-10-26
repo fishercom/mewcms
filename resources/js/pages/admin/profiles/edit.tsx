@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { updateProfile } from '@/services/profiles';
 import { Profile, ProfileForm } from '@/types';
 import { AdmModule } from '@/types/models/adm-module';
@@ -36,14 +37,14 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view="Editar">
+        <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={updateProfileHandler} className="space-y-6">
                     <ProfileFormFields data={data} setData={setData} errors={errors} processing={processing} modules={modules} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/profiles">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/profiles">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

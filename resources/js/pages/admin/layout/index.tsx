@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
 import { CheckCircle2, Code, Globe, Layout, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import React, { useState } from 'react';
@@ -61,7 +62,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
 
     return (
         <ModuleLayout>
-            <Head title="Configuración del Sitio" />
+            <Head title={t('Configuración del Sitio')} />
 
             <FormLayout>
                 <div className="space-y-6">
@@ -69,7 +70,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                     {(saved || flash?.success) && (
                         <div className="animate-in fade-in border-success/30 bg-success-soft text-success flex items-center gap-2 rounded-xl border p-4 text-xs font-semibold duration-200">
                             <CheckCircle2 className="text-success h-4.5 w-4.5 shrink-0" />
-                            <span>{flash?.success ?? 'Configuraciones de layout guardadas.'}</span>
+                            <span>{flash?.success ?? t('Configuraciones de layout guardadas.')}</span>
                         </div>
                     )}
 
@@ -86,7 +87,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 }`}
                             >
                                 <Layout className="h-4 w-4" />
-                                <span>General & Logos</span>
+                                <span>{t('General & Logos')}</span>
                             </button>
                             <button
                                 type="button"
@@ -98,7 +99,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 }`}
                             >
                                 <Globe className="h-4 w-4" />
-                                <span>Redes Sociales</span>
+                                <span>{t('Redes Sociales')}</span>
                             </button>
                             <button
                                 type="button"
@@ -110,7 +111,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 }`}
                             >
                                 <Code className="h-4 w-4" />
-                                <span>Personalización (CSS)</span>
+                                <span>{t('Personalización (CSS)')}</span>
                             </button>
                         </div>
 
@@ -121,9 +122,11 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                                     <div>
                                         <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                                            Logo de Cabecera (Header)
+                                            {t('Logo de Cabecera (Header)')}
                                         </h3>
-                                        <p className="text-muted-foreground mt-0.5 text-[10px]">Se muestra en la barra de navegación superior</p>
+                                        <p className="text-muted-foreground mt-0.5 text-[10px]">
+                                            {t('Se muestra en la barra de navegación superior')}
+                                        </p>
                                     </div>
 
                                     {data.layout_header_logo ? (
@@ -132,12 +135,14 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                                 <div className="border-border bg-muted flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border">
                                                     <img
                                                         src={data.layout_header_logo}
-                                                        alt="Header Logo"
+                                                        alt={t('Header Logo')}
                                                         className="max-h-full max-w-full object-contain"
                                                     />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <span className="text-foreground block truncate text-xs font-semibold">Logo Seleccionado</span>
+                                                    <span className="text-foreground block truncate text-xs font-semibold">
+                                                        {t('Logo Seleccionado')}
+                                                    </span>
                                                     <span
                                                         className="text-muted-foreground mt-0.5 block truncate text-[9px]"
                                                         title={data.layout_header_logo}
@@ -154,7 +159,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                                     className="h-8 text-xs"
                                                     onClick={() => setDrawerTarget('header')}
                                                 >
-                                                    Cambiar
+                                                    {t('Cambiar')}
                                                 </Button>
                                                 <Button
                                                     type="button"
@@ -173,8 +178,10 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                             className="group border-border hover:border-primary/40 hover:bg-muted/30 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors"
                                         >
                                             <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-8 w-8 transition-colors" />
-                                            <span className="text-foreground text-xs font-semibold">Seleccionar Logo de Cabecera</span>
-                                            <span className="text-muted-foreground mt-1 text-[9px]">Busca o sube un archivo en la biblioteca</span>
+                                            <span className="text-foreground text-xs font-semibold">{t('Seleccionar Logo de Cabecera')}</span>
+                                            <span className="text-muted-foreground mt-1 text-[9px]">
+                                                {t('Busca o sube un archivo en la biblioteca')}
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -183,9 +190,9 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                                     <div>
                                         <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                                            Logo de Pie de Página (Footer)
+                                            {t('Logo de Pie de Página (Footer)')}
                                         </h3>
-                                        <p className="text-muted-foreground mt-0.5 text-[10px]">Se muestra en la zona inferior del sitio</p>
+                                        <p className="text-muted-foreground mt-0.5 text-[10px]">{t('Se muestra en la zona inferior del sitio')}</p>
                                     </div>
 
                                     {data.layout_footer_logo ? (
@@ -194,12 +201,14 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                                 <div className="border-border bg-muted flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border">
                                                     <img
                                                         src={data.layout_footer_logo}
-                                                        alt="Footer Logo"
+                                                        alt={t('Footer Logo')}
                                                         className="max-h-full max-w-full object-contain"
                                                     />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <span className="text-foreground block truncate text-xs font-semibold">Logo Seleccionado</span>
+                                                    <span className="text-foreground block truncate text-xs font-semibold">
+                                                        {t('Logo Seleccionado')}
+                                                    </span>
                                                     <span
                                                         className="text-muted-foreground mt-0.5 block truncate text-[9px]"
                                                         title={data.layout_footer_logo}
@@ -216,7 +225,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                                     className="h-8 text-xs"
                                                     onClick={() => setDrawerTarget('footer')}
                                                 >
-                                                    Cambiar
+                                                    {t('Cambiar')}
                                                 </Button>
                                                 <Button
                                                     type="button"
@@ -235,8 +244,10 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                             className="group border-border hover:border-primary/40 hover:bg-muted/30 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors"
                                         >
                                             <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-8 w-8 transition-colors" />
-                                            <span className="text-foreground text-xs font-semibold">Seleccionar Logo de Footer</span>
-                                            <span className="text-muted-foreground mt-1 text-[9px]">Busca o sube un archivo en la biblioteca</span>
+                                            <span className="text-foreground text-xs font-semibold">{t('Seleccionar Logo de Footer')}</span>
+                                            <span className="text-muted-foreground mt-1 text-[9px]">
+                                                {t('Busca o sube un archivo en la biblioteca')}
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -244,7 +255,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 {/* Copyright Text Field */}
                                 <div className="border-border bg-card space-y-3 rounded-xl border p-5 shadow-xs md:col-span-2">
                                     <Label htmlFor="layout_copyright" className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                                        Texto de Derechos Reservados (Copyright)
+                                        {t('Texto de Derechos Reservados (Copyright)')}
                                     </Label>
                                     <Input
                                         id="layout_copyright"
@@ -252,11 +263,11 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         value={data.layout_copyright}
                                         onChange={(e) => setData('layout_copyright', e.target.value)}
                                         className="bg-card h-9 w-full text-xs"
-                                        placeholder="Ej: © 2026 MewCMS. Todos los derechos reservados."
+                                        placeholder={t('Ej: © 2026 MewCMS. Todos los derechos reservados.')}
                                     />
                                     <p className="text-muted-foreground text-[11px]">
-                                        Admite enlaces simples, por ejemplo {'<a href="https://tusitio.com" target="_blank">Tu empresa</a>'}. Se
-                                        elimina cualquier otro código.
+                                        {t('Admite enlaces simples, por ejemplo')} {t('<a href="https://tusitio.com" target="_blank">Tu empresa</a>')}
+                                        {t('. Se elimina cualquier otro código.')}
                                     </p>
                                 </div>
                             </div>
@@ -266,9 +277,11 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                         {activeTab === 'social' && (
                             <div className="border-border bg-card space-y-5 rounded-xl border p-5 shadow-xs">
                                 <div>
-                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Redes sociales y contacto</h3>
+                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                                        {t('Redes sociales y contacto')}
+                                    </h3>
                                     <p className="text-muted-foreground mt-0.5 text-[10px]">
-                                        Enlaces con https://, un correo o un teléfono. El texto es opcional y se usa para lectores de pantalla.
+                                        {t('Enlaces con https://, un correo o un teléfono. El texto es opcional y se usa para lectores de pantalla.')}
                                     </p>
                                 </div>
 
@@ -289,15 +302,17 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                         {activeTab === 'css' && (
                             <div className="border-border bg-card space-y-4 rounded-xl border p-5 shadow-xs">
                                 <div>
-                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Estilos CSS Personalizados</h3>
+                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                                        {t('Estilos CSS Personalizados')}
+                                    </h3>
                                     <p className="text-muted-foreground mt-0.5 text-[10px]">
-                                        Se inyectarán como un bloque inline global en la cabecera del frontend
+                                        {t('Se inyectarán como un bloque inline global en la cabecera del frontend')}
                                     </p>
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label htmlFor="layout_custom_css" className="sr-only">
-                                        CSS
+                                        {t('CSS')}
                                     </Label>
                                     <Textarea
                                         id="layout_custom_css"
@@ -320,10 +335,10 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 {processing ? (
                                     <>
                                         <RefreshCw className="h-4 w-4 animate-spin" />
-                                        <span>Guardando...</span>
+                                        <span>{t('Guardando...')}</span>
                                     </>
                                 ) : (
-                                    <span>Guardar Cambios</span>
+                                    <span>{t('Guardar Cambios')}</span>
                                 )}
                             </Button>
                         </div>

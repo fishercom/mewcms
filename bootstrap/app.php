@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureAdminAccess;
 use App\Http\Middleware\EnsureAdminPermission;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\HandleLocale;
 use App\Models\CmsRedirect;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        $middleware->encryptCookies(except: ['appearance']);
+        $middleware->encryptCookies(except: ['appearance', 'locale']);
 
         $middleware->alias([
             'admin.access' => EnsureAdminAccess::class,
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             HandleAppearance::class,
+            HandleLocale::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);

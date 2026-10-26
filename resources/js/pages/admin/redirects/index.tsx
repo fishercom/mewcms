@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -46,7 +47,7 @@ export default function Index() {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const showErrors = (errors: Record<string, string>) => setError(Object.values(errors)[0] ?? 'Ocurrió un error.');
+    const showErrors = (errors: Record<string, string>) => setError(Object.values(errors)[0] ?? t('Ocurrió un error.'));
 
     const create = (e: FormEvent) => {
         e.preventDefault();
@@ -74,7 +75,7 @@ export default function Index() {
     };
 
     const destroy = (item: CmsRedirect) => {
-        if (window.confirm(`¿Eliminar la redirección de "${item.from_path}"?`)) {
+        if (window.confirm(t('¿Eliminar la redirección de ":path"?', { path: item.from_path }))) {
             router.delete(route('redirects.destroy', item.id), { preserveScroll: true, onError: showErrors });
         }
     };
@@ -93,7 +94,7 @@ export default function Index() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                placeholder="Buscar dirección..."
+                                placeholder={t('Buscar dirección...')}
                             />
                         </div>
                     </div>
@@ -103,26 +104,26 @@ export default function Index() {
                     <Input
                         value={draft.from_path}
                         onChange={(e) => setDraft({ ...draft, from_path: e.target.value })}
-                        placeholder="Desde: /direccion-antigua"
+                        placeholder={t('Desde: /direccion-antigua')}
                         className="font-mono text-sm md:flex-1"
-                        aria-label="Desde"
+                        aria-label={t('Desde')}
                     />
                     <ArrowRight className="text-muted-foreground hidden h-4 w-4 shrink-0 md:block" />
                     <Input
                         value={draft.to_path}
                         onChange={(e) => setDraft({ ...draft, to_path: e.target.value })}
-                        placeholder="Hacia: /direccion-nueva o https://..."
+                        placeholder={t('Hacia: /direccion-nueva o https://...')}
                         className="font-mono text-sm md:flex-1"
-                        aria-label="Hacia"
+                        aria-label={t('Hacia')}
                     />
                     <select
                         value={draft.status_code}
                         onChange={(e) => setDraft({ ...draft, status_code: Number(e.target.value) })}
                         className={selectClass}
-                        aria-label="Tipo"
+                        aria-label={t('Tipo')}
                     >
-                        <option value={301}>301 Permanente</option>
-                        <option value={302}>302 Temporal</option>
+                        <option value={301}>{t('301 Permanente')}</option>
+                        <option value={302}>{t('302 Temporal')}</option>
                     </select>
                     <Button
                         type="submit"
@@ -130,7 +131,7 @@ export default function Index() {
                         className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5"
                     >
                         <Plus className="h-4 w-4" />
-                        <span>Crear Redirección</span>
+                        <span>{t('Crear Redirección')}</span>
                     </Button>
                 </form>
 
@@ -141,19 +142,19 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Desde
+                                    {t('Desde')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Hacia
+                                    {t('Hacia')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Tipo
+                                    {t('Tipo')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Visitas
+                                    {t('Visitas')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Última visita
+                                    {t('Última visita')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -172,7 +173,7 @@ export default function Index() {
                                                         onChange={(e) => setEditing({ ...editing, from_path: e.target.value })}
                                                         onKeyDown={handleEditKey}
                                                         className="h-8 font-mono text-xs"
-                                                        aria-label="Desde"
+                                                        aria-label={t('Desde')}
                                                     />
                                                 ) : (
                                                     item.from_path
@@ -185,7 +186,7 @@ export default function Index() {
                                                         onChange={(e) => setEditing({ ...editing, to_path: e.target.value })}
                                                         onKeyDown={handleEditKey}
                                                         className="h-8 font-mono text-xs"
-                                                        aria-label="Hacia"
+                                                        aria-label={t('Hacia')}
                                                     />
                                                 ) : (
                                                     <a
@@ -205,7 +206,7 @@ export default function Index() {
                                                         value={editing.status_code}
                                                         onChange={(e) => setEditing({ ...editing, status_code: Number(e.target.value) })}
                                                         className={selectClass}
-                                                        aria-label="Tipo"
+                                                        aria-label={t('Tipo')}
                                                     >
                                                         <option value={301}>301</option>
                                                         <option value={302}>302</option>
@@ -223,10 +224,10 @@ export default function Index() {
                                                     {isEditing ? (
                                                         <>
                                                             <Button size="sm" className="h-8" onClick={saveEdit}>
-                                                                Guardar
+                                                                {t('Guardar')}
                                                             </Button>
                                                             <Button size="sm" variant="ghost" className="h-8" onClick={() => setEditing(null)}>
-                                                                Cancelar
+                                                                {t('Cancelar')}
                                                             </Button>
                                                         </>
                                                     ) : (
@@ -245,7 +246,7 @@ export default function Index() {
                                                                 }
                                                             >
                                                                 <Edit className="h-3.5 w-3.5" />
-                                                                <span>Editar</span>
+                                                                <span>{t('Editar')}</span>
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
@@ -254,7 +255,7 @@ export default function Index() {
                                                                 onClick={() => destroy(item)}
                                                             >
                                                                 <Trash2 className="h-3.5 w-3.5" />
-                                                                <span>Eliminar</span>
+                                                                <span>{t('Eliminar')}</span>
                                                             </Button>
                                                         </>
                                                     )}
@@ -267,8 +268,8 @@ export default function Index() {
                                 <tr>
                                     <td colSpan={6} className="text-muted-foreground px-4 py-8 text-center italic">
                                         {search
-                                            ? `No hay redirecciones que coincidan con "${search}".`
-                                            : 'Aún no hay redirecciones. Se crean solas cuando cambias la dirección de una página.'}
+                                            ? t('No hay redirecciones que coincidan con ":search".', { search })
+                                            : t('Aún no hay redirecciones. Se crean solas cuando cambias la dirección de una página.')}
                                     </td>
                                 </tr>
                             )}

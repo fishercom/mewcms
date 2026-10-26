@@ -4,6 +4,7 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { CmsBlockPattern } from '@/types/models/cms-block-pattern';
 
 interface Props {
@@ -29,13 +30,13 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
         <div className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="grid gap-2">
-                    <Label htmlFor="name">Nombre</Label>
+                    <Label htmlFor="name">{t('Nombre')}</Label>
                     <Input
                         id="name"
                         required
                         autoFocus
                         value={data.name ?? ''}
-                        placeholder="Ej. Aviso de horarios"
+                        placeholder={t('Ej. Aviso de horarios')}
                         onChange={(e) => setData({ ...data, name: e.target.value, key: data.id ? data.key : slugify(e.target.value) })}
                         disabled={processing}
                     />
@@ -43,7 +44,7 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="key">Clave</Label>
+                    <Label htmlFor="key">{t('Clave')}</Label>
                     <Input
                         id="key"
                         required
@@ -56,7 +57,7 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="category">Categoría</Label>
+                    <Label htmlFor="category">{t('Categoría')}</Label>
                     <select
                         id="category"
                         value={data.category ?? 'general'}
@@ -75,11 +76,11 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="description">Descripción</Label>
+                <Label htmlFor="description">{t('Descripción')}</Label>
                 <Input
                     id="description"
                     value={data.description ?? ''}
-                    placeholder="Para qué sirve este bloque, visible en el buscador de bloques"
+                    placeholder={t('Para qué sirve este bloque, visible en el buscador de bloques')}
                     onChange={(e) => setData({ ...data, description: e.target.value })}
                     disabled={processing}
                 />
@@ -95,9 +96,9 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
                         className="mt-0.5"
                     />
                     <span>
-                        <span className="text-foreground block text-sm font-medium">Sincronizado</span>
+                        <span className="text-foreground block text-sm font-medium">{t('Sincronizado')}</span>
                         <span className="text-muted-foreground block text-xs">
-                            Las páginas lo muestran siempre actualizado. Sin sincronizar, se inserta como una copia independiente.
+                            {t('Las páginas lo muestran siempre actualizado. Sin sincronizar, se inserta como una copia independiente.')}
                         </span>
                     </span>
                 </label>
@@ -110,16 +111,16 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
                         className="mt-0.5"
                     />
                     <span>
-                        <span className="text-foreground block text-sm font-medium">Activo</span>
-                        <span className="text-muted-foreground block text-xs">Solo los bloques activos aparecen en el editor.</span>
+                        <span className="text-foreground block text-sm font-medium">{t('Activo')}</span>
+                        <span className="text-muted-foreground block text-xs">{t('Solo los bloques activos aparecen en el editor.')}</span>
                     </span>
                 </label>
             </div>
 
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <Label className="text-foreground font-semibold">Contenido del bloque</Label>
-                    <span className="text-muted-foreground text-[11px]">Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos</span>
+                    <Label className="text-foreground font-semibold">{t('Contenido del bloque')}</Label>
+                    <span className="text-muted-foreground text-[11px]">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
                 </div>
                 <BlockEditor allowPatterns={false} types={blockTypes} value={data.blocks ?? []} onChange={(blocks) => setData({ ...data, blocks })} />
                 <InputError message={errors.blocks} />

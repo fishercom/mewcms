@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { createParameter } from '@/services/parameters';
 import { CmsParameter, CmsParameterForm } from '@/types/models/cms-parameter';
 import { CmsParameterGroup } from '@/types/models/cms-parameter-group';
@@ -42,14 +43,14 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={createParameterHandler} className="space-y-6">
                     <ParameterFormFields data={data} setData={setData} errors={errors} processing={processing} groups={groups} parents={parents} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/parameters">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/parameters">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

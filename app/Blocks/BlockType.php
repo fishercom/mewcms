@@ -87,15 +87,40 @@ abstract class BlockType
     {
         return [
             'key' => $this->key(),
-            'name' => $this->name(),
+            'name' => __($this->name()),
             'icon' => $this->icon(),
             'category' => $this->category(),
-            'description' => $this->description(),
+            'description' => __($this->description()),
             'version' => static::VERSION,
             'nestable' => $this->nestable(),
-            'fields' => $this->fields(),
+            'fields' => self::translateFields($this->fields()),
             'defaults' => $this->sanitize([]),
         ];
+    }
+
+    /**
+     * Field and option labels in the admin language (lang/*.json).
+     *
+     * @param  list<array<string, mixed>>  $fields
+     * @return list<array<string, mixed>>
+     */
+    protected static function translateFields(array $fields): array
+    {
+        return array_map(function (array $field): array {
+            foreach (['label', 'help', 'placeholder'] as $key) {
+                if (isset($field[$key]) && is_string($field[$key])) {
+                    $field[$key] = __($field[$key]);
+                }
+            }
+            if (isset($field['options']) && is_array($field['options'])) {
+                $field['options'] = array_map(fn ($option) => is_array($option) && isset($option['label']) ? [...$option, 'label' => __((string) $option['label'])] : $option, $field['options']);
+            }
+            if (isset($field['fields']) && is_array($field['fields'])) {
+                $field['fields'] = self::translateFields($field['fields']);
+            }
+
+            return $field;
+        }, $fields);
     }
 
     /**

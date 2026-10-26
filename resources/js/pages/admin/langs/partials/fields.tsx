@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { CmsLangForm } from '@/types/models/cms-lang';
 
 interface Props {
@@ -15,7 +16,7 @@ export default function LangFormFields({ data, setData, errors, processing }: Pr
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('Name')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -31,7 +32,7 @@ export default function LangFormFields({ data, setData, errors, processing }: Pr
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="iso">ISO</Label>
+                <Label htmlFor="iso">{t('ISO')}</Label>
                 <Input
                     id="iso"
                     type="text"
@@ -53,7 +54,7 @@ export default function LangFormFields({ data, setData, errors, processing }: Pr
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={3}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active">{t('Active')}</Label>
             </div>
         </>
     );

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { AdmLog, Pagination } from '@/types';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
@@ -40,7 +41,7 @@ export default function Index() {
                                     value={query.s ?? ''}
                                     onChange={handleSearch}
                                     className="border-border-strong data-focus:border-ring data-focus:ring-ring/50 block w-full rounded-md border p-2 pl-10 text-sm outline-none data-focus:ring-[3px]"
-                                    placeholder="Buscar"
+                                    placeholder={t('Buscar')}
                                 />
                             </div>
                         </form>
@@ -51,13 +52,13 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Usuario
+                                    {t('Usuario')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Actividad
+                                    {t('Actividad')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3">
-                                    Fecha
+                                    {t('Fecha')}
                                 </th>
                             </tr>
                         </thead>
@@ -65,7 +66,7 @@ export default function Index() {
                             {items.data.map((item: AdmLog) => {
                                 return (
                                     <tr key={item.id} className="border-b">
-                                        <td className="px-4 py-3 whitespace-nowrap">{item.user?.name ?? 'Sistema'}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{item.user?.name ?? t('Sistema')}</td>
                                         <th scope="row" className="text-foreground px-4 py-3 font-medium">
                                             {item.comment}
                                         </th>

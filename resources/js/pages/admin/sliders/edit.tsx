@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { updateSlider } from '@/services/sliders';
 import { CmsSlide, CmsSlider } from '@/types/models/cms-slider';
 import { Link, usePage } from '@inertiajs/react';
@@ -56,7 +57,7 @@ export default function Edit() {
     };
 
     const handleRemoveSlide = (index: number) => {
-        if (window.confirm('¿Deseas quitar esta diapositiva? Guarde los cambios para confirmar.')) {
+        if (window.confirm(t('¿Deseas quitar esta diapositiva? Guarde los cambios para confirmar.'))) {
             setSlides(slides.filter((_, i) => i !== index));
         }
     };
@@ -128,17 +129,17 @@ export default function Edit() {
     };
 
     return (
-        <ModuleLayout view={`Editar: ${slider.name}`}>
+        <ModuleLayout view={t('Editar: :name', { name: slider.name })}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* General Section */}
                     <div className="space-y-4">
                         <div className="border-border flex items-center justify-between border-b pb-2">
-                            <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">Información General</h3>
+                            <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">{t('Información General')}</h3>
                         </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Nombre del Slider</Label>
+                                <Label htmlFor="name">{t('Nombre del Slider')}</Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -152,7 +153,7 @@ export default function Edit() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="key">Clave (Key identificadora)</Label>
+                                <Label htmlFor="key">{t('Clave (Key identificadora)')}</Label>
                                 <Input
                                     id="key"
                                     type="text"
@@ -167,7 +168,7 @@ export default function Edit() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="description">Descripción</Label>
+                            <Label htmlFor="description">{t('Descripción')}</Label>
                             <Input
                                 id="description"
                                 type="text"
@@ -183,26 +184,26 @@ export default function Edit() {
                     <div className="space-y-4">
                         <div className="border-border flex items-center justify-between border-b pb-2">
                             <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
-                                Configuración de Reproducción y Efectos
+                                {t('Configuración de Reproducción y Efectos')}
                             </h3>
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-3">
                             <div className="grid gap-2">
-                                <Label htmlFor="effect">Efecto de Transición</Label>
+                                <Label htmlFor="effect">{t('Efecto de Transición')}</Label>
                                 <Select value={effect} onValueChange={(val: 'slide' | 'fade') => setEffect(val)} disabled={processing}>
                                     <SelectTrigger className="bg-card">
-                                        <SelectValue placeholder="Efecto" />
+                                        <SelectValue placeholder={t('Efecto')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="slide">Slide (Deslizar)</SelectItem>
-                                        <SelectItem value="fade">Fade (Desvanecer)</SelectItem>
+                                        <SelectItem value="slide">{t('Slide (Deslizar)')}</SelectItem>
+                                        <SelectItem value="fade">{t('Fade (Desvanecer)')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="autoplaySpeed">Tiempo por Diapositiva (ms)</Label>
+                                <Label htmlFor="autoplaySpeed">{t('Tiempo por Diapositiva (ms)')}</Label>
                                 <Input
                                     id="autoplaySpeed"
                                     type="number"
@@ -216,7 +217,7 @@ export default function Edit() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="transitionSpeed">Velocidad de Transición (ms)</Label>
+                                <Label htmlFor="transitionSpeed">{t('Velocidad de Transición (ms)')}</Label>
                                 <Input
                                     id="transitionSpeed"
                                     type="number"
@@ -239,21 +240,21 @@ export default function Edit() {
                                     disabled={processing}
                                 />
                                 <Label htmlFor="autoplay" className="cursor-pointer leading-none font-semibold">
-                                    Autoplay (Reproducción Automática)
+                                    {t('Autoplay (Reproducción Automática)')}
                                 </Label>
                             </div>
 
                             <div className="border-border bg-muted/50 flex items-center space-x-3 rounded-lg border p-3">
                                 <Checkbox id="loop" checked={loop} onCheckedChange={(checked) => setLoop(Boolean(checked))} disabled={processing} />
                                 <Label htmlFor="loop" className="cursor-pointer leading-none font-semibold">
-                                    Loop Infinito
+                                    {t('Loop Infinito')}
                                 </Label>
                             </div>
 
                             <div className="border-border bg-muted/50 flex items-center space-x-3 rounded-lg border p-3">
                                 <Checkbox id="dots" checked={dots} onCheckedChange={(checked) => setDots(Boolean(checked))} disabled={processing} />
                                 <Label htmlFor="dots" className="cursor-pointer leading-none font-semibold">
-                                    Mostrar Paginación (Puntos)
+                                    {t('Mostrar Paginación (Puntos)')}
                                 </Label>
                             </div>
 
@@ -265,7 +266,7 @@ export default function Edit() {
                                     disabled={processing}
                                 />
                                 <Label htmlFor="arrows" className="cursor-pointer leading-none font-semibold">
-                                    Mostrar Flechas de Navegación
+                                    {t('Mostrar Flechas de Navegación')}
                                 </Label>
                             </div>
                         </div>
@@ -275,8 +276,8 @@ export default function Edit() {
                     <div className="space-y-4">
                         <div className="border-border flex items-center justify-between border-b pb-2">
                             <div>
-                                <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">Diapositivas (Slides)</h3>
-                                <p className="text-muted-foreground mt-0.5 text-xs">Arriba y abajo para reordenar el carrusel</p>
+                                <h3 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">{t('Diapositivas (Slides)')}</h3>
+                                <p className="text-muted-foreground mt-0.5 text-xs">{t('Arriba y abajo para reordenar el carrusel')}</p>
                             </div>
                             <Button
                                 type="button"
@@ -285,7 +286,7 @@ export default function Edit() {
                                 className="bg-muted hover:bg-muted flex h-8 items-center gap-1 px-3 text-white"
                             >
                                 <Plus className="h-4 w-4" />
-                                <span>Añadir Diapositiva</span>
+                                <span>{t('Añadir Diapositiva')}</span>
                             </Button>
                         </div>
 
@@ -314,7 +315,7 @@ export default function Edit() {
                                                     <div className="border-border bg-muted relative aspect-[4/3] overflow-hidden rounded-lg border">
                                                         <img
                                                             src={slide.image_url}
-                                                            alt={slide.title || 'Slide Image'}
+                                                            alt={slide.title || t('Slide Image')}
                                                             className="h-full w-full object-cover"
                                                         />
                                                         <Button
@@ -324,7 +325,7 @@ export default function Edit() {
                                                             onClick={() => handleOpenMediaDrawer(index)}
                                                             className="absolute right-1 bottom-1 h-7 border-0 bg-black/60 px-2 text-[10px] text-white backdrop-blur-xs hover:bg-black/80"
                                                         >
-                                                            Cambiar
+                                                            {t('Cambiar')}
                                                         </Button>
                                                     </div>
                                                 ) : (
@@ -334,7 +335,7 @@ export default function Edit() {
                                                     >
                                                         <UploadCloud className="text-muted-foreground group-hover:text-primary mb-1 h-5 w-5 transition-colors" />
                                                         <span className="text-muted-foreground group-hover:text-primary text-[10px] font-semibold">
-                                                            Elegir Imagen
+                                                            {t('Elegir Imagen')}
                                                         </span>
                                                     </div>
                                                 )}
@@ -345,14 +346,14 @@ export default function Edit() {
                                                         onClick={() => toggleManualUrl(index)}
                                                         className="text-muted-foreground text-[9px] hover:underline"
                                                     >
-                                                        {showManual ? 'Ocultar URL manual' : 'Editar URL manual'}
+                                                        {showManual ? t('Ocultar URL manual') : t('Editar URL manual')}
                                                     </button>
                                                 </div>
 
                                                 {showManual && (
                                                     <Input
                                                         type="text"
-                                                        placeholder="URL de la imagen"
+                                                        placeholder={t('URL de la imagen')}
                                                         value={slide.image_url}
                                                         onChange={(e) => handleUpdateSlideField(index, 'image_url', e.target.value)}
                                                         className="bg-card h-7 text-[10px]"
@@ -363,18 +364,20 @@ export default function Edit() {
                                             {/* Slide Fields */}
                                             <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2">
                                                 <div className="grid gap-1">
-                                                    <Label className="text-muted-foreground text-[11px] font-medium">Título</Label>
+                                                    <Label className="text-muted-foreground text-[11px] font-medium">{t('Título')}</Label>
                                                     <Input
                                                         type="text"
                                                         value={slide.title || ''}
                                                         onChange={(e) => handleUpdateSlideField(index, 'title', e.target.value)}
-                                                        placeholder="Título de la diapositiva"
+                                                        placeholder={t('Título de la diapositiva')}
                                                         className="bg-card h-8 text-xs"
                                                     />
                                                 </div>
 
                                                 <div className="grid gap-1">
-                                                    <Label className="text-muted-foreground text-[11px] font-medium">Enlace / URL de destino</Label>
+                                                    <Label className="text-muted-foreground text-[11px] font-medium">
+                                                        {t('Enlace / URL de destino')}
+                                                    </Label>
                                                     <Input
                                                         type="text"
                                                         value={slide.link_url || ''}
@@ -386,13 +389,13 @@ export default function Edit() {
 
                                                 <div className="grid gap-1 md:col-span-2">
                                                     <Label className="text-muted-foreground text-[11px] font-medium">
-                                                        Subtítulo / Leyenda (Caption)
+                                                        {t('Subtítulo / Leyenda (Caption)')}
                                                     </Label>
                                                     <Input
                                                         type="text"
                                                         value={slide.caption || ''}
                                                         onChange={(e) => handleUpdateSlideField(index, 'caption', e.target.value)}
-                                                        placeholder="Texto secundario o descripción..."
+                                                        placeholder={t('Texto secundario o descripción...')}
                                                         className="bg-card h-8 text-xs"
                                                     />
                                                 </div>
@@ -408,7 +411,7 @@ export default function Edit() {
                                                             ? 'text-success hover:bg-success/10 border-success/30 bg-success/50'
                                                             : 'text-muted-foreground border-border bg-muted hover:bg-muted'
                                                     }`}
-                                                    title={slide.active ? 'Diapositiva Activa' : 'Diapositiva Inactiva'}
+                                                    title={slide.active ? t('Diapositiva Activa') : t('Diapositiva Inactiva')}
                                                 >
                                                     {slide.active ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                                                 </button>
@@ -419,7 +422,7 @@ export default function Edit() {
                                                     size="icon"
                                                     onClick={() => handleRemoveSlide(index)}
                                                     className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-7 w-7"
-                                                    title="Eliminar Diapositiva"
+                                                    title={t('Eliminar Diapositiva')}
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                 </Button>
@@ -431,9 +434,9 @@ export default function Edit() {
                         ) : (
                             <div className="bg-muted/5 border-border rounded-xl border border-dashed py-10 text-center">
                                 <ImageIcon className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
-                                <p className="text-muted-foreground text-xs italic">No hay diapositivas en este slider.</p>
+                                <p className="text-muted-foreground text-xs italic">{t('No hay diapositivas en este slider.')}</p>
                                 <Button type="button" variant="outline" size="sm" onClick={handleAddSlide} className="mt-3 text-xs">
-                                    Agregar la Primera Diapositiva
+                                    {t('Agregar la Primera Diapositiva')}
                                 </Button>
                             </div>
                         )}
@@ -441,10 +444,10 @@ export default function Edit() {
 
                     <div className="border-border flex items-center gap-4 border-t pt-4">
                         <Button type="submit" disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
-                            {processing ? 'Guardando...' : 'Guardar Slider'}
+                            {processing ? t('Guardando...') : t('Guardar Slider')}
                         </Button>
                         <Button asChild variant="ghost" className="h-10 px-4">
-                            <Link href={route('sliders.index')}>Cancelar</Link>
+                            <Link href={route('sliders.index')}>{t('Cancelar')}</Link>
                         </Button>
                     </div>
                 </form>

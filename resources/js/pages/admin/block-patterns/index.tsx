@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
+import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsBlockPattern } from '@/types/models/cms-block-pattern';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -21,7 +22,7 @@ export default function Index() {
     }, [searchTerm]);
 
     const handleDelete = (id: number, name: string) => {
-        if (window.confirm(`¿Eliminar el bloque reutilizable "${name}"? Las páginas que lo usen sincronizado dejarán de mostrarlo.`)) {
+        if (window.confirm(t('¿Eliminar el bloque reutilizable ":name"? Las páginas que lo usen sincronizado dejarán de mostrarlo.', { name }))) {
             router.delete(route('block-patterns.destroy', id), { preserveScroll: true });
         }
     };
@@ -41,7 +42,7 @@ export default function Index() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="border-border text-foreground block w-full rounded-md border bg-transparent p-2 pl-10 text-sm"
-                                placeholder="Buscar bloque reutilizable..."
+                                placeholder={t('Buscar bloque reutilizable...')}
                             />
                         </div>
                     </div>
@@ -49,7 +50,7 @@ export default function Index() {
                         <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={route('block-patterns.create')}>
                                 <Plus className="h-4 w-4" />
-                                <span>Nuevo bloque</span>
+                                <span>{t('Nuevo bloque')}</span>
                             </Link>
                         </Button>
                     </div>
@@ -60,22 +61,22 @@ export default function Index() {
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
                             <tr>
                                 <th scope="col" className="rounded-l-md px-4 py-3">
-                                    Nombre
+                                    {t('Nombre')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Clave
+                                    {t('Clave')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Categoría
+                                    {t('Categoría')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Bloques
+                                    {t('Bloques')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    Modo
+                                    {t('Modo')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
-                                    Actualizado
+                                    {t('Actualizado')}
                                 </th>
                                 <th scope="col" className="rounded-r-md px-4 py-3"></th>
                             </tr>
@@ -104,15 +105,15 @@ export default function Index() {
                                             {item.synced ? (
                                                 <span className="bg-primary-soft text-primary-soft-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
                                                     <RefreshCw className="h-3 w-3" />
-                                                    Sincronizado
+                                                    {t('Sincronizado')}
                                                 </span>
                                             ) : (
                                                 <span className="text-muted-foreground inline-flex items-center gap-1 text-xs">
                                                     <Copy className="h-3 w-3" />
-                                                    Copia
+                                                    {t('Copia')}
                                                 </span>
                                             )}
-                                            {!item.active && <span className="text-muted-foreground ml-2 text-xs">(inactivo)</span>}
+                                            {!item.active && <span className="text-muted-foreground ml-2 text-xs">({t('inactivo')})</span>}
                                         </td>
                                         <td className="text-muted-foreground px-4 py-3 text-center">
                                             {item.updated_at ? format(new Date(item.updated_at), 'dd/MM/yyyy') : '-'}
@@ -126,7 +127,7 @@ export default function Index() {
                                                     onClick={() => router.visit(route('block-patterns.edit', item.id))}
                                                 >
                                                     <Edit className="h-3.5 w-3.5" />
-                                                    <span>Editar</span>
+                                                    <span>{t('Editar')}</span>
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
@@ -143,7 +144,7 @@ export default function Index() {
                             ) : (
                                 <tr>
                                     <td colSpan={7} className="text-muted-foreground px-4 py-8 text-center italic">
-                                        Aún no hay bloques reutilizables. Crea uno o guarda un bloque desde el editor de una página.
+                                        {t('Aún no hay bloques reutilizables. Crea uno o guarda un bloque desde el editor de una página.')}
                                     </td>
                                 </tr>
                             )}

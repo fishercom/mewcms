@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import ModuleLayout from '@/layouts/module/layout';
+import { getLocale, t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { Pagination } from '@/types';
 import { type CmsMedia } from '@/types/models/cms-media';
@@ -33,11 +34,11 @@ interface Props {
 }
 
 const TYPE_FILTERS = [
-    { value: 'all', label: 'Todos los tipos' },
-    { value: 'image', label: 'Imágenes' },
-    { value: 'document', label: 'Documentos' },
-    { value: 'video', label: 'Vídeos' },
-    { value: 'audio', label: 'Audio' },
+    { value: 'all', label: t('Todos los tipos') },
+    { value: 'image', label: t('Imágenes') },
+    { value: 'document', label: t('Documentos') },
+    { value: 'video', label: t('Vídeos') },
+    { value: 'audio', label: t('Audio') },
 ];
 
 export default function MediaIndex() {
@@ -124,13 +125,13 @@ export default function MediaIndex() {
                             <Input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Buscar por nombre, título o texto alternativo..."
+                                placeholder={t('Buscar por nombre, título o texto alternativo...')}
                                 className="pl-9"
-                                aria-label="Buscar medios"
+                                aria-label={t('Buscar medios')}
                             />
                         </div>
                         <Select value={filters.type ?? 'all'} onValueChange={(value) => visit({ type: value })}>
-                            <SelectTrigger className="sm:w-44" aria-label="Tipo de archivo">
+                            <SelectTrigger className="sm:w-44" aria-label={t('Tipo de archivo')}>
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -144,11 +145,11 @@ export default function MediaIndex() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <ToggleGroup type="single" value={view} onValueChange={changeView} variant="outline" size="sm" aria-label="Vista">
-                            <ToggleGroupItem value="grid" aria-label="Cuadrícula">
+                        <ToggleGroup type="single" value={view} onValueChange={changeView} variant="outline" size="sm" aria-label={t('Vista')}>
+                            <ToggleGroupItem value="grid" aria-label={t('Cuadrícula')}>
                                 <LayoutGrid className="h-4 w-4" />
                             </ToggleGroupItem>
-                            <ToggleGroupItem value="list" aria-label="Lista">
+                            <ToggleGroupItem value="list" aria-label={t('Lista')}>
                                 <List className="h-4 w-4" />
                             </ToggleGroupItem>
                         </ToggleGroup>
@@ -156,7 +157,7 @@ export default function MediaIndex() {
                         {!trash && (
                             <Button onClick={() => fileInput.current?.click()} disabled={uploading} className="h-10 gap-1.5">
                                 {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
-                                Subir archivos
+                                {t('Subir archivos')}
                             </Button>
                         )}
                         <input
@@ -187,7 +188,7 @@ export default function MediaIndex() {
                                 ) : u.progress === 100 ? (
                                     <span className="text-success flex items-center gap-1">
                                         <Check className="h-3.5 w-3.5" />
-                                        Subido
+                                        {t('Subido')}
                                     </span>
                                 ) : (
                                     <span className="bg-muted h-1.5 w-32 overflow-hidden rounded-full">
@@ -199,7 +200,7 @@ export default function MediaIndex() {
                         {uploads.some((u) => u.error) && (
                             <li>
                                 <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setUploads([])}>
-                                    Cerrar
+                                    {t('Cerrar')}
                                 </Button>
                             </li>
                         )}
@@ -210,7 +211,9 @@ export default function MediaIndex() {
                 {selection.selected.length > 0 && (
                     <div className="border-border/70 bg-muted/40 flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-xs">
                         <span className="text-foreground font-medium">
-                            {selection.selected.length} {selection.selected.length === 1 ? 'seleccionado' : 'seleccionados'}
+                            {t(selection.selected.length === 1 ? ':count seleccionado' : ':count seleccionados', {
+                                count: selection.selected.length,
+                            })}
                         </span>
                         <div className="ml-auto flex items-center gap-1.5">
                             {trash ? (
@@ -221,7 +224,7 @@ export default function MediaIndex() {
                                         className="h-8"
                                         onClick={() => runBulkAction('media.bulk', 'restore', selection.selected, selection.clear)}
                                     >
-                                        Restaurar
+                                        {t('Restaurar')}
                                     </Button>
                                     <Button
                                         variant="destructive"
@@ -229,7 +232,7 @@ export default function MediaIndex() {
                                         className="h-8"
                                         onClick={() => runBulkAction('media.bulk', 'force_delete', selection.selected, selection.clear)}
                                     >
-                                        Eliminar definitivamente
+                                        {t('Eliminar definitivamente')}
                                     </Button>
                                 </>
                             ) : (
@@ -240,10 +243,10 @@ export default function MediaIndex() {
                                     onClick={() => runBulkAction('media.bulk', 'trash', selection.selected, selection.clear)}
                                 >
                                     <Trash2 className="h-3.5 w-3.5" />
-                                    Mover a papelera
+                                    {t('Mover a papelera')}
                                 </Button>
                             )}
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={selection.clear} aria-label="Quitar selección">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={selection.clear} aria-label={t('Quitar selección')}>
                                 <X className="h-3.5 w-3.5" />
                             </Button>
                         </div>
@@ -263,7 +266,7 @@ export default function MediaIndex() {
                                         'border-border/70 bg-muted/30 focus-visible:ring-primary/40 block aspect-square w-full overflow-hidden rounded-xl border transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none',
                                         selection.isSelected(item.id) && 'ring-primary ring-2',
                                     )}
-                                    aria-label={`Detalles de ${item.title || item.filename}`}
+                                    aria-label={t('Detalles de :name', { name: item.title || item.filename })}
                                 >
                                     <MediaThumb item={item} />
                                 </button>
@@ -283,7 +286,7 @@ export default function MediaIndex() {
                                 </div>
                                 {item.type === 'image' && !item.alt && !trash && (
                                     <span className="bg-warning-soft text-warning absolute top-2 right-2 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
-                                        Sin alt
+                                        {t('Sin alt')}
                                     </span>
                                 )}
                                 <p className="text-foreground mt-1.5 truncate text-xs font-medium" title={item.filename}>
@@ -305,19 +308,19 @@ export default function MediaIndex() {
                                         <SelectAllCheckbox state={selection.allState} onToggle={selection.toggleAll} />
                                     </th>
                                     <th scope="col" className="px-4 py-3">
-                                        Archivo
+                                        {t('Archivo')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 md:table-cell">
-                                        Texto alternativo
+                                        {t('Texto alternativo')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 sm:table-cell">
-                                        Tipo
+                                        {t('Tipo')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 lg:table-cell">
-                                        Tamaño
+                                        {t('Tamaño')}
                                     </th>
                                     <th scope="col" className="hidden px-4 py-3 lg:table-cell">
-                                        Subido
+                                        {t('Subido')}
                                     </th>
                                     <th scope="col" className="rounded-r-md px-4 py-3"></th>
                                 </tr>
@@ -353,7 +356,7 @@ export default function MediaIndex() {
                                             {item.alt ? (
                                                 item.alt
                                             ) : item.type === 'image' ? (
-                                                <span className="text-warning font-medium">Sin texto alternativo</span>
+                                                <span className="text-warning font-medium">{t('Sin texto alternativo')}</span>
                                             ) : (
                                                 '—'
                                             )}
@@ -361,14 +364,14 @@ export default function MediaIndex() {
                                         <td className="hidden px-4 py-2.5 text-xs sm:table-cell">{MEDIA_TYPE_LABELS[item.type]}</td>
                                         <td className="hidden px-4 py-2.5 text-xs whitespace-nowrap lg:table-cell">{formatBytes(item.size)}</td>
                                         <td className="hidden px-4 py-2.5 text-xs whitespace-nowrap lg:table-cell">
-                                            {new Date(item.created_at).toLocaleDateString('es')}
+                                            {new Date(item.created_at).toLocaleDateString(getLocale())}
                                         </td>
                                         <td className="px-4 py-2.5 text-right">
                                             {trash ? (
                                                 <TrashRowActions routeName="media.bulk" id={item.id} />
                                             ) : (
                                                 <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setDetailId(item.id)}>
-                                                    Editar
+                                                    {t('Editar')}
                                                 </Button>
                                             )}
                                         </td>
@@ -382,7 +385,7 @@ export default function MediaIndex() {
                 {view === 'grid' && items.data.length > 0 && (
                     <label className="text-muted-foreground flex w-fit items-center gap-2 text-xs">
                         <Checkbox checked={selection.allState} onCheckedChange={selection.toggleAll} />
-                        Seleccionar todos en esta página
+                        {t('Seleccionar todos en esta página')}
                     </label>
                 )}
 
@@ -392,7 +395,7 @@ export default function MediaIndex() {
                     <div className="border-primary bg-primary/5 pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-2xl border-2 border-dashed backdrop-blur-[1px]">
                         <div className="bg-card text-foreground flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-md">
                             <UploadCloud className="text-primary h-5 w-5" />
-                            Suelta los archivos para subirlos
+                            {t('Suelta los archivos para subirlos')}
                         </div>
                     </div>
                 )}
@@ -410,16 +413,16 @@ function EmptyLibrary({ trash, filtered, onUpload }: { trash: boolean; filtered:
                 <ImageIcon className="h-5 w-5" />
             </div>
             <p className="text-foreground text-sm font-semibold">
-                {trash ? 'La papelera está vacía' : filtered ? 'No hay archivos que coincidan' : 'Tu biblioteca está vacía'}
+                {trash ? t('La papelera está vacía') : filtered ? t('No hay archivos que coincidan') : t('Tu biblioteca está vacía')}
             </p>
             {!trash && !filtered && (
                 <>
                     <p className="text-muted-foreground mt-1 mb-4 max-w-sm text-xs">
-                        Arrastra imágenes o documentos aquí, o elígelos desde tu equipo.
+                        {t('Arrastra imágenes o documentos aquí, o elígelos desde tu equipo.')}
                     </p>
                     <Button onClick={onUpload} className="gap-1.5">
                         <UploadCloud className="h-4 w-4" />
-                        Subir archivos
+                        {t('Subir archivos')}
                     </Button>
                 </>
             )}
@@ -472,7 +475,7 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
     };
 
     const moveToTrash = () => {
-        if (!window.confirm('¿Mover este archivo a la papelera?')) return;
+        if (!window.confirm(t('¿Mover este archivo a la papelera?'))) return;
         router.delete(route('media.destroy', item.id), { preserveScroll: true, onSuccess: onClose });
     };
 
@@ -496,20 +499,20 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                     </div>
 
                     <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-xs">
-                        <dt className="text-muted-foreground">Tipo</dt>
+                        <dt className="text-muted-foreground">{t('Tipo')}</dt>
                         <dd className="text-foreground">
                             {MEDIA_TYPE_LABELS[item.type]} · {item.mime}
                         </dd>
-                        <dt className="text-muted-foreground">Tamaño</dt>
+                        <dt className="text-muted-foreground">{t('Tamaño')}</dt>
                         <dd className="text-foreground">
                             {formatBytes(item.size)}
                             {item.width && item.height ? ` · ${item.width}×${item.height} px` : ''}
                         </dd>
                         {item.variants && (
                             <>
-                                <dt className="text-muted-foreground">Versiones</dt>
+                                <dt className="text-muted-foreground">{t('Versiones')}</dt>
                                 <dd className="text-foreground">
-                                    WebP de{' '}
+                                    {t('WebP de')}{' '}
                                     {Object.keys(item.variants)
                                         .map(Number)
                                         .sort((a, b) => a - b)
@@ -518,9 +521,9 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                                 </dd>
                             </>
                         )}
-                        <dt className="text-muted-foreground">Subido</dt>
+                        <dt className="text-muted-foreground">{t('Subido')}</dt>
                         <dd className="text-foreground">
-                            {new Date(item.created_at).toLocaleString('es')}
+                            {new Date(item.created_at).toLocaleString(getLocale())}
                             {item.uploader ? ` · ${item.uploader.name}` : ''}
                         </dd>
                     </dl>
@@ -530,14 +533,21 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                             value={item.url}
                             readOnly
                             className="h-9 font-mono text-xs"
-                            aria-label="URL del archivo"
+                            aria-label={t('URL del archivo')}
                             onFocus={(e) => e.target.select()}
                         />
-                        <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={copyUrl} aria-label="Copiar URL">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 shrink-0"
+                            onClick={copyUrl}
+                            aria-label={t('Copiar URL')}
+                        >
                             {copied ? <Check className="text-success h-4 w-4" /> : <Copy className="h-4 w-4" />}
                         </Button>
                         <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0" asChild>
-                            <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Abrir en una pestaña nueva">
+                            <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={t('Abrir en una pestaña nueva')}>
                                 <ExternalLink className="h-4 w-4" />
                             </a>
                         </Button>
@@ -549,26 +559,26 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                         <form onSubmit={save} className="space-y-4">
                             {item.type === 'image' && (
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="media-alt">Texto alternativo</Label>
+                                    <Label htmlFor="media-alt">{t('Texto alternativo')}</Label>
                                     <Textarea
                                         id="media-alt"
                                         rows={2}
                                         value={form.alt}
                                         onChange={(e) => setForm({ ...form, alt: e.target.value })}
-                                        placeholder="Describe la imagen para quien no puede verla"
+                                        placeholder={t('Describe la imagen para quien no puede verla')}
                                         aria-invalid={!!errors.alt}
                                     />
                                     {errors.alt ? (
                                         <p className="text-destructive text-xs">{errors.alt}</p>
                                     ) : (
                                         <p className="text-muted-foreground text-[11px]">
-                                            Se usa en el sitio cuando la imagen no tiene su propio texto. Déjalo vacío si es decorativa.
+                                            {t('Se usa en el sitio cuando la imagen no tiene su propio texto. Déjalo vacío si es decorativa.')}
                                         </p>
                                     )}
                                 </div>
                             )}
                             <div className="space-y-1.5">
-                                <Label htmlFor="media-title">Título</Label>
+                                <Label htmlFor="media-title">{t('Título')}</Label>
                                 <Input
                                     id="media-title"
                                     value={form.title}
@@ -578,7 +588,7 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                                 {errors.title && <p className="text-destructive text-xs">{errors.title}</p>}
                             </div>
                             <div className="space-y-1.5">
-                                <Label htmlFor="media-caption">Leyenda</Label>
+                                <Label htmlFor="media-caption">{t('Leyenda')}</Label>
                                 <Textarea
                                     id="media-caption"
                                     rows={2}
@@ -596,18 +606,18 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                                     onClick={moveToTrash}
                                 >
                                     <Trash2 className="h-4 w-4" />
-                                    Mover a papelera
+                                    {t('Mover a papelera')}
                                 </Button>
                                 <div className="flex items-center gap-2">
                                     {saved && (
                                         <span className="text-success flex items-center gap-1 text-xs font-medium">
                                             <Check className="h-3.5 w-3.5" />
-                                            Guardado
+                                            {t('Guardado')}
                                         </span>
                                     )}
                                     <Button type="submit" disabled={saving}>
                                         {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                                        Guardar
+                                        {t('Guardar')}
                                     </Button>
                                 </div>
                             </div>

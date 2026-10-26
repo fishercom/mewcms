@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { createNotify } from '@/services/notifies';
 import { CmsForm } from '@/types/models/cms-form';
 import { CmsNotifyForm } from '@/types/models/cms-notify';
@@ -41,14 +42,14 @@ export default function Create() {
     };
 
     return (
-        <ModuleLayout view="Crear">
+        <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={createNotifyHandler} className="space-y-6">
                     <NotifyFormFields data={data} setData={setData} errors={errors} processing={processing} forms={forms} users={users} />
 
                     <div className="flex items-center gap-4">
-                        <Button disabled={processing}>Guardar</Button>
-                        <Link href="/admin/notifies">Cancelar</Link>
+                        <Button disabled={processing}>{t('Guardar')}</Button>
+                        <Link href="/admin/notifies">{t('Cancelar')}</Link>
                     </div>
                 </form>
             </FormLayout>

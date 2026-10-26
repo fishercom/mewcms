@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { ProfileForm } from '@/types';
 import { AdmEvent } from '@/types/models/adm-event';
 import { AdmModule } from '@/types/models/adm-module';
@@ -31,7 +32,7 @@ export default function ProfileFormFields({ data, setData, errors, processing, m
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="name">Nombre</Label>
+                <Label htmlFor="name">{t('Nombre')}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -47,7 +48,7 @@ export default function ProfileFormFields({ data, setData, errors, processing, m
             </div>
 
             <div className="grid gap-4">
-                <h3 className="text-lg font-medium">Permisos</h3>
+                <h3 className="text-lg font-medium">{t('Permisos')}</h3>
                 {modules.map((module) => (
                     <div key={module.id} className="rounded-md border p-2">
                         <h4 className="mb-2 font-medium">{module.name}</h4>
@@ -75,7 +76,7 @@ export default function ProfileFormFields({ data, setData, errors, processing, m
                     onClick={() => setData({ ...data, active: !data.active })}
                     tabIndex={3}
                 />
-                <Label htmlFor="active">Activo</Label>
+                <Label htmlFor="active">{t('Activo')}</Label>
             </div>
         </>
     );
