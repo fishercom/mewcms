@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useStarterLayout } from '@/hooks/use-starter-layout';
 import { cn } from '@/lib/utils';
 import { CmsArticle, CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
@@ -82,6 +83,7 @@ export default function ArticleFields({
     const hasSchemaFields = Boolean(schema?.fields && schema.fields.length > 0);
     const { auth } = usePage<{ auth?: { permissions?: { super_admin?: boolean; modules?: Record<string, string[]> } | null } }>().props;
     const { blockTypes = [] } = usePage<{ blockTypes?: BlockDefinition[] }>().props;
+    useStarterLayout(!data.id, schema, data.blocks ?? [], (blocks) => setData({ ...data, blocks }));
     const canManageSchemas = Boolean(auth?.permissions?.super_admin || auth?.permissions?.modules?.schemas?.includes('administrar'));
 
     const parentPrefix = `/${parents.find((p) => p.id === data.parent_id)?.uri ?? ''}${data.parent_id ? '/' : ''}`.replace('//', '/');
@@ -198,7 +200,12 @@ export default function ArticleFields({
                                 <Label className="text-foreground font-semibold">Contenido</Label>
                                 <span className="text-muted-foreground text-[11px]">Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos</span>
                             </div>
-                            <BlockEditor value={data.blocks ?? []} onChange={(blocks) => setData({ ...data, blocks })} types={blockTypes} />
+                            <BlockEditor
+                                value={data.blocks ?? []}
+                                onChange={(blocks) => setData({ ...data, blocks })}
+                                types={blockTypes}
+                                allowedTypes={schema?.allowed_blocks ?? null}
+                            />
                             <InputError message={errors.blocks ?? errors.content} />
                         </div>
 

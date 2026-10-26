@@ -38,6 +38,8 @@ interface Props {
     nested?: boolean;
     /** False inside the editor of a reusable block itself (no block inside a block) */
     allowPatterns?: boolean;
+    /** Block types the picker offers (the schema's allowed blocks); null = all. Existing blocks stay editable. */
+    allowedTypes?: string[] | null;
 }
 
 interface ColumnData {
@@ -105,7 +107,7 @@ const summaryOf = (block: BlockData): string => {
  * reorder, duplicate, collapse and delete. Text blocks are edited in place; the other
  * blocks show their public preview and open their settings in a side panel.
  */
-export default function BlockEditor({ value, onChange, types, nested = false, allowPatterns = true }: Props) {
+export default function BlockEditor({ value, onChange, types, nested = false, allowPatterns = true, allowedTypes = null }: Props) {
     const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
     const [editingId, setEditingId] = useState<string | null>(null);
     /** Index of the block being saved as a reusable block (its dialog is open) */
@@ -122,15 +124,22 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
         [allowPatterns, page.props.blockPatterns, saved],
     );
     const patternByKey = useMemo(() => Object.fromEntries(patterns.map((p) => [p.key, p])), [patterns]);
-    // Inside a column a synced reference is not offered (its content may hold columns): only copies
-    const pickerPatterns = useMemo(() => (nested ? patterns.filter((p) => !p.synced) : patterns), [nested, patterns]);
+    // Inside a column a synced reference is not offered (its content may hold columns): only copies.
+    // A schema that leaves out "pattern" hides the reusable blocks altogether.
+    const pickerPatterns = useMemo(
+        () => (allowedTypes && !allowedTypes.includes('pattern') ? [] : nested ? patterns.filter((p) => !p.synced) : patterns),
+        [allowedTypes, nested, patterns],
+    );
     const canSavePatterns =
         allowPatterns &&
         Boolean(page.props.auth?.permissions?.super_admin || page.props.auth?.permissions?.modules?.['block-patterns']?.includes('administrar'));
     const typeByKey = useMemo(() => Object.fromEntries(types.map((t) => [t.key, t])), [types]);
     // Inside a column only blocks that may nest are offered (no columns in columns).
     // Synced blocks have their own section in the picker, so the type itself is hidden.
-    const pickerTypes = useMemo(() => types.filter((t) => t.key !== 'pattern' && (!nested || t.nestable !== false)), [nested, types]);
+    const pickerTypes = useMemo(
+        () => types.filter((t) => t.key !== 'pattern' && (!nested || t.nestable !== false) && (!allowedTypes || allowedTypes.includes(t.key))),
+        [nested, types, allowedTypes],
+    );
     // Separate handles, so dragging inside a column doesn't also drag the columns block
     const handleClass = nested ? 'block-drag-nested' : 'block-drag';
 
@@ -357,6 +366,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                                         <BlockEditor
                                                             nested
                                                             allowPatterns={allowPatterns}
+                                                            allowedTypes={allowedTypes}
                                                             types={types}
                                                             value={columns[columnIndex]?.blocks ?? []}
                                                             onChange={(blocks) => {

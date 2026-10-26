@@ -16,6 +16,8 @@ export default function Edit() {
         group_id: item.group_id,
         name: item.name,
         fields: item.fields,
+        allowed_blocks: item.allowed_blocks ?? null,
+        default_blocks: item.default_blocks ?? [],
         front_view: item.front_view || '',
         active: Boolean(item.active),
     };

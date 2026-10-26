@@ -7,6 +7,7 @@ import TagField from '@/components/tag-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useStarterLayout } from '@/hooks/use-starter-layout';
 import { CmsPost } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
@@ -31,6 +32,7 @@ interface Props {
 
 export default function PostFields({ data, setData, errors, processing, schemas, authors, tags, schema, onChangeSchema, cptLabelSingular }: Props) {
     const { blockTypes = [] } = usePage<{ blockTypes?: BlockDefinition[] }>().props;
+    useStarterLayout(!data.id, schema, data.blocks ?? [], (blocks) => setData({ ...data, blocks }));
     const [mediaDrawerOpen, setMediaDrawerOpen] = useState(false);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +116,12 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                         <Label className="text-sm font-semibold">Contenido</Label>
                         <span className="text-muted-foreground text-[11px]">Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos</span>
                     </div>
-                    <BlockEditor value={data.blocks ?? []} onChange={(blocks) => setData({ ...data, blocks })} types={blockTypes} />
+                    <BlockEditor
+                        value={data.blocks ?? []}
+                        onChange={(blocks) => setData({ ...data, blocks })}
+                        types={blockTypes}
+                        allowedTypes={schema?.allowed_blocks ?? null}
+                    />
                     <InputError message={errors.blocks ?? errors.content} />
                 </div>
 

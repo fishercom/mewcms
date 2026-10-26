@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Controller;
+use App\Models\CmsBlockPattern;
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
 use Illuminate\Http\RedirectResponse;
@@ -81,6 +83,8 @@ class SchemaController extends Controller
             'item' => $args,
             'groups' => $groups,
             'templates' => CmsSchema::getAvailableTemplates(),
+            'blockTypes' => BlockRegistry::definitions(),
+            'blockPatterns' => CmsBlockPattern::forEditor(),
         ]);
     }
 
@@ -91,6 +95,10 @@ class SchemaController extends Controller
             'group_id' => 'required|integer|exists:cms_schema_groups,id',
             'front_view' => 'nullable|string',
             'fields' => 'nullable|array',
+            'allowed_blocks' => 'nullable|array',
+            'allowed_blocks.*' => 'string|max:60',
+            'default_blocks' => 'nullable|array|max:'.BlockRegistry::MAX_BLOCKS,
+            'default_blocks.*' => 'array',
             'active' => 'boolean',
         ]);
 
@@ -115,6 +123,8 @@ class SchemaController extends Controller
             'item' => $item,
             'groups' => $groups,
             'templates' => CmsSchema::getAvailableTemplates(),
+            'blockTypes' => BlockRegistry::definitions(),
+            'blockPatterns' => CmsBlockPattern::forEditor(),
         ]);
     }
 
@@ -128,6 +138,10 @@ class SchemaController extends Controller
             'group_id' => 'required|integer|exists:cms_schema_groups,id',
             'front_view' => 'nullable|string',
             'fields' => 'nullable|array',
+            'allowed_blocks' => 'nullable|array',
+            'allowed_blocks.*' => 'string|max:60',
+            'default_blocks' => 'nullable|array|max:'.BlockRegistry::MAX_BLOCKS,
+            'default_blocks.*' => 'array',
             'active' => 'boolean',
         ]);
 

@@ -17,6 +17,8 @@ export default function Create() {
         group_id: groups[0]?.id || 0,
         name: '',
         fields: [] as CustomField[],
+        allowed_blocks: null,
+        default_blocks: [],
         front_view: '',
         active: false,
     };
