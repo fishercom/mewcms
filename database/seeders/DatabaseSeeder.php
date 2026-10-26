@@ -326,6 +326,16 @@ class DatabaseSeeder extends Seeder
                 'position' => 8,
                 'visible' => false,
             ],
+            [
+                'menu_id' => $menuAdmin->id,
+                'name' => 'Asistente IA',
+                'description' => 'Proveedores, modelos y consumo del asistente de contenido',
+                'url' => '/admin/ai',
+                'route' => 'ai.index',
+                'icon' => 'sparkles',
+                'position' => 9,
+                'visible' => true,
+            ],
         ];
 
         foreach ($modules as $modData) {

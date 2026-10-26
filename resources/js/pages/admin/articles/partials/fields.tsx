@@ -1,4 +1,5 @@
 import { type BlockDefinition } from '@/blocks/types';
+import AiAssistant from '@/components/ai-assistant';
 import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
@@ -176,6 +177,17 @@ export default function ArticleFields({
                         <span>{t('SEO & Metadatos')}</span>
                         <SeoScoreBadge result={seo.result} className={activeTab === 'seo' ? 'bg-white/25' : ''} />
                     </button>
+
+                    <AiAssistant
+                        module="articles"
+                        input={data}
+                        className="ml-auto"
+                        onApply={(field, value) =>
+                            field === 'slug'
+                                ? setData({ ...data, slug: value })
+                                : setData({ ...data, metadata: { ...data.metadata, [field]: value } })
+                        }
+                    />
                 </div>
 
                 {/* Tab 1: Main Content */}

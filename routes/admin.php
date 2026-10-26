@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AiController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\BlockPatternController;
 use App\Http\Controllers\Admin\ConfigController;
@@ -43,6 +44,13 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::resource('logs', LogController::class)->only(['index']);
     Route::resource('translates', TranslateController::class);
     Route::resource('configs', ConfigController::class);
+
+    Route::get('ai', [AiController::class, 'index'])->name('ai.index');
+    Route::put('ai', [AiController::class, 'update'])->name('ai.update');
+    Route::middleware('throttle:ai')->group(function (): void {
+        Route::post('ai/test', [AiController::class, 'test'])->name('ai.test');
+        Route::post('ai/metadata', [AiController::class, 'metadata'])->name('ai.metadata');
+    });
 
     Route::resource('sites', SiteController::class);
     Route::resource('schemas', SchemaController::class);
