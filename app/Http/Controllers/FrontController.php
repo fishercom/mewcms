@@ -12,7 +12,9 @@ use App\Models\CmsSlider;
 use App\Models\CmsTag;
 use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
+use App\Support\MediaLibrary;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -235,6 +237,7 @@ class FrontController extends Controller
 
         return Inertia::render($template, [
             'article' => $article,
+            'media' => $this->mediaFor($article, $article->metadata),
             ...$shared,
             'slider' => $slider,
         ]);
@@ -290,6 +293,19 @@ class FrontController extends Controller
         return Str::limit(trim(strip_tags((string) $html)), 160);
     }
 
+    /**
+     * Add srcset and alt text to the library images in the item's content, and return
+     * the library details (alt, srcset, size) of its featured and field images.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    protected function mediaFor(Model $item, mixed $fields = null): array
+    {
+        $item->setAttribute('content', MediaLibrary::enrichHtml($item->getAttribute('content')));
+
+        return MediaLibrary::lookup(MediaLibrary::collectUrls($item->getAttribute('featured_image'), $fields));
+    }
+
     public function blogIndex(Request $request): Response
     {
         $shared = FrontCache::shared();
@@ -305,6 +321,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => null,
+            'media' => MediaLibrary::lookup($posts->getCollection()->pluck('featured_image')->filter()),
             ...$shared,
         ]);
     }
@@ -322,6 +339,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => null,
+            'media' => $this->mediaFor($post, $post->metadata ?? null),
             ...$shared,
         ]);
     }
@@ -341,6 +359,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => $cpt,
+            'media' => MediaLibrary::lookup($posts->getCollection()->pluck('featured_image')->filter()),
             ...$shared,
         ]);
     }
@@ -358,6 +377,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => $cpt,
+            'media' => $this->mediaFor($post, $post->metadata ?? null),
             ...$shared,
         ]);
     }

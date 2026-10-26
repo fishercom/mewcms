@@ -1,12 +1,12 @@
 import ContentRenderer from '@/components/content-renderer';
+import { MediaImage } from '@/components/media-image';
 import { tagUrl } from '@/lib/tag-url';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
-import { PopularTag } from '../components/sidebar';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { ArrowLeft, Calendar, Settings, Tag, User } from 'lucide-react';
-import FrontSidebar from '../components/sidebar';
+import FrontSidebar, { PopularTag } from '../components/sidebar';
 import FrontLayout from '../layout';
 
 interface Props {
@@ -47,7 +47,6 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                 {/* Main Content Article */}
                 <article className="space-y-6 lg:col-span-8">
                     <div className="space-y-4">
-
                         <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-zinc-900 capitalize sm:text-5xl dark:text-white">
                             {post.title}
                         </h1>
@@ -68,7 +67,7 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                     {/* Featured Image */}
                     {post.featured_image && (
                         <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-xs dark:border-zinc-800">
-                            <img src={post.featured_image} alt={post.title} className="h-full w-full object-cover" />
+                            <MediaImage src={post.featured_image} fallbackAlt={post.title} loading="eager" className="h-full w-full object-cover" />
                         </div>
                     )}
 

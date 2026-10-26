@@ -1,12 +1,12 @@
+import { MediaImage } from '@/components/media-image';
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
-import { PopularTag } from '../components/sidebar';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { ArrowRight, BookOpen, Calendar, Search, User } from 'lucide-react';
 import { useState } from 'react';
-import FrontSidebar from '../components/sidebar';
+import FrontSidebar, { PopularTag } from '../components/sidebar';
 import FrontLayout from '../layout';
 
 interface Props {
@@ -72,9 +72,10 @@ export default function Index({ posts, cpt, navigation, popularTags = [], recent
                                         {/* Post Thumbnail */}
                                         <Link href={detailUrl} className="relative block aspect-[16/10] overflow-hidden bg-zinc-100">
                                             {post.featured_image ? (
-                                                <img
+                                                <MediaImage
                                                     src={post.featured_image}
-                                                    alt={post.title}
+                                                    fallbackAlt={post.title}
+                                                    sizes="(max-width: 768px) 100vw, 33vw"
                                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                 />
                                             ) : (

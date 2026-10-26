@@ -1,9 +1,13 @@
 <?php
 
+use App\Models\CmsArticle;
 use App\Models\CmsConfig;
+use App\Models\CmsLang;
 use App\Models\Profile;
 use App\Models\User;
+use App\Support\FrontCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -97,4 +101,49 @@ it('shares layout configurations globally in Inertia', function (): void {
         ->has('layout_settings')
         ->where('layout_settings.layout_copyright', 'Testing Global Inertia Share')
     );
+});
+
+function footerTestPage(): void
+{
+    CmsArticle::create(['lang_id' => CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => true])->id, 'title' => 'Inicio', 'slug' => 'home', 'active' => true]);
+}
+
+it('keeps simple links in the footer credit and strips anything else', function (): void {
+    footerTestPage();
+    $this->actingAs($this->user)->post('/admin/layout', [
+        'layout_copyright' => '© MewCMS. Desarrollado por <a href="https://deepsoft.lat" target="_blank" onclick="steal()">DeepSoft</a>.<script>alert(1)</script><a href="javascript:alert(1)">x</a>',
+    ])->assertRedirect();
+
+    $stored = CmsConfig::where('alias', 'layout_copyright')->value('value');
+    expect($stored)
+        ->toContain('<a href="https://deepsoft.lat" target="_blank" rel="noopener noreferrer">DeepSoft</a>')
+        ->not->toContain('<script')
+        ->not->toContain('onclick')
+        ->not->toContain('javascript:');
+
+    // The save flushes the cached settings, so the public footer shows it right away
+    $this->get('/home')->assertInertia(fn (Assert $page): AssertableInertia => $page
+        ->where('layout_settings.layout_copyright', $stored));
+});
+
+it('sanitizes a footer credit written straight to the database before showing it', function (): void {
+    footerTestPage();
+    DB::table('cms_configs')->where('alias', 'layout_copyright')->update(['value' => 'Hola <img src=x onerror="alert(1)"><b>mundo</b>']);
+    FrontCache::flush();
+
+    $this->get('/home')->assertInertia(fn (Assert $page): AssertableInertia => $page
+        ->where('layout_settings.layout_copyright', 'Hola <b>mundo</b>'));
+});
+
+it('replaces only the old default credit in existing sites', function (): void {
+    $migration = require database_path('migrations/2026_10_30_110000_update_default_footer_credit.php');
+
+    CmsConfig::where('alias', 'layout_copyright')->update(['value' => '© 2026 MewCMS. Powered by Laravel, Inertia, and React.']);
+    $migration->up();
+    expect(CmsConfig::where('alias', 'layout_copyright')->value('value'))
+        ->toBe('© 2026 MewCMS. Desarrollado por <a href="https://deepsoft.lat" target="_blank" rel="noopener noreferrer">DeepSoft</a>.');
+
+    CmsConfig::where('alias', 'layout_copyright')->update(['value' => '© Mi Empresa']);
+    $migration->up();
+    expect(CmsConfig::where('alias', 'layout_copyright')->value('value'))->toBe('© Mi Empresa');
 });

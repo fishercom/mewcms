@@ -1,3 +1,4 @@
+import { MediaImage } from '@/components/media-image';
 /**
  * Template Name: Blog Post Detail
  */
@@ -56,7 +57,7 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                     {/* Featured Image */}
                     {featuredImage && (
                         <div className="aspect-[16/9] w-full overflow-hidden rounded-xl border border-[#19140010] shadow-sm dark:border-[#3E3E3A]/25">
-                            <img src={featuredImage} alt={article.title} className="h-full w-full object-cover" />
+                            <MediaImage src={featuredImage} fallbackAlt={article.title} loading="eager" className="h-full w-full object-cover" />
                         </div>
                     )}
 

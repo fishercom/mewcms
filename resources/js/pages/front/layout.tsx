@@ -202,7 +202,15 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                         </ul>
                     )}
 
-                    <p>{layout_settings?.layout_copyright || `© ${new Date().getFullYear()} MewCMS. Powered by Laravel, Inertia, and React.`}</p>
+                    {/* Sanitized on the server (ContentSanitizer::inline): only simple links and inline formatting */}
+                    <p
+                        className="[&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-colors [&_a:hover]:text-[#f53003] dark:[&_a:hover]:text-[#FF4433]"
+                        dangerouslySetInnerHTML={{
+                            __html:
+                                layout_settings?.layout_copyright ||
+                                `© ${new Date().getFullYear()} MewCMS. Desarrollado por <a href="https://deepsoft.lat" target="_blank" rel="noopener noreferrer">DeepSoft</a>.`,
+                        }}
+                    />
                 </div>
             </footer>
 

@@ -73,7 +73,9 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
 
     Route::resource('templates', TemplateController::class)->except(['show']);
     Route::resource('redirects', RedirectController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    Route::get('media/picker', [MediaController::class, 'picker'])->name('media.picker');
+    Route::post('media/bulk', [MediaController::class, 'bulk'])->name('media.bulk');
+    Route::resource('media', MediaController::class)->only(['index', 'store', 'update', 'destroy'])->parameters(['media' => 'medium']);
 
     Route::resource('sliders', SliderController::class);
 

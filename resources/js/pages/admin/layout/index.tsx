@@ -254,6 +254,10 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         className="bg-card h-9 w-full text-xs"
                                         placeholder="Ej: © 2026 MewCMS. Todos los derechos reservados."
                                     />
+                                    <p className="text-muted-foreground text-[11px]">
+                                        Admite enlaces simples, por ejemplo {'<a href="https://tusitio.com" target="_blank">Tu empresa</a>'}. Se
+                                        elimina cualquier otro código.
+                                    </p>
                                 </div>
                             </div>
                         )}

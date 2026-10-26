@@ -1,3 +1,4 @@
+import { MediaImage } from '@/components/media-image';
 /**
  * Template Name: Standard Page
  */
@@ -52,7 +53,7 @@ export default function Page({ article, navigation }: PageProps) {
                 {/* Main default page content (WordPress-style) */}
                 {article.featured_image && (
                     <div className="aspect-video w-full overflow-hidden rounded-xl border border-zinc-200 shadow-xs md:aspect-[21/9] dark:border-zinc-800">
-                        <img src={article.featured_image} alt={article.title} className="h-full w-full object-cover" />
+                        <MediaImage src={article.featured_image} fallbackAlt={article.title} loading="eager" className="h-full w-full object-cover" />
                     </div>
                 )}
 
@@ -98,7 +99,12 @@ export default function Page({ article, navigation }: PageProps) {
                                                 {readableKey}
                                             </h3>
                                             <div className="overflow-hidden rounded-lg border border-[#19140010] dark:border-[#3E3E3A]/20">
-                                                <img src={val} alt={readableKey} className="h-auto max-w-full object-cover" />
+                                                <MediaImage
+                                                    src={val}
+                                                    fallbackAlt={readableKey}
+                                                    sizes="(max-width: 768px) 100vw, 768px"
+                                                    className="h-auto max-w-full object-cover"
+                                                />
                                             </div>
                                         </div>
                                     );
