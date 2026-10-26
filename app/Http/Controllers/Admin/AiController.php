@@ -116,6 +116,43 @@ class AiController extends Controller
     }
 
     /**
+     * "Redactar contenido", step 1: an outline from the brief.
+     */
+    public function outline(Request $request, ContentAssistant $assistant): JsonResponse
+    {
+        $brief = $this->brief($request);
+        set_time_limit(180);
+
+        try {
+            return response()->json($assistant->outline($brief, $brief['module'], $request->user()));
+        } catch (AiException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * "Redactar contenido", step 2: the full draft as blocks, from the brief and the outline
+     * the editor approved.
+     */
+    public function draft(Request $request, ContentAssistant $assistant): JsonResponse
+    {
+        $brief = $this->brief($request);
+        $outline = $request->validate([
+            'outline.title' => 'required|string|max:255',
+            'outline.sections' => 'required|array|min:1|max:12',
+            'outline.sections.*.heading' => 'required|string|max:255',
+            'outline.sections.*.summary' => 'nullable|string|max:500',
+        ])['outline'];
+        set_time_limit(300);
+
+        try {
+            return response()->json($assistant->draft($brief, $outline, $brief['module'], $request->user()));
+        } catch (AiException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
      * "Mejorar bloque": the block's texts rewritten, as a preview the editor accepts or discards.
      */
     public function improveBlock(Request $request, ContentAssistant $assistant): JsonResponse
@@ -136,6 +173,25 @@ class AiController extends Controller
         }
 
         return response()->json(['data' => $result]);
+    }
+
+    /**
+     * @return array{module: string, topic: string, keyword: ?string, audience: ?string, length: ?string, lang_id: ?int, schema_id: ?int}
+     */
+    protected function brief(Request $request): array
+    {
+        $brief = $request->validate([
+            'module' => 'required|in:articles,posts',
+            'topic' => 'required|string|max:1000',
+            'keyword' => 'nullable|string|max:100',
+            'audience' => 'nullable|string|max:255',
+            'length' => ['nullable', Rule::in(array_keys(ContentAssistant::LENGTHS))],
+            'lang_id' => 'nullable|integer',
+            'schema_id' => 'nullable|integer',
+        ]);
+        abort_unless($request->user()->hasAdminPermission($brief['module'], AdmAction::MANAGE), 403);
+
+        return $brief + ['keyword' => null, 'audience' => null, 'length' => null, 'lang_id' => null, 'schema_id' => null];
     }
 
     protected function canConfigure(Request $request): bool

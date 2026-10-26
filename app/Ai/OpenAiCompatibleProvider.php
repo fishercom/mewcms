@@ -21,7 +21,7 @@ class OpenAiCompatibleProvider implements AiProvider
         protected string $apiKey,
         protected bool $jsonSchema = true,
         protected string $maxTokensParam = 'max_tokens',
-        protected int $timeout = 60,
+        protected int $timeout = 180,
     ) {}
 
     public function text(string $model, string $system, string $prompt, int $maxTokens = 1024): AiResponse

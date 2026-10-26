@@ -187,6 +187,14 @@ export default function ArticleFields({
                                 ? setData({ ...data, slug: value })
                                 : setData({ ...data, metadata: { ...data.metadata, [field]: value } })
                         }
+                        onDraft={(draft, mode) => {
+                            setData({
+                                ...data,
+                                title: data.title || draft.title,
+                                blocks: mode === 'append' ? [...(data.blocks ?? []), ...draft.blocks] : draft.blocks,
+                            });
+                            setActiveTab('content');
+                        }}
                     />
                 </div>
 

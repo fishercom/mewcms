@@ -178,6 +178,14 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                                     ? setData({ ...data, slug: value })
                                     : setData({ ...data, metadata: { ...data.metadata, [field]: value } as CmsPost['metadata'] })
                             }
+                            onDraft={(draft, mode) => {
+                                setData({
+                                    ...data,
+                                    title: data.title || draft.title,
+                                    blocks: mode === 'append' ? [...(data.blocks ?? []), ...draft.blocks] : draft.blocks,
+                                });
+                                document.getElementById('title')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }}
                         />
                     </div>
                     <SeoReview result={seo.result} loading={seo.loading} />
