@@ -3,6 +3,7 @@ import { generateBreadcrumb } from '@/lib/breadcrumbs';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { Activity, ArrowUpRight, ChevronRight, Clock, Database, FileText, Inbox, Mail, Menu, PlusCircle, Settings, Tags } from 'lucide-react';
 
 interface DashboardProps {
@@ -101,7 +102,7 @@ export default function Dashboard() {
                                     <span className="bg-success h-1.5 w-1.5 animate-pulse rounded-full" />
                                     MewCMS Studio
                                 </span>
-                                <span className="text-xs text-white/70">{format(new Date(), 'EEEE, d MMMM yyyy')}</span>
+                                <span className="text-xs text-white/70">{format(new Date(), "EEEE, d 'de' MMMM 'de' yyyy", { locale: es })}</span>
                             </div>
                             <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">¡Bienvenido de nuevo, {userName}!</h1>
                             <p className="max-w-xl text-sm leading-relaxed text-white/80">
@@ -187,10 +188,10 @@ export default function Dashboard() {
                     </div>
 
                     {/* Card 3: Files & Disk Space */}
-                    <div className="group border-border/70 bg-card relative rounded-xl border p-5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/30 hover:shadow-md">
+                    <div className="group border-border/70 bg-card hover:border-border-strong relative rounded-xl border p-5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                         <div className="flex items-center justify-between">
                             <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Almacenamiento</span>
-                            <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400">
+                            <div className="bg-muted text-foreground rounded-xl p-2.5 transition-transform group-hover:scale-110">
                                 <Database className="h-5 w-5" />
                             </div>
                         </div>
@@ -198,7 +199,7 @@ export default function Dashboard() {
                             <h3 className="text-foreground text-3xl font-bold tracking-tight">{stats.disk_usage}</h3>
                             <p className="text-muted-foreground text-xs font-medium">Espacio Utilizado</p>
                             <div className="pt-2">
-                                <span className="inline-flex items-center rounded-md border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-300">
+                                <span className="border-border/60 bg-muted text-muted-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium">
                                     {stats.file_count} Archivos en Biblioteca
                                 </span>
                             </div>
@@ -542,10 +543,10 @@ export default function Dashboard() {
                             {/* Action 4: Menus config */}
                             <Link
                                 href="/admin/menus"
-                                className="group border-border/60 bg-muted/20 flex items-center justify-between rounded-xl border p-3.5 transition-all hover:border-blue-500/30 hover:bg-blue-500/5 dark:hover:bg-blue-950/20"
+                                className="group border-border/60 bg-muted/20 hover:border-primary/30 hover:bg-primary/5 flex items-center justify-between rounded-xl border p-3.5 transition-all"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="rounded-lg bg-blue-500/10 p-2 text-blue-600 transition-transform group-hover:scale-105 dark:text-blue-400">
+                                    <div className="bg-primary/10 text-primary rounded-lg p-2 transition-transform group-hover:scale-105">
                                         <Menu className="h-4.5 w-4.5" />
                                     </div>
                                     <span className="text-foreground text-xs font-semibold">Menús</span>

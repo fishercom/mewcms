@@ -391,7 +391,7 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                     />
                                                 ) : (
-                                                    <FileText className="h-8 w-8 text-blue-500" />
+                                                    <FileText className="text-primary h-8 w-8" />
                                                 )}
                                             </div>
 

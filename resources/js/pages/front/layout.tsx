@@ -1,7 +1,8 @@
+import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ChevronDown, Facebook, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import React from 'react';
 
 interface LayoutProps {
@@ -10,9 +11,16 @@ interface LayoutProps {
 }
 
 export default function FrontLayout({ children, navigation }: LayoutProps) {
-    const { menus = [], layout_settings = {} } = usePage<{
+    const {
+        menus = [],
+        layout_settings = {},
+        social_links = [],
+        name,
+    } = usePage<{
         menus: CmsMenu[];
         layout_settings?: Record<string, string>;
+        social_links?: SocialLink[];
+        name: string;
     }>().props;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,63 +177,27 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                     )}
 
                     {/* Social Media Links */}
-                    <div className="flex justify-center gap-4 py-1.5 text-[#706f6c] dark:text-[#A1A09A]">
-                        {layout_settings?.layout_facebook && (
-                            <a
-                                href={layout_settings.layout_facebook}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="transition-colors hover:text-blue-600"
-                                title="Facebook"
-                            >
-                                <Facebook className="h-4.5 w-4.5" />
-                            </a>
-                        )}
-                        {layout_settings?.layout_instagram && (
-                            <a
-                                href={layout_settings.layout_instagram}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="transition-colors hover:text-pink-600"
-                                title="Instagram"
-                            >
-                                <Instagram className="h-4.5 w-4.5" />
-                            </a>
-                        )}
-                        {layout_settings?.layout_twitter && (
-                            <a
-                                href={layout_settings.layout_twitter}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="transition-colors hover:text-sky-500"
-                                title="Twitter/X"
-                            >
-                                <Twitter className="h-4.5 w-4.5" />
-                            </a>
-                        )}
-                        {layout_settings?.layout_linkedin && (
-                            <a
-                                href={layout_settings.layout_linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="transition-colors hover:text-blue-700"
-                                title="LinkedIn"
-                            >
-                                <Linkedin className="h-4.5 w-4.5" />
-                            </a>
-                        )}
-                        {layout_settings?.layout_youtube && (
-                            <a
-                                href={layout_settings.layout_youtube}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="transition-colors hover:text-red-600"
-                                title="YouTube"
-                            >
-                                <Youtube className="h-4.5 w-4.5" />
-                            </a>
-                        )}
-                    </div>
+                    {social_links.length > 0 && (
+                        <ul className="flex flex-wrap justify-center gap-1 py-1.5 text-[#706f6c] dark:text-[#A1A09A]">
+                            {social_links.map((link, index) => {
+                                const external = isExternalLink(link.url);
+                                return (
+                                    <li key={index}>
+                                        <a
+                                            href={link.url}
+                                            target={external ? '_blank' : undefined}
+                                            rel={external ? 'noopener noreferrer' : undefined}
+                                            aria-label={`${socialLinkName(link)} de ${name}`}
+                                            title={socialLinkName(link)}
+                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f53003]/10 hover:text-[#f53003] focus-visible:ring-2 focus-visible:ring-[#f53003]/40 focus-visible:outline-none dark:hover:bg-[#FF4433]/10 dark:hover:text-[#FF4433]"
+                                        >
+                                            <SocialIcon network={link.network} className="h-4.5 w-4.5" />
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
 
                     <p>{layout_settings?.layout_copyright || `© ${new Date().getFullYear()} MewCMS. Powered by Laravel, Inertia, and React.`}</p>
                 </div>

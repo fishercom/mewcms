@@ -8,6 +8,7 @@ use App\Models\CmsLang;
 use App\Models\CmsMenu;
 use App\Models\CmsRegister;
 use App\Models\User;
+use App\Support\SocialLinks;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -69,19 +70,18 @@ test('menu items reject script URLs', function (): void {
 
 test('layout settings reject script URLs and cannot close the custom CSS style tag', function (): void {
     CmsConfig::create(['type' => 'text', 'name' => 'Custom CSS', 'alias' => 'layout_custom_css', 'value' => '']);
-    CmsConfig::create(['type' => 'string', 'name' => 'Facebook', 'alias' => 'layout_facebook', 'value' => '']);
 
     $this->actingAs($this->admin)->post('/admin/layout', [
-        'layout_facebook' => 'javascript:alert(1)',
-    ])->assertSessionHasErrors('layout_facebook');
+        'social_links' => [['network' => 'facebook', 'url' => 'javascript:alert(1)']],
+    ])->assertSessionHasErrors('social_links.0.url');
 
     $this->actingAs($this->admin)->post('/admin/layout', [
         'layout_custom_css' => 'body{color:red}</style><script>alert(1)</script>',
-        'layout_facebook' => 'https://facebook.com/mewcms',
+        'social_links' => [['network' => 'facebook', 'url' => 'https://facebook.com/mewcms']],
     ])->assertSessionHasNoErrors();
 
     expect(CmsConfig::where('alias', 'layout_custom_css')->value('value'))->not->toContain('<')
-        ->and(CmsConfig::where('alias', 'layout_facebook')->value('value'))->toBe('https://facebook.com/mewcms');
+        ->and(SocialLinks::all()[0]['url'])->toBe('https://facebook.com/mewcms');
 });
 
 describe('public form submissions', function (): void {

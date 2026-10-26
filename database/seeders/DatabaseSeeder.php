@@ -562,11 +562,7 @@ class DatabaseSeeder extends Seeder
             ['type' => 'string', 'name' => 'Logo de Cabecera (URL)', 'alias' => 'layout_header_logo', 'value' => null],
             ['type' => 'string', 'name' => 'Logo de Pie de Página (URL)', 'alias' => 'layout_footer_logo', 'value' => null],
             ['type' => 'string', 'name' => 'Texto Copyright', 'alias' => 'layout_copyright', 'value' => '© '.date('Y').' MewCMS. Powered by Laravel, Inertia, and React.'],
-            ['type' => 'string', 'name' => 'Facebook Link', 'alias' => 'layout_facebook', 'value' => ''],
-            ['type' => 'string', 'name' => 'Instagram Link', 'alias' => 'layout_instagram', 'value' => ''],
-            ['type' => 'string', 'name' => 'Twitter/X Link', 'alias' => 'layout_twitter', 'value' => ''],
-            ['type' => 'string', 'name' => 'LinkedIn Link', 'alias' => 'layout_linkedin', 'value' => ''],
-            ['type' => 'string', 'name' => 'YouTube Link', 'alias' => 'layout_youtube', 'value' => ''],
+            ['type' => 'json', 'name' => 'Redes sociales', 'alias' => 'layout_social_links', 'value' => '[]'],
             ['type' => 'text', 'name' => 'Custom CSS', 'alias' => 'layout_custom_css', 'value' => ''],
         ];
 

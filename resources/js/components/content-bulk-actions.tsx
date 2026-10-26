@@ -163,5 +163,5 @@ export function TrashRowActions({ routeName, id }: { routeName: string; id: numb
 }
 
 export function ScheduledBadge({ date }: { date?: string | Date | null }) {
-    return <StatusBadge status="scheduled" title={date ? `Se publicará el ${new Date(date).toLocaleString()}` : undefined} />;
+    return <StatusBadge status="scheduled" title={date ? `Se publicará el ${new Date(date).toLocaleString('es')}` : undefined} />;
 }

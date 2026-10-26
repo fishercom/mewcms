@@ -30,11 +30,7 @@ beforeEach(function (): void {
         ['type' => 'string', 'name' => 'Logo Header', 'alias' => 'layout_header_logo', 'value' => null],
         ['type' => 'string', 'name' => 'Logo Footer', 'alias' => 'layout_footer_logo', 'value' => null],
         ['type' => 'string', 'name' => 'Copyright', 'alias' => 'layout_copyright', 'value' => '© MewCMS'],
-        ['type' => 'string', 'name' => 'Facebook', 'alias' => 'layout_facebook', 'value' => ''],
-        ['type' => 'string', 'name' => 'Instagram', 'alias' => 'layout_instagram', 'value' => ''],
-        ['type' => 'string', 'name' => 'Twitter', 'alias' => 'layout_twitter', 'value' => ''],
-        ['type' => 'string', 'name' => 'LinkedIn', 'alias' => 'layout_linkedin', 'value' => ''],
-        ['type' => 'string', 'name' => 'YouTube', 'alias' => 'layout_youtube', 'value' => ''],
+        ['type' => 'json', 'name' => 'Redes sociales', 'alias' => 'layout_social_links', 'value' => '[]'],
         ['type' => 'text', 'name' => 'Custom CSS', 'alias' => 'layout_custom_css', 'value' => ''],
     ];
 
@@ -63,7 +59,7 @@ it('allows updating layout settings and changes configs in db', function (): voi
     $response = $this->actingAs($this->user)->post('/admin/layout', [
         'layout_header_logo' => 'https://site.com/header.png',
         'layout_copyright' => 'Updated Copyright 2026',
-        'layout_facebook' => 'https://facebook.com/mewcms',
+        'social_links' => [['network' => 'facebook', 'url' => 'https://facebook.com/mewcms', 'label' => '']],
         'layout_custom_css' => 'body { background: #000; }',
     ]);
 
@@ -80,8 +76,8 @@ it('allows updating layout settings and changes configs in db', function (): voi
     ]);
 
     $this->assertDatabaseHas('cms_configs', [
-        'alias' => 'layout_facebook',
-        'value' => 'https://facebook.com/mewcms',
+        'alias' => 'layout_social_links',
+        'value' => '[{"network":"facebook","url":"https://facebook.com/mewcms","label":""}]',
     ]);
 
     $this->assertDatabaseHas('cms_configs', [

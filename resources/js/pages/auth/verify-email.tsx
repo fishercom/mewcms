@@ -21,23 +21,23 @@ export default function VerifyEmail({ status }: { status?: string }) {
     };
 
     return (
-        <AuthLayout title="Verify email" description="Please verify your email address by clicking on the link we just emailed to you.">
-            <Head title="Email verification" />
+        <AuthLayout title="Verifica tu correo" description="Confirma tu dirección de correo con el enlace que te acabamos de enviar.">
+            <Head title="Verificación de correo" />
 
             {status === 'verification-link-sent' && (
                 <div className="text-success mb-4 text-center text-sm font-medium">
-                    A new verification link has been sent to the email address you provided during registration.
+                    Te enviamos un nuevo enlace de verificación al correo que registraste.
                 </div>
             )}
 
             <form onSubmit={submit} className="space-y-6 text-center">
                 <Button disabled={processing} variant="secondary">
                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                    Resend verification email
+                    Reenviar correo de verificación
                 </Button>
 
                 <TextLink href={route('logout')} method="post" className="mx-auto block text-sm">
-                    Log out
+                    Cerrar sesión
                 </TextLink>
             </form>
         </AuthLayout>

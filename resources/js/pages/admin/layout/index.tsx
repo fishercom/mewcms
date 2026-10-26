@@ -1,4 +1,6 @@
 import QuickMediaDrawer from '@/components/quick-media-drawer';
+import { type SocialLink } from '@/components/social-icon';
+import SocialLinksEditor, { toSocialRows } from '@/components/social-links-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
 import { Head, useForm } from '@inertiajs/react';
-import { CheckCircle2, Code, Facebook, Globe, Instagram, Layout, Linkedin, RefreshCw, Trash2, Twitter, UploadCloud, Youtube } from 'lucide-react';
+import { CheckCircle2, Code, Globe, Layout, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface Props {
@@ -14,37 +16,39 @@ interface Props {
         layout_header_logo: string | null;
         layout_footer_logo: string | null;
         layout_copyright: string;
-        layout_facebook: string;
-        layout_instagram: string;
-        layout_twitter: string;
-        layout_linkedin: string;
-        layout_youtube: string;
         layout_custom_css: string;
     };
+    socialLinks: SocialLink[];
     flash?: {
         success?: string;
     };
 }
 
-export default function LayoutCustomizer({ settings, flash }: Props) {
+export default function LayoutCustomizer({ settings, socialLinks, flash }: Props) {
     const [activeTab, setActiveTab] = useState<'general' | 'social' | 'css'>('general');
+    const [saved, setSaved] = useState(false);
     const [drawerTarget, setDrawerTarget] = useState<'header' | 'footer' | null>(null);
 
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, post, processing, errors, clearErrors } = useForm({
         layout_header_logo: settings.layout_header_logo || '',
         layout_footer_logo: settings.layout_footer_logo || '',
         layout_copyright: settings.layout_copyright || '',
-        layout_facebook: settings.layout_facebook || '',
-        layout_instagram: settings.layout_instagram || '',
-        layout_twitter: settings.layout_twitter || '',
-        layout_linkedin: settings.layout_linkedin || '',
-        layout_youtube: settings.layout_youtube || '',
+        social_links: toSocialRows(socialLinks ?? []),
+        social_links_managed: true,
         layout_custom_css: settings.layout_custom_css || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('layout.update'));
+        setSaved(false);
+        post(route('layout.update'), {
+            preserveScroll: true,
+            // Show the links as the server stored them (https:// and mailto:/tel: added)
+            onSuccess: (page) => {
+                setData('social_links', toSocialRows((page.props as unknown as Props).socialLinks ?? []));
+                setSaved(true);
+            },
+        });
     };
 
     const clearLogo = (type: 'header' | 'footer') => {
@@ -62,10 +66,10 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
             <FormLayout>
                 <div className="space-y-6">
                     {/* Top alert feedback */}
-                    {flash?.success && (
+                    {(saved || flash?.success) && (
                         <div className="animate-in fade-in border-success/30 bg-success-soft text-success flex items-center gap-2 rounded-xl border p-4 text-xs font-semibold duration-200">
                             <CheckCircle2 className="text-success h-4.5 w-4.5 shrink-0" />
-                            <span>{flash.success}</span>
+                            <span>{flash?.success ?? 'Configuraciones de layout guardadas.'}</span>
                         </div>
                     )}
 
@@ -258,93 +262,22 @@ export default function LayoutCustomizer({ settings, flash }: Props) {
                         {activeTab === 'social' && (
                             <div className="border-border bg-card space-y-5 rounded-xl border p-5 shadow-xs">
                                 <div>
-                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Enlaces de Redes Sociales</h3>
+                                    <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Redes sociales y contacto</h3>
                                     <p className="text-muted-foreground mt-0.5 text-[10px]">
-                                        Introduce las URLs completas (con https://) para los íconos del layout
+                                        Enlaces con https://, un correo o un teléfono. El texto es opcional y se usa para lectores de pantalla.
                                     </p>
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    {/* Facebook */}
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="layout_facebook" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
-                                            <Facebook className="h-4 w-4 text-blue-600" />
-                                            <span>Facebook</span>
-                                        </Label>
-                                        <Input
-                                            id="layout_facebook"
-                                            type="url"
-                                            value={data.layout_facebook}
-                                            onChange={(e) => setData('layout_facebook', e.target.value)}
-                                            className="bg-card h-9 w-full text-xs"
-                                            placeholder="https://facebook.com/usuario"
-                                        />
-                                    </div>
-
-                                    {/* Instagram */}
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="layout_instagram" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
-                                            <Instagram className="h-4 w-4 text-pink-600" />
-                                            <span>Instagram</span>
-                                        </Label>
-                                        <Input
-                                            id="layout_instagram"
-                                            type="url"
-                                            value={data.layout_instagram}
-                                            onChange={(e) => setData('layout_instagram', e.target.value)}
-                                            className="bg-card h-9 w-full text-xs"
-                                            placeholder="https://instagram.com/usuario"
-                                        />
-                                    </div>
-
-                                    {/* Twitter */}
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="layout_twitter" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
-                                            <Twitter className="h-4 w-4 text-sky-500" />
-                                            <span>Twitter / X</span>
-                                        </Label>
-                                        <Input
-                                            id="layout_twitter"
-                                            type="url"
-                                            value={data.layout_twitter}
-                                            onChange={(e) => setData('layout_twitter', e.target.value)}
-                                            className="bg-card h-9 w-full text-xs"
-                                            placeholder="https://x.com/usuario"
-                                        />
-                                    </div>
-
-                                    {/* LinkedIn */}
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="layout_linkedin" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
-                                            <Linkedin className="h-4 w-4 text-blue-700" />
-                                            <span>LinkedIn</span>
-                                        </Label>
-                                        <Input
-                                            id="layout_linkedin"
-                                            type="url"
-                                            value={data.layout_linkedin}
-                                            onChange={(e) => setData('layout_linkedin', e.target.value)}
-                                            className="bg-card h-9 w-full text-xs"
-                                            placeholder="https://linkedin.com/in/usuario"
-                                        />
-                                    </div>
-
-                                    {/* YouTube */}
-                                    <div className="space-y-1.5 md:col-span-2">
-                                        <Label htmlFor="layout_youtube" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
-                                            <Youtube className="text-primary h-4 w-4" />
-                                            <span>YouTube</span>
-                                        </Label>
-                                        <Input
-                                            id="layout_youtube"
-                                            type="url"
-                                            value={data.layout_youtube}
-                                            onChange={(e) => setData('layout_youtube', e.target.value)}
-                                            className="bg-card h-9 w-full text-xs"
-                                            placeholder="https://youtube.com/c/canal"
-                                        />
-                                    </div>
-                                </div>
+                                <SocialLinksEditor
+                                    links={data.social_links}
+                                    onChange={(links) => {
+                                        setData('social_links', links);
+                                        // Errors are keyed by position, so they go stale once the list changes
+                                        const stale = Object.keys(errors).filter((key) => key.startsWith('social_links'));
+                                        if (stale.length) clearErrors(...(stale as (keyof typeof errors)[]));
+                                    }}
+                                    errors={errors}
+                                />
                             </div>
                         )}
 
