@@ -1060,5 +1060,6 @@
     "Este sitio todavía tiene contenido. Elimínalo o muévelo antes de borrar el sitio.": "This site still has content. Delete or move it before deleting the site.",
     "Elige otro sitio por defecto antes de borrar este.": "Choose another default site before deleting this one.",
     "Dominio no válido: usa solo el nombre, como www.ejemplo.com.": "Invalid domain: use just the name, like www.example.com.",
-    "El dominio :domain ya pertenece a otro sitio.": "The domain :domain already belongs to another site."
+    "El dominio :domain ya pertenece a otro sitio.": "The domain :domain already belongs to another site.",
+    "Agregar sitio": "Add site"
 }

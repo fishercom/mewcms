@@ -1,5 +1,5 @@
 import { deleteSite, getSites, switchSite } from '@/services/sites';
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Pagination } from '@/types';
 import { CmsSite, CmsTheme } from '@/types/models/cms-site';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { Edit, LogIn, Search, Trash2 } from 'lucide-react';
+import { Edit, LogIn, Plus, Search, Trash2 } from 'lucide-react';
 
 export default function Index() {
     const { items, themes, site } = usePage<{ items: Pagination<CmsSite>; themes: Record<string, CmsTheme>; site: { id: number } | null }>().props;
@@ -35,7 +35,7 @@ export default function Index() {
         <ModuleLayout>
             <div className="relative">
                 <div className="flex flex-col items-center justify-between space-y-3 pb-4 md:flex-row md:space-y-0 md:space-x-4">
-                    <div className="w-full">
+                    <div className="w-full md:w-3/4">
                         <form className="flex items-center">
                             <div className="relative w-full">
                                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
@@ -51,6 +51,15 @@ export default function Index() {
                                 />
                             </div>
                         </form>
+                    </div>
+                    <div className="flex w-full flex-shrink-0 flex-col items-stretch justify-end space-y-2 md:w-auto md:flex-row md:items-center md:space-y-0 md:space-x-3">
+                        <Link
+                            href={route('sites.create')}
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span>{t('Agregar sitio')}</span>
+                        </Link>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
