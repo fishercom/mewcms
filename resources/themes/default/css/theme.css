@@ -12,3 +12,16 @@
 @source '../../../js/components';
 @source '../../../js/blocks';
 @source '../../../js/lib';
+
+/*
+ * Theme settings. Each site can change these in Admin → Sites (see "settings" in
+ * theme.json): the server sets the --site-* variables, and these are the defaults.
+ */
+.front-theme {
+    --theme-accent: var(--site-accent, #f53003);
+    font-family: var(--site-font, inherit);
+}
+
+.dark .front-theme {
+    --theme-accent: var(--site-accent-dark, #ff4433);
+}

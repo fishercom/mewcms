@@ -164,7 +164,7 @@ export default function Page({ article, navigation }: PageProps) {
                                 <li key={child.id}>
                                     <Link
                                         href={getUrl(child)}
-                                        className="block rounded-lg border border-[#19140015] bg-white p-4 shadow-sm transition-all hover:border-[#f53003]/50 dark:border-[#3E3E3A]/40 dark:bg-[#161615] dark:hover:border-[#FF4433]/50"
+                                        className="block rounded-lg border border-[#19140015] bg-white p-4 shadow-sm transition-all hover:border-(--theme-accent)/50 dark:border-[#3E3E3A]/40 dark:bg-[#161615]"
                                     >
                                         <h4 className="text-sm font-semibold capitalize">{child.title}</h4>
                                     </Link>

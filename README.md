@@ -156,10 +156,10 @@ sequenceDiagram
 
 ### Multisite & Themes
 
-- **Sites** (Admin → Sites) have a name, domains (one per line), a site URL and a theme. A request is matched to the site whose domain it uses; an unknown domain (for example a preview URL) gets the default site. With no sites configured nothing is scoped.
+- **Sites** (Admin → Sites) have a name, domains (one per line), a site URL, a main language, a theme (picked from preview cards, with the colours and font the theme lets each site change), and their own browser title, default description and favicon. A request is matched to the site whose domain it uses; an unknown domain (for example a preview URL) gets the default site. With no sites configured nothing is scoped.
 - **Content per site**: pages, posts, menus, sliders, forms (and their submissions), redirects and the layout settings belong to one site. Slugs, page addresses, form aliases and slider keys only have to be unique within their site. Tags, media, post types, schemas and languages are shared by all sites. A setting with no site applies to every site until a site saves its own.
 - **Admin**: the site switcher in the header picks the site you work on; every list and editor then shows that site's content.
-- **Themes** live in `resources/themes/<theme>` (`theme.json`, `css/theme.css`, `front/` pages, `assets/`). Every theme is built in the same `npm run build`; only the site's theme stylesheet is loaded. See [`resources/themes/README.md`](resources/themes/README.md) to make one.
+- **Themes** live in `resources/themes/<theme>` (`theme.json` with its adjustable settings, `screenshot.png`, `css/theme.css`, `front/` pages, `assets/`). Every theme is built in the same `npm run build`; only the site's theme stylesheet is loaded. See [`resources/themes/README.md`](resources/themes/README.md) to make one.
 - **Deploying**: point every site's domain at the same app, and add each domain to the site in the admin. No separate builds are needed.
 
 ---

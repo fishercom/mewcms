@@ -47,3 +47,36 @@ it('offers the page templates of the default theme', function (): void {
 
     expect($values)->toContain('front/templates/page', 'front/templates/home');
 });
+
+it('reads the settings and screenshot of each theme', function (): void {
+    $default = Themes::all()['default'];
+
+    expect($default['screenshot'])->toBeTrue()
+        ->and(array_column($default['settings'], 'key'))->toBe(['accent', 'accent_dark', 'font'])
+        ->and($default['settings'][0])->toMatchArray(['type' => 'color', 'css' => '--site-accent', 'default' => '#f53003']);
+});
+
+it('keeps only valid theme settings', function (): void {
+    expect(Themes::cleanSettings('default', [
+        'accent' => '#00AA00',
+        'accent_dark' => 'red; } body { display: none',
+        'font' => 'serif',
+        'unknown' => '#ffffff',
+    ]))->toBe(['accent' => '#00aa00', 'font' => 'serif'])
+        ->and(Themes::cleanSettings('default', ['font' => 'comic-sans']))->toBe([]);
+});
+
+it('turns a site\'s settings into CSS variables, with the theme defaults for the rest', function (): void {
+    $css = Themes::cssVariables('default', ['accent' => '#00aa00', 'font' => 'mono']);
+
+    expect($css)->toContain('--site-accent: #00aa00;')
+        ->and($css)->toContain('--site-accent-dark: #ff4433;')
+        ->and($css)->toContain('--site-font: ui-monospace')
+        ->and($css)->not->toContain('<');
+});
+
+it('cleans the settings when a site is saved', function (): void {
+    $site = CmsSite::create(['name' => 'B', 'domains' => ['b.test'], 'theme' => 'editorial', 'theme_settings' => ['accent' => '#123456', 'font' => 'nope'], 'active' => true]);
+
+    expect($site->fresh()->theme_settings)->toBe(['accent' => '#123456']);
+});

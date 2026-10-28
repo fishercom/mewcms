@@ -78,7 +78,7 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                     {tags.length > 0 && (
                         <div className="border-t border-[#19140010] pt-6 dark:border-[#3E3E3A]/20">
                             <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
-                                <Tag className="h-3.5 w-3.5 text-[#f53003] dark:text-[#FF4433]" />
+                                <Tag className="h-3.5 w-3.5 text-(--theme-accent)" />
                                 <span>Etiquetas</span>
                             </h4>
                             <div className="flex flex-wrap gap-2">
@@ -86,7 +86,7 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                                     <Link
                                         key={term.id}
                                         href={tagUrl(term.slug)}
-                                        className="inline-flex items-center rounded-lg border border-[#19140010] bg-gray-50 px-3 py-1.5 text-xs text-[#706f6c] transition-colors hover:bg-[#fff2f2] hover:text-[#f53003] dark:border-[#3E3E3A]/50 dark:bg-[#222] dark:text-[#c5c4c0] dark:hover:bg-[#1D0002] dark:hover:text-[#FF4433]"
+                                        className="inline-flex items-center rounded-lg border border-[#19140010] bg-gray-50 px-3 py-1.5 text-xs text-[#706f6c] transition-colors hover:bg-[#fff2f2] hover:text-(--theme-accent) dark:border-[#3E3E3A]/50 dark:bg-[#222] dark:text-[#c5c4c0] dark:hover:bg-[#1D0002]"
                                     >
                                         #{term.name}
                                     </Link>

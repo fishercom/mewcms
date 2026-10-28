@@ -1,9 +1,8 @@
 import { CmsArticle } from '@/types/models/cms-article';
-import { PopularTag } from './components/sidebar';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, Calendar, Search } from 'lucide-react';
 import React, { useState } from 'react';
-import FrontSidebar from './components/sidebar';
+import FrontSidebar, { PopularTag } from './components/sidebar';
 import FrontLayout from './layout';
 
 interface SearchResult {

@@ -53,15 +53,19 @@ class FrontController extends Controller
         $article = null;
 
         if (empty($slug)) {
+            // The site's language goes first when there is a home page per language
+            $siteLang = Sites::current()?->lang_id;
+            $inSiteLang = fn ($query) => $siteLang ? $query->orderByRaw('lang_id = ? desc', [$siteLang]) : $query;
+
             // Find the Home page article
             $article = CmsArticle::whereHas('schema', function ($query): void {
                 $query->whereIn('type', ['HOME', 'PAGE']);
-            })->where('slug', 'home')->published()->first();
+            })->where('slug', 'home')->published()->tap($inSiteLang)->first();
 
             if (! $article) {
                 $article = CmsArticle::whereHas('schema', function ($query): void {
                     $query->where('type', 'HOME');
-                })->published()->first();
+                })->published()->tap($inSiteLang)->first();
             }
 
             // Fallback to first published article if still not found

@@ -14,10 +14,9 @@ class CmsSite extends Model
 
     protected $table = 'cms_sites';
 
-    protected $fillable = ['name', 'segment', 'site_url', 'domains', 'theme', 'theme_settings', 'schema_group_id', 'metadata', 'default', 'active'];
+    protected $fillable = ['name', 'site_url', 'domains', 'theme', 'theme_settings', 'lang_id', 'title', 'description', 'favicon', 'default', 'active'];
 
     protected $casts = [
-        'metadata' => 'array',
         'domains' => 'array',
         'theme_settings' => 'array',
         'default' => 'boolean',
@@ -41,6 +40,9 @@ class CmsSite extends Model
             if (blank($site->theme) || ! Themes::exists($site->theme)) {
                 $site->theme = Themes::DEFAULT;
             }
+
+            // Only the settings the theme declares, with valid values
+            $site->theme_settings = Themes::cleanSettings($site->theme, (array) ($site->theme_settings ?? []));
         });
 
         // Only one default site
@@ -116,9 +118,36 @@ class CmsSite extends Model
         return false;
     }
 
-    public function schemaGroup()
+    public function lang()
     {
-        return $this->belongsTo(CmsSchemaGroup::class, 'schema_group_id');
+        return $this->belongsTo(CmsLang::class, 'lang_id');
+    }
+
+    /**
+     * Whether "/" shows something: the home page, or else the first published page
+     * (see FrontController::show).
+     */
+    public function hasHomePage(): bool
+    {
+        return CmsArticle::withoutGlobalScope(CmsArticle::SITE_SCOPE)
+            ->where('site_id', $this->id)
+            ->published()
+            ->exists();
+    }
+
+    /**
+     * What the public pages and the admin need to know about the site.
+     *
+     * @return array<string, mixed>
+     */
+    public function summary(): array
+    {
+        return [
+            ...$this->only(['id', 'name', 'description', 'favicon']),
+            'title' => $this->title ?: $this->name,
+            'url' => $this->publicUrl(),
+            'locale' => $this->lang?->iso,
+        ];
     }
 
     public function adminActivityModule(): string
