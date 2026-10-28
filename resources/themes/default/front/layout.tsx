@@ -17,11 +17,13 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
         layout_settings = {},
         social_links = [],
         name,
+        site,
     } = usePage<{
         menus: CmsMenu[];
         layout_settings?: Record<string, string>;
         social_links?: SocialLink[];
         name: string;
+        site?: { title?: string; description?: string | null } | null;
     }>().props;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,7 +32,8 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
     const seo = activeItem?.metadata || {};
 
     const seoTitle = seo.seo_title || activeItem?.title || '';
-    const seoDescription = seo.seo_description || activeItem?.excerpt || '';
+    // Pages without their own description use the site's (Admin → Sites)
+    const seoDescription = seo.seo_description || activeItem?.excerpt || site?.description || '';
     const seoKeywords = seo.seo_keywords || '';
     const seoOgImage = seo.seo_og_image || activeItem?.featured_image || '';
     const headerMenu = menus.find((m) => m.slug === 'main' || m.slug === 'header' || m.slug === 'navigation' || m.slug === 'site-principal');
@@ -55,7 +58,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                 if (hasChildren) {
                     return (
                         <div key={item.id} className="group relative py-2">
-                            <button className="flex cursor-pointer items-center gap-1 border-0 bg-transparent text-sm font-medium capitalize transition-colors hover:text-[#f53003] dark:hover:text-[#FF4433]">
+                            <button className="flex cursor-pointer items-center gap-1 border-0 bg-transparent text-sm font-medium capitalize transition-colors hover:text-(--theme-accent)">
                                 <span>{item.title}</span>
                                 <ChevronDown className="h-3.5 w-3.5 opacity-60 transition-transform duration-300 group-hover:rotate-180" />
                             </button>
@@ -65,7 +68,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                                         key={child.id}
                                         href={child.resolved_url || '#'}
                                         target={child.target}
-                                        className="block rounded-lg px-3 py-2 text-xs text-[#706f6c] capitalize transition-all hover:bg-gray-50 hover:text-[#f53003] dark:text-[#c5c4c0] dark:hover:bg-gray-800/30 dark:hover:text-[#FF4433]"
+                                        className="block rounded-lg px-3 py-2 text-xs text-[#706f6c] capitalize transition-all hover:bg-gray-50 hover:text-(--theme-accent) dark:text-[#c5c4c0] dark:hover:bg-gray-800/30"
                                     >
                                         {child.title}
                                     </Link>
@@ -80,7 +83,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                         key={item.id}
                         href={item.resolved_url || '#'}
                         target={item.target}
-                        className="text-sm font-medium capitalize transition-colors hover:text-[#f53003] dark:hover:text-[#FF4433]"
+                        className="text-sm font-medium capitalize transition-colors hover:text-(--theme-accent)"
                     >
                         {item.title}
                     </Link>
@@ -90,7 +93,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
         return (
             <>
-                <Link href="/" className="text-sm font-medium transition-colors hover:text-[#f53003] dark:hover:text-[#FF4433]">
+                <Link href="/" className="text-sm font-medium transition-colors hover:text-(--theme-accent)">
                     Inicio
                 </Link>
                 {navigation
@@ -99,7 +102,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                         <Link
                             key={item.id}
                             href={getUrl(item)}
-                            className="text-sm font-medium capitalize transition-colors hover:text-[#f53003] dark:hover:text-[#FF4433]"
+                            className="text-sm font-medium capitalize transition-colors hover:text-(--theme-accent)"
                         >
                             {item.title}
                         </Link>
@@ -124,7 +127,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     {/* Logo */}
                     <div className="flex items-center gap-2">
-                        <Link href="/" className="text-[#1b1b18] hover:opacity-85 dark:text-[#EDEDEC]" aria-label={`${name} — inicio`}>
+                        <Link href="/" className="text-[#1b1b18] hover:opacity-85 dark:text-[#EDEDEC]" aria-label={`${site?.title || name} — inicio`}>
                             {layout_settings?.layout_header_logo ? (
                                 <img src={layout_settings.layout_header_logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
                             ) : (
@@ -171,7 +174,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                                     key={item.id}
                                     href={item.resolved_url || '#'}
                                     target={item.target}
-                                    className="transition-colors hover:text-[#f53003] dark:hover:text-[#FF4433]"
+                                    className="transition-colors hover:text-(--theme-accent)"
                                 >
                                     {item.title}
                                 </Link>
@@ -192,7 +195,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                                             rel={external ? 'noopener noreferrer' : undefined}
                                             aria-label={`${socialLinkName(link)} de ${name}`}
                                             title={socialLinkName(link)}
-                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f53003]/10 hover:text-[#f53003] focus-visible:ring-2 focus-visible:ring-[#f53003]/40 focus-visible:outline-none dark:hover:bg-[#FF4433]/10 dark:hover:text-[#FF4433]"
+                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-(--theme-accent)/10 hover:text-(--theme-accent) focus-visible:ring-2 focus-visible:ring-(--theme-accent)/40 focus-visible:outline-none"
                                         >
                                             <SocialIcon network={link.network} className="h-4.5 w-4.5" />
                                         </a>
@@ -204,7 +207,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
                     {/* Sanitized on the server (ContentSanitizer::inline): only simple links and inline formatting */}
                     <p
-                        className="[&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-colors [&_a:hover]:text-[#f53003] dark:[&_a:hover]:text-[#FF4433]"
+                        className="[&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-colors [&_a:hover]:text-(--theme-accent)"
                         dangerouslySetInnerHTML={{
                             __html:
                                 layout_settings?.layout_copyright ||

@@ -9,7 +9,12 @@ import { resolvePage } from './lib/resolve-page';
 const appName = import.meta.env.VITE_APP_NAME || 'MewCMS';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    // Public pages end their title with the site's title (Admin → Sites)
+    title: (title) => {
+        const siteTitle = document.documentElement.dataset.siteTitle || appName;
+
+        return title ? `${title} - ${siteTitle}` : siteTitle;
+    },
     // The site's theme is fixed for the whole visit: the server sets it on <html>
     resolve: (name) => resolvePage(name, document.documentElement.dataset.siteTheme),
     setup({ el, App, props }) {

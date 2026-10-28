@@ -72,7 +72,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'adm_menu' => fn (): array => $this->adminMenu($request),
             'theme' => fn (): string => Themes::current(),
-            'site' => fn (): ?array => ($site = Sites::current()) ? [...$site->only(['id', 'name']), 'url' => $site->publicUrl()] : null,
+            'site' => fn (): ?array => Sites::current()?->summary(),
             // Sites the admin can switch between (see the site switcher)
             'sites' => fn (): array => $request->user()?->canAccessAdmin()
                 ? Sites::all()->map(fn ($site): array => $site->only(['id', 'name', 'active']))->values()->all()

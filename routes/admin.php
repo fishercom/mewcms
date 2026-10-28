@@ -33,6 +33,7 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function ():
     Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
     // Site switcher: every admin user picks the site they work on
     Route::post('sites/{site}/switch', [SiteController::class, 'switch'])->name('sites.switch');
+    Route::get('themes/{theme}/screenshot', [SiteController::class, 'themeScreenshot'])->where('theme', '[a-z0-9_-]+')->name('themes.screenshot');
 });
 
 Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function (): void {

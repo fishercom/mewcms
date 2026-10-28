@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CmsSchemaGroup;
+use App\Models\CmsLang;
 use App\Models\CmsSite;
+use App\Rules\SafeUrl;
 use App\Support\Sites;
 use App\Support\Themes;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class SiteController extends Controller
 {
@@ -30,7 +32,13 @@ class SiteController extends Controller
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
+            ->orderByDesc('default')
+            ->orderBy('name')
             ->paginate(15);
+
+        // Where to see each site, and whether "/" shows anything yet
+        $items->getCollection()->transform(fn (CmsSite $site): CmsSite => $site->setAttribute('public_url', $site->publicUrl())
+            ->setAttribute('has_home', $site->hasHomePage()));
 
         return Inertia::render('admin/sites/index', [
             'items' => $items,
@@ -38,14 +46,9 @@ class SiteController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
-        $schemaGroups = CmsSchemaGroup::all();
-
-        return Inertia::render('admin/sites/create', [
-            'schemaGroups' => $schemaGroups,
-            'themes' => array_values(Themes::all()),
-        ]);
+        return Inertia::render('admin/sites/create', $this->formOptions());
     }
 
     public function store(Request $request): Redirector|RedirectResponse
@@ -62,12 +65,10 @@ class SiteController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsSite::findOrFail($id);
-        $schemaGroups = CmsSchemaGroup::all();
 
         return Inertia::render('admin/sites/edit', [
             'item' => $item,
-            'schemaGroups' => $schemaGroups,
-            'themes' => array_values(Themes::all()),
+            ...$this->formOptions(),
         ]);
     }
 
@@ -107,6 +108,27 @@ class SiteController extends Controller
     }
 
     /**
+     * Preview image of a theme (resources/themes/<theme>/screenshot.png).
+     */
+    public function themeScreenshot(string $theme): BinaryFileResponse
+    {
+        abort_unless(Themes::exists($theme) && Themes::all()[$theme]['screenshot'], 404);
+
+        return response()->file(Themes::path($theme, 'screenshot.png'), ['Cache-Control' => 'public, max-age=86400']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function formOptions(): array
+    {
+        return [
+            'themes' => array_values(Themes::all()),
+            'langs' => CmsLang::where('active', true)->orderBy('name')->get(['id', 'name', 'iso']),
+        ];
+    }
+
+    /**
      * Work on another site in the admin: content lists and editors show that site's
      * pages, posts, menus, forms, sliders, redirects and layout settings.
      */
@@ -130,14 +152,15 @@ class SiteController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'segment' => ['nullable', 'string', 'max:25', Rule::unique('cms_sites', 'segment')->ignore($id)],
             'site_url' => ['nullable', 'url:http,https', 'max:255', Rule::unique('cms_sites', 'site_url')->ignore($id)],
             'domains' => 'nullable|array|max:20',
             'domains.*' => ['string', 'max:255', 'regex:/^(https?:\/\/)?[a-z0-9.-]+(:\d+)?\/?$/i'],
             'theme' => ['required', 'string', Rule::in(array_keys(Themes::all()))],
             'theme_settings' => 'nullable|array',
-            'schema_group_id' => 'nullable|integer|exists:cms_schema_groups,id',
-            'metadata' => 'nullable|array',
+            'lang_id' => 'nullable|integer|exists:cms_langs,id',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'favicon' => ['nullable', 'string', 'max:2048', new SafeUrl],
             'default' => 'nullable|boolean',
             'active' => 'nullable|boolean',
         ], [

@@ -138,6 +138,79 @@ it('saves a site with its domains and theme', function (): void {
         ->and($site->theme)->toBe('editorial');
 });
 
+it('saves a site\'s language, SEO data, favicon and theme settings', function (): void {
+    $this->actingAs($this->user)->put("http://a.test/admin/sites/{$this->siteB->id}", [
+        'name' => 'Site B',
+        'domains' => 'b.test',
+        'theme' => 'editorial',
+        'theme_settings' => ['accent' => '#112233', 'font' => 'mono'],
+        'lang_id' => $this->lang->id,
+        'title' => 'El blog de B',
+        'description' => 'Notas y novedades',
+        'favicon' => '/storage/media/favicon-b.png',
+        'active' => 1,
+    ])->assertRedirect('/admin/sites');
+
+    $site = $this->siteB->fresh();
+    expect($site->theme_settings)->toBe(['accent' => '#112233', 'font' => 'mono'])
+        ->and($site->lang_id)->toBe($this->lang->id)
+        ->and($site->title)->toBe('El blog de B')
+        ->and($site->description)->toBe('Notas y novedades')
+        ->and($site->favicon)->toBe('/storage/media/favicon-b.png');
+});
+
+it('refuses an unsafe favicon address', function (): void {
+    $this->actingAs($this->user)->put("http://a.test/admin/sites/{$this->siteB->id}", [
+        'name' => 'Site B',
+        'domains' => 'b.test',
+        'theme' => 'editorial',
+        'favicon' => 'javascript:alert(1)',
+    ])->assertSessionHasErrors('favicon');
+});
+
+it('shows each site with its own title, language, favicon and theme colours', function (): void {
+    $en = CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => 1]);
+    $this->siteB->update(['lang_id' => $en->id, 'title' => 'B Journal', 'description' => 'All about B', 'favicon' => '/storage/b.png', 'theme_settings' => ['accent' => '#112233']]);
+    ($this->page)($this->siteB, 'About B');
+
+    $this->get('http://b.test/about')->assertOk()
+        ->assertSee('lang="en"', false)
+        ->assertSee('data-site-title="B Journal"', false)
+        ->assertSee('href="/storage/b.png"', false)
+        ->assertSee('--site-accent: #112233;', false)
+        ->assertInertia(fn (Assert $page) => $page->where('site.title', 'B Journal')->where('site.description', 'All about B')->where('site.locale', 'en'));
+
+    // The admin keeps its own look
+    $this->actingAs($this->user)->get('http://b.test/admin/sites')->assertOk()->assertDontSee('<style>:root', false);
+});
+
+it('lists where to see each site and whether it has a home page', function (): void {
+    ($this->page)($this->siteA, 'Home A');
+
+    $this->actingAs($this->user)->get('http://a.test/admin/sites')->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->has('items.data', 2)
+            ->where('items.data.0.name', 'Site A')
+            ->where('items.data.0.has_home', true)
+            ->where('items.data.0.public_url', 'http://a.test')
+            ->where('items.data.1.has_home', false));
+});
+
+it('serves the theme screenshots to the admin', function (): void {
+    $this->actingAs($this->user)->get('http://a.test/admin/themes/default/screenshot')->assertOk()->assertHeader('content-type', 'image/png');
+    $this->actingAs($this->user)->get('http://a.test/admin/themes/missing/screenshot')->assertNotFound();
+    auth()->logout();
+    $this->get('http://a.test/admin/themes/default/screenshot')->assertRedirect();
+});
+
+it('offers the themes and languages on the site form', function (): void {
+    $this->actingAs($this->user)->get('http://a.test/admin/sites/create')->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('admin/sites/create')
+            ->has('themes', 2)
+            ->has('themes.0.settings', 3)
+            ->where('langs.0.iso', 'es')
+            ->missing('schemaGroups'));
+});
+
 it('refuses a domain that another site uses, or an unknown theme', function (): void {
     $this->actingAs($this->user)->post('http://a.test/admin/sites', [
         'name' => 'Site C',

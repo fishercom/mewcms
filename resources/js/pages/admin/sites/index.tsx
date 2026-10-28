@@ -10,7 +10,7 @@ import { Pagination } from '@/types';
 import { CmsSite, CmsTheme } from '@/types/models/cms-site';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { Edit, LogIn, Plus, Search, Trash2 } from 'lucide-react';
+import { AlertTriangle, Edit, ExternalLink, LogIn, Plus, Search, Trash2 } from 'lucide-react';
 
 export default function Index() {
     const { items, themes, site } = usePage<{ items: Pagination<CmsSite>; themes: Record<string, CmsTheme>; site: { id: number } | null }>().props;
@@ -97,11 +97,31 @@ export default function Index() {
                                                     {t('Inactivo')}
                                                 </span>
                                             )}
+                                            {item.has_home === false && (
+                                                <span
+                                                    className="ml-2 inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
+                                                    title={t('Este sitio aún no tiene páginas publicadas: su dirección muestra un error 404.')}
+                                                >
+                                                    <AlertTriangle className="h-3 w-3" />
+                                                    {t('Sin página de inicio')}
+                                                </span>
+                                            )}
                                         </th>
                                         <td className="px-4 py-3">{(item.domains || []).join(', ') || item.site_url || '—'}</td>
                                         <td className="px-4 py-3">{themes[item.theme]?.name || item.theme}</td>
                                         <td className="px-4 py-3">{format(item.updated_at, 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="flex items-center justify-end gap-2 px-4 py-3">
+                                            {item.public_url && (
+                                                <a
+                                                    href={item.public_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="hover:bg-accent hover:text-accent-foreground flex h-8 items-center gap-1 rounded-md px-2.5 text-sm font-medium"
+                                                >
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                    <span>{t('Ver sitio')}</span>
+                                                </a>
+                                            )}
                                             {site && site.id !== item.id && (
                                                 <Button
                                                     variant="ghost"

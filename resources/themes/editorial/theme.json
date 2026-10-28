@@ -1,6 +1,51 @@
 {
     "name": "Editorial",
-    "description": "Serif headings and a warm palette. Uses the default theme's pages, with its own styles.",
-    "version": "1.0.0",
-    "author": "MewCMS"
+    "description": "Títulos con serifa y una paleta cálida. Usa las páginas del tema Default con estilos propios.",
+    "version": "1.1.0",
+    "author": "MewCMS",
+    "settings": [
+        {
+            "key": "accent",
+            "label": "Color de acento",
+            "type": "color",
+            "default": "#a5462b",
+            "css": "--site-accent"
+        },
+        {
+            "key": "accent_dark",
+            "label": "Color de acento en modo oscuro",
+            "type": "color",
+            "default": "#e0905f",
+            "css": "--site-accent-dark"
+        },
+        {
+            "key": "font",
+            "label": "Tipografía",
+            "type": "select",
+            "default": "serif",
+            "css": "--site-font",
+            "options": [
+                {
+                    "value": "instrument",
+                    "label": "Instrument Sans",
+                    "css": "'Instrument Sans', ui-sans-serif, system-ui, sans-serif"
+                },
+                {
+                    "value": "system",
+                    "label": "La del sistema",
+                    "css": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+                },
+                {
+                    "value": "serif",
+                    "label": "Serif",
+                    "css": "'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif"
+                },
+                {
+                    "value": "mono",
+                    "label": "Monoespaciada",
+                    "css": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+                }
+            ]
+        }
+    ]
 }

@@ -10,7 +10,12 @@ createServer((page) =>
     createInertiaApp({
         page,
         render: ReactDOMServer.renderToString,
-        title: (title) => (title ? `${title} - ${appName}` : appName),
+        title: (title) => {
+            const site = page.props.site as { title?: string } | null;
+            const siteTitle = (page.component.startsWith('front/') && site?.title) || appName;
+
+            return title ? `${title} - ${siteTitle}` : siteTitle;
+        },
         resolve: (name) => resolvePage(name, page.props.theme as string | undefined),
         setup: ({ App, props }) => {
             /* eslint-disable */

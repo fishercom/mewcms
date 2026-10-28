@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
             'site_url' => config('app.url'),
             'domains' => ['localhost', '127.0.0.1'],
             'theme' => 'default',
-            'schema_group_id' => $schgDefault->id,
+            'lang_id' => $langEs->id,
             'default' => '1',
             'active' => true,
         ]);

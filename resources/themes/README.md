@@ -6,7 +6,8 @@ while sharing one build and one admin.
 
 ```
 resources/themes/<slug>/
-├── theme.json        name, description, version, author
+├── theme.json        name, description, version, author, settings
+├── screenshot.png    preview shown in Admin → Sites (16:10, about 960×600)
 ├── css/theme.css     the theme's stylesheet (its own Vite entry)
 ├── assets/           images and fonts, imported from the pages or the CSS
 └── front/            the theme's pages, named like the Inertia components
@@ -28,6 +29,35 @@ the default ones.
 
 Every theme is built in the same `npm run build`. Their pages are split into their own
 chunks, and only the active theme's stylesheet is loaded on a page.
+
+## Settings each site can change
+
+A theme lists in `theme.json` what a site may adjust without touching code. Admin → Sites
+shows a colour picker or a list for each one, and the public pages get the chosen values
+as CSS variables on `:root`:
+
+```json
+"settings": [
+    { "key": "accent", "label": "Color de acento", "type": "color", "default": "#f53003", "css": "--site-accent" },
+    {
+        "key": "font", "label": "Tipografía", "type": "select", "default": "instrument", "css": "--site-font",
+        "options": [
+            { "value": "instrument", "label": "Instrument Sans", "css": "'Instrument Sans', ui-sans-serif, sans-serif" },
+            { "value": "serif", "label": "Serif", "css": "ui-serif, Georgia, serif" }
+        ]
+    }
+]
+```
+
+- `type` is `color` (a `#rrggbb` value) or `select` (one of `options`; the variable gets
+  the option's `css`).
+- `css` is the variable name, lowercase, starting with `--`.
+- Use the variable in the theme's CSS with a fallback, such as
+  `color: var(--site-accent, #f53003)`. The default theme maps them to `--theme-accent`
+  (switching to `--site-accent-dark` in dark mode) and the page font.
+
+Values a site saved for a setting the new theme does not have are dropped when the site
+changes theme.
 
 ## Making a theme
 
@@ -53,7 +83,9 @@ chunks, and only the active theme's stylesheet is loaded on a page.
    copy the layout too, or import the default one from `../../../default/front/layout`.
 4. Put images and fonts in `assets/` and import them (`import logo from '../assets/logo.svg'`)
    so Vite fingerprints and bundles them.
-5. Run `npm run build`, then choose the theme for a site in Admin → Sites.
+5. Add a `screenshot.png` (a capture of the home page at 1280×800, scaled to 960×600, is
+   enough) and, if the theme should be adjustable, `settings` in `theme.json`.
+6. Run `npm run build`, then choose the theme for a site in Admin → Sites.
 
 New page templates created in Admin → Templates go to the default theme, so every theme
 can use them.
