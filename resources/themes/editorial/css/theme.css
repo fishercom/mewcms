@@ -1,0 +1,50 @@
+/*
+ * Editorial theme: no pages of its own, so every page comes from the default theme.
+ * It only restyles them. Add files under front/ (same names as the default theme's)
+ * to change a page's markup.
+ */
+@import '../../default/css/theme.css';
+
+@source '../front';
+
+@theme {
+    --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+}
+
+.front-theme {
+    --background: oklch(0.985 0.008 85);
+    --foreground: oklch(0.24 0.02 60);
+    --card: oklch(0.995 0.005 85);
+    --card-foreground: oklch(0.24 0.02 60);
+    --primary: oklch(0.45 0.12 35);
+    --primary-foreground: oklch(0.985 0.008 85);
+    --muted: oklch(0.95 0.012 85);
+    --muted-foreground: oklch(0.5 0.03 60);
+    --accent: oklch(0.94 0.02 70);
+    --border: oklch(0.9 0.015 80);
+    --input: oklch(0.9 0.015 80);
+    --ring: oklch(0.45 0.12 35 / 0.4);
+
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+}
+
+.dark .front-theme {
+    --background: oklch(0.18 0.012 60);
+    --foreground: oklch(0.93 0.012 85);
+    --card: oklch(0.21 0.014 60);
+    --card-foreground: oklch(0.93 0.012 85);
+    --primary: oklch(0.75 0.11 45);
+    --primary-foreground: oklch(0.2 0.02 60);
+    --muted: oklch(0.25 0.015 60);
+    --muted-foreground: oklch(0.7 0.02 70);
+    --accent: oklch(0.26 0.02 60);
+    --border: oklch(0.3 0.015 60);
+    --input: oklch(0.3 0.015 60);
+    --ring: oklch(0.75 0.11 45 / 0.4);
+}
+
+.front-theme :is(h1, h2, h3, h4) {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+}

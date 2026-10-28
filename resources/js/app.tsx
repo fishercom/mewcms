@@ -1,17 +1,17 @@
 import '@fontsource/sora/latin-500.css';
 import '@fontsource/sora/latin-700.css';
-import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
+import { resolvePage } from './lib/resolve-page';
 
 const appName = import.meta.env.VITE_APP_NAME || 'MewCMS';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    // The site's theme is fixed for the whole visit: the server sets it on <html>
+    resolve: (name) => resolvePage(name, document.documentElement.dataset.siteTheme),
     setup({ el, App, props }) {
         const root = createRoot(el);
 

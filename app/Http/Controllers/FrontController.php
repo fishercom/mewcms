@@ -14,6 +14,7 @@ use App\Models\CmsTag;
 use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
 use App\Support\MediaLibrary;
+use App\Support\Sites;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -109,11 +110,12 @@ class FrontController extends Controller
         $payload = Cache::get('preview.'.$token);
         abort_unless(is_array($payload), 404);
 
-        $response = $payload['module'] === 'posts'
+        // Shown as the site it was edited in, whatever domain the preview link uses
+        $response = Sites::as(Sites::find($payload['site_id'] ?? null) ?? Sites::current(), fn (): SymfonyResponse => ($payload['module'] === 'posts'
             ? $this->previewPost($payload['data'])
-            : $this->previewArticle($payload['data']);
+            : $this->previewArticle($payload['data']))->toResponse($request));
 
-        return $response->toResponse($request)->withHeaders([
+        return $response->withHeaders([
             'X-Robots-Tag' => 'noindex, nofollow',
             'Cache-Control' => 'no-store, private',
         ]);

@@ -50,7 +50,9 @@ class DatabaseSeeder extends Seeder
 
         CmsSite::create([
             'name' => 'Site Principal',
-            'site_url' => 'http://localhost/lasbambas-reconocimientos',
+            'site_url' => config('app.url'),
+            'domains' => ['localhost', '127.0.0.1'],
+            'theme' => 'default',
             'schema_group_id' => $schgDefault->id,
             'default' => '1',
             'active' => true,

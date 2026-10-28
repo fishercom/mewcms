@@ -3,10 +3,13 @@
 namespace App\Http\Middleware;
 
 use App\Ai\AiManager;
+use App\Http\Controllers\FrontController;
 use App\Models\AdmAction;
 use App\Models\AdmMenu;
 use App\Support\FrontCache;
+use App\Support\Sites;
 use App\Support\SocialLinks;
+use App\Support\Themes;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -30,7 +33,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function version(Request $request): ?string
     {
-        return parent::version($request);
+        // Public pages and the admin load different stylesheets (each theme has its own),
+        // so moving between them, or to another theme, reloads the whole page
+        $isPublic = $request->route()?->getControllerClass() === FrontController::class;
+
+        return parent::version($request).'|'.($isPublic ? 'theme:'.Themes::current() : 'admin');
     }
 
     /**
@@ -64,6 +71,12 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'adm_menu' => fn (): array => $this->adminMenu($request),
+            'theme' => fn (): string => Themes::current(),
+            'site' => fn (): ?array => ($site = Sites::current()) ? [...$site->only(['id', 'name']), 'url' => $site->publicUrl()] : null,
+            // Sites the admin can switch between (see the site switcher)
+            'sites' => fn (): array => $request->user()?->canAccessAdmin()
+                ? Sites::all()->map(fn ($site): array => $site->only(['id', 'name', 'active']))->values()->all()
+                : [],
             'menus' => fn (): array => FrontCache::menus(),
             'layout_settings' => fn (): array => FrontCache::layoutSettings(),
             'social_links' => fn (): array => SocialLinks::decode(FrontCache::layoutSettings()[SocialLinks::ALIAS] ?? null),

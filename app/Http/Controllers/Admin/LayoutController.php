@@ -24,13 +24,8 @@ class LayoutController extends Controller
      */
     public function index(): Response
     {
-        $configs = CmsConfig::where('alias', 'like', 'layout_%')->get();
-
-        // Map alias keys directly to their values
-        $settings = [];
-        foreach ($configs as $config) {
-            $settings[$config->alias] = $config->value;
-        }
+        // The current site's settings, over the ones shared by every site
+        $settings = CmsConfig::forSite('layout_%');
 
         return Inertia::render('admin/layout/index', [
             'settings' => $settings,
@@ -82,10 +77,10 @@ class LayoutController extends Controller
         }
 
         foreach ($data as $alias => $value) {
-            CmsConfig::where('alias', $alias)->update(['value' => $value ?? '']);
+            CmsConfig::saveForSite($alias, $value ?? '');
         }
 
-        // Query-builder updates fire no model events
+        // Saved without model events
         FrontCache::flush();
         AdminActivity::record('layout', AdmAction::MANAGE, 'Actualizado', $savesSocial
             ? 'logos, textos y redes sociales ('.count(SocialLinks::all()).' enlaces)'

@@ -9,6 +9,7 @@ use App\Models\CmsArticle;
 use App\Models\CmsPost;
 use App\Models\CmsRevision;
 use App\Support\AdminActivity;
+use App\Support\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -107,7 +108,7 @@ class ContentRevisionController extends Controller
         }
 
         $token = (string) Str::uuid();
-        Cache::put('preview.'.$token, ['module' => $module, 'data' => $data], now()->addMinutes(self::PREVIEW_MINUTES));
+        Cache::put('preview.'.$token, ['module' => $module, 'data' => $data, 'site_id' => Sites::currentId()], now()->addMinutes(self::PREVIEW_MINUTES));
 
         return response()->json([
             'url' => URL::temporarySignedRoute('front.preview', now()->addMinutes(self::PREVIEW_MINUTES), ['token' => $token]),

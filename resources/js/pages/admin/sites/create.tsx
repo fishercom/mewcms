@@ -7,20 +7,22 @@ import { Button } from '@/components/ui/button';
 import { t } from '@/lib/i18n';
 import { createSite } from '@/services/sites';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
-import { CmsSiteForm } from '@/types/models/cms-site';
+import { CmsSiteForm, CmsTheme } from '@/types/models/cms-site';
 import SiteFormFields from './partials/fields';
 
 export default function Create() {
-    const { schemaGroups } = usePage<{ schemaGroups: CmsSchemaGroup[] }>().props;
+    const { schemaGroups, themes } = usePage<{ schemaGroups: CmsSchemaGroup[]; themes: CmsTheme[] }>().props;
 
     const item: CmsSiteForm = {
         name: '',
         segment: '',
         site_url: '',
-        schema_group_id: schemaGroups[0]?.id || 0,
+        domains: '',
+        theme: themes[0]?.slug || 'default',
+        schema_group_id: schemaGroups[0]?.id ?? null,
         metadata: {},
         default: false,
-        active: false,
+        active: true,
     };
     const [data, setData] = useState<CmsSiteForm>(item);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -47,7 +49,14 @@ export default function Create() {
         <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={createSiteHandler} className="space-y-6">
-                    <SiteFormFields data={data} setData={setData} errors={errors} processing={processing} schemaGroups={schemaGroups} />
+                    <SiteFormFields
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        processing={processing}
+                        schemaGroups={schemaGroups}
+                        themes={themes}
+                    />
 
                     <div className="flex items-center gap-4">
                         <Button disabled={processing}>{t('Guardar')}</Button>

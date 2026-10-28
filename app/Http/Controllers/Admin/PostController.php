@@ -13,6 +13,7 @@ use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Models\User;
 use App\Support\FrontCache;
+use App\Support\Sites;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -138,7 +139,7 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_posts,slug',
+            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_posts', 'slug')],
             'status' => 'required|string|in:draft,published',
             'published_at' => 'nullable|date',
             'schema_id' => 'nullable|integer|exists:cms_schemas,id',
@@ -211,7 +212,7 @@ class PostController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:cms_posts,slug,'.$id,
+            'slug' => ['required', 'string', 'max:255', Sites::unique('cms_posts', 'slug', $id)],
             'status' => 'required|string|in:draft,published',
             'published_at' => 'nullable|date',
             'schema_id' => 'nullable|integer|exists:cms_schemas,id',

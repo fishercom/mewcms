@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { t } from '@/lib/i18n';
 import { CmsSchemaGroup } from '@/types/models/cms-schema-group';
-import { CmsSiteForm } from '@/types/models/cms-site';
+import { CmsSiteForm, CmsTheme } from '@/types/models/cms-site';
 
 interface Props {
     data: CmsSiteForm;
@@ -14,9 +14,12 @@ interface Props {
     errors: Record<string, string>;
     processing: boolean;
     schemaGroups: CmsSchemaGroup[];
+    themes: CmsTheme[];
 }
 
-export default function SiteFormFields({ data, setData, errors, processing, schemaGroups }: Props) {
+export default function SiteFormFields({ data, setData, errors, processing, schemaGroups, themes }: Props) {
+    const theme = themes.find((item) => item.slug === data.theme);
+
     return (
         <>
             <div className="grid gap-2">
@@ -54,7 +57,6 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
                 <Input
                     id="site_url"
                     type="url"
-                    required
                     tabIndex={3}
                     autoComplete="site_url"
                     value={data.site_url}
@@ -65,9 +67,43 @@ export default function SiteFormFields({ data, setData, errors, processing, sche
             </div>
 
             <div className="grid gap-2">
+                <Label htmlFor="domains">{t('Dominios')}</Label>
+                <Textarea
+                    id="domains"
+                    rows={3}
+                    placeholder={'www.ejemplo.com\nejemplo.com'}
+                    value={data.domains}
+                    onChange={(e) => setData({ ...data, domains: e.target.value })}
+                    disabled={processing}
+                />
+                <p className="text-muted-foreground text-xs">
+                    {t('Uno por línea. Las visitas a estos dominios ven este sitio; un dominio desconocido muestra el sitio por defecto.')}
+                </p>
+                <InputError message={errors.domains || Object.entries(errors).find(([key]) => key.startsWith('domains.'))?.[1]} />
+            </div>
+
+            <div className="grid gap-2">
+                <Label htmlFor="theme">{t('Tema')}</Label>
+                <Select value={data.theme} onValueChange={(value) => setData({ ...data, theme: value })} disabled={processing}>
+                    <SelectTrigger id="theme">
+                        <SelectValue placeholder={t('Elige un tema')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {themes.map((item) => (
+                            <SelectItem key={item.slug} value={item.slug}>
+                                {item.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {theme?.description && <p className="text-muted-foreground text-xs">{theme.description}</p>}
+                <InputError message={errors.theme} />
+            </div>
+
+            <div className="grid gap-2">
                 <Label htmlFor="schema_group_id">{t('Schema Group')}</Label>
                 <Select
-                    value={data.schema_group_id.toString()}
+                    value={data.schema_group_id ? data.schema_group_id.toString() : undefined}
                     onValueChange={(value) => setData({ ...data, schema_group_id: Number(value) })}
                     disabled={processing}
                 >

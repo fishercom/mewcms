@@ -1,4 +1,4 @@
-import { deleteSite, getSites } from '@/services/sites';
+import { deleteSite, getSites, switchSite } from '@/services/sites';
 import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -7,13 +7,13 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
 import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
-import { CmsSite } from '@/types/models/cms-site';
+import { CmsSite, CmsTheme } from '@/types/models/cms-site';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { Edit, Search, Trash2 } from 'lucide-react';
+import { Edit, LogIn, Search, Trash2 } from 'lucide-react';
 
 export default function Index() {
-    const { items } = usePage<{ items: Pagination<CmsSite> }>().props;
+    const { items, themes, site } = usePage<{ items: Pagination<CmsSite>; themes: Record<string, CmsTheme>; site: { id: number } | null }>().props;
     const [query, setQuery] = useState({ s: '' });
 
     useEffect(() => {
@@ -61,7 +61,10 @@ export default function Index() {
                                     {t('Name')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
-                                    {t('Created Date')}
+                                    {t('Dominios')}
+                                </th>
+                                <th scope="col" className="px-4 py-3">
+                                    {t('Tema')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
                                     {t('Updated Date')}
@@ -75,10 +78,32 @@ export default function Index() {
                                     <tr key={item.id} className="border-b">
                                         <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             {item.name}
+                                            {item.default && (
+                                                <span className="bg-primary-soft text-primary-soft-foreground ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium">
+                                                    {t('Por defecto')}
+                                                </span>
+                                            )}
+                                            {!item.active && (
+                                                <span className="bg-muted text-muted-foreground ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium">
+                                                    {t('Inactivo')}
+                                                </span>
+                                            )}
                                         </th>
-                                        <td className="px-4 py-3">{format(item.created_at, 'dd/MM/yyyy HH:mm')}</td>
+                                        <td className="px-4 py-3">{(item.domains || []).join(', ') || item.site_url || '—'}</td>
+                                        <td className="px-4 py-3">{themes[item.theme]?.name || item.theme}</td>
                                         <td className="px-4 py-3">{format(item.updated_at, 'dd/MM/yyyy HH:mm')}</td>
                                         <td className="flex items-center justify-end gap-2 px-4 py-3">
+                                            {site && site.id !== item.id && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="flex h-8 items-center gap-1 px-2.5"
+                                                    onClick={() => switchSite(item.id)}
+                                                >
+                                                    <LogIn className="h-3.5 w-3.5" />
+                                                    <span>{t('Trabajar aquí')}</span>
+                                                </Button>
+                                            )}
                                             <Button
                                                 variant="outline"
                                                 size="sm"

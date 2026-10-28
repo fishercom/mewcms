@@ -34,7 +34,7 @@ class SocialLinks
      */
     public static function all(): array
     {
-        return self::decode(CmsConfig::where('alias', self::ALIAS)->value('value'));
+        return self::decode(CmsConfig::valueForSite(self::ALIAS));
     }
 
     /**
@@ -102,13 +102,10 @@ class SocialLinks
      */
     public static function save(array $links): void
     {
-        $now = now();
-        // Written without model events: the layout controller logs the whole save once
-        CmsConfig::query()->updateOrInsert(['alias' => self::ALIAS], [
+        // Saved for the current site; written without model events (the layout controller logs the whole save once)
+        CmsConfig::saveForSite(self::ALIAS, json_encode(self::clean($links), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), [
             'type' => 'json',
             'name' => 'Redes sociales',
-            'value' => json_encode(self::clean($links), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-            'updated_at' => $now,
         ]);
         FrontCache::flush();
     }

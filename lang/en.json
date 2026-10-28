@@ -1050,5 +1050,15 @@
     "Corto (~350 palabras)": "Short (~350 words)",
     "Medio (~700 palabras)": "Medium (~700 words)",
     "Largo (~1200 palabras)": "Long (~1200 words)",
-    "Esquema": "Outline"
+    "Esquema": "Outline",
+    "Dominios": "Domains",
+    "Elige un tema": "Choose a theme",
+    "Uno por línea. Las visitas a estos dominios ven este sitio; un dominio desconocido muestra el sitio por defecto.": "One per line. Visits to these domains see this site; an unknown domain shows the default site.",
+    "Trabajar en el sitio": "Work on site",
+    "Trabajar aquí": "Work here",
+    "Ahora trabajas en el sitio :name.": "You are now working on the site :name.",
+    "Este sitio todavía tiene contenido. Elimínalo o muévelo antes de borrar el sitio.": "This site still has content. Delete or move it before deleting the site.",
+    "Elige otro sitio por defecto antes de borrar este.": "Choose another default site before deleting this one.",
+    "Dominio no válido: usa solo el nombre, como www.ejemplo.com.": "Invalid domain: use just the name, like www.example.com.",
+    "El dominio :domain ya pertenece a otro sitio.": "The domain :domain already belongs to another site."
 }

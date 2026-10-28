@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsForm;
 use App\Models\CmsFormField;
+use App\Support\Sites;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,7 +40,7 @@ class FormController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'alias' => 'required|string|max:255|unique:cms_forms,alias',
+            'alias' => ['required', 'string', 'max:255', Sites::unique('cms_forms', 'alias')],
             'info' => 'nullable|string',
             'color' => 'nullable|string|max:7',
             'active' => 'boolean',
@@ -83,7 +84,7 @@ class FormController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'alias' => 'required|string|max:255|unique:cms_forms,alias,'.$id,
+            'alias' => ['required', 'string', 'max:255', Sites::unique('cms_forms', 'alias', $id)],
             'info' => 'nullable|string',
             'color' => 'nullable|string|max:7',
             'active' => 'boolean',

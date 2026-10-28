@@ -1,0 +1,14 @@
+/*
+ * Default theme stylesheet. Only the theme's own pages and the shared components
+ * they render are scanned, so the admin's classes stay out of this file.
+ */
+@import 'tailwindcss' source(none);
+@import '../../../css/tokens.css';
+
+@plugin 'tailwindcss-animate';
+@plugin '@tailwindcss/typography';
+
+@source '../front';
+@source '../../../js/components';
+@source '../../../js/blocks';
+@source '../../../js/lib';

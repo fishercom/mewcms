@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToSite;
 use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CmsMenu extends Model
 {
+    use BelongsToSite;
     use FlushesFrontCache;
     use LogsAdminActivity;
     use Sluggable;

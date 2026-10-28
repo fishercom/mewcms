@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToSite;
 use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\HasBlocks;
 use App\Models\Concerns\HasPublishing;
@@ -19,6 +20,7 @@ use Rutorika\Sortable\SortableTrait;
 
 class CmsArticle extends Model
 {
+    use BelongsToSite;
     use FlushesFrontCache;
     use HasBlocks;
     use HasPublishing;
@@ -69,16 +71,18 @@ class CmsArticle extends Model
 
             // The slug is one path segment, unique among its siblings; the uri is the full path
             if ($model->isDirty(['slug', 'parent_id', 'lang_id']) || blank($model->uri)) {
-                $model->slug = $model->uniqueSiblingSlug(Str::slug(Str::afterLast((string) $model->slug, '/')) ?: Str::slug((string) $model->title) ?: 'pagina');
-                $parentUri = $model->parent_id ? self::withTrashed()->whereKey($model->parent_id)->value('uri') : null;
-                $model->uri = ltrim($parentUri.'/'.$model->slug, '/');
+                $model->inOwnSite(function () use ($model): void {
+                    $model->slug = $model->uniqueSiblingSlug(Str::slug(Str::afterLast((string) $model->slug, '/')) ?: Str::slug((string) $model->title) ?: 'pagina');
+                    $parentUri = $model->parent_id ? self::withTrashed()->whereKey($model->parent_id)->value('uri') : null;
+                    $model->uri = ltrim($parentUri.'/'.$model->slug, '/');
+                });
             }
         });
 
         // Before the row goes: the menu item foreign key would only blank its link
         static::forceDeleting(fn (self $model) => PageMenus::removeItems(CmsMenuItem::where('article_id', $model->id)->get()));
 
-        static::saved(function (self $model): void {
+        static::saved(fn (self $model) => $model->inOwnSite(function () use ($model): void {
             $old = $model->getOriginal('uri');
             if ($model->wasChanged('uri') && filled($old)) {
                 $model->moveDescendants($old, $model->uri);
@@ -86,7 +90,7 @@ class CmsArticle extends Model
 
             // A live page wins over any redirect from its address
             CmsRedirect::where('from_path', '/'.$model->uri)->delete();
-        });
+        }));
     }
 
     /**

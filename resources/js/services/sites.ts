@@ -23,8 +23,8 @@ export const deleteSite = (id: number) => {
         onBefore: () => {
             return window.confirm('Esta seguro que desea eliminar este registro?');
         },
-        onError: () => {
-            alert('Ocurrió un error al eliminar el registro.');
+        onError: (errors) => {
+            alert(Object.values(errors)[0] || 'Ocurrió un error al eliminar el registro.');
         },
     });
 };
@@ -39,4 +39,8 @@ export const updateSite = (id: number, data: Record<string, unknown>, callbacks:
         _method: 'PUT',
     };
     router.post(route('sites.update', id), objectToFormData(options), callbacks);
+};
+
+export const switchSite = (id: number) => {
+    router.post(route('sites.switch', id), {}, { preserveScroll: true });
 };
