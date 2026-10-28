@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToSite;
 use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsSlider extends Model
 {
+    use BelongsToSite;
     use LogsAdminActivity;
 
     protected $table = 'cms_sliders';

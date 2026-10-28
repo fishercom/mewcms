@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToSite;
 use App\Models\Concerns\LogsAdminActivity;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CmsRedirect extends Model
 {
+    use BelongsToSite;
     use LogsAdminActivity;
 
     protected $table = 'cms_redirects';

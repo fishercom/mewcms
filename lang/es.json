@@ -1050,5 +1050,15 @@
     "Corto (~350 palabras)": "Corto (~350 palabras)",
     "Medio (~700 palabras)": "Medio (~700 palabras)",
     "Largo (~1200 palabras)": "Largo (~1200 palabras)",
-    "Esquema": "Esquema"
+    "Esquema": "Esquema",
+    "Dominios": "Dominios",
+    "Elige un tema": "Elige un tema",
+    "Uno por línea. Las visitas a estos dominios ven este sitio; un dominio desconocido muestra el sitio por defecto.": "Uno por línea. Las visitas a estos dominios ven este sitio; un dominio desconocido muestra el sitio por defecto.",
+    "Trabajar en el sitio": "Trabajar en el sitio",
+    "Trabajar aquí": "Trabajar aquí",
+    "Ahora trabajas en el sitio :name.": "Ahora trabajas en el sitio :name.",
+    "Este sitio todavía tiene contenido. Elimínalo o muévelo antes de borrar el sitio.": "Este sitio todavía tiene contenido. Elimínalo o muévelo antes de borrar el sitio.",
+    "Elige otro sitio por defecto antes de borrar este.": "Elige otro sitio por defecto antes de borrar este.",
+    "Dominio no válido: usa solo el nombre, como www.ejemplo.com.": "Dominio no válido: usa solo el nombre, como www.ejemplo.com.",
+    "El dominio :domain ya pertenece a otro sitio.": "El dominio :domain ya pertenece a otro sitio."
 }

@@ -31,6 +31,8 @@ use Illuminate\Support\Facades\Route;
 // Endpoints any admin user may call from shared editor components
 Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function (): void {
     Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
+    // Site switcher: every admin user picks the site they work on
+    Route::post('sites/{site}/switch', [SiteController::class, 'switch'])->name('sites.switch');
 });
 
 Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function (): void {

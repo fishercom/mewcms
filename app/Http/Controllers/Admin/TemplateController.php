@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CmsSchema;
+use App\Support\Themes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -78,7 +79,8 @@ class TemplateController extends Controller
         ]);
 
         $filename = $request->input('filename').'.tsx';
-        $directory = resource_path('js/pages/front/templates');
+        // New templates go to the default theme, so every theme can use them
+        $directory = Themes::templatesPath();
         $filePath = $directory.'/'.$filename;
 
         // Ensure directory exists
@@ -216,11 +218,11 @@ class TemplateController extends Controller
             abort(400, 'Invalid template filename.');
         }
 
-        $directory = resource_path('js/pages/front/templates');
-        $filePath = $directory.'/'.$filename;
+        // The current site's theme copy when it has one, otherwise the default theme's
+        $filePath = Themes::templateFiles()[$filename] ?? Themes::templatesPath().'/'.$filename;
 
         // Double check traversal
-        $realDirectory = realpath($directory);
+        $realDirectory = realpath(resource_path('themes'));
         $realFilePath = realpath($filePath);
         if ($realFilePath !== false && ! str_starts_with($realFilePath, $realDirectory)) {
             abort(403, 'Path traversal detected.');

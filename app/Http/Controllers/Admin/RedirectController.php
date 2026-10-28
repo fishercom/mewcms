@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CmsRedirect;
+use App\Support\Sites;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -64,7 +65,7 @@ class RedirectController extends Controller
         ]);
 
         $data = $request->validate([
-            'from_path' => ['required', 'string', 'max:500', 'regex:#^/#', Rule::unique('cms_redirects', 'from_path')->ignore($redirect?->id)],
+            'from_path' => ['required', 'string', 'max:500', 'regex:#^/#', Sites::unique('cms_redirects', 'from_path', $redirect?->id)],
             'to_path' => ['required', 'string', 'max:1000', 'regex:#^(/|https?://)#i'],
             'status_code' => ['nullable', 'integer', Rule::in([301, 302])],
         ], [

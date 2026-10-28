@@ -11,13 +11,13 @@ use Closure;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Caches data every public page needs; content models flush it when they change.
+ * Caches data every public page needs, per site; content models flush it when they change.
  */
 class FrontCache
 {
     public const TTL = 3600;
 
-    private const KEYS = ['front.shared', 'front.menus', 'front.layout', 'front.sitemap'];
+    private const KEYS = ['shared', 'menus', 'layout', 'sitemap'];
 
     /**
      * Navigation, popular tags and recent articles shared by the public templates.
@@ -26,7 +26,7 @@ class FrontCache
      */
     public static function shared(): array
     {
-        return Cache::remember('front.shared', self::ttl(...), fn (): array => [
+        return Cache::remember(self::key('shared'), self::ttl(...), fn (): array => [
             // Root navigation links (all published top-level pages)
             'navigation' => CmsArticle::published()
                 ->whereNull('parent_id')
@@ -60,7 +60,7 @@ class FrontCache
      */
     public static function menus(): array
     {
-        return Cache::remember('front.menus', self::ttl(...), fn (): array => CmsMenu::with(['items' => function ($query): void {
+        return Cache::remember(self::key('menus'), self::ttl(...), fn (): array => CmsMenu::with(['items' => function ($query): void {
             // Items pointing at a draft, scheduled or trashed page are hidden
             $query->where('active', true)
                 ->where(fn ($query) => $query->whereNull('article_id')->orWhereHas('article', fn ($query) => $query->published()))
@@ -76,8 +76,8 @@ class FrontCache
      */
     public static function layoutSettings(): array
     {
-        return Cache::remember('front.layout', self::TTL, function (): array {
-            $settings = CmsConfig::where('alias', 'like', 'layout_%')->pluck('value', 'alias')->all();
+        return Cache::remember(self::key('layout'), self::TTL, function (): array {
+            $settings = CmsConfig::forSite('layout_%');
 
             // Rendered as HTML in the footer: sanitize again in case it was written around the model
             if (isset($settings['layout_copyright'])) {
@@ -93,7 +93,7 @@ class FrontCache
      */
     public static function sitemap(Closure $build): string
     {
-        return Cache::remember('front.sitemap', self::ttl(...), $build);
+        return Cache::remember(self::key('sitemap'), self::ttl(...), $build);
     }
 
     /**
@@ -118,10 +118,28 @@ class FrontCache
         return max(1, min(self::TTL, (int) ceil(now()->diffInSeconds($next, true))));
     }
 
+    /**
+     * Cache key of $name for the current site ("front.shared" when there are no sites).
+     */
+    public static function key(string $name): string
+    {
+        return self::siteKey($name, Sites::currentId());
+    }
+
+    /**
+     * Forget every site's cached data: settings without a site are shared by all sites.
+     */
     public static function flush(): void
     {
-        foreach (self::KEYS as $key) {
-            Cache::forget($key);
+        foreach ([null, ...Sites::all()->pluck('id')] as $siteId) {
+            foreach (self::KEYS as $name) {
+                Cache::forget(self::siteKey($name, $siteId));
+            }
         }
+    }
+
+    private static function siteKey(string $name, ?int $siteId): string
+    {
+        return $siteId === null ? 'front.'.$name : 'front.'.$siteId.'.'.$name;
     }
 }

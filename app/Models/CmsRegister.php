@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\Sites;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsRegister extends Model
@@ -14,6 +16,16 @@ class CmsRegister extends Model
     protected $table = 'cms_registers';
 
     protected $fillable = ['form_id', 'contact_id', 'name', 'email', 'phone', 'message', 'acceptance', 'review', 'review_date'];
+
+    protected static function booted(): void
+    {
+        // Submissions belong to the site of their form
+        static::addGlobalScope('site', function (Builder $query): void {
+            if (Sites::currentId() !== null) {
+                $query->whereHas('form');
+            }
+        });
+    }
 
     public function form()
     {

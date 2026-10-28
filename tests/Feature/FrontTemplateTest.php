@@ -26,7 +26,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
-    $filePath = resource_path('js/pages/front/templates/test-page-template.tsx');
+    $filePath = resource_path('themes/default/front/templates/test-page-template.tsx');
     if (file_exists($filePath)) {
         unlink($filePath);
     }
@@ -47,7 +47,7 @@ it('allows authenticated admin users to list templates', function (): void {
 });
 
 it('allows authenticated admin users to create, update, and delete a custom template', function (): void {
-    $filePath = resource_path('js/pages/front/templates/test-page-template.tsx');
+    $filePath = resource_path('themes/default/front/templates/test-page-template.tsx');
     if (file_exists($filePath)) {
         unlink($filePath);
     }
@@ -97,7 +97,7 @@ it('blocks template file writes when the editor is disabled', function (): void 
         'content' => 'import React from "react";',
     ])->assertForbidden();
 
-    expect(file_exists(resource_path('js/pages/front/templates/test-page-template.tsx')))->toBeFalse();
+    expect(file_exists(resource_path('themes/default/front/templates/test-page-template.tsx')))->toBeFalse();
 });
 
 it('blocks template file writes for admins who are not super administrators', function (): void {

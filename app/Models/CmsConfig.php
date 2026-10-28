@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
 use App\Support\ContentSanitizer;
+use App\Support\Sites;
 use App\Support\SocialLinks;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,7 +21,7 @@ class CmsConfig extends Model
      */
     protected $table = 'cms_configs';
 
-    protected $fillable = ['type', 'name', 'alias', 'value'];
+    protected $fillable = ['site_id', 'type', 'name', 'alias', 'value'];
 
     /**
      * Layout settings printed as link targets on the public site.
@@ -48,6 +49,63 @@ class CmsConfig extends Model
                 $config->value = '';
             }
         });
+    }
+
+    /**
+     * Values of the settings whose alias matches $aliasLike (SQL LIKE), keyed by alias,
+     * for the current site: a site's own value wins over the shared one (no site).
+     *
+     * @return array<string, mixed>
+     */
+    public static function forSite(string $aliasLike): array
+    {
+        $siteId = Sites::currentId();
+
+        return self::where('alias', 'like', $aliasLike)
+            ->where(fn ($query) => $query->whereNull('site_id')->when($siteId, fn ($query) => $query->orWhere('site_id', $siteId)))
+            // Shared rows first, so the site's own rows overwrite them
+            ->orderByRaw('site_id is null desc')
+            ->orderBy('id')
+            ->pluck('value', 'alias')
+            ->all();
+    }
+
+    /**
+     * The current site's value of one setting (or the shared one).
+     */
+    public static function valueForSite(string $alias): mixed
+    {
+        $siteId = Sites::currentId();
+
+        return self::where('alias', $alias)
+            ->where(fn ($query) => $query->whereNull('site_id')->when($siteId, fn ($query) => $query->orWhere('site_id', $siteId)))
+            ->orderByRaw('site_id is null asc')
+            ->value('value');
+    }
+
+    /**
+     * Save a setting for the current site, or the shared one when there are no sites.
+     * The site's row is created from the shared one (same name and type) when missing.
+     *
+     * @param  array<string, mixed>  $attributes  defaults for a new row (type, name)
+     */
+    public static function saveForSite(string $alias, mixed $value, array $attributes = []): void
+    {
+        $siteId = Sites::currentId();
+        $shared = self::whereNull('site_id')->where('alias', $alias)->first();
+
+        $row = self::where('alias', $alias)->where('site_id', $siteId)->first()
+            ?? ($siteId === null ? $shared : null)
+            ?? new self([
+                'site_id' => $siteId,
+                'alias' => $alias,
+                'type' => $shared->type ?? ($attributes['type'] ?? 'string'),
+                'name' => $shared->name ?? ($attributes['name'] ?? $alias),
+            ]);
+
+        $row->value = $value;
+        // Written without model events: callers log the whole save once
+        $row->saveQuietly();
     }
 
     public function adminActivityModule(): string

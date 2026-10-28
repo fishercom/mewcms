@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+@php
+    // Public pages come from the site's theme, with its own stylesheet; the admin uses app.css
+    $siteTheme = \App\Support\Themes::current();
+    $isThemePage = \App\Support\Themes::isThemePage($page['component']);
+@endphp
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-site-theme="{{ $siteTheme }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -39,7 +44,11 @@
 
         @routes
         @viteReactRefresh
-        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        @vite([
+            $isThemePage ? \App\Support\Themes::styleFile($siteTheme) : 'resources/css/app.css',
+            'resources/js/app.tsx',
+            \App\Support\Themes::pageFile($page['component'], $siteTheme),
+        ])
         @inertiaHead
         @if (empty($__inertiaSsrResponse))
             <title inertia>{{ config('app.name', 'MewCMS') }}</title>

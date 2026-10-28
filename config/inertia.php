@@ -39,6 +39,8 @@ return [
 
         'page_paths' => [
             resource_path('js/pages'),
+            // Public pages ("front/...") of the default theme
+            resource_path('themes/default'),
         ],
 
         'page_extensions' => [

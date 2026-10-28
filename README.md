@@ -45,7 +45,8 @@ Combining the rock-solid foundation of **Laravel 12** with the reactivity and sp
 - 🗂️ **Visual Menu Builder**: Drag-and-drop structural editor with nested parent-child items, custom URLs, and automatic target article resolution.
 - 📬 **Dynamic Form & Lead Engine**: Build custom contact forms (`CmsForm`), accept submissions via public JSON API (`/api/forms/submit`), store leads (`CmsRegister`), and trigger notifications (`CmsNotify`).
 - 📊 **Executive Admin Dashboard**: Real-time operational widgets, interactive SVG trend charts (Articles vs. Leads, activity logs), quick action consoles, and complete audit trails (`AdmLog`).
-- 🌐 **Multi-Site & Multi-Language**: Isolate schemas and templates across multiple domains (`CmsSite`) with built-in multi-language translation management (`CmsLang`, `CmsTranslate`).
+- 🌐 **Multi-Site & Multi-Language**: One install and one build serve several sites, each picked by its domain (`CmsSite`), with its own pages, posts, menus, forms, sliders, redirects and layout settings. Built-in multi-language translation management (`CmsLang`, `CmsTranslate`).
+- 🎨 **Themes**: Each site chooses a theme from `resources/themes/<theme>`: its own pages, stylesheet and assets, falling back to the default theme for any page it does not change.
 - 🔍 **Native SEO & Discovery**: Automated dynamic XML sitemaps (`/sitemap.xml`), configurable `robots.txt`, and full OpenGraph social metadata out of the box.
 - 🔐 **Granular Access Control**: Role-based permissions across profiles (Super Admin, Admin, Webmaster) mapped to individual modules and actions.
 
@@ -150,6 +151,16 @@ sequenceDiagram
     Inertia-->>React: Hydrate React Props (Article, Schema Data, Menus)
     React-->>Visitor: Rendered Fast SPA Page
 ```
+
+---
+
+### Multisite & Themes
+
+- **Sites** (Admin → Sites) have a name, domains (one per line), a site URL and a theme. A request is matched to the site whose domain it uses; an unknown domain (for example a preview URL) gets the default site. With no sites configured nothing is scoped.
+- **Content per site**: pages, posts, menus, sliders, forms (and their submissions), redirects and the layout settings belong to one site. Slugs, page addresses, form aliases and slider keys only have to be unique within their site. Tags, media, post types, schemas and languages are shared by all sites. A setting with no site applies to every site until a site saves its own.
+- **Admin**: the site switcher in the header picks the site you work on; every list and editor then shows that site's content.
+- **Themes** live in `resources/themes/<theme>` (`theme.json`, `css/theme.css`, `front/` pages, `assets/`). Every theme is built in the same `npm run build`; only the site's theme stylesheet is loaded. See [`resources/themes/README.md`](resources/themes/README.md) to make one.
+- **Deploying**: point every site's domain at the same app, and add each domain to the site in the admin. No separate builds are needed.
 
 ---
 

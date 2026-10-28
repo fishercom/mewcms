@@ -8,6 +8,7 @@ use App\Models\CmsMenu;
 use App\Models\CmsMenuItem;
 use App\Rules\SafeUrl;
 use App\Support\FrontCache;
+use App\Support\Sites;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,7 +44,7 @@ class MenuController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_menus,slug',
+            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_menus', 'slug')],
             'description' => 'nullable|string',
             'auto_add_pages' => 'boolean',
             'auto_add_subpages' => 'boolean',
@@ -78,7 +79,7 @@ class MenuController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:cms_menus,slug,'.$id,
+            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_menus', 'slug', $id)],
             'description' => 'nullable|string',
             'auto_add_pages' => 'boolean',
             'auto_add_subpages' => 'boolean',

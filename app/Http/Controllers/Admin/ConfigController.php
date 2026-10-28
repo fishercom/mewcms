@@ -19,7 +19,9 @@ class ConfigController extends Controller
     {
         $s = $request->get('s');
 
+        // Settings saved for one site are edited in the layout customizer of that site
         $items = CmsConfig::select()
+            ->whereNull('site_id')
             ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');

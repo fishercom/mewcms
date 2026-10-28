@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CmsSlide;
 use App\Models\CmsSlider;
 use App\Rules\SafeUrl;
+use App\Support\Sites;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,7 +50,7 @@ class SliderController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'key' => 'required|string|max:255|unique:cms_sliders,key',
+            'key' => ['required', 'string', 'max:255', Sites::unique('cms_sliders', 'key')],
             'description' => 'nullable|string',
             'settings' => 'array',
         ]);
@@ -80,7 +81,7 @@ class SliderController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'key' => 'required|string|max:255|unique:cms_sliders,key,'.$id,
+            'key' => ['required', 'string', 'max:255', Sites::unique('cms_sliders', 'key', $id)],
             'description' => 'nullable|string',
             'settings' => 'array',
             'slides' => 'array',

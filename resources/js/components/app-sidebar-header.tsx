@@ -1,15 +1,18 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CommandPalette } from '@/components/command-palette';
+import { SiteSwitcher, type SiteSummary } from '@/components/site-switcher';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { t } from '@/lib/i18n';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { usePage } from '@inertiajs/react';
 import { ExternalLink, Globe, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const [commandOpen, setCommandOpen] = useState(false);
+    const { site } = usePage<{ site: SiteSummary | null }>().props;
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,13 +60,15 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         <span className="sr-only">{t('Buscar')}</span>
                     </Button>
 
+                    <SiteSwitcher />
+
                     <Button
                         variant="outline"
                         size="sm"
                         className="border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted/50 h-8 gap-1.5 text-xs font-medium shadow-2xs transition-colors"
                         asChild
                     >
-                        <a href="/" target="_blank" rel="noopener noreferrer">
+                        <a href={site?.url || '/'} target="_blank" rel="noopener noreferrer">
                             <span className="relative flex h-2 w-2">
                                 <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
                                 <span className="bg-success relative inline-flex h-2 w-2 rounded-full" />

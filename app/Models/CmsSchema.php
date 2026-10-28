@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Blocks\BlockRegistry;
 use App\Models\Concerns\LogsAdminActivity;
+use App\Support\Themes;
 use Illuminate\Database\Eloquent\Model;
 use Rutorika\Sortable\SortableTrait;
 
@@ -65,19 +66,9 @@ class CmsSchema extends Model
 
     public static function getAvailableTemplates(): array
     {
-        $directory = resource_path('js/pages/front/templates');
-        if (! is_dir($directory)) {
-            return [];
-        }
-
+        // The default theme's templates, plus any the current site's theme adds
         $templates = [];
-        $files = scandir($directory);
-        foreach ($files as $file) {
-            if ($file === '.' || $file === '..' || ! str_ends_with($file, '.tsx')) {
-                continue;
-            }
-
-            $filePath = $directory.'/'.$file;
+        foreach (Themes::templateFiles() as $file => $filePath) {
             $content = file_get_contents($filePath);
 
             $templateName = null;
@@ -167,11 +158,8 @@ class CmsSchema extends Model
             return false;
         }
 
-        $filename = basename($this->front_view).'.tsx';
-        $directory = resource_path('js/pages/front/templates');
-        $filePath = $directory.'/'.$filename;
-
-        if (! file_exists($filePath)) {
+        $filePath = Themes::templateFiles()[basename($this->front_view).'.tsx'] ?? null;
+        if ($filePath === null) {
             return false;
         }
 

@@ -5,12 +5,14 @@ use App\Http\Middleware\EnsureAdminPermission;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\HandleLocale;
+use App\Http\Middleware\ResolveSite;
 use App\Models\CmsRedirect;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -24,12 +26,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->encryptCookies(except: ['appearance', 'locale']);
 
+        // The site is known before route model binding, so bound models are scoped to it
+        $middleware->prependToPriorityList(SubstituteBindings::class, ResolveSite::class);
+
         $middleware->alias([
             'admin.access' => EnsureAdminAccess::class,
             'admin.permission' => EnsureAdminPermission::class,
         ]);
 
         $middleware->web(append: [
+            ResolveSite::class,
             HandleAppearance::class,
             HandleLocale::class,
             HandleInertiaRequests::class,
