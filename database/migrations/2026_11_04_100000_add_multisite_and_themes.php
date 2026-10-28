@@ -30,21 +30,33 @@ return new class extends Migration
         'cms_redirects' => ['cms_redirects_from_path_unique', ['from_path'], 'cms_redirects_site_from_path_unique'],
     ];
 
+    /**
+     * Safe to run again after a failed attempt: MySQL does not roll back schema changes,
+     * so every step checks whether it already happened.
+     */
     public function up(): void
     {
         Schema::table('cms_sites', function (Blueprint $table): void {
-            $table->json('domains')->nullable()->after('site_url');
-            $table->string('theme', 50)->default('default')->after('domains');
-            $table->json('theme_settings')->nullable()->after('theme');
+            if (! Schema::hasColumn('cms_sites', 'domains')) {
+                $table->json('domains')->nullable()->after('site_url');
+            }
+            if (! Schema::hasColumn('cms_sites', 'theme')) {
+                $table->string('theme', 50)->default('default')->after('domains');
+            }
+            if (! Schema::hasColumn('cms_sites', 'theme_settings')) {
+                $table->json('theme_settings')->nullable()->after('theme');
+            }
             $table->string('site_url')->nullable()->change();
             $table->unsignedInteger('schema_group_id')->nullable()->change();
         });
 
         foreach ([...array_keys($this->uniques), 'cms_configs'] as $table) {
-            Schema::table($table, function (Blueprint $blueprint): void {
-                $blueprint->unsignedInteger('site_id')->nullable()->after('id');
-                $blueprint->foreign('site_id')->references('id')->on('cms_sites')->restrictOnDelete();
-            });
+            if (! Schema::hasColumn($table, 'site_id')) {
+                Schema::table($table, fn (Blueprint $blueprint) => $blueprint->unsignedInteger('site_id')->nullable()->after('id'));
+            }
+            if (! $this->hasForeignKey($table, 'site_id')) {
+                Schema::table($table, fn (Blueprint $blueprint) => $blueprint->foreign('site_id')->references('id')->on('cms_sites')->restrictOnDelete());
+            }
         }
 
         $siteId = $this->defaultSiteId();
@@ -54,16 +66,29 @@ return new class extends Migration
             }
         }
 
-        foreach ($this->uniques as $table => [$old, $columns, $new]) {
-            Schema::table($table, function (Blueprint $blueprint) use ($table, $old, $columns, $new): void {
-                if (Schema::hasIndex($table, $old)) {
-                    $blueprint->dropUnique($old);
-                }
-                $blueprint->unique(['site_id', ...$columns], $new);
-            });
+        // MySQL backs the lang_id foreign key with the old (lang_id, uri) index: give it
+        // its own index before that one goes
+        if (! Schema::hasIndex('cms_articles', 'cms_articles_lang_id_index')) {
+            Schema::table('cms_articles', fn (Blueprint $table) => $table->index('lang_id', 'cms_articles_lang_id_index'));
         }
 
-        Schema::table('cms_configs', fn (Blueprint $table) => $table->index(['site_id', 'alias'], 'cms_configs_site_alias_index'));
+        foreach ($this->uniques as $table => [$old, $columns, $new]) {
+            if (! Schema::hasIndex($table, $new)) {
+                Schema::table($table, fn (Blueprint $blueprint) => $blueprint->unique(['site_id', ...$columns], $new));
+            }
+            if (Schema::hasIndex($table, $old)) {
+                Schema::table($table, fn (Blueprint $blueprint) => $blueprint->dropUnique($old));
+            }
+        }
+
+        if (! Schema::hasIndex('cms_configs', 'cms_configs_site_alias_index')) {
+            Schema::table('cms_configs', fn (Blueprint $table) => $table->index(['site_id', 'alias'], 'cms_configs_site_alias_index'));
+        }
+    }
+
+    protected function hasForeignKey(string $table, string $column): bool
+    {
+        return collect(Schema::getForeignKeys($table))->contains(fn (array $key): bool => $key['columns'] === [$column]);
     }
 
     /**
@@ -101,6 +126,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Foreign keys first: MySQL will not drop an index a foreign key relies on
+        foreach ([...array_keys($this->uniques), 'cms_configs'] as $table) {
+            Schema::table($table, fn (Blueprint $blueprint) => $blueprint->dropForeign(['site_id']));
+        }
+
         Schema::table('cms_configs', fn (Blueprint $table) => $table->dropIndex('cms_configs_site_alias_index'));
 
         // Settings saved for one site only are dropped: the shared ones stay
@@ -108,16 +138,15 @@ return new class extends Migration
 
         foreach ($this->uniques as $table => [$old, $columns, $new]) {
             Schema::table($table, function (Blueprint $blueprint) use ($old, $columns, $new): void {
-                $blueprint->dropUnique($new);
                 $blueprint->unique($columns, $old);
+                $blueprint->dropUnique($new);
             });
         }
 
+        Schema::table('cms_articles', fn (Blueprint $table) => $table->dropIndex('cms_articles_lang_id_index'));
+
         foreach ([...array_keys($this->uniques), 'cms_configs'] as $table) {
-            Schema::table($table, function (Blueprint $blueprint): void {
-                $blueprint->dropForeign(['site_id']);
-                $blueprint->dropColumn('site_id');
-            });
+            Schema::table($table, fn (Blueprint $blueprint) => $blueprint->dropColumn('site_id'));
         }
 
         Schema::table('cms_sites', function (Blueprint $table): void {
