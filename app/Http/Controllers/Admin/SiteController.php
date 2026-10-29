@@ -108,13 +108,13 @@ class SiteController extends Controller
     }
 
     /**
-     * Preview image of a theme (resources/themes/<theme>/screenshot.png).
+     * Preview image of a theme (the screenshot.png in its folder).
      */
     public function themeScreenshot(string $theme): BinaryFileResponse
     {
         abort_unless(Themes::exists($theme) && Themes::all()[$theme]['screenshot'], 404);
 
-        return response()->file(Themes::path($theme, 'screenshot.png'), ['Cache-Control' => 'public, max-age=86400']);
+        return response()->file(Themes::dir($theme, 'screenshot.png'), ['Cache-Control' => 'public, max-age=86400']);
     }
 
     /**

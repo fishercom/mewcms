@@ -24,6 +24,9 @@ class Themes
     /** Folder of the uploaded themes, on the public disk */
     public const UPLOADS = 'themes';
 
+    /** Where uploaded themes live, when not storage/app/public/themes (tests) */
+    public static ?string $uploadRoot = null;
+
     /** @var array<string, array<string, mixed>>|null */
     private static ?array $themes = null;
 
@@ -40,7 +43,9 @@ class Themes
      */
     public static function uploadPath(string $theme = '', string $file = ''): string
     {
-        return storage_path('app/public/'.self::UPLOADS.($theme !== '' ? '/'.$theme : '').($file !== '' ? '/'.ltrim($file, '/') : ''));
+        $root = self::$uploadRoot ?? storage_path('app/public/'.self::UPLOADS);
+
+        return $root.($theme !== '' ? '/'.$theme : '').($file !== '' ? '/'.ltrim($file, '/') : '');
     }
 
     /**

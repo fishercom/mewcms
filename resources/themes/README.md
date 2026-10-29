@@ -6,7 +6,7 @@ while sharing one build and one admin.
 
 ```
 resources/themes/<slug>/
-├── theme.json        name, description, version, author, settings
+├── theme.json        name, description, version, author (and styles, scripts)
 ├── screenshot.png    preview shown in Admin → Sites (16:10, about 960×600)
 ├── css/theme.css     the theme's stylesheet (its own Vite entry)
 ├── assets/           images and fonts, imported from the pages or the CSS
@@ -30,34 +30,75 @@ the default ones.
 Every theme is built in the same `npm run build`. Their pages are split into their own
 chunks, and only the active theme's stylesheet is loaded on a page.
 
-## Settings each site can change
+## Design and scripts
 
-A theme lists in `theme.json` what a site may adjust without touching code. Admin → Sites
-shows a colour picker or a list for each one, and the public pages get the chosen values
-as CSS variables on `:root`:
+A site's whole look comes from its theme: colours, fonts, images and its own scripts.
+The default theme reads `--site-accent`, `--site-accent-dark` and `--site-font`, so a
+theme built on it changes those in its stylesheet:
 
-```json
-"settings": [
-    { "key": "accent", "label": "Color de acento", "type": "color", "default": "#f53003", "css": "--site-accent" },
-    {
-        "key": "font", "label": "Tipografía", "type": "select", "default": "instrument", "css": "--site-font",
-        "options": [
-            { "value": "instrument", "label": "Instrument Sans", "css": "'Instrument Sans', ui-sans-serif, sans-serif" },
-            { "value": "serif", "label": "Serif", "css": "ui-serif, Georgia, serif" }
-        ]
-    }
-]
+```css
+.front-theme {
+    --site-accent: #a5462b;
+    --site-font: 'Lora', Georgia, serif;
+}
 ```
 
-- `type` is `color` (a `#rrggbb` value) or `select` (one of `options`; the variable gets
-  the option's `css`).
-- `css` is the variable name, lowercase, starting with `--`.
-- Use the variable in the theme's CSS with a fallback, such as
-  `color: var(--site-accent, #f53003)`. The default theme maps them to `--theme-accent`
-  (switching to `--site-accent-dark` in dark mode) and the page font.
+Tracking code that differs per site (Google Analytics, Tag Manager, a pixel) does not go
+in the theme: each site has **Scripts** fields in Admin → Sites, printed in `<head>` and at
+the end of `<body>` of its public pages.
 
-Values a site saved for a setting the new theme does not have are dropped when the site
-changes theme.
+## Uploaded themes
+
+A designer can make a theme without touching the code or running a build: a folder with
+stylesheets, scripts, images and fonts, zipped and uploaded in **Admin → Sites → Themes**.
+It uses the pages of a built theme and adds its own files on top.
+
+```
+aurora.zip
+├── theme.json        required
+├── screenshot.png    preview in Admin → Sites (16:10)
+├── css/main.css
+├── js/menu.js
+└── assets/           images and fonts, referenced from the CSS with relative paths
+```
+
+```json
+{
+    "name": "Aurora",
+    "slug": "aurora",
+    "description": "Tema claro con tipografía serif",
+    "version": "1.0.0",
+    "author": "Estudio X",
+    "layout": "default",
+    "styles": [
+        "css/main.css",
+        { "href": "css/print.css", "media": "print" },
+        "https://fonts.bunny.net/css?family=lora:400,700"
+    ],
+    "scripts": [
+        { "src": "js/menu.js", "position": "body", "defer": true }
+    ]
+}
+```
+
+- `layout`: the built theme whose pages it uses (`default` when missing or unknown).
+- `styles`: loaded in `<head>`, in order, after the layout's compiled stylesheet, so they
+  can override it. A path in the theme or an `https://` URL; `media` is optional.
+- `scripts`: `position` is `head` or `body` (end of `<body>`); `defer`, `async` and
+  `"type": "module"` are optional.
+- `slug`: the folder name; without it the name of the zipped folder or of the file is
+  used. Uploading a theme with the slug of an installed one updates it.
+
+The files are served from `/storage/themes/<slug>/` with a stamp that changes on every
+upload, so browsers never keep an old copy. The upload is refused, and nothing is
+written, when theme.json is missing or invalid, a file is not a stylesheet, script, image,
+font or text file (`.php`, `.html`, `.htaccess` and the like), a path leaves the folder,
+or the theme has more than 500 files or 20 MB once unpacked. A theme a site uses cannot be
+deleted. Built themes can list `https://` styles and scripts too; their own files are
+bundled by Vite instead.
+
+Uploaded themes live in `storage/app/public/themes`, like the media library: on a host
+without a persistent disk they are lost on every deploy, so keep the zip.
 
 ## Making a theme
 
@@ -84,7 +125,7 @@ changes theme.
 4. Put images and fonts in `assets/` and import them (`import logo from '../assets/logo.svg'`)
    so Vite fingerprints and bundles them.
 5. Add a `screenshot.png` (a capture of the home page at 1280×800, scaled to 960×600, is
-   enough) and, if the theme should be adjustable, `settings` in `theme.json`.
+   enough).
 6. Run `npm run build`, then choose the theme for a site in Admin → Sites.
 
 New page templates created in Admin → Templates go to the default theme, so every theme

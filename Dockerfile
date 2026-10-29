@@ -49,9 +49,10 @@ RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
-    libwebp-dev && \
+    libwebp-dev \
+    libzip-dev && \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
-    docker-php-ext-install pdo_mysql mbstring intl bcmath exif gd && \
+    docker-php-ext-install pdo_mysql mbstring intl bcmath exif gd zip && \
     rm -rf /var/cache/apk/*
 
 # Copy application code

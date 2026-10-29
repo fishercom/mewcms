@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { CmsSiteForm, CmsSiteLang, CmsTheme } from '@/types/models/cms-site';
+import { Link } from '@inertiajs/react';
 import { Check, ImageOff, Trash2, UploadCloud } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
@@ -180,6 +181,12 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                     })}
                 </div>
                 <InputError message={errors.theme} />
+                <p className="text-muted-foreground text-xs">
+                    {t('Cada tema trae su propio diseño, estilos y scripts.')}{' '}
+                    <Link href={route('themes.index')} className="text-primary font-medium hover:underline">
+                        {t('Subir o gestionar temas')}
+                    </Link>
+                </p>
             </Section>
 
             <Section

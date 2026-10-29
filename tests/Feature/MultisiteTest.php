@@ -12,6 +12,8 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Support\FrontCache;
 use App\Support\Sites;
+use App\Support\Themes;
+use Illuminate\Support\Facades\File;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function (): void {
@@ -252,4 +254,30 @@ it('leaves a single-site install unscoped', function (): void {
 
     expect($page->site_id)->toBeNull();
     $this->get('http://anything.test/about')->assertOk();
+});
+
+it('prints an uploaded theme\'s stylesheets and scripts on the sites that use it', function (): void {
+    Themes::$uploadRoot = sys_get_temp_dir().'/mewcms-themes-'.uniqid();
+    File::ensureDirectoryExists(Themes::uploadPath('aurora', 'css'));
+    File::put(Themes::uploadPath('aurora', 'css/main.css'), 'body { color: red }');
+    File::put(Themes::uploadPath('aurora', 'menu.js'), '');
+    File::put(Themes::uploadPath('aurora', 'theme.json'), json_encode(['name' => 'Aurora', 'layout' => 'editorial', 'styles' => ['css/main.css'], 'scripts' => ['menu.js']]));
+    Themes::flush();
+
+    try {
+        $this->siteB->update(['theme' => 'aurora']);
+        ($this->page)($this->siteB, 'About B');
+        ($this->page)($this->siteA, 'About A');
+
+        $this->get('http://b.test/about')->assertOk()
+            ->assertSee('href="/storage/themes/aurora/css/main.css?v=', false)
+            ->assertSee('src="/storage/themes/aurora/menu.js?v=', false)
+            ->assertSee('data-site-theme="editorial"', false)
+            ->assertInertia(fn (Assert $page) => $page->where('theme', 'editorial'));
+        $this->get('http://a.test/about')->assertOk()->assertDontSee('/storage/themes/aurora', false);
+    } finally {
+        File::deleteDirectory(Themes::uploadPath());
+        Themes::$uploadRoot = null;
+        Themes::flush();
+    }
 });

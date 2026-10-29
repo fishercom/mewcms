@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TemplateController;
+use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,14 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function ():
     // Site switcher: every admin user picks the site they work on
     Route::post('sites/{site}/switch', [SiteController::class, 'switch'])->name('sites.switch');
     Route::get('themes/{theme}/screenshot', [SiteController::class, 'themeScreenshot'])->where('theme', '[a-z0-9_-]+')->name('themes.screenshot');
+});
+
+// Themes belong to the Sites module: same permissions, and listed under /admin/sites
+Route::middleware(['auth', 'admin.permission:sites'])->prefix('admin/sites/themes')->name('themes.')->group(function (): void {
+    Route::get('/', [ThemeController::class, 'index'])->name('index');
+    Route::post('/', [ThemeController::class, 'store'])->name('store');
+    Route::get('{theme}/download', [ThemeController::class, 'download'])->where('theme', '[a-z0-9_-]+')->name('download');
+    Route::delete('{theme}', [ThemeController::class, 'destroy'])->where('theme', '[a-z0-9_-]+')->name('destroy');
 });
 
 Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function (): void {

@@ -57,6 +57,7 @@ it('reads the screenshot of each theme', function (): void {
 
 describe('uploaded themes', function (): void {
     beforeEach(function (): void {
+        Themes::$uploadRoot = sys_get_temp_dir().'/mewcms-themes-'.uniqid();
         $this->themeDir = Themes::uploadPath('aurora');
         File::ensureDirectoryExists($this->themeDir.'/css');
         File::ensureDirectoryExists($this->themeDir.'/js');
@@ -84,6 +85,7 @@ describe('uploaded themes', function (): void {
 
     afterEach(function (): void {
         File::deleteDirectory(Themes::uploadPath());
+        Themes::$uploadRoot = null;
         Themes::flush();
     });
 
