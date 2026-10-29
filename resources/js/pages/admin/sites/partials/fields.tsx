@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { CmsSiteForm, CmsSiteLang, CmsTheme } from '@/types/models/cms-site';
-import { Check, ImageOff, RotateCcw, Trash2, UploadCloud } from 'lucide-react';
+import { Check, ImageOff, Trash2, UploadCloud } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
 interface Props {
@@ -35,37 +35,8 @@ function Section({ title, description, children }: { title: string; description?
     );
 }
 
-/**
- * The theme's settings with the values saved for the site, or the theme defaults.
- */
-export function themeSettingValues(theme: CmsTheme | undefined, saved: Record<string, string> | null | undefined): Record<string, string> {
-    const values: Record<string, string> = {};
-    for (const setting of theme?.settings ?? []) {
-        values[setting.key] = saved?.[setting.key] ?? setting.default;
-    }
-
-    return values;
-}
-
 export default function SiteFormFields({ data, setData, errors, processing, themes, langs }: Props) {
     const [pickingFavicon, setPickingFavicon] = useState(false);
-    const theme = themes.find((item) => item.slug === data.theme);
-
-    const chooseTheme = (slug: string) => {
-        if (slug === data.theme) return;
-        // Settings with the same key carry over; the rest start from the new theme's defaults
-        setData({
-            ...data,
-            theme: slug,
-            theme_settings: themeSettingValues(
-                themes.find((item) => item.slug === slug),
-                data.theme_settings,
-            ),
-        });
-    };
-
-    const setSetting = (key: string, value: string) => setData({ ...data, theme_settings: { ...data.theme_settings, [key]: value } });
-
     return (
         <>
             <Section title={t('Sitio')}>
@@ -170,7 +141,7 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                                 type="button"
                                 role="radio"
                                 aria-checked={selected}
-                                onClick={() => chooseTheme(item.slug)}
+                                onClick={() => setData({ ...data, theme: item.slug })}
                                 disabled={processing}
                                 className={cn(
                                     'group bg-background relative overflow-hidden rounded-xl border text-left transition',
@@ -209,70 +180,6 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                     })}
                 </div>
                 <InputError message={errors.theme} />
-
-                {theme && theme.settings.length > 0 && (
-                    <div className="space-y-4 border-t pt-4">
-                        <div className="flex items-center justify-between gap-2">
-                            <span className="text-foreground text-sm font-medium">{t('Ajustes del tema')}</span>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 gap-1 text-xs"
-                                onClick={() => setData({ ...data, theme_settings: themeSettingValues(theme, null) })}
-                                disabled={processing}
-                            >
-                                <RotateCcw className="h-3.5 w-3.5" />
-                                {t('Restablecer')}
-                            </Button>
-                        </div>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            {theme.settings.map((setting) => {
-                                const value = data.theme_settings[setting.key] ?? setting.default;
-                                const id = `theme_setting_${setting.key}`;
-
-                                return (
-                                    <div key={setting.key} className="grid gap-2">
-                                        <Label htmlFor={id}>{t(setting.label)}</Label>
-                                        {setting.type === 'color' ? (
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    id={id}
-                                                    type="color"
-                                                    value={value}
-                                                    onChange={(e) => setSetting(setting.key, e.target.value)}
-                                                    disabled={processing}
-                                                    className="border-border h-9 w-12 cursor-pointer rounded-md border bg-transparent p-1"
-                                                />
-                                                <Input
-                                                    value={value}
-                                                    onChange={(e) => setSetting(setting.key, e.target.value)}
-                                                    maxLength={7}
-                                                    aria-label={t(setting.label)}
-                                                    className="w-28 font-mono uppercase"
-                                                    disabled={processing}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <Select value={value} onValueChange={(next) => setSetting(setting.key, next)} disabled={processing}>
-                                                <SelectTrigger id={id}>
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {(setting.options ?? []).map((option) => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            {t(option.label)}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
             </Section>
 
             <Section
@@ -350,6 +257,44 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                         </button>
                     )}
                     <InputError message={errors.favicon} />
+                </div>
+            </Section>
+
+            <Section
+                title={t('Scripts')}
+                description={t(
+                    'Código de servicios externos como Google Analytics, Tag Manager o un píxel. Se añade a las páginas públicas de este sitio, nunca al admin.',
+                )}
+            >
+                <div className="grid gap-2">
+                    <Label htmlFor="head_scripts">{t('En <head>')}</Label>
+                    <Textarea
+                        id="head_scripts"
+                        rows={5}
+                        spellCheck={false}
+                        className="font-mono text-xs"
+                        placeholder={'<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>'}
+                        value={data.head_scripts}
+                        onChange={(e) => setData({ ...data, head_scripts: e.target.value })}
+                        disabled={processing}
+                    />
+                    <p className="text-muted-foreground text-xs">{t('Analytics, Tag Manager, verificación de buscadores.')}</p>
+                    <InputError message={errors.head_scripts} />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="body_scripts">{t('Al final de <body>')}</Label>
+                    <Textarea
+                        id="body_scripts"
+                        rows={5}
+                        spellCheck={false}
+                        className="font-mono text-xs"
+                        value={data.body_scripts}
+                        onChange={(e) => setData({ ...data, body_scripts: e.target.value })}
+                        disabled={processing}
+                    />
+                    <p className="text-muted-foreground text-xs">{t('Chats, píxeles y el <noscript> de Tag Manager.')}</p>
+                    <InputError message={errors.body_scripts} />
                 </div>
             </Section>
 

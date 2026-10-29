@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { t } from '@/lib/i18n';
 import { createSite } from '@/services/sites';
 import { CmsSiteForm, CmsSiteLang, CmsTheme } from '@/types/models/cms-site';
-import SiteFormFields, { themeSettingValues } from './partials/fields';
+import SiteFormFields from './partials/fields';
 
 export default function Create() {
     const { langs, themes } = usePage<{ langs: CmsSiteLang[]; themes: CmsTheme[] }>().props;
@@ -17,11 +17,12 @@ export default function Create() {
         site_url: '',
         domains: '',
         theme: themes[0]?.slug || 'default',
-        theme_settings: themeSettingValues(themes[0], null),
         lang_id: '',
         title: '',
         description: '',
         favicon: '',
+        head_scripts: '',
+        body_scripts: '',
         default: false,
         active: true,
     };

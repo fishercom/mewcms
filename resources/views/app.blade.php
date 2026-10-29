@@ -4,9 +4,11 @@
     $siteTheme = \App\Support\Themes::current();
     $isThemePage = \App\Support\Themes::isThemePage($page['component']);
     $site = $isThemePage ? \App\Support\Sites::current() : null;
+    // Stylesheets and scripts the theme lists in theme.json (uploaded themes)
+    $themeInfo = $isThemePage ? (\App\Support\Themes::all()[$siteTheme] ?? null) : null;
     $lang = $site?->lang?->iso ?? str_replace('_', '-', app()->getLocale());
 @endphp
-<html lang="{{ $lang }}" data-site-theme="{{ $siteTheme }}" @if ($site) data-site-title="{{ $site->title ?: $site->name }}" @endif @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ $lang }}" data-site-theme="{{ \App\Support\Themes::layout($siteTheme) }}" @if ($site) data-site-title="{{ $site->title ?: $site->name }}" @endif @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,11 +48,6 @@
             <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         @endif
 
-        @if ($isThemePage && ($themeVariables = \App\Support\Themes::cssVariables($siteTheme, \App\Support\Sites::current()?->theme_settings)))
-            {{-- The site's theme settings (Admin → Sites) --}}
-            <style>:root { {!! $themeVariables !!} }</style>
-        @endif
-
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
@@ -61,6 +58,16 @@
             'resources/js/app.tsx',
             \App\Support\Themes::pageFile($page['component'], $siteTheme),
         ])
+        @foreach ($themeInfo['styles'] ?? [] as $style)
+            <link rel="stylesheet" href="{{ $style['href'] }}" @if ($style['media']) media="{{ $style['media'] }}" @endif>
+        @endforeach
+        @foreach (collect($themeInfo['scripts'] ?? [])->where('position', 'head') as $script)
+            <script src="{{ $script['src'] }}" @if ($script['module']) type="module" @endif @if ($script['defer']) defer @endif @if ($script['async']) async @endif></script>
+        @endforeach
+        @if ($site?->head_scripts)
+            {{-- The site's own scripts (Admin → Sites), such as Google Analytics --}}
+            {!! $site->head_scripts !!}
+        @endif
         @inertiaHead
         @if (empty($__inertiaSsrResponse))
             <title inertia>{{ $site ? ($site->title ?: $site->name) : config('app.name', 'MewCMS') }}</title>
@@ -68,5 +75,11 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+        @foreach (collect($themeInfo['scripts'] ?? [])->where('position', 'body') as $script)
+            <script src="{{ $script['src'] }}" @if ($script['module']) type="module" @endif @if ($script['defer']) defer @endif @if ($script['async']) async @endif></script>
+        @endforeach
+        @if ($site?->body_scripts)
+            {!! $site->body_scripts !!}
+        @endif
     </body>
 </html>

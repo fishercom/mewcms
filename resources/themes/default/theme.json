@@ -1,51 +1,6 @@
 {
     "name": "Default",
     "description": "El sitio público estándar de MewCMS: limpio, neutro, en modo claro u oscuro.",
-    "version": "1.1.0",
-    "author": "MewCMS",
-    "settings": [
-        {
-            "key": "accent",
-            "label": "Color de acento",
-            "type": "color",
-            "default": "#f53003",
-            "css": "--site-accent"
-        },
-        {
-            "key": "accent_dark",
-            "label": "Color de acento en modo oscuro",
-            "type": "color",
-            "default": "#ff4433",
-            "css": "--site-accent-dark"
-        },
-        {
-            "key": "font",
-            "label": "Tipografía",
-            "type": "select",
-            "default": "instrument",
-            "css": "--site-font",
-            "options": [
-                {
-                    "value": "instrument",
-                    "label": "Instrument Sans",
-                    "css": "'Instrument Sans', ui-sans-serif, system-ui, sans-serif"
-                },
-                {
-                    "value": "system",
-                    "label": "La del sistema",
-                    "css": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
-                },
-                {
-                    "value": "serif",
-                    "label": "Serif",
-                    "css": "'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif"
-                },
-                {
-                    "value": "mono",
-                    "label": "Monoespaciada",
-                    "css": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
-                }
-            ]
-        }
-    ]
+    "version": "1.2.0",
+    "author": "MewCMS"
 }

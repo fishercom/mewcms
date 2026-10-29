@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { t } from '@/lib/i18n';
 import { updateSite } from '@/services/sites';
 import { CmsSite, CmsSiteForm, CmsSiteLang, CmsTheme } from '@/types/models/cms-site';
-import SiteFormFields, { themeSettingValues } from './partials/fields';
+import SiteFormFields from './partials/fields';
 
 export default function Edit() {
     const { item, langs, themes } = usePage<{ item: CmsSite; langs: CmsSiteLang[]; themes: CmsTheme[] }>().props;
@@ -18,14 +18,12 @@ export default function Edit() {
         site_url: item.site_url || '',
         domains: (item.domains || []).join('\n'),
         theme: item.theme || 'default',
-        theme_settings: themeSettingValues(
-            themes.find((theme) => theme.slug === item.theme),
-            item.theme_settings,
-        ),
         lang_id: item.lang_id ? item.lang_id.toString() : '',
         title: item.title || '',
         description: item.description || '',
         favicon: item.favicon || '',
+        head_scripts: item.head_scripts || '',
+        body_scripts: item.body_scripts || '',
         default: Boolean(item.default),
         active: Boolean(item.active),
     });

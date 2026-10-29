@@ -14,11 +14,10 @@ class CmsSite extends Model
 
     protected $table = 'cms_sites';
 
-    protected $fillable = ['name', 'site_url', 'domains', 'theme', 'theme_settings', 'lang_id', 'title', 'description', 'favicon', 'default', 'active'];
+    protected $fillable = ['name', 'site_url', 'domains', 'theme', 'lang_id', 'title', 'description', 'favicon', 'head_scripts', 'body_scripts', 'default', 'active'];
 
     protected $casts = [
         'domains' => 'array',
-        'theme_settings' => 'array',
         'default' => 'boolean',
         'active' => 'boolean',
     ];
@@ -40,9 +39,6 @@ class CmsSite extends Model
             if (blank($site->theme) || ! Themes::exists($site->theme)) {
                 $site->theme = Themes::DEFAULT;
             }
-
-            // Only the settings the theme declares, with valid values
-            $site->theme_settings = Themes::cleanSettings($site->theme, (array) ($site->theme_settings ?? []));
         });
 
         // Only one default site
