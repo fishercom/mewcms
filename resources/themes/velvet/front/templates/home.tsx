@@ -129,7 +129,7 @@ export default function Home({ article, navigation }: HomeProps) {
                             className="absolute inset-0 -z-20 h-full w-full object-cover object-[center_35%]"
                         />
                         <div
-                            className="absolute inset-0 -z-10 bg-gradient-to-r from-[#14221c]/85 via-[#14221c]/45 to-transparent"
+                            className="absolute inset-0 -z-10 bg-[#14221c]/55 sm:bg-transparent sm:bg-gradient-to-r sm:from-[#14221c]/85 sm:via-[#14221c]/45 sm:to-transparent"
                             aria-hidden="true"
                         />
                         <div

@@ -35,11 +35,15 @@ function NavLink({ item, className, onClick }: { item: MenuItem; className?: str
 export function JournalBrand({ name, tagline }: { name: string; tagline?: string }) {
     return (
         <span className="inline-flex flex-col items-center leading-none">
-            <span className="font-display text-ink flex items-center gap-2.5 text-[2rem] tracking-tight sm:text-[2.6rem]">
-                <Leaf className="text-sage h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.4} aria-hidden="true" />
+            <span className="font-display text-ink flex items-center gap-2.5 text-[1.55rem] tracking-tight whitespace-nowrap sm:text-[2.6rem]">
+                <Leaf className="text-sage hidden h-7 w-7 sm:block" strokeWidth={1.4} aria-hidden="true" />
                 {name}
             </span>
-            {tagline && <span className="text-graphite mt-2 text-[0.62rem] font-semibold tracking-[0.34em] uppercase">{tagline}</span>}
+            {tagline && (
+                <span className="text-graphite mt-2 text-[0.62rem] font-semibold tracking-[0.2em] whitespace-nowrap uppercase sm:tracking-[0.34em]">
+                    {tagline}
+                </span>
+            )}
         </span>
     );
 }
