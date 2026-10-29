@@ -3,35 +3,63 @@
 namespace App\Support;
 
 /**
- * Public site themes. Each theme is a folder in resources/themes/<slug> with:
+ * Public site themes. A theme comes from one of two places:
  *
- * - theme.json      name, description, version, author
- * - css/theme.css   its stylesheet (its own Vite entry, so themes never share CSS)
- * - front/          its pages, named like the Inertia components ("front/templates/page")
- * - assets/         images and fonts, imported from its pages or CSS so Vite bundles them
- * - screenshot.png  its preview in Admin → Sites
+ * - Built themes, in resources/themes/<slug>: React pages (front/, named like the Inertia
+ *   components, "front/templates/page"), a css/theme.css that Vite compiles, and assets/
+ *   imported from them. They change with the code and need `npm run build`.
+ * - Uploaded themes, in storage/app/public/themes/<slug> (Admin → Themes): stylesheets,
+ *   scripts, images and fonts ready to serve. They use the pages of a built theme (their
+ *   "layout") and add their own files on top, with no build.
  *
- * theme.json may declare "settings" each site can change (colours, fonts): each one
- * sets a CSS variable on the public pages (see cssVariables).
+ * Both have a theme.json (name, description, version, author, layout, styles, scripts)
+ * and may have a screenshot.png, shown in Admin → Sites.
  *
- * A theme only needs the pages it changes: any other page comes from the default theme.
+ * A built theme only needs the pages it changes: any other page comes from the default theme.
  */
 class Themes
 {
     public const DEFAULT = 'default';
 
-    /** @var array<string, array{slug: string, name: string, description: string, version: string, author: string, screenshot: bool, settings: list<array<string, mixed>>}>|null */
+    /** Folder of the uploaded themes, on the public disk */
+    public const UPLOADS = 'themes';
+
+    /** Where uploaded themes live, when not storage/app/public/themes (tests) */
+    public static ?string $uploadRoot = null;
+
+    /** @var array<string, array<string, mixed>>|null */
     private static ?array $themes = null;
 
+    /**
+     * Folder of a built theme, or of a file in it.
+     */
     public static function path(string $theme = self::DEFAULT, string $file = ''): string
     {
         return resource_path('themes/'.$theme.($file !== '' ? '/'.ltrim($file, '/') : ''));
     }
 
     /**
-     * Installed themes, keyed by folder name.
+     * Folder of an uploaded theme, or of a file in it.
+     */
+    public static function uploadPath(string $theme = '', string $file = ''): string
+    {
+        $root = self::$uploadRoot ?? storage_path('app/public/'.self::UPLOADS);
+
+        return $root.($theme !== '' ? '/'.$theme : '').($file !== '' ? '/'.ltrim($file, '/') : '');
+    }
+
+    /**
+     * Folder of any installed theme, or of a file in it.
+     */
+    public static function dir(string $theme, string $file = ''): string
+    {
+        return (self::all()[$theme]['uploaded'] ?? false) ? self::uploadPath($theme, $file) : self::path($theme, $file);
+    }
+
+    /**
+     * Installed themes, keyed by slug: the built ones (default first), then the uploaded ones.
      *
-     * @return array<string, array{slug: string, name: string, description: string, version: string, author: string, screenshot: bool, settings: list<array<string, mixed>>}>
+     * @return array<string, array{slug: string, name: string, description: string, version: string, author: string, screenshot: bool, uploaded: bool, layout: string, styles: list<array{href: string, media: string|null}>, scripts: list<array{src: string, position: string, defer: bool, async: bool, module: bool}>}>
      */
     public static function all(): array
     {
@@ -39,130 +67,136 @@ class Themes
             return self::$themes;
         }
 
-        $themes = [];
+        $built = [];
         foreach (glob(self::path('*').'/theme.json') ?: [] as $manifest) {
             $slug = basename(dirname($manifest));
-            if (! preg_match('/^[a-z0-9_-]+$/', $slug)) {
-                continue;
+            if (self::validSlug($slug)) {
+                $built[$slug] = self::read($slug, dirname($manifest), false, []);
             }
-
-            $info = json_decode((string) file_get_contents($manifest), true);
-            $info = is_array($info) ? $info : [];
-
-            $themes[$slug] = [
-                'slug' => $slug,
-                'name' => (string) ($info['name'] ?? ucfirst($slug)),
-                'description' => (string) ($info['description'] ?? ''),
-                'version' => (string) ($info['version'] ?? ''),
-                'author' => (string) ($info['author'] ?? ''),
-                'screenshot' => is_file(self::path($slug, 'screenshot.png')),
-                'settings' => self::settingDefinitions($info['settings'] ?? []),
-            ];
         }
-        ksort($themes);
-
-        // The default theme first
-        if (isset($themes[self::DEFAULT])) {
-            $themes = [self::DEFAULT => $themes[self::DEFAULT]] + $themes;
+        ksort($built);
+        if (isset($built[self::DEFAULT])) {
+            $built = [self::DEFAULT => $built[self::DEFAULT]] + $built;
         }
 
-        return self::$themes = $themes;
+        $uploaded = [];
+        foreach (glob(self::uploadPath('*').'/theme.json') ?: [] as $manifest) {
+            $slug = basename(dirname($manifest));
+            // A built theme with the same name wins
+            if (self::validSlug($slug) && ! isset($built[$slug])) {
+                $uploaded[$slug] = self::read($slug, dirname($manifest), true, array_keys($built));
+            }
+        }
+        ksort($uploaded);
+
+        return self::$themes = $built + $uploaded;
+    }
+
+    public static function validSlug(string $slug): bool
+    {
+        return preg_match('/^[a-z0-9][a-z0-9_-]{0,49}$/', $slug) === 1;
     }
 
     /**
-     * Valid setting definitions from theme.json: a key, a label, a CSS variable, and
-     * a colour or a list of options (each with the CSS value it stands for).
+     * The manifest of a theme: what theme.json says, with only the files and addresses
+     * that are safe to print in a page.
      *
-     * @return list<array<string, mixed>>
+     * @param  list<string>  $layouts  built themes an uploaded theme may use the pages of
+     * @return array<string, mixed>
      */
-    private static function settingDefinitions(mixed $settings): array
+    private static function read(string $slug, string $folder, bool $uploaded, array $layouts): array
     {
-        $definitions = [];
-        foreach (is_array($settings) ? $settings : [] as $setting) {
-            $key = $setting['key'] ?? null;
-            $css = $setting['css'] ?? null;
-            $type = $setting['type'] ?? null;
-            if (! is_string($key) || ! is_string($css) || ! preg_match('/^--[a-z0-9-]+$/', $css) || ! in_array($type, ['color', 'select'], true)) {
-                continue;
-            }
+        $info = self::manifest($folder.'/theme.json') ?? [];
+        $version = (string) ($info['version'] ?? '');
+        // Changes on every upload, so browsers never keep an old copy of the files
+        $stamp = substr(md5($version.'|'.@filemtime($folder.'/theme.json')), 0, 8);
 
-            $definition = [
-                'key' => $key,
-                'label' => (string) ($setting['label'] ?? $key),
-                'type' => $type,
-                'css' => $css,
-                'default' => (string) ($setting['default'] ?? ''),
-            ];
-
-            if ($type === 'select') {
-                $definition['options'] = array_values(array_filter(array_map(fn ($option): ?array => is_array($option) && isset($option['value'], $option['css']) ? [
-                    'value' => (string) $option['value'],
-                    'label' => (string) ($option['label'] ?? $option['value']),
-                    'css' => (string) $option['css'],
-                ] : null, (array) ($setting['options'] ?? []))));
-            }
-
-            $definitions[] = $definition;
+        $layout = $slug;
+        if ($uploaded) {
+            $layout = in_array($info['layout'] ?? null, $layouts, true) ? $info['layout'] : self::DEFAULT;
         }
 
-        return $definitions;
+        $styles = [];
+        foreach ((array) ($info['styles'] ?? []) as $style) {
+            $style = is_string($style) ? ['href' => $style] : $style;
+            $href = is_array($style) ? self::fileUrl($slug, $folder, $uploaded, $style['href'] ?? null, 'css', $stamp) : null;
+            if ($href !== null) {
+                $styles[] = ['href' => $href, 'media' => self::attribute($style['media'] ?? null)];
+            }
+        }
+
+        $scripts = [];
+        foreach ((array) ($info['scripts'] ?? []) as $script) {
+            $script = is_string($script) ? ['src' => $script] : $script;
+            $src = is_array($script) ? self::fileUrl($slug, $folder, $uploaded, $script['src'] ?? null, 'js', $stamp) : null;
+            if ($src !== null) {
+                $scripts[] = [
+                    'src' => $src,
+                    'position' => ($script['position'] ?? 'body') === 'head' ? 'head' : 'body',
+                    'defer' => (bool) ($script['defer'] ?? false),
+                    'async' => (bool) ($script['async'] ?? false),
+                    'module' => ($script['type'] ?? null) === 'module',
+                ];
+            }
+        }
+
+        return [
+            'slug' => $slug,
+            'name' => (string) ($info['name'] ?? ucfirst($slug)),
+            'description' => (string) ($info['description'] ?? ''),
+            'version' => $version,
+            'author' => (string) ($info['author'] ?? ''),
+            'screenshot' => is_file($folder.'/screenshot.png'),
+            'uploaded' => $uploaded,
+            'layout' => $layout,
+            'styles' => $styles,
+            'scripts' => $scripts,
+        ];
     }
 
     /**
-     * Keep the values of $values that $theme declares and that are valid (a #rrggbb
-     * colour, or one of the options). Anything else falls back to the theme default.
+     * The decoded theme.json at $file, or null when it is missing or not a JSON object.
      *
-     * @param  array<string, mixed>  $values
-     * @return array<string, string>
+     * @return array<string, mixed>|null
      */
-    public static function cleanSettings(string $theme, array $values): array
+    public static function manifest(string $file): ?array
     {
-        $clean = [];
-        foreach (self::all()[$theme]['settings'] ?? [] as $setting) {
-            $value = $values[$setting['key']] ?? null;
-            if (! is_string($value)) {
-                continue;
-            }
+        $info = is_file($file) ? json_decode((string) file_get_contents($file), true) : null;
 
-            $valid = $setting['type'] === 'color'
-                ? preg_match('/^#[0-9a-f]{6}$/i', $value) === 1
-                : in_array($value, array_column($setting['options'], 'value'), true);
-
-            if ($valid) {
-                $clean[$setting['key']] = $setting['type'] === 'color' ? strtolower($value) : $value;
-            }
-        }
-
-        return $clean;
+        return is_array($info) ? $info : null;
     }
 
     /**
-     * CSS declarations ("--site-accent: #f53003; ...") for a site's theme settings,
-     * printed on its public pages.
-     *
-     * @param  array<string, mixed>|null  $values
+     * Address of a stylesheet or script a theme lists: an https:// URL as it is, or a
+     * file of an uploaded theme with the expected extension (served from /storage, with
+     * a stamp so a new upload is not cached). Built themes bundle their own
+     * files with Vite, so only URLs count for them.
      */
-    public static function cssVariables(string $theme, ?array $values): string
+    private static function fileUrl(string $slug, string $folder, bool $uploaded, mixed $file, string $extension, string $stamp): ?string
     {
-        $values = self::cleanSettings($theme, (array) $values);
-
-        $declarations = [];
-        foreach (self::all()[$theme]['settings'] ?? [] as $setting) {
-            $value = $values[$setting['key']] ?? $setting['default'];
-            if ($setting['type'] === 'select') {
-                $option = collect($setting['options'])->firstWhere('value', $value);
-                $value = $option['css'] ?? null;
-            } elseif (preg_match('/^#[0-9a-f]{6}$/i', $value) !== 1) {
-                $value = null;
-            }
-
-            if ($value !== null && $value !== '') {
-                // Values come from theme.json; still keep them from closing the rule or the tag
-                $declarations[] = $setting['css'].': '.str_replace(['<', '>', '{', '}', ';'], '', $value).';';
-            }
+        if (! is_string($file) || $file === '' || preg_match('/[\s"\'<>]/', $file)) {
+            return null;
         }
 
-        return implode(' ', $declarations);
+        if (str_starts_with($file, 'https://')) {
+            return filter_var($file, FILTER_VALIDATE_URL) ? $file : null;
+        }
+
+        $file = ltrim($file, './');
+        if (! $uploaded
+            || ! preg_match('#^[A-Za-z0-9_-][A-Za-z0-9_./-]*$#', $file)
+            || str_contains($file, '..')
+            || strtolower(pathinfo($file, PATHINFO_EXTENSION)) !== $extension
+            || ! is_file($folder.'/'.$file)) {
+            return null;
+        }
+
+        return '/storage/'.self::UPLOADS.'/'.$slug.'/'.$file.'?v='.$stamp;
+    }
+
+    private static function attribute(mixed $value): ?string
+    {
+        return is_string($value) && preg_match('/^[A-Za-z0-9 ():,.-]{1,100}$/', $value) ? $value : null;
     }
 
     public static function exists(?string $theme): bool
@@ -178,6 +212,17 @@ class Themes
         $theme = Sites::current()?->theme;
 
         return self::exists($theme) ? $theme : self::DEFAULT;
+    }
+
+    /**
+     * The built theme whose pages and compiled stylesheet $theme uses: itself for a
+     * built theme, its "layout" for an uploaded one.
+     */
+    public static function layout(?string $theme = null): string
+    {
+        $theme ??= self::current();
+
+        return self::all()[$theme]['layout'] ?? self::DEFAULT;
     }
 
     /**
@@ -197,7 +242,7 @@ class Themes
             return 'resources/js/pages/'.$component.'.tsx';
         }
 
-        $theme ??= self::current();
+        $theme = self::layout($theme);
         $file = $component.'.tsx';
 
         return 'resources/themes/'.(is_file(self::path($theme, $file)) ? $theme : self::DEFAULT).'/'.$file;
@@ -208,7 +253,7 @@ class Themes
      */
     public static function styleFile(?string $theme = null): string
     {
-        $theme ??= self::current();
+        $theme = self::layout($theme);
 
         return 'resources/themes/'.(is_file(self::path($theme, 'css/theme.css')) ? $theme : self::DEFAULT).'/css/theme.css';
     }
@@ -221,7 +266,7 @@ class Themes
      */
     public static function templateFiles(?string $theme = null): array
     {
-        $theme ??= self::current();
+        $theme = self::layout($theme);
 
         $files = [];
         foreach (array_unique([self::DEFAULT, $theme]) as $slug) {

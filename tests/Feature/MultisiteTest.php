@@ -12,6 +12,8 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Support\FrontCache;
 use App\Support\Sites;
+use App\Support\Themes;
+use Illuminate\Support\Facades\File;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function (): void {
@@ -138,21 +140,23 @@ it('saves a site with its domains and theme', function (): void {
         ->and($site->theme)->toBe('editorial');
 });
 
-it('saves a site\'s language, SEO data, favicon and theme settings', function (): void {
+it('saves a site\'s language, SEO data, favicon and scripts', function (): void {
     $this->actingAs($this->user)->put("http://a.test/admin/sites/{$this->siteB->id}", [
         'name' => 'Site B',
         'domains' => 'b.test',
         'theme' => 'editorial',
-        'theme_settings' => ['accent' => '#112233', 'font' => 'mono'],
         'lang_id' => $this->lang->id,
         'title' => 'El blog de B',
         'description' => 'Notas y novedades',
         'favicon' => '/storage/media/favicon-b.png',
+        'head_scripts' => '<script async src="https://www.googletagmanager.com/gtag/js?id=G-B"></script>',
+        'body_scripts' => '<noscript>B</noscript>',
         'active' => 1,
     ])->assertRedirect('/admin/sites');
 
     $site = $this->siteB->fresh();
-    expect($site->theme_settings)->toBe(['accent' => '#112233', 'font' => 'mono'])
+    expect($site->head_scripts)->toContain('id=G-B')
+        ->and($site->body_scripts)->toBe('<noscript>B</noscript>')
         ->and($site->lang_id)->toBe($this->lang->id)
         ->and($site->title)->toBe('El blog de B')
         ->and($site->description)->toBe('Notas y novedades')
@@ -168,20 +172,23 @@ it('refuses an unsafe favicon address', function (): void {
     ])->assertSessionHasErrors('favicon');
 });
 
-it('shows each site with its own title, language, favicon and theme colours', function (): void {
+it('shows each site with its own title, language, favicon and scripts', function (): void {
     $en = CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => 1]);
-    $this->siteB->update(['lang_id' => $en->id, 'title' => 'B Journal', 'description' => 'All about B', 'favicon' => '/storage/b.png', 'theme_settings' => ['accent' => '#112233']]);
+    $this->siteB->update(['lang_id' => $en->id, 'title' => 'B Journal', 'description' => 'All about B', 'favicon' => '/storage/b.png', 'head_scripts' => '<script>window.gaB = 1</script>', 'body_scripts' => '<script>window.pixelB = 1</script>']);
     ($this->page)($this->siteB, 'About B');
 
     $this->get('http://b.test/about')->assertOk()
         ->assertSee('lang="en"', false)
         ->assertSee('data-site-title="B Journal"', false)
         ->assertSee('href="/storage/b.png"', false)
-        ->assertSee('--site-accent: #112233;', false)
+        ->assertSee('<script>window.gaB = 1</script>', false)
+        ->assertSee('<script>window.pixelB = 1</script>', false)
         ->assertInertia(fn (Assert $page) => $page->where('site.title', 'B Journal')->where('site.description', 'All about B')->where('site.locale', 'en'));
 
-    // The admin keeps its own look
-    $this->actingAs($this->user)->get('http://b.test/admin/sites')->assertOk()->assertDontSee('<style>:root', false);
+    // Another site does not get them, and neither does the admin
+    ($this->page)($this->siteA, 'About A');
+    $this->get('http://a.test/about')->assertOk()->assertDontSee('window.gaB', false);
+    $this->actingAs($this->user)->get('http://b.test/admin/sites')->assertOk()->assertDontSee('<script>window.gaB', false);
 });
 
 it('lists where to see each site and whether it has a home page', function (): void {
@@ -206,7 +213,7 @@ it('offers the themes and languages on the site form', function (): void {
     $this->actingAs($this->user)->get('http://a.test/admin/sites/create')->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('admin/sites/create')
             ->has('themes', 2)
-            ->has('themes.0.settings', 3)
+            ->where('themes.0.layout', 'default')
             ->where('langs.0.iso', 'es')
             ->missing('schemaGroups'));
 });
@@ -247,4 +254,30 @@ it('leaves a single-site install unscoped', function (): void {
 
     expect($page->site_id)->toBeNull();
     $this->get('http://anything.test/about')->assertOk();
+});
+
+it('prints an uploaded theme\'s stylesheets and scripts on the sites that use it', function (): void {
+    Themes::$uploadRoot = sys_get_temp_dir().'/mewcms-themes-'.uniqid();
+    File::ensureDirectoryExists(Themes::uploadPath('aurora', 'css'));
+    File::put(Themes::uploadPath('aurora', 'css/main.css'), 'body { color: red }');
+    File::put(Themes::uploadPath('aurora', 'menu.js'), '');
+    File::put(Themes::uploadPath('aurora', 'theme.json'), json_encode(['name' => 'Aurora', 'layout' => 'editorial', 'styles' => ['css/main.css'], 'scripts' => ['menu.js']]));
+    Themes::flush();
+
+    try {
+        $this->siteB->update(['theme' => 'aurora']);
+        ($this->page)($this->siteB, 'About B');
+        ($this->page)($this->siteA, 'About A');
+
+        $this->get('http://b.test/about')->assertOk()
+            ->assertSee('href="/storage/themes/aurora/css/main.css?v=', false)
+            ->assertSee('src="/storage/themes/aurora/menu.js?v=', false)
+            ->assertSee('data-site-theme="editorial"', false)
+            ->assertInertia(fn (Assert $page) => $page->where('theme', 'editorial'));
+        $this->get('http://a.test/about')->assertOk()->assertDontSee('/storage/themes/aurora', false);
+    } finally {
+        File::deleteDirectory(Themes::uploadPath());
+        Themes::$uploadRoot = null;
+        Themes::flush();
+    }
 });

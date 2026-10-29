@@ -10,7 +10,7 @@ import { Pagination } from '@/types';
 import { CmsSite, CmsTheme } from '@/types/models/cms-site';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { AlertTriangle, Edit, ExternalLink, LogIn, Plus, Search, Trash2 } from 'lucide-react';
+import { AlertTriangle, Edit, ExternalLink, LogIn, Palette, Plus, Search, Trash2 } from 'lucide-react';
 
 export default function Index() {
     const { items, themes, site } = usePage<{ items: Pagination<CmsSite>; themes: Record<string, CmsTheme>; site: { id: number } | null }>().props;
@@ -53,6 +53,13 @@ export default function Index() {
                         </form>
                     </div>
                     <div className="flex w-full flex-shrink-0 flex-col items-stretch justify-end space-y-2 md:w-auto md:flex-row md:items-center md:space-y-0 md:space-x-3">
+                        <Link
+                            href={route('themes.index')}
+                            className="border-border hover:bg-accent hover:text-accent-foreground flex items-center justify-center gap-1.5 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+                        >
+                            <Palette className="h-4 w-4" />
+                            <span>{t('Temas')}</span>
+                        </Link>
                         <Link
                             href={route('sites.create')}
                             className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors"

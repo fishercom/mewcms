@@ -71,7 +71,8 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'adm_menu' => fn (): array => $this->adminMenu($request),
-            'theme' => fn (): string => Themes::current(),
+            // The built theme whose pages the site uses (an uploaded theme borrows one)
+            'theme' => fn (): string => Themes::layout(),
             'site' => fn (): ?array => Sites::current()?->summary(),
             // Sites the admin can switch between (see the site switcher)
             'sites' => fn (): array => $request->user()?->canAccessAdmin()

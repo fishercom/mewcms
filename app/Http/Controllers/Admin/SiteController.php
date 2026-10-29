@@ -108,13 +108,13 @@ class SiteController extends Controller
     }
 
     /**
-     * Preview image of a theme (resources/themes/<theme>/screenshot.png).
+     * Preview image of a theme (the screenshot.png in its folder).
      */
     public function themeScreenshot(string $theme): BinaryFileResponse
     {
         abort_unless(Themes::exists($theme) && Themes::all()[$theme]['screenshot'], 404);
 
-        return response()->file(Themes::path($theme, 'screenshot.png'), ['Cache-Control' => 'public, max-age=86400']);
+        return response()->file(Themes::dir($theme, 'screenshot.png'), ['Cache-Control' => 'public, max-age=86400']);
     }
 
     /**
@@ -156,11 +156,12 @@ class SiteController extends Controller
             'domains' => 'nullable|array|max:20',
             'domains.*' => ['string', 'max:255', 'regex:/^(https?:\/\/)?[a-z0-9.-]+(:\d+)?\/?$/i'],
             'theme' => ['required', 'string', Rule::in(array_keys(Themes::all()))],
-            'theme_settings' => 'nullable|array',
             'lang_id' => 'nullable|integer|exists:cms_langs,id',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',
             'favicon' => ['nullable', 'string', 'max:2048', new SafeUrl],
+            'head_scripts' => 'nullable|string|max:20000',
+            'body_scripts' => 'nullable|string|max:20000',
             'default' => 'nullable|boolean',
             'active' => 'nullable|boolean',
         ], [

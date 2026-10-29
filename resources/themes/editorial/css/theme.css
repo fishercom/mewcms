@@ -12,6 +12,10 @@
 }
 
 .front-theme {
+    --site-accent: #a5462b;
+    --site-accent-dark: #e0905f;
+    --site-font: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
     --background: oklch(0.985 0.008 85);
     --foreground: oklch(0.24 0.02 60);
     --card: oklch(0.995 0.005 85);

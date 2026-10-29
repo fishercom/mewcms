@@ -4,11 +4,12 @@ export interface CmsSite {
     site_url: string | null;
     domains: string[] | null;
     theme: string;
-    theme_settings: Record<string, string> | null;
     lang_id: number | null;
     title: string | null;
     description: string | null;
     favicon: string | null;
+    head_scripts: string | null;
+    body_scripts: string | null;
     default: boolean;
     active: boolean;
     /** Sites list only: where the site can be seen, and whether "/" shows a page */
@@ -25,28 +26,16 @@ export interface CmsSiteForm {
     /** One host per line */
     domains: string;
     theme: string;
-    theme_settings: Record<string, string>;
     /** Empty for none */
     lang_id: string;
     title: string;
     description: string;
     favicon: string;
+    head_scripts: string;
+    body_scripts: string;
     default: boolean;
     active: boolean;
-    [key: string]: string | number | boolean | null | undefined | Record<string, string>;
-}
-
-export interface CmsThemeSettingOption {
-    value: string;
-    label: string;
-}
-
-export interface CmsThemeSetting {
-    key: string;
-    label: string;
-    type: 'color' | 'select';
-    default: string;
-    options?: CmsThemeSettingOption[];
+    [key: string]: string | number | boolean | null | undefined;
 }
 
 export interface CmsTheme {
@@ -57,7 +46,10 @@ export interface CmsTheme {
     author: string;
     /** Whether the theme folder has a screenshot.png */
     screenshot: boolean;
-    settings: CmsThemeSetting[];
+    /** Uploaded in Admin → Themes (not part of the code) */
+    uploaded: boolean;
+    /** The built theme whose pages it uses */
+    layout: string;
 }
 
 export interface CmsSiteLang {

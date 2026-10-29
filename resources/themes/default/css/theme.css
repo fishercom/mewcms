@@ -14,8 +14,9 @@
 @source '../../../js/lib';
 
 /*
- * Theme settings. Each site can change these in Admin → Sites (see "settings" in
- * theme.json): the server sets the --site-* variables, and these are the defaults.
+ * Accent colour and font. A theme that builds on this one (or an uploaded theme that
+ * uses its pages) changes them by setting --site-accent, --site-accent-dark and
+ * --site-font in its own stylesheet.
  */
 .front-theme {
     --theme-accent: var(--site-accent, #f53003);
