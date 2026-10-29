@@ -94,3 +94,14 @@ it('replaces the content with the demo pet shop and pet care journal', function 
         ->assertSuccessful();
     expect(CmsArticle::withoutGlobalScopes()->count())->toBe(9);
 });
+
+it('uses the port-less local addresses by default', function (): void {
+    config(['app.url' => 'http://127.0.0.1:8000']);
+
+    $this->artisan('cms:demo-sites', ['--force' => true])->assertSuccessful();
+
+    expect($this->shop->fresh()->site_url)->toBe('http://mewcms.localhost')
+        ->and($this->shop->fresh()->domains)->toBe(['mewcms.localhost'])
+        ->and($this->journal->fresh()->site_url)->toBe('http://blog.localhost')
+        ->and($this->journal->fresh()->domains)->toBe(['blog.localhost']);
+});
