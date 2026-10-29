@@ -1,0 +1,9 @@
+{
+    "name": "Velvet Paw Boutique",
+    "description": "Boutique para mascotas: marfil, verde bosque y latón, con Cormorant Garamond y Jost. Página de inicio por secciones, catálogo y servicios.",
+    "version": "1.0.0",
+    "author": "MewCMS",
+    "styles": [
+        "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap"
+    ]
+}

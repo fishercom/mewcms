@@ -212,7 +212,7 @@ it('serves the theme screenshots to the admin', function (): void {
 it('offers the themes and languages on the site form', function (): void {
     $this->actingAs($this->user)->get('http://a.test/admin/sites/create')->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('admin/sites/create')
-            ->has('themes', 2)
+            ->has('themes', count(Themes::all()))
             ->where('themes.0.layout', 'default')
             ->where('langs.0.iso', 'es')
             ->missing('schemaGroups'));

@@ -98,13 +98,16 @@ it('lists the themes with the sites that use them, and lets sites pick an upload
     $this->actingAs($this->user)->post('/admin/sites/themes', ['file' => ($this->zip)(['theme.json' => ($this->manifest)(), 'css/main.css' => 'a'])]);
     $site = CmsSite::create(['name' => 'Blog', 'domains' => ['blog.test'], 'theme' => 'aurora', 'active' => true]);
 
+    // Uploaded themes are listed after every built one
+    $uploaded = count(glob(resource_path('themes/*/theme.json')));
+
     expect($site->theme)->toBe('aurora');
     $this->actingAs($this->user)->get('/admin/sites/themes')->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('admin/sites/themes')
             ->where('themes.0.slug', 'default')
-            ->where('themes.2.slug', 'aurora')
-            ->where('themes.2.uploaded', true)
-            ->where('themes.2.sites', ['Blog']));
+            ->where("themes.{$uploaded}.slug", 'aurora')
+            ->where("themes.{$uploaded}.uploaded", true)
+            ->where("themes.{$uploaded}.sites", ['Blog']));
 });
 
 it('downloads an uploaded theme as a zip', function (): void {

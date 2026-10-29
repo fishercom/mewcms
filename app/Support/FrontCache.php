@@ -20,9 +20,9 @@ class FrontCache
     private const KEYS = ['shared', 'menus', 'layout', 'sitemap'];
 
     /**
-     * Navigation, popular tags and recent articles shared by the public templates.
+     * Navigation, popular tags, recent articles and recent posts shared by the public templates.
      *
-     * @return array{navigation: array<int, mixed>, popularTags: list<array{id: int, name: string, slug: string, count: int}>, recentArticles: array<int, mixed>}
+     * @return array{navigation: array<int, mixed>, popularTags: list<array{id: int, name: string, slug: string, count: int}>, recentArticles: array<int, mixed>, recentPosts: array<int, mixed>}
      */
     public static function shared(): array
     {
@@ -49,6 +49,14 @@ class FrontCache
                 ->latest()
                 ->take(5)
                 ->get(['id', 'lang_id', 'title', 'slug', 'uri', 'created_at'])
+                ->toArray(),
+            // Latest published blog posts, for home pages and "read next" lists
+            'recentPosts' => CmsPost::published()
+                ->where('post_type', 'post')
+                ->with('tags:id,name,slug')
+                ->latest('published_at')
+                ->take(7)
+                ->get(['id', 'title', 'slug', 'excerpt', 'featured_image', 'published_at'])
                 ->toArray(),
         ]);
     }

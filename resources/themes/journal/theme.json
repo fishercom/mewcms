@@ -1,0 +1,9 @@
+{
+    "name": "Velvet Paw Journal",
+    "description": "Revista de cuidado de mascotas: papel cálido, salvia y terracota, con Fraunces, Newsreader y Figtree. Portada con artículos recientes y lectura cómoda.",
+    "version": "1.0.0",
+    "author": "MewCMS",
+    "styles": [
+        "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Figtree:wght@400;500;600&display=swap"
+    ]
+}
