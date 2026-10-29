@@ -147,12 +147,24 @@ it('saves a site with its domains and theme', function (): void {
         'name' => 'Site C',
         'domains' => "https://C.test/\nwww.c.test",
         'theme' => 'editorial',
+        'lang_id' => $this->lang->id,
         'active' => 1,
     ])->assertRedirect('/admin/sites');
 
     $site = CmsSite::where('name', 'Site C')->first();
     expect($site->domains)->toBe(['c.test', 'www.c.test'])
-        ->and($site->theme)->toBe('editorial');
+        ->and($site->theme)->toBe('editorial')
+        ->and($site->lang_id)->toBe($this->lang->id);
+});
+
+it('requires a language for every site', function (): void {
+    $this->actingAs($this->user)->post('http://a.test/admin/sites', [
+        'name' => 'Site C',
+        'domains' => 'c.test',
+        'theme' => 'default',
+    ])->assertSessionHasErrors('lang_id');
+
+    expect(CmsSite::where('name', 'Site C')->exists())->toBeFalse();
 });
 
 it('saves a site\'s language, SEO data, favicon and scripts', function (): void {

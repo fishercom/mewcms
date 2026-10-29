@@ -22,8 +22,6 @@ interface Props {
     langs: CmsSiteLang[];
 }
 
-const NO_LANG = 'none';
-
 function Section({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
     return (
         <section className="border-border bg-card space-y-5 rounded-xl border p-5 shadow-xs">
@@ -88,16 +86,11 @@ export default function SiteFormFields({ data, setData, errors, processing, them
 
                 <div className="grid gap-2">
                     <Label htmlFor="lang_id">{t('Idioma principal')}</Label>
-                    <Select
-                        value={data.lang_id || NO_LANG}
-                        onValueChange={(value) => setData({ ...data, lang_id: value === NO_LANG ? '' : value })}
-                        disabled={processing}
-                    >
+                    <Select value={data.lang_id} onValueChange={(value) => setData({ ...data, lang_id: value })} disabled={processing}>
                         <SelectTrigger id="lang_id">
-                            <SelectValue />
+                            <SelectValue placeholder={t('Elige un idioma')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={NO_LANG}>{t('El idioma por defecto del CMS')}</SelectItem>
                             {langs.map((lang) => (
                                 <SelectItem key={lang.id} value={lang.id.toString()}>
                                     {lang.name} ({lang.iso})
@@ -105,7 +98,9 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                             ))}
                         </SelectContent>
                     </Select>
-                    <p className="text-muted-foreground text-xs">{t('Su página de inicio se busca primero en este idioma.')}</p>
+                    <p className="text-muted-foreground text-xs">
+                        {t('El idioma del contenido de este sitio. Para otro idioma, crea otro sitio con su propio dominio.')}
+                    </p>
                     <InputError message={errors.lang_id} />
                 </div>
 
