@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
+use App\Http\Controllers\Admin\Concerns\ContentLanguage;
 use App\Http\Controllers\Controller;
 use App\Models\CmsBlockPattern;
-use App\Models\CmsLang;
 use App\Models\CmsPost;
 use App\Models\CmsPostType;
 use App\Models\CmsSchema;
@@ -23,26 +23,15 @@ use Inertia\Response;
 class PostController extends Controller
 {
     use BulkContentActions;
-
-    protected $lang_id;
+    use ContentLanguage;
 
     protected $post_type;
 
     public function __construct(Request $request)
     {
-        $this->lang_id = $request->get('lang_id');
-        if (! $this->lang_id) {
-            $lang = CmsLang::where('active', true)
-                ->orderBy('name', 'desc')
-                ->first();
-            if ($lang) {
-                $this->lang_id = $lang->id;
-            }
-        }
-
         $this->post_type = $request->get('post_type', 'post');
 
-        Inertia::share('lang_id', $this->lang_id);
+        Inertia::share('lang_id', fn (): ?int => $this->langId());
         Inertia::share('post_type', $this->post_type);
     }
 
@@ -54,7 +43,7 @@ class PostController extends Controller
 
         $query = ($trash ? CmsPost::onlyTrashed() : CmsPost::query())
             ->with(['user', 'tags', 'schema'])
-            ->where('lang_id', $this->lang_id)
+            ->where('lang_id', $this->langId())
             ->where('post_type', $this->post_type);
 
         if (! empty($s)) {
@@ -81,7 +70,7 @@ class PostController extends Controller
             'cpt' => $cpt,
             'trash' => $trash,
             'trashCount' => CmsPost::onlyTrashed()
-                ->where('lang_id', $this->lang_id)
+                ->where('lang_id', $this->langId())
                 ->where('post_type', $this->post_type)
                 ->count(),
         ]);
@@ -106,7 +95,7 @@ class PostController extends Controller
 
         $args = [
             'id' => null,
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'user_id' => Auth::id(),
             'schema_id' => $schemaId,
             'post_type' => $this->post_type,
@@ -155,7 +144,7 @@ class PostController extends Controller
 
         $post = new CmsPost($request->except('tag_ids'));
         $post->post_type = $this->post_type;
-        $post->lang_id = $this->lang_id;
+        $post->lang_id = $this->langId();
 
         if (empty($post->published_at)) {
             $post->published_at = now();
@@ -171,7 +160,7 @@ class PostController extends Controller
         $post->recordSave($request->user()?->id);
 
         return redirect()->route('posts.index', [
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'post_type' => $this->post_type,
         ]);
     }
@@ -250,7 +239,7 @@ class PostController extends Controller
         $post->recordSave($request->user()?->id);
 
         return redirect()->route('posts.index', [
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'post_type' => $this->post_type,
         ]);
     }
@@ -274,7 +263,7 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()->route('posts.index', [
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'post_type' => $this->post_type,
         ]);
     }

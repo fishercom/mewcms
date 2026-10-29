@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
+use App\Http\Controllers\Admin\Concerns\ContentLanguage;
 use App\Http\Controllers\Controller;
 use App\Models\CmsBlockPattern;
 use App\Models\AdmAction;
 use App\Models\CmsArticle;
-use App\Models\CmsLang;
 use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Support\FrontCache;
@@ -25,29 +25,18 @@ use Inertia\Response;
 class ArticleController extends Controller
 {
     use BulkContentActions;
+    use ContentLanguage;
 
     /** Form fields saved through relations, not as page columns. */
     protected const RELATION_FIELDS = ['tag_ids', 'menu_ids', 'menus_managed'];
-
-    protected $lang_id;
 
     protected $parent_id;
 
     public function __construct(Request $request)
     {
-        $this->lang_id = $request->get('lang_id');
         $this->parent_id = $request->get('parent_id');
-        if (! $this->lang_id) {
-            $lang = CmsLang::select()
-                ->where('active', true)
-                ->orderBy('name', 'desc')
-                ->first();
-            if ($lang) {
-                $this->lang_id = $lang->id;
-            }
-        }
 
-        Inertia::share('lang_id', $this->lang_id);
+        Inertia::share('lang_id', fn (): ?int => $this->langId());
         Inertia::share('parent_id', $this->parent_id);
     }
 
@@ -56,7 +45,7 @@ class ArticleController extends Controller
      */
     public function index(Request $request): Response
     {
-        $lang_id = $this->lang_id;
+        $lang_id = $this->langId();
         $s = $request->get('s');
         $trash = $request->boolean('trash');
 
@@ -108,7 +97,7 @@ class ArticleController extends Controller
 
         $args = [
             'id' => null,
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'parent_id' => null,
             'schema_id' => $schemaId,
             'title' => '',
@@ -123,7 +112,7 @@ class ArticleController extends Controller
             'active' => true,
         ];
 
-        $parents = CmsArticle::where('lang_id', $this->lang_id)
+        $parents = CmsArticle::where('lang_id', $this->langId())
             ->where('active', 1)
             ->get()
             ->filter(fn ($article): bool => ! $article->schema?->isUnique())
@@ -177,7 +166,7 @@ class ArticleController extends Controller
         $profile->recordSave($request->user()?->id);
 
         $args = [
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'parent_id' => null,
         ];
 
@@ -192,7 +181,7 @@ class ArticleController extends Controller
         $item = CmsArticle::with(['schema', 'tags'])->findOrFail($id);
         $descendantIds = $item->getAllDescendantIds();
 
-        $parents = CmsArticle::where('lang_id', $this->lang_id)
+        $parents = CmsArticle::where('lang_id', $this->langId())
             ->where('id', '!=', $id)
             ->where('active', 1)
             ->get()
@@ -270,7 +259,7 @@ class ArticleController extends Controller
         $item->recordSave($request->user()?->id);
 
         $args = [
-            'lang_id' => $this->lang_id,
+            'lang_id' => $this->langId(),
             'parent_id' => null,
         ];
 
