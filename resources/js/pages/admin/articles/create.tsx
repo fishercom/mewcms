@@ -20,8 +20,10 @@ export default function Create() {
         menus = [],
         parents = [],
         tags,
+        lang_id,
     } = usePage<{
         schema?: CmsSchema;
+        lang_id?: number | null;
         schemas?: CmsSchema[];
         templates?: PageTemplate[];
         menus?: PageMenu[];
@@ -33,7 +35,7 @@ export default function Create() {
         id: null,
         parent_id: null,
         schema_id: schema?.id || null,
-        lang_id: 1, // Assuming default lang_id
+        lang_id: lang_id ?? null,
         title: '',
         content: '',
         blocks: [],
