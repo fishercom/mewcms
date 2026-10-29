@@ -156,7 +156,7 @@ class SiteController extends Controller
             'domains' => 'nullable|array|max:20',
             'domains.*' => ['string', 'max:255', 'regex:/^(https?:\/\/)?[a-z0-9.-]+(:\d+)?\/?$/i'],
             'theme' => ['required', 'string', Rule::in(array_keys(Themes::all()))],
-            'lang_id' => 'nullable|integer|exists:cms_langs,id',
+            'lang_id' => 'required|integer|exists:cms_langs,id',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',
             'favicon' => ['nullable', 'string', 'max:2048', new SafeUrl],
