@@ -1,0 +1,171 @@
+/*
+ * Velvet Paw Boutique: a light-only theme for a pet shop. Ivory paper, forest green and
+ * brass, Cormorant Garamond for titles and Jost for text (loaded in theme.json).
+ */
+@import 'tailwindcss' source(none);
+@import '../../../css/tokens.css';
+
+/* Light only: the shared components' dark: styles never apply on this theme */
+@custom-variant dark (&:where(.velvet-dark-never *));
+
+@plugin 'tailwindcss-animate';
+@plugin '@tailwindcss/typography';
+
+@source '../front';
+@source '../../../js/components';
+@source '../../../js/blocks';
+@source '../../../js/lib';
+
+@theme {
+    --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+    --font-body: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+
+    --color-ivory: #f8f4ec;
+    --color-paper: #fdfbf7;
+    --color-cream: #efe6d7;
+    --color-blush: #ead8c7;
+    --color-ink: #1d2622;
+    --color-stone: #6b6f67;
+    --color-forest: #2e4a3f;
+    --color-forest-deep: #1e3129;
+    --color-brass: #a9824d;
+    --color-brass-light: #c9a877;
+}
+
+html[data-site-theme='velvet'] {
+    background-color: #f8f4ec;
+    color-scheme: light;
+}
+
+.front-theme {
+    --theme-accent: #a9824d;
+    --background: #f8f4ec;
+    --foreground: #1d2622;
+    --card: #fdfbf7;
+    --card-foreground: #1d2622;
+    --primary: #2e4a3f;
+    --primary-foreground: #f8f4ec;
+    --muted: #efe6d7;
+    --muted-foreground: #6b6f67;
+    --accent: #efe6d7;
+    --accent-foreground: #1d2622;
+    --border: #e2d7c5;
+    --input: #e2d7c5;
+    --ring: rgb(169 130 77 / 0.4);
+
+    font-family: var(--font-body);
+    font-weight: 400;
+    background-color: var(--color-ivory);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* In the base layer, so font and tracking utilities on a heading still win */
+@layer base {
+    .front-theme :is(h1, h2, h3, h4) {
+        font-family: var(--font-display);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+    }
+}
+
+.front-theme ::selection {
+    background: #ead8c7;
+}
+
+/* Long text written in the editor */
+.front-theme .velvet-prose {
+    --tw-prose-body: #3b433f;
+    --tw-prose-headings: #1d2622;
+    --tw-prose-links: #2e4a3f;
+    --tw-prose-bold: #1d2622;
+    --tw-prose-bullets: #a9824d;
+    --tw-prose-counters: #a9824d;
+    --tw-prose-quotes: #2e4a3f;
+    --tw-prose-quote-borders: #a9824d;
+    --tw-prose-hr: #e2d7c5;
+    font-size: 1.0625rem;
+    line-height: 1.8;
+}
+
+.front-theme .velvet-prose :is(h2, h3) {
+    font-weight: 500;
+}
+
+.front-theme .velvet-prose h2 {
+    font-size: 2.1rem;
+    line-height: 1.15;
+}
+
+.front-theme .velvet-prose a {
+    text-decoration-color: #c9a877;
+    text-underline-offset: 3px;
+}
+
+/*
+ * The content blocks use the MewCMS accent colours; on this theme they take the brass
+ * and forest palette instead.
+ */
+.front-theme [data-block] :is(.text-\[\#f53003\]) {
+    color: var(--color-brass);
+}
+.front-theme [data-block] :is(.bg-\[\#f53003\]) {
+    background-color: var(--color-forest);
+}
+.front-theme [data-block] :is(.hover\:bg-\[\#d92a02\]:hover) {
+    background-color: var(--color-forest-deep);
+}
+.front-theme [data-block] :is(.bg-\[\#f53003\]\/5, .bg-\[\#f53003\]\/10) {
+    background-color: var(--color-cream);
+}
+.front-theme [data-block] :is(.border-\[\#f53003\]) {
+    border-color: var(--color-brass);
+}
+.front-theme [data-block] :is(.bg-\[\#1b1b18\]) {
+    background-color: var(--color-forest-deep);
+}
+.front-theme [data-block] :is(.text-\[\#706f6c\]) {
+    color: var(--color-stone);
+}
+.front-theme [data-block] :is(.text-\[\#1b1b18\]) {
+    color: var(--color-ink);
+}
+.front-theme [data-block] :is(.border-\[\#19140015\]) {
+    border-color: #e2d7c5;
+}
+.front-theme [data-block='features'] li > span:first-child {
+    border-radius: 9999px;
+    background-color: var(--color-cream);
+    color: var(--color-forest);
+}
+.front-theme [data-block] :is(h2) {
+    font-weight: 500;
+    font-size: clamp(1.9rem, 3vw, 2.5rem);
+    line-height: 1.1;
+}
+.front-theme [data-block] :is(h3) {
+    font-size: 1.45rem;
+}
+.front-theme [data-block='quote'] blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.6rem;
+    line-height: 1.35;
+}
+.front-theme [data-block] :is(a.rounded-lg) {
+    border-radius: 9999px;
+    letter-spacing: 0.04em;
+}
+
+/* Slow, soft reveal for images on hover */
+.velvet-zoom img {
+    transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.velvet-zoom:hover img {
+    transform: scale(1.045);
+}
+
+/* Arch-topped images, a nod to boutique shop windows */
+.velvet-arch {
+    border-radius: 999px 999px 1.25rem 1.25rem;
+}

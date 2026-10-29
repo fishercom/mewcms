@@ -262,7 +262,9 @@ class FrontController extends Controller
 
         return Inertia::render($template, [
             'article' => $article,
-            'media' => $this->mediaFor($article, $article->metadata),
+            // Templates may list the recent posts, so their featured images get srcsets too
+            'media' => $this->mediaFor($article, $article->metadata)
+                + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter()),
             ...$shared,
             'slider' => $slider,
         ]);
@@ -370,7 +372,9 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => null,
-            'media' => $this->mediaFor($post, $post->metadata ?? null),
+            // The page may list the recent posts ("keep reading"), so their images get srcsets too
+            'media' => $this->mediaFor($post, $post->metadata ?? null)
+                + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter()),
             ...$shared,
         ]);
     }

@@ -1,0 +1,185 @@
+/*
+ * Velvet Paw Journal: a light-only editorial theme for a pet care blog. Warm paper, sage
+ * and terracotta; Fraunces for titles, Newsreader for reading and Figtree for the
+ * interface (loaded in theme.json).
+ */
+@import 'tailwindcss' source(none);
+@import '../../../css/tokens.css';
+
+/* Light only: the shared components' dark: styles never apply on this theme */
+@custom-variant dark (&:where(.journal-dark-never *));
+
+@plugin 'tailwindcss-animate';
+@plugin '@tailwindcss/typography';
+
+@source '../front';
+@source '../../../js/components';
+@source '../../../js/blocks';
+@source '../../../js/lib';
+
+@theme {
+    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-read: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    --font-ui: 'Figtree', 'Helvetica Neue', Arial, sans-serif;
+
+    --color-paper: #faf6ef;
+    --color-sheet: #fffdf9;
+    --color-sand: #efe6d8;
+    --color-line: #e6dccb;
+    --color-ink: #24211d;
+    --color-graphite: #6c665d;
+    --color-sage: #5f7a63;
+    --color-sage-deep: #3f5743;
+    --color-sage-soft: #dfe7dc;
+    --color-terracotta: #b8603f;
+}
+
+html[data-site-theme='journal'] {
+    background-color: #faf6ef;
+    color-scheme: light;
+}
+
+.front-theme {
+    --theme-accent: #b8603f;
+    --background: #faf6ef;
+    --foreground: #24211d;
+    --card: #fffdf9;
+    --card-foreground: #24211d;
+    --primary: #3f5743;
+    --primary-foreground: #faf6ef;
+    --muted: #efe6d8;
+    --muted-foreground: #6c665d;
+    --accent: #efe6d8;
+    --accent-foreground: #24211d;
+    --border: #e6dccb;
+    --input: #e6dccb;
+    --ring: rgb(95 122 99 / 0.4);
+
+    font-family: var(--font-ui);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* In the base layer, so font and tracking utilities on a heading still win */
+@layer base {
+    .front-theme :is(h1, h2, h3, h4) {
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: -0.015em;
+        font-variation-settings: 'opsz' 96;
+    }
+}
+
+.front-theme ::selection {
+    background: #dfe7dc;
+}
+
+/* Reading column of the articles */
+.front-theme .journal-prose {
+    --tw-prose-body: #37332d;
+    --tw-prose-headings: #24211d;
+    --tw-prose-links: #3f5743;
+    --tw-prose-bold: #24211d;
+    --tw-prose-bullets: #b8603f;
+    --tw-prose-counters: #b8603f;
+    --tw-prose-quotes: #3f5743;
+    --tw-prose-quote-borders: #b8603f;
+    --tw-prose-hr: #e6dccb;
+    font-family: var(--font-read);
+    font-size: 1.25rem;
+    line-height: 1.75;
+}
+
+.front-theme .journal-prose :is(h2, h3) {
+    font-family: var(--font-display);
+    font-weight: 400;
+}
+
+.front-theme .journal-prose h2 {
+    font-size: 1.95rem;
+    line-height: 1.2;
+    margin-top: 2.2em;
+}
+
+.front-theme .journal-prose h3 {
+    font-size: 1.45rem;
+}
+
+.front-theme .journal-prose a {
+    text-decoration-color: #b8603f;
+    text-underline-offset: 3px;
+}
+
+.front-theme [data-block='rich_text']:first-child .journal-prose > p:first-child::first-letter {
+    float: left;
+    font-family: var(--font-display);
+    font-size: 4.4em;
+    line-height: 0.82;
+    padding: 0.06em 0.12em 0 0;
+    color: #3f5743;
+}
+
+/*
+ * The content blocks use the MewCMS accent colours; on this theme they take the sage
+ * and terracotta palette instead.
+ */
+.front-theme [data-block] :is(.text-\[\#f53003\]) {
+    color: var(--color-terracotta);
+}
+.front-theme [data-block] :is(.bg-\[\#f53003\]) {
+    background-color: var(--color-sage-deep);
+}
+.front-theme [data-block] :is(.hover\:bg-\[\#d92a02\]:hover) {
+    background-color: #2f4433;
+}
+.front-theme [data-block] :is(.bg-\[\#f53003\]\/5, .bg-\[\#f53003\]\/10) {
+    background-color: var(--color-sage-soft);
+}
+.front-theme [data-block] :is(.border-\[\#f53003\]) {
+    border-color: var(--color-terracotta);
+}
+.front-theme [data-block] :is(.bg-\[\#1b1b18\]) {
+    background-color: var(--color-ink);
+}
+.front-theme [data-block] :is(.text-\[\#706f6c\]) {
+    color: var(--color-graphite);
+}
+.front-theme [data-block] :is(.text-\[\#1b1b18\]) {
+    color: var(--color-ink);
+}
+.front-theme [data-block] :is(.border-\[\#19140015\]) {
+    border-color: var(--color-line);
+}
+.front-theme [data-block='features'] li > span:first-child {
+    border-radius: 9999px;
+    background-color: var(--color-sage-soft);
+    color: var(--color-sage-deep);
+}
+.front-theme [data-block] :is(h2) {
+    font-family: var(--font-display);
+    font-weight: 400;
+}
+.front-theme [data-block='quote'] blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.65rem;
+    line-height: 1.35;
+    color: var(--color-sage-deep);
+}
+.front-theme [data-block] :is(a.rounded-lg) {
+    border-radius: 9999px;
+}
+.front-theme [data-block='image'] figcaption {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: var(--color-graphite);
+}
+
+.journal-zoom img {
+    transition: transform 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.journal-zoom:hover img {
+    transform: scale(1.04);
+}
