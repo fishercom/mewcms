@@ -35,8 +35,8 @@ use RuntimeException;
 class DemoSites extends Command
 {
     protected $signature = 'cms:demo-sites
-        {--shop-url= : Public address of the shop (default: http://mewcms.localhost plus the port of APP_URL)}
-        {--blog-url= : Public address of the journal (default: http://blog.localhost plus the port of APP_URL)}
+        {--shop-url= : Public address of the shop (default: http://mewcms.localhost)}
+        {--blog-url= : Public address of the journal (default: http://blog.localhost)}
         {--force : Do not ask for confirmation}';
 
     protected $description = 'Delete all content and build the demo pet shop and pet care blog sites';
@@ -75,10 +75,8 @@ class DemoSites extends Command
             return self::FAILURE;
         }
 
-        $port = parse_url((string) config('app.url'), PHP_URL_PORT);
-        $suffix = $port ? ':'.$port : '';
-        $shopUrl = rtrim($this->option('shop-url') ?: 'http://mewcms.localhost'.$suffix, '/');
-        $blogUrl = rtrim($this->option('blog-url') ?: 'http://blog.localhost'.$suffix, '/');
+        $shopUrl = rtrim($this->option('shop-url') ?: 'http://mewcms.localhost', '/');
+        $blogUrl = rtrim($this->option('blog-url') ?: 'http://blog.localhost', '/');
         $this->replacements = ['{shop}' => $shopUrl, '{journal}' => $blogUrl];
 
         // Download first: if Unsplash can't be reached, nothing has been deleted yet
