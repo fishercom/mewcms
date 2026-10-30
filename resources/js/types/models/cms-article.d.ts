@@ -42,7 +42,7 @@ export interface CmsArticleForm {
     id: number | null;
     parent_id: number | null;
     schema_id: number | null;
-    lang_id: number;
+    lang_id: number | null;
     title: string;
     content?: string | null;
     blocks?: BlockData[] | null;

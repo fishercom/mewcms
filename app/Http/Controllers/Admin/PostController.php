@@ -43,7 +43,7 @@ class PostController extends Controller
 
         $query = ($trash ? CmsPost::onlyTrashed() : CmsPost::query())
             ->with(['user', 'tags', 'schema'])
-            ->where('lang_id', $this->langId())
+            ->tap(fn ($query) => $this->inContentLanguage($query))
             ->where('post_type', $this->post_type);
 
         if (! empty($s)) {
@@ -69,8 +69,7 @@ class PostController extends Controller
             'items' => $items,
             'cpt' => $cpt,
             'trash' => $trash,
-            'trashCount' => CmsPost::onlyTrashed()
-                ->where('lang_id', $this->langId())
+            'trashCount' => $this->inContentLanguage(CmsPost::onlyTrashed())
                 ->where('post_type', $this->post_type)
                 ->count(),
         ]);

@@ -45,13 +45,12 @@ class ArticleController extends Controller
      */
     public function index(Request $request): Response
     {
-        $lang_id = $this->langId();
         $s = $request->get('s');
         $trash = $request->boolean('trash');
 
         $query = ($trash ? CmsArticle::onlyTrashed() : CmsArticle::query())
             ->with(['schema', 'parent' => fn ($query) => $query->withTrashed()])
-            ->where('lang_id', $lang_id);
+            ->tap(fn ($query) => $this->inContentLanguage($query));
 
         if (! empty($s)) {
             $query->where('title', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
@@ -83,7 +82,7 @@ class ArticleController extends Controller
             'items' => $items->values(),
             'paging' => $paginated,
             'filters' => $request->only(['s', 'status', 'schema_id', 'trash']),
-            'trashCount' => CmsArticle::onlyTrashed()->where('lang_id', $lang_id)->count(),
+            'trashCount' => $this->inContentLanguage(CmsArticle::onlyTrashed())->count(),
         ]);
     }
 
@@ -112,7 +111,7 @@ class ArticleController extends Controller
             'active' => true,
         ];
 
-        $parents = CmsArticle::where('lang_id', $this->langId())
+        $parents = $this->inContentLanguage(CmsArticle::query())
             ->where('active', 1)
             ->get()
             ->filter(fn ($article): bool => ! $article->schema?->isUnique())
@@ -132,7 +131,8 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validatedData($request);
+        // A new page takes the language of the site it is created in
+        $data = ['lang_id' => $this->langId()] + $this->validatedData($request);
 
         $schemaId = $request->input('schema_id');
         $schema = $schemaId ? CmsSchema::find($schemaId) : null;
@@ -181,7 +181,7 @@ class ArticleController extends Controller
         $item = CmsArticle::with(['schema', 'tags'])->findOrFail($id);
         $descendantIds = $item->getAllDescendantIds();
 
-        $parents = CmsArticle::where('lang_id', $this->langId())
+        $parents = $this->inContentLanguage(CmsArticle::query())
             ->where('id', '!=', $id)
             ->where('active', 1)
             ->get()

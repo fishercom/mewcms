@@ -106,19 +106,38 @@ it('switches the site the admin works on', function (): void {
         ->assertInertia(fn (Assert $page) => $page->has('items', 1)->where('items.0.title', 'About B')->where('site.id', $this->siteB->id));
 });
 
-it('lists the pages in the language of the site being edited', function (): void {
+it('lists every page and post of the site, whatever language they were saved in', function (): void {
     $english = CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => 1]);
     $this->siteB->update(['lang_id' => $english->id]);
-    Sites::as($this->siteB, fn () => CmsArticle::create(['schema_id' => $this->schema->id, 'lang_id' => $english->id, 'title' => 'About B', 'slug' => 'about', 'active' => 1, 'metadata' => []]));
+    Sites::as($this->siteB, function () use ($english): void {
+        CmsArticle::create(['schema_id' => $this->schema->id, 'lang_id' => $english->id, 'title' => 'About B', 'slug' => 'about', 'active' => 1, 'metadata' => []]);
+        CmsPost::create(['title' => 'Hello B', 'slug' => 'hello', 'post_type' => 'post', 'lang_id' => $english->id, 'user_id' => $this->user->id]);
+    });
 
     $this->actingAs($this->user)->post("http://a.test/admin/sites/{$this->siteB->id}/switch")->assertRedirect();
 
     $this->actingAs($this->user)->get('http://a.test/admin/articles')
         ->assertInertia(fn (Assert $page) => $page->where('lang_id', $english->id)->has('items', 1)->where('items.0.title', 'About B'));
 
-    // A language picked in the admin still wins
-    $this->actingAs($this->user)->get("http://a.test/admin/articles?lang_id={$this->lang->id}")
-        ->assertInertia(fn (Assert $page) => $page->where('lang_id', $this->lang->id)->has('items', 0));
+    // Switching the site to Spanish keeps its English content on the list
+    $this->siteB->update(['lang_id' => $this->lang->id]);
+    Sites::flush();
+
+    $this->actingAs($this->user)->get('http://a.test/admin/articles')
+        ->assertInertia(fn (Assert $page) => $page->where('lang_id', $this->lang->id)->has('items', 1)->where('items.0.title', 'About B'));
+    $this->actingAs($this->user)->get("http://a.test/admin/posts?post_type=post&lang_id={$english->id}")
+        ->assertInertia(fn (Assert $page) => $page->has('items.data', 1)->where('items.data.0.title', 'Hello B'));
+});
+
+it('saves a new page in the language of the site', function (): void {
+    $english = CmsLang::create(['name' => 'English', 'iso' => 'en', 'active' => 1]);
+    $this->siteB->update(['lang_id' => $english->id]);
+    $this->actingAs($this->user)->post("http://a.test/admin/sites/{$this->siteB->id}/switch")->assertRedirect();
+
+    $this->actingAs($this->user)->post('http://a.test/admin/articles', ['title' => 'Contact', 'schema_id' => $this->schema->id, 'lang_id' => $this->lang->id, 'metadata' => []])
+        ->assertRedirect();
+
+    expect(Sites::as($this->siteB, fn () => CmsArticle::where('title', 'Contact')->value('lang_id')))->toBe($english->id);
 });
 
 it('keeps layout settings per site, over the shared ones', function (): void {
