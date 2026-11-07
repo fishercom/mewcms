@@ -1,4 +1,5 @@
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
+import { escapeHtml, useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
@@ -64,6 +65,7 @@ export default function JournalLayout({ children }: LayoutProps) {
     }>().props;
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
+    const { t, date } = useTexts();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pageProps = usePage().props as any;
@@ -77,7 +79,7 @@ export default function JournalLayout({ children }: LayoutProps) {
     const settings = layout_settings as Record<string, string>;
     const items = (menus.find((m) => m.slug === 'main')?.items ?? []).filter((i) => i.parent_id === null);
     const footerItems = menus.find((m) => m.slug === 'footer')?.items ?? [];
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const today = date(new Date(), { dateStyle: 'full' });
 
     const submitSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -121,11 +123,11 @@ export default function JournalLayout({ children }: LayoutProps) {
                         type="button"
                         onClick={() => setOpen(true)}
                         className="border-line text-ink hover:border-sage inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors md:invisible"
-                        aria-label="Open menu"
+                        aria-label={t('nav.open_menu')}
                     >
                         <Menu className="h-5 w-5" />
                     </button>
-                    <Link href="/" aria-label={`${brandName} — home`} className="text-center">
+                    <Link href="/" aria-label={t('nav.home_link', { name: brandName })} className="text-center">
                         {settings.layout_header_logo ? (
                             <img src={settings.layout_header_logo} alt={brandName} className="h-12 max-w-[260px] object-contain" />
                         ) : (
@@ -135,12 +137,12 @@ export default function JournalLayout({ children }: LayoutProps) {
                     <Link
                         href="/search"
                         className="border-line text-ink hover:border-sage inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors"
-                        aria-label="Search"
+                        aria-label={t('search.title')}
                     >
                         <Search className="h-[18px] w-[18px]" />
                     </Link>
                 </div>
-                <nav className="border-line hidden border-t md:block" aria-label="Main">
+                <nav className="border-line hidden border-t md:block" aria-label={t('nav.main')}>
                     <ul className="mx-auto flex max-w-7xl items-center justify-center gap-10 px-8">
                         {items.map((item) => (
                             <li key={item.id}>
@@ -176,7 +178,7 @@ export default function JournalLayout({ children }: LayoutProps) {
                             type="button"
                             onClick={() => setOpen(false)}
                             className="border-line text-ink inline-flex h-10 w-10 items-center justify-center rounded-full border"
-                            aria-label="Close menu"
+                            aria-label={t('nav.close_menu')}
                         >
                             <X className="h-5 w-5" />
                         </button>
@@ -187,12 +189,12 @@ export default function JournalLayout({ children }: LayoutProps) {
                             <input
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Search the journal"
+                                placeholder={t('search.heading')}
                                 className="placeholder:text-graphite/70 h-11 w-full bg-transparent text-sm outline-none"
                             />
                         </label>
                     </form>
-                    <nav className="mt-6 flex flex-col" aria-label="Mobile">
+                    <nav className="mt-6 flex flex-col" aria-label={t('nav.mobile')}>
                         {items.map((item) => (
                             <NavLink
                                 key={item.id}
@@ -239,7 +241,9 @@ export default function JournalLayout({ children }: LayoutProps) {
                     </div>
                     {footerItems.length > 0 && (
                         <div className="md:col-span-3">
-                            <h2 className="font-ui text-terracotta mb-5 text-[0.7rem] font-semibold tracking-[0.28em] uppercase">The journal</h2>
+                            <h2 className="font-ui text-terracotta mb-5 text-[0.7rem] font-semibold tracking-[0.28em] uppercase">
+                                {t('footer.explore')}
+                            </h2>
                             <ul className="space-y-3">
                                 {footerItems.map((item) => (
                                     <li key={item.id}>
@@ -252,15 +256,15 @@ export default function JournalLayout({ children }: LayoutProps) {
                     {settings.layout_cta_url && (
                         <div className="md:col-span-3">
                             <h2 className="font-ui text-terracotta mb-5 text-[0.7rem] font-semibold tracking-[0.28em] uppercase">
-                                From the makers of
+                                {t('footer.makers')}
                             </h2>
                             <a href={settings.layout_cta_url} className="group block">
                                 <span className="font-display text-ink group-hover:text-sage-deep text-2xl transition-colors">
-                                    {settings.layout_shop_name || 'The boutique'}
+                                    {settings.layout_shop_name || t('footer.shop_name')}
                                 </span>
                                 <span className="text-graphite mt-2 block text-sm leading-relaxed">{settings.layout_shop_text}</span>
                                 <span className="text-sage-deep mt-3 inline-flex items-center gap-1 text-sm font-semibold">
-                                    Visit the shop <ArrowUpRight className="h-4 w-4" />
+                                    {t('shop_band.button')} <ArrowUpRight className="h-4 w-4" />
                                 </span>
                             </a>
                         </div>
@@ -270,7 +274,10 @@ export default function JournalLayout({ children }: LayoutProps) {
                     {/* Sanitized on the server (ContentSanitizer::inline): only simple links and inline formatting */}
                     <p
                         className="text-graphite [&_a:hover]:text-sage-deep mx-auto max-w-7xl px-5 py-6 text-xs sm:px-8 [&_a]:underline [&_a]:underline-offset-2"
-                        dangerouslySetInnerHTML={{ __html: settings.layout_copyright || `© ${new Date().getFullYear()} ${brandName}.` }}
+                        dangerouslySetInnerHTML={{
+                            __html:
+                                settings.layout_copyright || escapeHtml(t('footer.copyright', { year: new Date().getFullYear(), name: brandName })),
+                        }}
                     />
                 </div>
             </footer>

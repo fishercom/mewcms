@@ -304,8 +304,8 @@ class DatabaseSeeder extends Seeder
             [
                 'menu_id' => $menuAdmin->id,
                 'name' => 'Traducciones',
-                'url' => '/admin/translates',
-                'route' => 'translates.index',
+                'url' => '/admin/translations',
+                'route' => 'translations.index',
                 'icon' => 'list-checks',
                 'position' => 6,
                 'visible' => true,

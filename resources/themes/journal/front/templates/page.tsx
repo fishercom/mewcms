@@ -3,6 +3,7 @@
  */
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -16,13 +17,14 @@ interface PageProps {
 
 export default function Page({ article, recentPosts = [] }: PageProps) {
     const m = (article.metadata || {}) as Record<string, string | undefined>;
+    const { t } = useTexts();
 
     return (
         <JournalLayout>
             <Head title={article.title} />
 
             <header className="mx-auto max-w-3xl px-5 pt-16 text-center sm:px-8 sm:pt-20">
-                <p className="text-terracotta text-[0.72rem] font-semibold tracking-[0.3em] uppercase">{m.eyebrow || 'The journal'}</p>
+                <p className="text-terracotta text-[0.72rem] font-semibold tracking-[0.3em] uppercase">{m.eyebrow || t('page.eyebrow')}</p>
                 <h1 className="text-ink mt-4 text-[2.8rem] leading-[1.05] sm:text-[3.8rem]">{m.subtitle || article.title}</h1>
                 {article.excerpt && (
                     <p className="font-read text-graphite mx-auto mt-6 max-w-2xl text-[1.3rem] leading-relaxed italic">{article.excerpt}</p>
@@ -65,7 +67,7 @@ export default function Page({ article, recentPosts = [] }: PageProps) {
                 {recentPosts.length > 0 && (
                     <aside className="lg:col-span-4">
                         <div className="border-ink/80 mb-8 border-b pb-3">
-                            <h2 className="font-ui text-ink text-[0.75rem] font-semibold tracking-[0.28em] uppercase">Latest articles</h2>
+                            <h2 className="font-ui text-ink text-[0.75rem] font-semibold tracking-[0.28em] uppercase">{t('blog.latest')}</h2>
                         </div>
                         {recentPosts.slice(0, 4).map((post) => (
                             <PostRow key={post.id} post={post} />

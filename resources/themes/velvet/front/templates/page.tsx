@@ -3,6 +3,7 @@
  */
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { type Price, useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowUpRight, Clock, Mail, MapPin, Phone } from 'lucide-react';
@@ -14,7 +15,8 @@ interface Product {
     name?: string;
     category?: string;
     text?: string;
-    price?: string;
+    /** A price field ({ amount, currency }), or text saved before price fields existed */
+    price?: Price | string;
     image?: string;
     badge?: string;
 }
@@ -23,7 +25,8 @@ interface Service {
     title?: string;
     text?: string;
     image?: string;
-    price?: string;
+    /** A price field ({ amount, currency }), or text saved before price fields existed */
+    price?: Price | string;
     duration?: string;
     includes?: string;
 }
@@ -53,16 +56,20 @@ export default function Page({ article, navigation }: PageProps) {
     const services = list<Service>(m.services);
     const hasBody = Boolean(article.blocks?.length || article.content);
     const settings = usePage<{ layout_settings?: Record<string, string> }>().props.layout_settings ?? {};
+    const { t, price } = useTexts();
+    // A product shows its price; a service its starting price ("from $65")
+    const fromPrice = (value: Service['price']) =>
+        typeof value === 'string' ? value : price(value) && t('shop.from_price', { price: price(value) });
     const contact = [
-        { icon: MapPin, label: 'Visit', text: settings.layout_address },
-        { icon: Clock, label: 'Opening hours', text: settings.layout_hours },
+        { icon: MapPin, label: t('contact.visit'), text: settings.layout_address },
+        { icon: Clock, label: t('contact.hours'), text: settings.layout_hours },
         {
             icon: Phone,
-            label: 'Call',
+            label: t('contact.call'),
             text: settings.layout_phone,
             href: settings.layout_phone ? `tel:${settings.layout_phone.replace(/[^+\d]/g, '')}` : '',
         },
-        { icon: Mail, label: 'Write', text: settings.layout_email, href: settings.layout_email ? `mailto:${settings.layout_email}` : '' },
+        { icon: Mail, label: t('contact.write'), text: settings.layout_email, href: settings.layout_email ? `mailto:${settings.layout_email}` : '' },
     ].filter((c) => c.text);
 
     return (
@@ -72,7 +79,7 @@ export default function Page({ article, navigation }: PageProps) {
             {/* Page header */}
             <section className="mx-auto grid max-w-7xl items-end gap-12 px-5 pt-16 pb-16 sm:px-8 sm:pt-24 lg:grid-cols-12">
                 <div className="space-y-7 lg:col-span-7">
-                    <Eyebrow>{m.eyebrow || 'Velvet Paw'}</Eyebrow>
+                    <Eyebrow>{m.eyebrow || t('page.eyebrow')}</Eyebrow>
                     <DisplayTitle as="h1" text={m.subtitle || article.title} className="text-ink text-[3.2rem] sm:text-[4.6rem]" />
                     {article.excerpt && <p className="text-stone max-w-xl text-xl leading-relaxed font-light">{article.excerpt}</p>}
                 </div>
@@ -130,7 +137,7 @@ export default function Page({ article, navigation }: PageProps) {
                                     )}
                                     <div className="mt-2 flex items-baseline justify-between gap-4">
                                         <h3 className="font-display text-ink text-[1.75rem] leading-tight">{product.name}</h3>
-                                        {product.price && <span className="text-forest shrink-0 font-medium">{product.price}</span>}
+                                        {price(product.price) && <span className="text-forest shrink-0 font-medium">{price(product.price)}</span>}
                                     </div>
                                     {product.text && <p className="text-stone mt-2 leading-relaxed">{product.text}</p>}
                                 </div>
@@ -172,9 +179,11 @@ export default function Page({ article, navigation }: PageProps) {
                                             ))}
                                     </ul>
                                 )}
-                                {(service.price || service.duration) && (
+                                {(fromPrice(service.price) || service.duration) && (
                                     <div className="flex flex-wrap items-center gap-6 border-t border-[#e2d7c5] pt-6">
-                                        {service.price && <span className="font-display text-forest text-3xl">{service.price}</span>}
+                                        {fromPrice(service.price) && (
+                                            <span className="font-display text-forest text-3xl">{fromPrice(service.price)}</span>
+                                        )}
                                         {service.duration && (
                                             <span className="text-stone inline-flex items-center gap-2 text-sm tracking-wide">
                                                 <Clock className="h-4 w-4" strokeWidth={1.6} />

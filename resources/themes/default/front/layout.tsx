@@ -1,5 +1,6 @@
 import { BrandLockup } from '@/components/app-logo';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
+import { escapeHtml, useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -28,6 +29,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pageProps = usePage().props as any;
+    const { t } = useTexts();
     const activeItem = pageProps.article || pageProps.post || null;
     const seo = activeItem?.metadata || {};
 
@@ -127,9 +129,17 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     {/* Logo */}
                     <div className="flex items-center gap-2">
-                        <Link href="/" className="text-[#1b1b18] hover:opacity-85 dark:text-[#EDEDEC]" aria-label={`${site?.title || name} — inicio`}>
+                        <Link
+                            href="/"
+                            className="text-[#1b1b18] hover:opacity-85 dark:text-[#EDEDEC]"
+                            aria-label={t('nav.home_link', { name: site?.title || name })}
+                        >
                             {layout_settings?.layout_header_logo ? (
-                                <img src={layout_settings.layout_header_logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
+                                <img
+                                    src={layout_settings.layout_header_logo}
+                                    alt={site?.title || name}
+                                    className="h-8 max-w-[200px] object-contain"
+                                />
                             ) : (
                                 <BrandLockup />
                             )}
@@ -145,7 +155,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                             href="/admin"
                             className="inline-flex h-9 items-center justify-center rounded-md border border-[#19140035] px-4 text-sm font-medium transition-colors hover:border-[#1915014a] dark:border-[#3E3E3A] dark:hover:border-[#62605b]"
                         >
-                            Admin Dashboard
+                            {t('nav.admin')}
                         </Link>
                     </div>
                 </div>
@@ -161,7 +171,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                 <div className="mx-auto max-w-7xl space-y-4 px-4 text-center text-xs text-[#706f6c] sm:px-6 lg:px-8 dark:text-[#A1A09A]">
                     <div className="mb-4 flex justify-center">
                         {layout_settings?.layout_footer_logo ? (
-                            <img src={layout_settings.layout_footer_logo} alt="Footer Logo" className="h-8 max-w-[200px] object-contain" />
+                            <img src={layout_settings.layout_footer_logo} alt={site?.title || name} className="h-8 max-w-[200px] object-contain" />
                         ) : (
                             <BrandLockup className="text-[#1b1b18] dark:text-[#EDEDEC]" />
                         )}
@@ -193,7 +203,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                                             href={link.url}
                                             target={external ? '_blank' : undefined}
                                             rel={external ? 'noopener noreferrer' : undefined}
-                                            aria-label={`${socialLinkName(link)} de ${name}`}
+                                            aria-label={t('footer.social_link', { network: socialLinkName(link), name })}
                                             title={socialLinkName(link)}
                                             className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-(--theme-accent)/10 hover:text-(--theme-accent) focus-visible:ring-2 focus-visible:ring-(--theme-accent)/40 focus-visible:outline-none"
                                         >
@@ -211,7 +221,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                         dangerouslySetInnerHTML={{
                             __html:
                                 layout_settings?.layout_copyright ||
-                                `© ${new Date().getFullYear()} MewCMS. Desarrollado por <a href="https://deepsoft.lat" target="_blank" rel="noopener noreferrer">DeepSoft</a>.`,
+                                `${escapeHtml(t('footer.copyright', { year: new Date().getFullYear(), name: 'MewCMS' }))} ${escapeHtml(t('footer.powered_by'))} <a href="https://deepsoft.lat" target="_blank" rel="noopener noreferrer">DeepSoft</a>.`,
                         }}
                     />
                 </div>

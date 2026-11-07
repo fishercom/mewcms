@@ -1,4 +1,5 @@
 import { MediaImage } from '@/components/media-image';
+import { useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ const GAPS: Record<string, string> = { none: 'gap-0', sm: 'gap-1.5', md: 'gap-3'
 const CROPS: Record<string, string> = { square: 'aspect-square object-cover', landscape: 'aspect-[4/3] object-cover', none: 'h-auto' };
 
 export default function GalleryRender({ data, editing }: BlockRenderProps) {
+    const { t } = useTexts();
     const images = (Array.isArray(data.images) ? data.images : []) as unknown as GalleryImage[];
     const [open, setOpen] = useState<number | null>(null);
     const columns = str(data.columns) || '3';
@@ -75,14 +77,14 @@ export default function GalleryRender({ data, editing }: BlockRenderProps) {
                 <div
                     role="dialog"
                     aria-modal="true"
-                    aria-label={current.caption || 'Imagen ampliada'}
+                    aria-label={current.caption || t('gallery.enlarged')}
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
                     onClick={() => setOpen(null)}
                 >
                     <button
                         type="button"
                         className="absolute top-4 right-4 rounded-full p-2 text-white/80 hover:bg-white/10 hover:text-white"
-                        aria-label="Cerrar"
+                        aria-label={t('gallery.close')}
                     >
                         <X className="h-6 w-6" />
                     </button>
@@ -91,7 +93,7 @@ export default function GalleryRender({ data, editing }: BlockRenderProps) {
                             <button
                                 type="button"
                                 className="absolute left-2 rounded-full p-2 text-white/80 hover:bg-white/10 hover:text-white sm:left-4"
-                                aria-label="Imagen anterior"
+                                aria-label={t('gallery.previous')}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     step(-1);
@@ -102,7 +104,7 @@ export default function GalleryRender({ data, editing }: BlockRenderProps) {
                             <button
                                 type="button"
                                 className="absolute right-2 rounded-full p-2 text-white/80 hover:bg-white/10 hover:text-white sm:right-4"
-                                aria-label="Imagen siguiente"
+                                aria-label={t('gallery.next')}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     step(1);

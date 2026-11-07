@@ -1,9 +1,9 @@
 import { MediaImage } from '@/components/media-image';
+import { useTexts } from '@/lib/theme-texts';
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { ArrowRight, BookOpen, Calendar, Search, User } from 'lucide-react';
 import { useState } from 'react';
 import FrontSidebar, { PopularTag } from '../components/sidebar';
@@ -19,11 +19,10 @@ interface Props {
 
 export default function Index({ posts, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
     const [search, setSearch] = useState('');
+    const { t, date } = useTexts();
 
-    const pageTitle = cpt ? cpt.name : 'Blog / Entradas';
-    const pageDesc = cpt
-        ? cpt.description || `Explora todos los artículos de ${cpt.name.toLowerCase()}.`
-        : 'Mantente al día con nuestras últimas publicaciones.';
+    const pageTitle = cpt ? cpt.name : t('blog.title');
+    const pageDesc = cpt ? cpt.description || t('blog.type_description', { type: cpt.name.toLowerCase() }) : t('blog.description');
 
     const filteredPosts = posts.data.filter(
         (post) =>
@@ -54,7 +53,7 @@ export default function Index({ posts, cpt, navigation, popularTags = [], recent
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder={`Buscar en ${pageTitle.toLowerCase()}...`}
+                            placeholder={t('blog.search_placeholder', { name: pageTitle.toLowerCase() })}
                             className="block w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-3 pl-10 text-sm text-zinc-800 placeholder-zinc-400 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
                         />
                     </div>
@@ -107,7 +106,7 @@ export default function Index({ posts, cpt, navigation, popularTags = [], recent
                                                 </h3>
 
                                                 <p className="line-clamp-3 text-xs leading-relaxed text-zinc-500 dark:text-[#A1A09A]">
-                                                    {post.excerpt || 'Sin extracto disponible.'}
+                                                    {post.excerpt || t('blog.no_excerpt')}
                                                 </p>
                                             </div>
 
@@ -116,18 +115,18 @@ export default function Index({ posts, cpt, navigation, popularTags = [], recent
                                                 <div className="flex items-center gap-3">
                                                     <div className="flex items-center gap-1">
                                                         <Calendar className="h-3 w-3" />
-                                                        <span>{format(new Date(post.published_at), 'dd/MM/yyyy')}</span>
+                                                        <span>{date(post.published_at)}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1">
                                                         <User className="h-3 w-3" />
-                                                        <span>{post.user?.name || 'Autor'}</span>
+                                                        <span>{post.user?.name || t('blog.default_author')}</span>
                                                     </div>
                                                 </div>
                                                 <Link
                                                     href={detailUrl}
                                                     className="inline-flex items-center gap-0.5 font-bold text-red-600 hover:underline dark:text-red-500"
                                                 >
-                                                    <span>Ver</span>
+                                                    <span>{t('blog.read')}</span>
                                                     <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                                                 </Link>
                                             </div>
@@ -139,7 +138,7 @@ export default function Index({ posts, cpt, navigation, popularTags = [], recent
                     ) : (
                         <div className="rounded-2xl border border-dashed border-zinc-200 py-16 text-center text-zinc-400 dark:border-zinc-800">
                             <BookOpen className="mx-auto mb-3 h-10 w-10 text-zinc-300" />
-                            <p className="text-sm font-medium">No se encontraron artículos.</p>
+                            <p className="text-sm font-medium">{t('blog.empty')}</p>
                         </div>
                     )}
 

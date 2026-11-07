@@ -5,6 +5,8 @@ export interface CmsSite {
     domains: string[] | null;
     theme: string;
     lang_id: number | null;
+    /** ISO 4217, the default currency of price fields */
+    currency: string | null;
     title: string | null;
     description: string | null;
     favicon: string | null;
@@ -28,6 +30,7 @@ export interface CmsSiteForm {
     theme: string;
     /** Empty for none */
     lang_id: string;
+    currency: string;
     title: string;
     description: string;
     favicon: string;

@@ -15,7 +15,10 @@ import { CalendarIcon, FileText, Plus, Trash2, UploadCloud } from 'lucide-react'
 import React from 'react';
 import { DayPicker } from 'react-day-picker';
 // react-day-picker base styles. If Tailwind purges them, consider importing via CSS entry.
+import { CURRENCIES } from '@/lib/currencies';
 import { t } from '@/lib/i18n';
+import { DEFAULT_CURRENCY, isPrice } from '@/lib/theme-texts';
+import { usePage } from '@inertiajs/react';
 import 'react-day-picker/style.css';
 // Using the core widget to avoid React peer dependency issues
 
@@ -387,6 +390,55 @@ function RepeaterField({ field, values, onChange, idPrefix = '' }: RepeaterField
     );
 }
 
+/**
+ * A price: an amount and an ISO 4217 currency, saved as { amount, currency }. The theme
+ * formats it for the site's language, so "from" or "/month" stay in the theme's texts.
+ * A price saved as plain text before ("from $48") shows its number to start from.
+ */
+function PriceFieldRenderer({ id, value, onChange }: { id: string; value: JsonValue; onChange: (value: JsonValue) => void }) {
+    const { site } = usePage<{ site: { currency?: string | null } | null }>().props;
+    const fallbackCurrency = site?.currency || DEFAULT_CURRENCY;
+    const price = isPrice(value) ? value : null;
+    const legacy = typeof value === 'string' && value !== '' ? value : null;
+    const amount = price?.amount ?? (legacy ? Number(legacy.replace(/[^0-9.]/g, '')) || null : null);
+    const currency = price?.currency || fallbackCurrency;
+    const update = (next: { amount?: number | null; currency?: string }) =>
+        onChange({ amount: next.amount !== undefined ? next.amount : amount, currency: next.currency ?? currency });
+
+    return (
+        <div className="space-y-1">
+            <div className="flex gap-2">
+                <Input
+                    id={id}
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    className="flex-1"
+                    value={amount ?? ''}
+                    onChange={(e) => update({ amount: e.target.value === '' ? null : Number(e.target.value) })}
+                />
+                <Select value={currency} onValueChange={(code) => update({ currency: code })}>
+                    <SelectTrigger className="w-28" aria-label={t('Moneda')}>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {Array.from(new Set([currency, ...CURRENCIES])).map((code) => (
+                            <SelectItem key={code} value={code}>
+                                {code}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            {legacy && (
+                <p className="text-muted-foreground text-xs">
+                    {t('Antes era texto: ":text". Revisa el monto: al cambiarlo se guarda como precio.', { text: legacy })}
+                </p>
+            )}
+        </div>
+    );
+}
+
 interface ContainerFieldProps {
     field: CustomField;
     values: Record<string, JsonValue>;
@@ -435,6 +487,8 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
                         onChange={(e) => onChange(field.key, e.target.value === '' ? null : Number(e.target.value))}
                     />
                 );
+            case 'price':
+                return <PriceFieldRenderer id={idPrefix + field.key} value={value} onChange={(price) => onChange(field.key, price)} />;
             case 'icon':
                 return (
                     <IconPicker

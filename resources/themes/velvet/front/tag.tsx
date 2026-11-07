@@ -1,3 +1,4 @@
+import { useTexts } from '@/lib/theme-texts';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowUpRight } from 'lucide-react';
 import { DisplayTitle, Eyebrow } from './components/brand';
@@ -13,11 +14,13 @@ interface TaggedItem {
 }
 
 export default function TagPage({ tag, items = [] }: { tag: { id: number; name: string; slug: string }; items: TaggedItem[] }) {
+    const { t } = useTexts();
+
     return (
         <VelvetLayout>
             <Head title={tag.name} />
             <section className="mx-auto max-w-3xl px-5 pt-16 pb-24 sm:px-8 sm:pt-24">
-                <Eyebrow>Tagged</Eyebrow>
+                <Eyebrow>{t('tag.eyebrow')}</Eyebrow>
                 <DisplayTitle as="h1" text={tag.name} className="text-ink mt-6 text-5xl sm:text-6xl" />
                 {items.length > 0 ? (
                     <ul className="mt-12 divide-y divide-[#e2d7c5] border-y border-[#e2d7c5]">
@@ -36,7 +39,7 @@ export default function TagPage({ tag, items = [] }: { tag: { id: number; name: 
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-stone mt-10 text-lg">Nothing here yet.</p>
+                    <p className="text-stone mt-10 text-lg">{t('tag.empty')}</p>
                 )}
             </section>
         </VelvetLayout>

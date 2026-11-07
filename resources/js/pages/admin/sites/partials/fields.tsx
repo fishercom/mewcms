@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { CURRENCIES } from '@/lib/currencies';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { CmsSiteForm, CmsSiteLang, CmsTheme } from '@/types/models/cms-site';
@@ -102,6 +103,26 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                         {t('El idioma del contenido de este sitio. Para otro idioma, crea otro sitio con su propio dominio.')}
                     </p>
                     <InputError message={errors.lang_id} />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="currency">{t('Moneda')}</Label>
+                    <Select value={data.currency || 'USD'} onValueChange={(value) => setData({ ...data, currency: value })} disabled={processing}>
+                        <SelectTrigger id="currency">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {CURRENCIES.map((code) => (
+                                <SelectItem key={code} value={code}>
+                                    {code}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <p className="text-muted-foreground text-xs">
+                        {t('La moneda por defecto de los campos de precio. El tema la muestra con el formato del idioma del sitio.')}
+                    </p>
+                    <InputError message={errors.currency} />
                 </div>
 
                 <div className="flex flex-wrap gap-6">

@@ -10,6 +10,7 @@ use App\Support\FrontCache;
 use App\Support\Sites;
 use App\Support\SocialLinks;
 use App\Support\Themes;
+use App\Support\ThemeTexts;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -35,9 +36,15 @@ class HandleInertiaRequests extends Middleware
     {
         // Public pages and the admin load different stylesheets (each theme has its own),
         // so moving between them, or to another theme, reloads the whole page
-        $isPublic = $request->route()?->getControllerClass() === FrontController::class;
+        return parent::version($request).'|'.($this->isPublic($request) ? 'theme:'.Themes::current() : 'admin');
+    }
 
-        return parent::version($request).'|'.($isPublic ? 'theme:'.Themes::current() : 'admin');
+    /**
+     * Whether the request is a public page, served by the site's theme.
+     */
+    protected function isPublic(Request $request): bool
+    {
+        return $request->route()?->getControllerClass() === FrontController::class;
     }
 
     /**
@@ -74,6 +81,8 @@ class HandleInertiaRequests extends Middleware
             // The built theme whose pages the site uses (an uploaded theme borrows one)
             'theme' => fn (): string => Themes::layout(),
             'site' => fn (): ?array => Sites::current()?->summary(),
+            // Fixed texts of the theme, in the site's language (see ThemeTexts); public pages only
+            'texts' => fn (): array => $this->isPublic($request) ? ThemeTexts::forCurrentSite() : [],
             // Sites the admin can switch between (see the site switcher)
             'sites' => fn (): array => $request->user()?->canAccessAdmin()
                 ? Sites::all()->map(fn ($site): array => $site->only(['id', 'name', 'active']))->values()->all()

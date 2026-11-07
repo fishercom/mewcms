@@ -25,7 +25,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\ThemeController;
-use App\Http\Controllers\Admin\TranslateController;
+use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,7 +54,10 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::resource('users', UserController::class);
     Route::resource('langs', LangController::class);
     Route::resource('logs', LogController::class)->only(['index']);
-    Route::resource('translates', TranslateController::class);
+    // Texts of the site's theme: listed and saved together, removed one by one
+    Route::get('translations', [TranslationController::class, 'index'])->name('translations.index');
+    Route::put('translations', [TranslationController::class, 'update'])->name('translations.update');
+    Route::delete('translations/{translation}', [TranslationController::class, 'destroy'])->name('translations.destroy');
     Route::resource('configs', ConfigController::class);
 
     Route::get('ai', [AiController::class, 'index'])->name('ai.index');

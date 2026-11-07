@@ -1,10 +1,10 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
 import { tagUrl } from '@/lib/tag-url';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { ArrowLeft, Calendar, Settings, Tag, User } from 'lucide-react';
 import FrontSidebar, { PopularTag } from '../components/sidebar';
 import FrontLayout from '../layout';
@@ -18,7 +18,8 @@ interface Props {
 }
 
 export default function Show({ post, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
-    const parentLabel = cpt ? cpt.name : 'Blog';
+    const { t, date } = useTexts();
+    const parentLabel = cpt ? cpt.name : t('blog.title');
     const parentUrl = cpt ? `/${cpt.slug}` : '/blog';
 
     const tags = post.tags ?? [];
@@ -39,7 +40,7 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-500 transition-colors hover:text-red-600 dark:text-[#A1A09A] dark:hover:text-red-500"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
-                    <span>Volver a {parentLabel}</span>
+                    <span>{t('blog.back_to', { name: parentLabel })}</span>
                 </Link>
             </div>
 
@@ -54,12 +55,12 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                         <div className="flex items-center gap-4 border-b border-zinc-100 pb-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-[#A1A09A]">
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-3.5 w-3.5" />
-                                <span>Publicado el:</span>
-                                <time dateTime={post.published_at}>{format(new Date(post.published_at), 'dd/MM/yyyy HH:mm')}</time>
+                                <span>{t('blog.published_on')}</span>
+                                <time dateTime={post.published_at}>{date(post.published_at, { dateStyle: 'medium', timeStyle: 'short' })}</time>
                             </div>
                             <div className="flex items-center gap-1">
                                 <User className="h-3.5 w-3.5" />
-                                <span>Por {post.user?.name || 'Autor'}</span>
+                                <span>{t('blog.by', { author: post.user?.name || t('blog.default_author') })}</span>
                             </div>
                         </div>
                     </div>
@@ -87,7 +88,7 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                                 textClassName="prose-red prose-sm sm:prose-base leading-relaxed text-zinc-800 dark:text-[#EDEDEC]"
                             />
                         ) : (
-                            <p className="py-6 text-center text-xs text-zinc-400 italic">Sin contenido disponible.</p>
+                            <p className="py-6 text-center text-xs text-zinc-400 italic">{t('blog.no_content')}</p>
                         )}
                     </div>
 
@@ -96,7 +97,7 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                         <div className="space-y-4 border-t border-zinc-100 pt-6 dark:border-zinc-800">
                             <h4 className="flex items-center gap-1.5 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
                                 <Settings className="h-3.5 w-3.5" />
-                                <span>Detalles Adicionales</span>
+                                <span>{t('blog.details')}</span>
                             </h4>
                             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 {metadataEntries.map(([key, val]) => (
@@ -119,7 +120,7 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                         <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
                             <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
                                 <Tag className="h-3.5 w-3.5 text-red-600 dark:text-red-500" />
-                                <span>Etiquetas</span>
+                                <span>{t('tag.list_title')}</span>
                             </h4>
                             <div className="flex flex-wrap gap-2">
                                 {tags.map((term) => (

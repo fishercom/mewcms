@@ -1,3 +1,4 @@
+import { useTexts } from '@/lib/theme-texts';
 import { CirclePlay } from 'lucide-react';
 import { type BlockRenderProps, str } from '../types';
 
@@ -9,10 +10,11 @@ const RATIOS: Record<string, string> = {
 };
 
 export default function VideoRender({ data, editing }: BlockRenderProps) {
+    const { t } = useTexts();
     // The server turns an allowed YouTube/Vimeo link into a privacy-friendly embed URL
     const embed = str(data.embed);
     const file = str(data.file);
-    const title = str(data.title) || 'Video';
+    const title = str(data.title) || t('video.title');
     const ratio = RATIOS[str(data.ratio)] ?? RATIOS['16:9'];
     if (!embed && !file && !str(data.url)) return null;
 

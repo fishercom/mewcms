@@ -1,6 +1,6 @@
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { ArrowRight, Calendar, Tag } from 'lucide-react';
 import FrontSidebar, { PopularTag } from './components/sidebar';
 import FrontLayout from './layout';
@@ -24,6 +24,8 @@ interface TagPageProps {
 }
 
 export default function TagPage({ tag, items = [], navigation, popularTags = [], recentArticles = [] }: TagPageProps) {
+    const { t, date } = useTexts();
+
     return (
         <FrontLayout navigation={navigation}>
             <Head title={`#${tag.name}`} />
@@ -33,7 +35,7 @@ export default function TagPage({ tag, items = [], navigation, popularTags = [],
                     <div className="rounded-2xl border border-[#19140010] bg-gradient-to-tr from-[#fff2f2] to-[#fffaf0] p-6 shadow-sm sm:p-8 dark:border-[#3E3E3A]/20 dark:from-[#1D0002] dark:to-[#1a0f00]">
                         <div className="mb-2 flex items-center gap-3 text-sm font-semibold text-(--theme-accent)">
                             <Tag className="h-5 w-5" />
-                            <span>Etiqueta</span>
+                            <span>{t('tag.eyebrow')}</span>
                         </div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-[#1b1b18] sm:text-4xl dark:text-[#EDEDEC]">#{tag.name}</h1>
                     </div>
@@ -53,7 +55,7 @@ export default function TagPage({ tag, items = [], navigation, popularTags = [],
                                             {item.date && (
                                                 <span className="flex items-center gap-1">
                                                     <Calendar className="h-3 w-3" />
-                                                    <time dateTime={item.date}>{format(new Date(item.date), 'dd/MM/yyyy')}</time>
+                                                    <time dateTime={item.date}>{date(item.date)}</time>
                                                 </span>
                                             )}
                                         </div>
@@ -72,7 +74,7 @@ export default function TagPage({ tag, items = [], navigation, popularTags = [],
                                             href={item.url}
                                             className="group inline-flex items-center gap-1 text-xs font-semibold text-(--theme-accent) transition-colors hover:text-[#c42400] dark:hover:text-[#ff6655]"
                                         >
-                                            <span>Leer más</span>
+                                            <span>{t('blog.read')}</span>
                                             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                                         </Link>
                                     </div>
@@ -81,7 +83,7 @@ export default function TagPage({ tag, items = [], navigation, popularTags = [],
                         </div>
                     ) : (
                         <div className="rounded-2xl border border-dashed border-[#19140015] py-16 text-center dark:border-[#3E3E3A]/40">
-                            <p className="text-sm text-[#706f6c] italic dark:text-[#A1A09A]">Todavía no hay contenido publicado con esta etiqueta.</p>
+                            <p className="text-sm text-[#706f6c] italic dark:text-[#A1A09A]">{t('tag.empty')}</p>
                         </div>
                     )}
                 </div>

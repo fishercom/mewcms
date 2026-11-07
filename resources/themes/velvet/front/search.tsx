@@ -1,3 +1,4 @@
+import { useTexts } from '@/lib/theme-texts';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowUpRight, Search } from 'lucide-react';
 import React, { useState } from 'react';
@@ -14,6 +15,7 @@ interface SearchResult {
 }
 
 export default function SearchPage({ results, query }: { results: SearchResult[]; query: string }) {
+    const { t, choice } = useTexts();
     const [text, setText] = useState(query);
 
     const submit = (e: React.FormEvent) => {
@@ -23,10 +25,10 @@ export default function SearchPage({ results, query }: { results: SearchResult[]
 
     return (
         <VelvetLayout>
-            <Head title={query ? `Search: ${query}` : 'Search'} />
+            <Head title={query ? t('search.title_query', { query }) : t('search.title')} />
             <section className="mx-auto max-w-3xl px-5 pt-16 pb-24 sm:px-8 sm:pt-24">
-                <Eyebrow>Search</Eyebrow>
-                <DisplayTitle as="h1" text="Find something *lovely*" className="text-ink mt-6 text-5xl sm:text-6xl" />
+                <Eyebrow>{t('search.title')}</Eyebrow>
+                <DisplayTitle as="h1" text={t('search.heading')} className="text-ink mt-6 text-5xl sm:text-6xl" />
                 <form
                     onSubmit={submit}
                     className="bg-paper focus-within:border-brass mt-10 flex items-center gap-3 rounded-full border border-[#e2d7c5] py-2 pr-2 pl-6 transition-colors"
@@ -35,22 +37,18 @@ export default function SearchPage({ results, query }: { results: SearchResult[]
                     <input
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder="Grooming, beds, cat toys…"
-                        aria-label="Search terms"
+                        placeholder={t('search.placeholder')}
+                        aria-label={t('search.terms')}
                         className="placeholder:text-stone/60 h-11 w-full bg-transparent outline-none"
                     />
                     <button
                         type="submit"
                         className="bg-forest text-ivory hover:bg-forest-deep shrink-0 rounded-full px-6 py-3 text-xs font-semibold tracking-[0.18em] uppercase transition-colors"
                     >
-                        Search
+                        {t('search.submit')}
                     </button>
                 </form>
-                {query && (
-                    <p className="text-stone mt-6">
-                        {results.length} {results.length === 1 ? 'result' : 'results'} for “{query}”
-                    </p>
-                )}
+                {query && <p className="text-stone mt-6">{choice('search.results', results.length, { query })}</p>}
                 {results.length > 0 && (
                     <ul className="mt-10 divide-y divide-[#e2d7c5] border-y border-[#e2d7c5]">
                         {results.map((result, index) => (

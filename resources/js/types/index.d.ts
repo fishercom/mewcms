@@ -19,7 +19,7 @@ export * from './models/cms-schema';
 export * from './models/cms-schema-group';
 export * from './models/cms-site';
 export * from './models/cms-tag';
-export * from './models/cms-translate';
+export * from './models/cms-translation';
 export * from './models/custom-field';
 export * from './models/nav-group';
 export * from './models/nav-item';

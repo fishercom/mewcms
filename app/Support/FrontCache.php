@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Caches data every public page needs, per site; content models flush it when they change.
+ * The theme texts (ThemeTexts) are cached here too, under "texts".
  */
 class FrontCache
 {
     public const TTL = 3600;
 
-    private const KEYS = ['shared', 'menus', 'layout', 'sitemap'];
+    private const KEYS = ['shared', 'menus', 'layout', 'sitemap', 'texts'];
 
     /**
      * Navigation, popular tags, recent articles and recent posts shared by the public templates.

@@ -4,6 +4,7 @@ import { MediaImage } from '@/components/media-image';
  */
 import Blocks from '@/components/blocks';
 import { tagUrl } from '@/lib/tag-url';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
 import FrontLayout from '../layout';
@@ -20,6 +21,7 @@ interface PageMetadata {
 
 export default function Page({ article, navigation }: PageProps) {
     const meta = (article.metadata || {}) as PageMetadata;
+    const { t } = useTexts();
 
     // Helpers to format URL
     const getUrl = (item: { url?: string; slug: string }) => item.url ?? '/' + item.slug;
@@ -158,7 +160,7 @@ export default function Page({ article, navigation }: PageProps) {
                 {/* Subpages / Child Articles List */}
                 {article.children?.length ? (
                     <div className="space-y-4 border-t border-[#19140015] pt-8 dark:border-[#3E3E3A]/40">
-                        <h2 className="text-lg font-bold">Páginas Hijas</h2>
+                        <h2 className="text-lg font-bold">{t('page.children')}</h2>
                         <ul className="grid gap-4 sm:grid-cols-2">
                             {article.children.map((child) => (
                                 <li key={child.id}>

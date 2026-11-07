@@ -1,4 +1,5 @@
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
+import { escapeHtml, useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
@@ -49,6 +50,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
         site?: { title?: string; description?: string | null } | null;
     }>().props;
     const [open, setOpen] = useState(false);
+    const { t } = useTexts();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pageProps = usePage().props as any;
@@ -100,15 +102,15 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                 )}
             >
                 <div className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-6 px-5 sm:px-8">
-                    <Link href="/" aria-label={`${brandName} — home`} className="shrink-0">
+                    <Link href="/" aria-label={t('nav.home_link', { name: brandName })} className="shrink-0">
                         {settings.layout_header_logo ? (
                             <img src={settings.layout_header_logo} alt={brandName} className="h-10 max-w-[220px] object-contain" />
                         ) : (
-                            <VelvetBrand name={brandName} tagline="Pet Boutique" light={overlay} />
+                            <VelvetBrand name={brandName} tagline={t('brand.tagline')} light={overlay} />
                         )}
                     </Link>
 
-                    <nav className="hidden items-center gap-9 lg:flex" aria-label="Main">
+                    <nav className="hidden items-center gap-9 lg:flex" aria-label={t('nav.main')}>
                         {parents.map((item) => {
                             const children = childrenOf(item.id);
                             if (children.length === 0) {
@@ -165,7 +167,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                                 'inline-flex h-11 w-11 items-center justify-center rounded-full border lg:hidden',
                                 overlay ? 'border-ivory/40 text-ivory' : 'text-ink border-[#e2d7c5]',
                             )}
-                            aria-label="Open menu"
+                            aria-label={t('nav.open_menu')}
                         >
                             <Menu className="h-5 w-5" />
                         </button>
@@ -195,12 +197,12 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                             type="button"
                             onClick={() => setOpen(false)}
                             className="text-ink inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e2d7c5]"
-                            aria-label="Close menu"
+                            aria-label={t('nav.close_menu')}
                         >
                             <X className="h-5 w-5" />
                         </button>
                     </div>
-                    <nav className="mt-10 flex flex-col" aria-label="Mobile">
+                    <nav className="mt-10 flex flex-col" aria-label={t('nav.mobile')}>
                         {items.map((item) => (
                             <NavLink
                                 key={item.id}
@@ -232,7 +234,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                         {settings.layout_footer_logo ? (
                             <img src={settings.layout_footer_logo} alt={brandName} className="h-10 max-w-[220px] object-contain" />
                         ) : (
-                            <VelvetBrand name={brandName} tagline="Pet Boutique" light />
+                            <VelvetBrand name={brandName} tagline={t('brand.tagline')} light />
                         )}
                         {site?.description && <p className="font-display text-ivory/85 max-w-sm text-2xl leading-snug italic">{site.description}</p>}
                         {social_links.length > 0 && (
@@ -260,7 +262,9 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
 
                     {footerItems.length > 0 && (
                         <div className="md:col-span-3">
-                            <h2 className="text-brass-light font-body mb-5 text-[0.7rem] font-medium tracking-[0.3em] uppercase">Explore</h2>
+                            <h2 className="text-brass-light font-body mb-5 text-[0.7rem] font-medium tracking-[0.3em] uppercase">
+                                {t('footer.explore')}
+                            </h2>
                             <ul className="space-y-3">
                                 {footerItems.map((item) => (
                                     <li key={item.id}>
@@ -274,7 +278,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                     {contact.length > 0 && (
                         <div className="md:col-span-4">
                             <h2 className="text-brass-light font-body mb-5 text-[0.7rem] font-medium tracking-[0.3em] uppercase">
-                                Visit the boutique
+                                {t('footer.contact')}
                             </h2>
                             <ul className="space-y-4">
                                 {contact.map(({ icon: Icon, text, href }) => (
@@ -298,7 +302,10 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                     {/* Sanitized on the server (ContentSanitizer::inline): only simple links and inline formatting */}
                     <p
                         className="text-ivory/50 [&_a:hover]:text-ivory mx-auto max-w-7xl px-5 py-6 text-xs tracking-wide sm:px-8 [&_a]:underline [&_a]:underline-offset-2"
-                        dangerouslySetInnerHTML={{ __html: settings.layout_copyright || `© ${new Date().getFullYear()} ${brandName}.` }}
+                        dangerouslySetInnerHTML={{
+                            __html:
+                                settings.layout_copyright || escapeHtml(t('footer.copyright', { year: new Date().getFullYear(), name: brandName })),
+                        }}
                     />
                 </div>
 
@@ -306,7 +313,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                     className="font-display text-ivory/[0.035] pointer-events-none absolute -right-6 -bottom-16 text-[16rem] leading-none italic select-none"
                     aria-hidden="true"
                 >
-                    Paw
+                    {t('brand.watermark')}
                 </span>
             </footer>
 
