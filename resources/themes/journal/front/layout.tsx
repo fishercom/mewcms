@@ -1,4 +1,6 @@
+import { LanguageSwitcher } from '@/components/front-language-switcher';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
+import { localePath } from '@/lib/locale-path';
 import { escapeHtml, useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -84,7 +86,7 @@ export default function JournalLayout({ children }: LayoutProps) {
     const submitSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (query.trim()) {
-            router.get('/search', { q: query.trim() });
+            router.get(localePath('/search'), { q: query.trim() });
         }
     };
 
@@ -127,20 +129,23 @@ export default function JournalLayout({ children }: LayoutProps) {
                     >
                         <Menu className="h-5 w-5" />
                     </button>
-                    <Link href="/" aria-label={t('nav.home_link', { name: brandName })} className="text-center">
+                    <Link href={localePath('/')} aria-label={t('nav.home_link', { name: brandName })} className="text-center">
                         {settings.layout_header_logo ? (
                             <img src={settings.layout_header_logo} alt={brandName} className="h-12 max-w-[260px] object-contain" />
                         ) : (
                             <JournalBrand name={brandName} tagline={settings.layout_tagline} />
                         )}
                     </Link>
-                    <Link
-                        href="/search"
-                        className="border-line text-ink hover:border-sage inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors"
-                        aria-label={t('search.title')}
-                    >
-                        <Search className="h-[18px] w-[18px]" />
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <LanguageSwitcher className="text-ink/75 hidden tracking-[0.18em] sm:flex" linkClassName="hover:text-terracotta" />
+                        <Link
+                            href={localePath('/search')}
+                            className="border-line text-ink hover:border-sage inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors"
+                            aria-label={t('search.title')}
+                        >
+                            <Search className="h-[18px] w-[18px]" />
+                        </Link>
+                    </div>
                 </div>
                 <nav className="border-line hidden border-t md:block" aria-label={t('nav.main')}>
                     <ul className="mx-auto flex max-w-7xl items-center justify-center gap-10 px-8">
@@ -204,6 +209,7 @@ export default function JournalLayout({ children }: LayoutProps) {
                             />
                         ))}
                     </nav>
+                    <LanguageSwitcher className="text-ink/75 mt-6 tracking-[0.18em]" linkClassName="hover:text-terracotta" />
                 </div>
             </div>
 

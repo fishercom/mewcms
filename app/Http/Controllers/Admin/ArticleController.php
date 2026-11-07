@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Admin\Concerns\ContentLanguage;
+use App\Http\Controllers\Admin\Concerns\TranslatesContent;
 use App\Http\Controllers\Controller;
-use App\Models\CmsBlockPattern;
 use App\Models\AdmAction;
 use App\Models\CmsArticle;
+use App\Models\CmsBlockPattern;
 use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Support\FrontCache;
+use App\Support\Locales;
 use App\Support\PageMenus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +28,7 @@ class ArticleController extends Controller
 {
     use BulkContentActions;
     use ContentLanguage;
+    use TranslatesContent;
 
     /** Form fields saved through relations, not as page columns. */
     protected const RELATION_FIELDS = ['tag_ids', 'menu_ids', 'menus_managed'];
@@ -139,7 +142,7 @@ class ArticleController extends Controller
         $parentId = $request->input('parent_id');
 
         if ($schema && $schema->isUnique()) {
-            if (CmsArticle::where('schema_id', $schema->id)->exists()) {
+            if ($this->inContentLanguage(CmsArticle::where('schema_id', $schema->id))->exists()) {
                 return back()->withErrors(['schema_id' => __('Esta plantilla es única y ya está asignada a otra página.')]);
             }
             if ($parentId !== null) {
@@ -181,6 +184,9 @@ class ArticleController extends Controller
         $item = CmsArticle::with(['schema', 'tags'])->findOrFail($id);
         $descendantIds = $item->getAllDescendantIds();
 
+        // The editor works in the page's language: its parent options and lists are that language's
+        $this->editIn($request, $item->lang_id);
+
         $parents = $this->inContentLanguage(CmsArticle::query())
             ->where('id', '!=', $id)
             ->where('active', 1)
@@ -205,7 +211,46 @@ class ArticleController extends Controller
             'menus' => PageMenus::options(),
             'menuIds' => PageMenus::membership($item),
             'autosave' => $item->pendingAutosave($request->user()->id),
+            'translations' => $this->translationOptions($item),
         ]);
+    }
+
+    /**
+     * Start the page's version in another language of the site: a draft copy with the
+     * same content, below the version of its parent page in that language. Opens the
+     * version instead when there is one already.
+     */
+    public function translate($id, int $lang, Request $request): RedirectResponse
+    {
+        $item = CmsArticle::with('tags')->findOrFail($id);
+        $target = $this->targetLanguage($lang);
+
+        $version = $item->translationIn($target->id);
+        if (! $version) {
+            $version = $item->replicate(['uri', 'position', 'published_at']);
+            $version->forceFill([
+                // The same address in the other language (replicating gives it a new slug)
+                'slug' => $item->slug,
+                'lang_id' => $target->id,
+                'translation_group' => $item->translationGroup(),
+                'status' => CmsArticle::STATUS_DRAFT,
+                // Below the parent's version in that language, else at the top
+                'parent_id' => $item->parent_id ? CmsArticle::find($item->parent_id)?->translationIn($target->id)?->id : null,
+            ]);
+            // A single-use template (the home page) is single-use per language
+            if ($version->schema?->isUnique() && Locales::scope(CmsArticle::where('schema_id', $version->schema_id), $target->id)->exists()) {
+                $version->schema_id = null;
+            }
+            $version->save();
+            $version->tags()->sync($item->tags->modelKeys());
+            FrontCache::flush();
+            $version->recordSave($request->user()?->id);
+        }
+
+        Locales::choose($request, $target->id);
+
+        return redirect()->route('articles.edit', $version->id)
+            ->with('success', __('Versión en :lang lista para traducir.', ['lang' => $target->name]));
     }
 
     /**
@@ -221,7 +266,7 @@ class ArticleController extends Controller
         $item = CmsArticle::findOrFail($id);
 
         if ($schema && $schema->isUnique()) {
-            if (CmsArticle::where('schema_id', $schema->id)->where('id', '!=', $id)->exists()) {
+            if (Locales::scope(CmsArticle::where('schema_id', $schema->id)->where('id', '!=', $id), Locales::forContent($item->lang_id)?->id)->exists()) {
                 return back()->withErrors(['schema_id' => __('Esta plantilla es única y ya está asignada a otra página.')]);
             }
             if ($parentId !== null) {
@@ -244,7 +289,8 @@ class ArticleController extends Controller
         }
 
         $oldTitle = $item->title;
-        $item->fill(Arr::except($data, self::RELATION_FIELDS));
+        // A page keeps its language: its version in another language is another page
+        $item->fill(Arr::except($data, [...self::RELATION_FIELDS, 'lang_id']));
         $item->save();
 
         $item->tags()->sync($data['tag_ids'] ?? []);
@@ -318,7 +364,7 @@ class ArticleController extends Controller
             }
 
             $taken = $items->filter(fn (CmsArticle $item): bool => $item->schema?->isUnique()
-                && CmsArticle::where('schema_id', $item->schema_id)->exists());
+                && Locales::scope(CmsArticle::where('schema_id', $item->schema_id), Locales::forContent($item->lang_id)?->id)->exists());
             if ($taken->isNotEmpty()) {
                 throw ValidationException::withMessages([
                     'ids' => __('La plantilla única ya está asignada a otra página: :titles.', ['titles' => $taken->pluck('title')->implode(', ')]),
@@ -365,6 +411,7 @@ class ArticleController extends Controller
         $templates = $templates->map(function (array $template) use ($schemas, $item): array {
             $usedBy = $template['unique']
                 ? CmsArticle::whereHas('schema', fn ($query) => $query->where('front_view', $template['value']))
+                    ->tap(fn ($query) => $this->inContentLanguage($query))
                     ->when($item, fn ($query) => $query->whereKeyNot($item->id))
                     ->first(['id', 'title'])
                 : null;

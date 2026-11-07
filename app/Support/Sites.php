@@ -67,7 +67,7 @@ class Sites
      */
     public static function all(): Collection
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn (): Collection => CmsSite::orderBy('id')->get());
+        return Cache::rememberForever(self::CACHE_KEY, fn (): Collection => CmsSite::with(['lang', 'langs'])->orderBy('id')->get());
     }
 
     public static function flush(): void

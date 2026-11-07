@@ -7,8 +7,10 @@ use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\HasBlocks;
 use App\Models\Concerns\HasPublishing;
 use App\Models\Concerns\HasRevisions;
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\LogsAdminActivity;
 use App\Support\ContentSanitizer;
+use App\Support\Locales;
 use App\Support\PageMenus;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +27,7 @@ class CmsArticle extends Model
     use HasBlocks;
     use HasPublishing;
     use HasRevisions;
+    use HasTranslations;
     use LogsAdminActivity;
 
     /**
@@ -89,7 +92,7 @@ class CmsArticle extends Model
             }
 
             // A live page wins over any redirect from its address
-            CmsRedirect::where('from_path', '/'.$model->uri)->delete();
+            CmsRedirect::where('from_path', Locales::url('/'.$model->uri, $model->lang_id))->delete();
         }));
     }
 
@@ -119,9 +122,11 @@ class CmsArticle extends Model
                 ->update(['uri' => DB::raw($expression)]);
         }
 
-        CmsRedirect::record('/'.$old, '/'.$new);
+        // Pages in an extra language keep their prefix: "/en/old" → "/en/new"
+        $url = fn (string $uri): string => Locales::url('/'.$uri, $this->lang_id);
+        CmsRedirect::record($url($old), $url($new));
         foreach ($below as $uri) {
-            CmsRedirect::record('/'.$uri, '/'.$new.substr($uri, strlen($old)));
+            CmsRedirect::record($url($uri), $url($new.substr($uri, strlen($old))));
         }
     }
 
@@ -160,6 +165,14 @@ class CmsArticle extends Model
      * Public URL of the page.
      */
     public function getUrlAttribute(): string
+    {
+        return Locales::url($this->path(), $this->lang_id);
+    }
+
+    /**
+     * Address of the page without its language prefix ("/about").
+     */
+    public function path(): string
     {
         return in_array($this->uri, [null, 'home', 'home-page'], true) ? '/' : '/'.$this->uri;
     }

@@ -5,8 +5,10 @@ use App\Http\Middleware\EnsureAdminPermission;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\HandleLocale;
+use App\Http\Middleware\ResolveLocale;
 use App\Http\Middleware\ResolveSite;
 use App\Models\CmsRedirect;
+use App\Support\Locales;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
+
+        // Before routing: "/en/about" is served by the same routes as "/about" (see ResolveLocale)
+        $middleware->prepend(ResolveLocale::class);
 
         $middleware->encryptCookies(except: ['appearance', 'locale']);
 
@@ -49,7 +54,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            $redirect = rescue(fn () => CmsRedirect::match('/'.$request->path()), null, false);
+            // The address as typed, with its language prefix ("/en/old-page")
+            $path = parse_url((string) $request->attributes->get(Locales::ORIGINAL_URI, $request->getRequestUri()), PHP_URL_PATH) ?: '/';
+            $redirect = rescue(fn () => CmsRedirect::match('/'.trim($path, '/')), null, false);
 
             return $redirect ? redirect($redirect->to_path, $redirect->status_code) : null;
         });

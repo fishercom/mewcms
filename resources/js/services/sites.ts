@@ -44,3 +44,7 @@ export const updateSite = (id: number, data: Record<string, unknown>, callbacks:
 export const switchSite = (id: number) => {
     router.post(route('sites.switch', id), {}, { preserveScroll: true });
 };
+
+export const switchLanguage = (id: number) => {
+    router.post(route('sites.language', id), {}, { preserveScroll: true });
+};

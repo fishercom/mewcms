@@ -1,4 +1,6 @@
+import { LanguageSwitcher } from '@/components/front-language-switcher';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
+import { localePath } from '@/lib/locale-path';
 import { escapeHtml, useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -102,7 +104,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                 )}
             >
                 <div className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-6 px-5 sm:px-8">
-                    <Link href="/" aria-label={t('nav.home_link', { name: brandName })} className="shrink-0">
+                    <Link href={localePath('/')} aria-label={t('nav.home_link', { name: brandName })} className="shrink-0">
                         {settings.layout_header_logo ? (
                             <img src={settings.layout_header_logo} alt={brandName} className="h-10 max-w-[220px] object-contain" />
                         ) : (
@@ -149,6 +151,7 @@ export default function VelvetLayout({ children, overlay = false }: LayoutProps)
                     </nav>
 
                     <div className="flex items-center gap-3">
+                        <LanguageSwitcher className={cn('tracking-[0.18em]', linkTone)} />
                         {settings.layout_cta_label && settings.layout_cta_url && (
                             <a
                                 href={settings.layout_cta_url}

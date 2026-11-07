@@ -11,7 +11,7 @@ use Closure;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Caches data every public page needs, per site; content models flush it when they change.
+ * Caches data every public page needs, per site and language; content models flush it when they change.
  * The theme texts (ThemeTexts) are cached here too, under "texts".
  */
 class FrontCache
@@ -30,6 +30,7 @@ class FrontCache
         return Cache::remember(self::key('shared'), self::ttl(...), fn (): array => [
             // Root navigation links (all published top-level pages)
             'navigation' => CmsArticle::published()
+                ->tap(fn ($query) => Locales::scope($query))
                 ->whereNull('parent_id')
                 ->orderBy('position')
                 ->get(['id', 'lang_id', 'title', 'slug', 'uri'])
@@ -46,6 +47,7 @@ class FrontCache
                 ->all(),
             // Recent published articles (except home page)
             'recentArticles' => CmsArticle::published()
+                ->tap(fn ($query) => Locales::scope($query))
                 ->where('slug', '!=', 'home-page')
                 ->latest()
                 ->take(5)
@@ -53,12 +55,14 @@ class FrontCache
                 ->toArray(),
             // Latest published blog posts, for home pages and "read next" lists
             'recentPosts' => CmsPost::published()
+                ->tap(fn ($query) => Locales::scope($query))
                 ->where('post_type', 'post')
                 ->with('tags:id,name,slug')
                 ->latest('published_at')
                 ->take(7)
-                ->get(['id', 'title', 'slug', 'excerpt', 'featured_image', 'published_at'])
-                ->toArray(),
+                ->get(['id', 'lang_id', 'post_type', 'title', 'slug', 'excerpt', 'featured_image', 'published_at'])
+                ->map(fn (CmsPost $post): array => [...$post->toArray(), 'url' => $post->url])
+                ->all(),
         ]);
     }
 
@@ -128,27 +132,40 @@ class FrontCache
     }
 
     /**
-     * Cache key of $name for the current site ("front.shared" when there are no sites).
+     * Cache key of $name for the current site and language ("front.shared" when there
+     * are no sites, "front.1.en.shared" for a site's extra language).
      */
     public static function key(string $name): string
     {
-        return self::siteKey($name, Sites::currentId());
+        return self::siteKey($name, Sites::currentId(), Locales::isExtra() ? Locales::currentId() : null);
     }
 
     /**
-     * Forget every site's cached data: settings without a site are shared by all sites.
+     * Forget every site's cached data, in every language: settings without a site are
+     * shared by all sites.
      */
     public static function flush(): void
     {
-        foreach ([null, ...Sites::all()->pluck('id')] as $siteId) {
+        $keys = [[null, null]];
+        foreach (Sites::all() as $site) {
+            foreach ([null, ...Locales::extra($site)->pluck('id')] as $langId) {
+                $keys[] = [$site->id, $langId];
+            }
+        }
+
+        foreach ($keys as [$siteId, $langId]) {
             foreach (self::KEYS as $name) {
-                Cache::forget(self::siteKey($name, $siteId));
+                Cache::forget(self::siteKey($name, $siteId, $langId));
             }
         }
     }
 
-    private static function siteKey(string $name, ?int $siteId): string
+    private static function siteKey(string $name, ?int $siteId, ?int $langId = null): string
     {
-        return $siteId === null ? 'front.'.$name : 'front.'.$siteId.'.'.$name;
+        if ($siteId === null) {
+            return 'front.'.$name;
+        }
+
+        return 'front.'.$siteId.'.'.($langId !== null ? 'lang'.$langId.'.' : '').$name;
     }
 }

@@ -1,4 +1,5 @@
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { Pagination } from '@/types';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
@@ -11,7 +12,7 @@ import VelvetLayout from '../layout';
 export default function Index({ posts, cpt }: { posts: Pagination<CmsPost>; cpt: CmsPostType | null }) {
     const { t } = useTexts();
     const settings = usePage<{ layout_settings?: Record<string, string> }>().props.layout_settings ?? {};
-    const base = cpt ? `/${cpt.slug}` : '/blog';
+    const base = localePath(cpt ? `/${cpt.slug}` : '/blog');
     const title = cpt?.name || t('blog.title');
 
     return (

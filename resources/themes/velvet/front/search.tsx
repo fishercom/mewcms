@@ -1,3 +1,4 @@
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowUpRight, Search } from 'lucide-react';
@@ -20,7 +21,7 @@ export default function SearchPage({ results, query }: { results: SearchResult[]
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get('/search', { q: text });
+        router.get(localePath('/search'), { q: text });
     };
 
     return (

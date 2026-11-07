@@ -1,4 +1,5 @@
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -61,7 +62,7 @@ export default function Index({ posts, cpt, navigation, popularTags = [], recent
                     {filteredPosts.length > 0 ? (
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {filteredPosts.map((post) => {
-                                const detailUrl = cpt ? `/${cpt.slug}/${post.slug}` : `/blog/${post.slug}`;
+                                const detailUrl = localePath(cpt ? `/${cpt.slug}/${post.slug}` : `/blog/${post.slug}`);
 
                                 return (
                                     <article

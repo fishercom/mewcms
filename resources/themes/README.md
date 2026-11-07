@@ -74,6 +74,21 @@ const { t, choice, price, date } = useTexts();
 Content an editor writes (titles, paragraphs, buttons of a section) stays in the page
 editor and its custom fields: theme texts are only the words the design itself needs.
 
+### Sites in several languages
+
+A site has a main language and may add others in **Admin → Sites**. The main language
+has no prefix (`/nosotros`); each extra language answers under its code (`/en/about`),
+with its own pages and posts (each page is translated from its editor, which links the
+versions). For a theme this means:
+
+- **Build addresses with `localePath()`** (`@/lib/locale-path`): `localePath('/blog')` is
+  `/en/blog` on an English page. Addresses that come from the server (`article.url`,
+  `post.url`, menu links, search results) already carry the prefix; `tagUrl()` adds it.
+- **Show `<LanguageSwitcher />`** (`@/components/front-language-switcher`) in the header:
+  it links to the page in the site's other languages and shows nothing on a single-language
+  site. The `alternates` prop holds the same links, and `site.locale` the page's language.
+- The `<html lang>`, the `hreflang` links and the sitemap are written by the CMS.
+
 ## Design and scripts
 
 A site's whole look comes from its theme: colours, fonts, images and its own scripts.

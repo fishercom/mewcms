@@ -1,6 +1,7 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CommandPalette } from '@/components/command-palette';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { SiteSwitcher, type SiteSummary } from '@/components/site-switcher';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -61,6 +62,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     </Button>
 
                     <SiteSwitcher />
+                    <LanguageSwitcher />
 
                     <Button
                         variant="outline"

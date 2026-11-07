@@ -1,5 +1,6 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -20,7 +21,7 @@ interface Props {
 export default function Show({ post, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
     const { t, date } = useTexts();
     const parentLabel = cpt ? cpt.name : t('blog.title');
-    const parentUrl = cpt ? `/${cpt.slug}` : '/blog';
+    const parentUrl = localePath(cpt ? `/${cpt.slug}` : '/blog');
 
     const tags = post.tags ?? [];
 

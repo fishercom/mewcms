@@ -38,7 +38,7 @@ class ThemeTexts
      */
     public static function coreSources(): array
     {
-        return [resource_path('js/blocks'), resource_path('js/components/front-form.tsx'), resource_path('js/components/front-slider.tsx')];
+        return [resource_path('js/blocks'), resource_path('js/components/front-form.tsx'), resource_path('js/components/front-slider.tsx'), resource_path('js/components/front-language-switcher.tsx')];
     }
 
     /**
@@ -84,11 +84,12 @@ class ThemeTexts
     }
 
     /**
-     * Language of the current site (else the CMS language), as a BCP 47 tag.
+     * Language of the current request (the site's language, or the extra language in the
+     * address or picked in the admin; else the CMS language), as a BCP 47 tag.
      */
     public static function locale(): string
     {
-        return self::normalizeLocale(Sites::current()?->lang?->iso ?: (string) config('app.locale'));
+        return self::normalizeLocale(Locales::current()?->iso ?: (string) config('app.locale'));
     }
 
     /**

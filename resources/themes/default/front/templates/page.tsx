@@ -3,6 +3,7 @@ import { MediaImage } from '@/components/media-image';
  * Template Name: Standard Page
  */
 import Blocks from '@/components/blocks';
+import { localePath } from '@/lib/locale-path';
 import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -24,7 +25,7 @@ export default function Page({ article, navigation }: PageProps) {
     const { t } = useTexts();
 
     // Helpers to format URL
-    const getUrl = (item: { url?: string; slug: string }) => item.url ?? '/' + item.slug;
+    const getUrl = (item: { url?: string; slug: string }) => item.url ?? localePath('/' + item.slug);
 
     const tags = article.tags ?? [];
 

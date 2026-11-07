@@ -7,12 +7,14 @@ use App\Http\Controllers\FrontController;
 use App\Models\AdmAction;
 use App\Models\AdmMenu;
 use App\Support\FrontCache;
+use App\Support\Locales;
 use App\Support\Sites;
 use App\Support\SocialLinks;
 use App\Support\Themes;
 use App\Support\ThemeTexts;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
@@ -36,7 +38,17 @@ class HandleInertiaRequests extends Middleware
     {
         // Public pages and the admin load different stylesheets (each theme has its own),
         // so moving between them, or to another theme, reloads the whole page
-        return parent::version($request).'|'.($this->isPublic($request) ? 'theme:'.Themes::current() : 'admin');
+        // Each language too: its pages have their own <html lang> and texts
+        return parent::version($request).'|'.($this->isPublic($request) ? 'theme:'.Themes::current().'|'.Locales::currentId() : 'admin');
+    }
+
+    /**
+     * The address the browser shows: as typed, with its language prefix (see ResolveLocale).
+     */
+    public function urlResolver()
+    {
+        return fn (Request $request): ?string => $request->attributes->get(Locales::ORIGINAL_URI)
+            ?? Str::start(Str::after($request->fullUrl(), $request->getSchemeAndHttpHost()), '/');
     }
 
     /**
@@ -80,7 +92,15 @@ class HandleInertiaRequests extends Middleware
             'adm_menu' => fn (): array => $this->adminMenu($request),
             // The built theme whose pages the site uses (an uploaded theme borrows one)
             'theme' => fn (): string => Themes::layout(),
-            'site' => fn (): ?array => Sites::current()?->summary(),
+            'site' => fn (): ?array => Sites::current() ? [
+                ...Sites::current()->summary(),
+                // The language of this page (an extra language in the address, or picked in the admin)
+                'locale' => Locales::current()?->iso,
+                'prefix' => Locales::prefix(),
+                'languages' => Locales::summary(),
+            ] : null,
+            // This page in the site's other languages (the language switcher and hreflang)
+            'alternates' => fn (): array => $this->isPublic($request) ? Locales::alternates() : [],
             // Fixed texts of the theme, in the site's language (see ThemeTexts); public pages only
             'texts' => fn (): array => $this->isPublic($request) ? ThemeTexts::forCurrentSite() : [],
             // Sites the admin can switch between (see the site switcher)

@@ -5,6 +5,8 @@ export interface CmsSite {
     domains: string[] | null;
     theme: string;
     lang_id: number | null;
+    /** Extra languages, besides the main one (edit form only) */
+    lang_ids?: number[];
     /** ISO 4217, the default currency of price fields */
     currency: string | null;
     title: string | null;
@@ -30,6 +32,8 @@ export interface CmsSiteForm {
     theme: string;
     /** Empty for none */
     lang_id: string;
+    /** Extra languages: their pages answer under their code (/en/...) */
+    lang_ids: number[];
     currency: string;
     title: string;
     description: string;
@@ -38,7 +42,7 @@ export interface CmsSiteForm {
     body_scripts: string;
     default: boolean;
     active: boolean;
-    [key: string]: string | number | boolean | null | undefined;
+    [key: string]: string | number | boolean | number[] | null | undefined;
 }
 
 export interface CmsTheme {

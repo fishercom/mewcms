@@ -1,3 +1,4 @@
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link, router } from '@inertiajs/react';
@@ -29,7 +30,7 @@ export default function SearchPage({ results, query, navigation, popularTags = [
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get('/search', { q: searchText });
+        router.get(localePath('/search'), { q: searchText });
     };
 
     return (

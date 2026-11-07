@@ -1,3 +1,4 @@
+import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -68,7 +69,7 @@ export default function TagPage({ tag, items = [], popularTags = [] }: TagPagePr
                                 .map((other) => (
                                     <li key={other.id}>
                                         <Link
-                                            href={`/tag/${other.slug}`}
+                                            href={tagUrl(other.slug)}
                                             className="border-line bg-sheet text-ink/80 hover:border-sage hover:text-sage-deep inline-flex rounded-full border px-4 py-1.5 text-sm transition-colors"
                                         >
                                             {other.name}

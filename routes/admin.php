@@ -34,6 +34,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function ():
     Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
     // Site switcher: every admin user picks the site they work on
     Route::post('sites/{site}/switch', [SiteController::class, 'switch'])->name('sites.switch');
+    // Language switcher: the language whose pages, posts and texts the admin edits
+    Route::post('sites/language/{lang}', [SiteController::class, 'language'])->whereNumber('lang')->name('sites.language');
     Route::get('themes/{theme}/screenshot', [SiteController::class, 'themeScreenshot'])->where('theme', '[a-z0-9_-]+')->name('themes.screenshot');
 });
 
@@ -90,6 +92,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     }
 
     Route::post('articles/bulk', [ArticleController::class, 'bulk'])->name('articles.bulk');
+    Route::post('articles/{article}/translate/{lang}', [ArticleController::class, 'translate'])->whereNumber(['article', 'lang'])->name('articles.translate');
     Route::resource('articles', ArticleController::class);
     Route::post('articles/sort', [ArticleController::class, 'sort'])->name('articles.sort');
     Route::post('tags/quick', [TagController::class, 'quickStore'])->name('tags.quick');
@@ -113,6 +116,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
 
     Route::resource('post-types', PostTypeController::class);
     Route::post('posts/bulk', [PostController::class, 'bulk'])->name('posts.bulk');
+    Route::post('posts/{post}/translate/{lang}', [PostController::class, 'translate'])->whereNumber(['post', 'lang'])->name('posts.translate');
     Route::resource('posts', PostController::class);
 
     Route::get('layout', [LayoutController::class, 'index'])->name('layout.index');

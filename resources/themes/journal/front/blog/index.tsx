@@ -1,3 +1,4 @@
+import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { Pagination } from '@/types';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
@@ -32,7 +33,7 @@ export default function Index({ posts, cpt, popularTags = [] }: Props) {
                         {popularTags.map((tag) => (
                             <li key={tag.id}>
                                 <Link
-                                    href={`/tag/${tag.slug}`}
+                                    href={tagUrl(tag.slug)}
                                     className="border-line bg-sheet text-ink/80 hover:border-sage hover:text-sage-deep inline-flex rounded-full border px-4 py-1.5 text-sm transition-colors"
                                 >
                                     {tag.name}

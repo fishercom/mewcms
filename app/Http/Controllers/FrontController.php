@@ -13,6 +13,7 @@ use App\Models\CmsSlider;
 use App\Models\CmsTag;
 use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
+use App\Support\Locales;
 use App\Support\MediaLibrary;
 use App\Support\Sites;
 use Carbon\Carbon;
@@ -53,9 +54,9 @@ class FrontController extends Controller
         $article = null;
 
         if (empty($slug)) {
-            // The site's language goes first when there is a home page per language
-            $siteLang = Sites::current()?->lang_id;
-            $inSiteLang = fn ($query) => $siteLang ? $query->orderByRaw('lang_id = ? desc', [$siteLang]) : $query;
+            // The current language's home page; with a single language, the site's language goes first
+            $siteLang = Locales::currentId();
+            $inSiteLang = fn ($query) => $siteLang ? Locales::scope($query)->orderByRaw('lang_id = ? desc', [$siteLang]) : $query;
 
             // Find the Home page article
             $article = CmsArticle::whereHas('schema', function ($query): void {
@@ -70,12 +71,12 @@ class FrontController extends Controller
 
             // Fallback to first published article if still not found
             if (! $article) {
-                $article = CmsArticle::published()->orderBy('position')->first();
+                $article = CmsArticle::published()->tap(fn ($query) => Locales::scope($query))->orderBy('position')->first();
             }
         } else {
             // Pages are found by their full path
             $uri = trim($slug, '/');
-            $article = CmsArticle::where('uri', $uri)->published()->first();
+            $article = CmsArticle::where('uri', $uri)->published()->tap(fn ($query) => Locales::scope($query))->first();
 
             // Every page above it must be published too (one query for all ancestors)
             $segments = explode('/', $uri);
@@ -88,7 +89,7 @@ class FrontController extends Controller
 
             // Old taxonomy archives ("/categorias/{term}", "/news/{term}"...) now live at "/tag/{term}"
             if (! $article && isset($parts) && count($parts) === 2 && CmsTag::where('slug', $parts[1])->where('active', true)->exists()) {
-                return redirect('/tag/'.$parts[1], 301);
+                return redirect(Locales::url('/tag/'.$parts[1]), 301);
             }
         }
 
@@ -267,6 +268,7 @@ class FrontController extends Controller
                 + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter()),
             ...$shared,
             'slider' => $slider,
+            'alternates' => Locales::alternates($article),
         ]);
     }
 
@@ -277,7 +279,7 @@ class FrontController extends Controller
     {
         $tag = CmsTag::where('slug', $slug)->where('active', true)->firstOrFail();
 
-        $pages = $tag->articles()->published()->latest('cms_articles.published_at')->get()
+        $pages = $tag->articles()->published()->tap(fn ($query) => Locales::scope($query))->latest('cms_articles.published_at')->get()
             ->map(fn (CmsArticle $article): array => [
                 'id' => 'page-'.$article->id,
                 'type' => 'Página',
@@ -288,12 +290,12 @@ class FrontController extends Controller
             ]);
 
         $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
-        $posts = $tag->posts()->published()->latest('cms_posts.published_at')->get()
+        $posts = $tag->posts()->published()->tap(fn ($query) => Locales::scope($query))->latest('cms_posts.published_at')->get()
             ->map(fn (CmsPost $post): array => [
                 'id' => 'post-'.$post->id,
                 'type' => $cpts->get($post->post_type)?->singular_name ?? 'Entrada',
                 'title' => $post->title,
-                'url' => ($cpts->has($post->post_type) ? '/'.$post->post_type : '/blog').'/'.$post->slug,
+                'url' => $post->url,
                 'excerpt' => $this->excerpt($post->excerpt ?: $post->content),
                 'date' => ($post->published_at ?? $post->created_at)?->toAtomString(),
             ]);
@@ -312,7 +314,7 @@ class FrontController extends Controller
     {
         abort_unless(CmsTag::where('slug', $slug)->where('active', true)->exists(), 404);
 
-        return redirect('/tag/'.$slug, 301);
+        return redirect(Locales::url('/tag/'.$slug), 301);
     }
 
     protected function excerpt(?string $html): string
@@ -347,6 +349,7 @@ class FrontController extends Controller
         $posts = CmsPost::with(['user', 'tags'])
             ->where('post_type', 'post')
             ->published()
+            ->tap(fn ($query) => Locales::scope($query))
             ->latest('published_at')
             ->paginate(6)
             ->withQueryString();
@@ -367,6 +370,7 @@ class FrontController extends Controller
             ->where('post_type', 'post')
             ->where('slug', $slug)
             ->published()
+            ->tap(fn ($query) => Locales::scope($query))
             ->firstOrFail();
 
         return Inertia::render('front/blog/show', [
@@ -376,6 +380,7 @@ class FrontController extends Controller
             'media' => $this->mediaFor($post, $post->metadata ?? null)
                 + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter()),
             ...$shared,
+            'alternates' => Locales::alternates($post),
         ]);
     }
 
@@ -387,6 +392,7 @@ class FrontController extends Controller
         $posts = CmsPost::with(['user', 'tags'])
             ->where('post_type', $cpt->slug)
             ->published()
+            ->tap(fn ($query) => Locales::scope($query))
             ->latest('published_at')
             ->paginate(6)
             ->withQueryString();
@@ -407,6 +413,7 @@ class FrontController extends Controller
             ->where('post_type', $cpt->slug)
             ->where('slug', $postSlug)
             ->published()
+            ->tap(fn ($query) => Locales::scope($query))
             ->firstOrFail();
 
         return Inertia::render('front/blog/show', [
@@ -414,6 +421,7 @@ class FrontController extends Controller
             'cpt' => $cpt,
             'media' => $this->mediaFor($post, $post->metadata ?? null),
             ...$shared,
+            'alternates' => Locales::alternates($post),
         ]);
     }
 
@@ -539,6 +547,7 @@ class FrontController extends Controller
         if (! empty($query)) {
             // 1. Search in Articles (Pages)
             $articles = CmsArticle::published()
+                ->tap(fn ($query) => Locales::scope($query))
                 ->where('slug', '!=', 'home-page')
                 ->where(function ($q) use ($cleanQuery): void {
                     $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
@@ -560,6 +569,7 @@ class FrontController extends Controller
             // 2. Search in Posts & CPTs
             $posts = CmsPost::with('user')
                 ->published()
+                ->tap(fn ($query) => Locales::scope($query))
                 ->where(function ($q) use ($cleanQuery): void {
                     $q->where('title', 'LIKE', '%'.$cleanQuery.'%')
                         ->orWhere('content', 'LIKE', '%'.$cleanQuery.'%');
@@ -571,7 +581,7 @@ class FrontController extends Controller
             foreach ($posts as $post) {
                 $cpt = $cpts->get($post->post_type);
                 $typeLabel = $cpt ? $cpt->singular_name : 'Entrada';
-                $url = $cpt ? '/'.$cpt->slug.'/'.$post->slug : '/blog/'.$post->slug;
+                $url = $post->url;
 
                 $results[] = [
                     'id' => $post->id,
@@ -591,87 +601,29 @@ class FrontController extends Controller
         ]);
     }
 
+    /**
+     * Every public address of the site, in each of its languages. The versions of a page
+     * or post in other languages are listed with it as alternates (hreflang).
+     */
     public function sitemap(): \Illuminate\Http\Response
     {
         $xml = FrontCache::sitemap(function (): string {
-            $urls = [];
             $baseUrl = url('/');
-
-            // 1. Add Homepage
-            $urls[] = [
-                'loc' => $baseUrl,
-                'lastmod' => now()->toAtomString(),
-                'changefreq' => 'daily',
-                'priority' => '1.0',
-            ];
-
-            // 2. Add Pages (Articles)
-            $articles = CmsArticle::published()->where('slug', '!=', 'home-page')->get();
-            foreach ($articles as $art) {
-                // The home page is already listed as the site root
-                if ($art->url === '/') {
-                    continue;
-                }
-                $urls[] = [
-                    'loc' => $baseUrl.$art->url,
-                    'lastmod' => $art->updated_at ? $art->updated_at->toAtomString() : now()->toAtomString(),
-                    'changefreq' => 'weekly',
-                    'priority' => '0.8',
-                ];
+            $urls = [];
+            foreach (Locales::of()->whenEmpty(fn ($langs) => $langs->push(null)) as $lang) {
+                $urls = [...$urls, ...Locales::as($lang, fn (): array => $this->sitemapUrls($baseUrl))];
             }
-
-            // 3. Add Blog Index
-            $urls[] = [
-                'loc' => $baseUrl.'/blog',
-                'lastmod' => now()->toAtomString(),
-                'changefreq' => 'daily',
-                'priority' => '0.9',
-            ];
-
-            // 4. Add Posts & dynamic CPTs
-            $posts = CmsPost::published()->get();
-            $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
-
-            foreach ($posts as $post) {
-                $cpt = $cpts->get($post->post_type);
-                $path = $cpt ? '/'.$cpt->slug.'/'.$post->slug : '/blog/'.$post->slug;
-
-                $urls[] = [
-                    'loc' => $baseUrl.$path,
-                    'lastmod' => $post->updated_at ? $post->updated_at->toAtomString() : now()->toAtomString(),
-                    'changefreq' => 'weekly',
-                    'priority' => '0.7',
-                ];
-            }
-
-            // 5. Add dynamic CPT archive pages
-            foreach ($cpts as $cpt) {
-                $urls[] = [
-                    'loc' => $baseUrl.'/'.$cpt->slug,
-                    'lastmod' => now()->toAtomString(),
-                    'changefreq' => 'daily',
-                    'priority' => '0.8',
-                ];
-            }
-
-            // 6. Add tag archives that list published content
-            $tags = CmsTag::where('active', true)->withPublishedCounts()->get()
-                ->filter(fn (CmsTag $tag): bool => $tag->articles_count + $tag->posts_count > 0);
-            foreach ($tags as $tag) {
-                $urls[] = [
-                    'loc' => $baseUrl.'/tag/'.$tag->slug,
-                    'lastmod' => $tag->updated_at ? $tag->updated_at->toAtomString() : now()->toAtomString(),
-                    'changefreq' => 'weekly',
-                    'priority' => '0.5',
-                ];
-            }
+            $multilingual = Locales::multiple();
 
             // Render XML sitemap
             $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'.($multilingual ? ' xmlns:xhtml="http://www.w3.org/1999/xhtml"' : '').'>';
             foreach ($urls as $url) {
                 $xml .= '<url>';
                 $xml .= '<loc>'.htmlspecialchars($url['loc']).'</loc>';
+                foreach ($url['alternates'] ?? [] as $alternate) {
+                    $xml .= '<xhtml:link rel="alternate" hreflang="'.htmlspecialchars($alternate['iso']).'" href="'.htmlspecialchars($baseUrl.$alternate['url']).'"/>';
+                }
                 $xml .= '<lastmod>'.$url['lastmod'].'</lastmod>';
                 $xml .= '<changefreq>'.$url['changefreq'].'</changefreq>';
                 $xml .= '<priority>'.$url['priority'].'</priority>';
@@ -685,6 +637,91 @@ class FrontController extends Controller
         return response($xml, 200, [
             'Content-Type' => 'application/xml',
         ]);
+    }
+
+    /**
+     * Sitemap entries of the current language.
+     *
+     * @return list<array<string, mixed>>
+     */
+    protected function sitemapUrls(string $baseUrl): array
+    {
+        $urls = [];
+        $listed = fn (array $alternates): array => array_values(array_filter($alternates, fn (array $alternate): bool => ! $alternate['missing']));
+        $everywhere = fn (string $path): array => $listed(Locales::alternates(null, $path));
+
+        // 1. Add Homepage
+        $urls[] = [
+            'loc' => $baseUrl.Locales::url('/'),
+            'alternates' => $everywhere('/'),
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ];
+
+        // 2. Add Pages (Articles)
+        $articles = CmsArticle::published()->tap(fn ($query) => Locales::scope($query))->where('slug', '!=', 'home-page')->get();
+        foreach ($articles as $art) {
+            // The home page is already listed as the site root
+            if ($art->path() === '/') {
+                continue;
+            }
+            $urls[] = [
+                'loc' => $baseUrl.$art->url,
+                'alternates' => $listed(Locales::alternates($art)),
+                'lastmod' => $art->updated_at ? $art->updated_at->toAtomString() : now()->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ];
+        }
+
+        // 3. Add Blog Index
+        $urls[] = [
+            'loc' => $baseUrl.Locales::url('/blog'),
+            'alternates' => $everywhere('/blog'),
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '0.9',
+        ];
+
+        // 4. Add Posts & dynamic CPTs
+        $posts = CmsPost::published()->tap(fn ($query) => Locales::scope($query))->get();
+        $cpts = CmsPostType::where('active', 1)->get()->keyBy('slug');
+
+        foreach ($posts as $post) {
+            $urls[] = [
+                'loc' => $baseUrl.$post->url,
+                'alternates' => $listed(Locales::alternates($post)),
+                'lastmod' => $post->updated_at ? $post->updated_at->toAtomString() : now()->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.7',
+            ];
+        }
+
+        // 5. Add dynamic CPT archive pages
+        foreach ($cpts as $cpt) {
+            $urls[] = [
+                'loc' => $baseUrl.Locales::url('/'.$cpt->slug),
+                'alternates' => $everywhere('/'.$cpt->slug),
+                'lastmod' => now()->toAtomString(),
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ];
+        }
+
+        // 6. Add tag archives that list published content in this language
+        $tags = CmsTag::where('active', true)->withPublishedCounts()->get()
+            ->filter(fn (CmsTag $tag): bool => $tag->articles_count + $tag->posts_count > 0);
+        foreach ($tags as $tag) {
+            $urls[] = [
+                'loc' => $baseUrl.$tag->url,
+                'lastmod' => $tag->updated_at ? $tag->updated_at->toAtomString() : now()->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.5',
+            ];
+        }
+
+        return $urls;
     }
 
     public function robots(): \Illuminate\Http\Response

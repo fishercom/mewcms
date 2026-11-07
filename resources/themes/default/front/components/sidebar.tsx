@@ -1,3 +1,4 @@
+import { localePath } from '@/lib/locale-path';
 import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
@@ -20,7 +21,8 @@ interface SidebarProps {
 export default function FrontSidebar({ popularTags = [], recentArticles = [] }: SidebarProps) {
     const { t, date } = useTexts();
     // Helper to format URLs
-    const getArticleUrl = (item: { url?: string; slug: string }) => item.url ?? (!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
+    const getArticleUrl = (item: { url?: string; slug: string }) =>
+        item.url ?? localePath(!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
 
     return (
         <aside className="space-y-8 lg:sticky lg:top-24">

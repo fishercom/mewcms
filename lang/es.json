@@ -1065,7 +1065,6 @@
     "Sitio": "Sitio",
     "La dirección principal, usada en los enlaces a este sitio.": "La dirección principal, usada en los enlaces a este sitio.",
     "Idioma principal": "Idioma principal",
-    "El idioma del contenido de este sitio. Para otro idioma, crea otro sitio con su propio dominio.": "El idioma del contenido de este sitio. Para otro idioma, crea otro sitio con su propio dominio.",
     "Elige un idioma": "Elige un idioma",
     "Sitio por defecto": "Sitio por defecto",
     "Cómo se ve el sitio público. Cada sitio puede usar un tema distinto.": "Cómo se ve el sitio público. Cada sitio puede usar un tema distinto.",
@@ -1141,5 +1140,16 @@
     "¿Volver al texto del tema para \":key\"?": "¿Volver al texto del tema para \":key\"?",
     "Textos guardados.": "Textos guardados.",
     "Se restauró el texto del tema.": "Se restauró el texto del tema.",
-    ":count texto|:count textos": ":count texto|:count textos"
+    ":count texto|:count textos": ":count texto|:count textos",
+    "Ahora editas en :name.": "Ahora editas en :name.",
+    "Crea una copia en borrador del contenido guardado, para traducirla.": "Crea una copia en borrador del contenido guardado, para traducirla.",
+    "Crear versión en :lang": "Crear versión en :lang",
+    "Editando la versión en :lang": "Editando la versión en :lang",
+    "Editar en": "Editar en",
+    "El mismo sitio en otros idiomas: sus páginas llevan el código del idioma delante, como /en/about. Cada página se traduce desde su editor.": "El mismo sitio en otros idiomas: sus páginas llevan el código del idioma delante, como /en/about. Cada página se traduce desde su editor.",
+    "Idioma que editas": "Idioma que editas",
+    "Otros idiomas": "Otros idiomas",
+    "Sus páginas no llevan prefijo en la dirección: /nosotros.": "Sus páginas no llevan prefijo en la dirección: /nosotros.",
+    "Versión en :lang lista para traducir.": "Versión en :lang lista para traducir.",
+    "principal": "principal"
 }
