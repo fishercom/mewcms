@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Blocks\BlockRegistry;
 use App\Http\Controllers\Admin\Concerns\BulkContentActions;
 use App\Http\Controllers\Admin\Concerns\ContentLanguage;
+use App\Http\Controllers\Admin\Concerns\TranslatesContent;
 use App\Http\Controllers\Controller;
 use App\Models\CmsBlockPattern;
 use App\Models\CmsPost;
@@ -13,6 +14,7 @@ use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Models\User;
 use App\Support\FrontCache;
+use App\Support\Locales;
 use App\Support\Sites;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +26,7 @@ class PostController extends Controller
 {
     use BulkContentActions;
     use ContentLanguage;
+    use TranslatesContent;
 
     protected $post_type;
 
@@ -127,7 +130,7 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_posts', 'slug')],
+            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_posts', 'slug')->where('lang_id', $this->langId())],
             'status' => 'required|string|in:draft,published',
             'published_at' => 'nullable|date',
             'schema_id' => 'nullable|integer|exists:cms_schemas,id',
@@ -168,6 +171,9 @@ class PostController extends Controller
     {
         $item = CmsPost::with(['tags'])->findOrFail($id);
 
+        // The editor works in the post's language
+        $this->editIn($request, $item->lang_id);
+
         $schemas = CmsSchema::where('active', 1)->get(['id', 'name']);
         $authors = User::where('active', 1)->get(['id', 'name', 'username']);
 
@@ -191,7 +197,39 @@ class PostController extends Controller
             'tags' => CmsTag::options(),
             'cpt' => $cpt,
             'autosave' => $item->pendingAutosave($request->user()->id),
+            'translations' => $this->translationOptions($item),
         ]);
+    }
+
+    /**
+     * Start the post's version in another language of the site: a draft copy with the
+     * same content and slug. Opens the version instead when there is one already.
+     */
+    public function translate($id, int $lang, Request $request): RedirectResponse
+    {
+        $item = CmsPost::with('tags')->findOrFail($id);
+        $target = $this->targetLanguage($lang);
+
+        $version = $item->translationIn($target->id);
+        if (! $version) {
+            $version = $item->replicate();
+            $version->forceFill([
+                // The same address in the other language (replicating gives it a new slug)
+                'slug' => $item->slug,
+                'lang_id' => $target->id,
+                'translation_group' => $item->translationGroup(),
+                'status' => CmsPost::STATUS_DRAFT,
+            ]);
+            $version->save();
+            $version->tags()->sync($item->tags->modelKeys());
+            FrontCache::flush();
+            $version->recordSave($request->user()?->id);
+        }
+
+        Locales::choose($request, $target->id);
+
+        return redirect()->route('posts.edit', ['post' => $version->id, 'post_type' => $version->post_type])
+            ->with('success', __('Versión en :lang lista para traducir.', ['lang' => $target->name]));
     }
 
     public function update($id, Request $request): RedirectResponse
@@ -200,7 +238,7 @@ class PostController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => ['required', 'string', 'max:255', Sites::unique('cms_posts', 'slug', $id)],
+            'slug' => ['required', 'string', 'max:255', Sites::unique('cms_posts', 'slug', $id)->where('lang_id', $post->lang_id)],
             'status' => 'required|string|in:draft,published',
             'published_at' => 'nullable|date',
             'schema_id' => 'nullable|integer|exists:cms_schemas,id',
@@ -218,7 +256,8 @@ class PostController extends Controller
             $post->slug = null;
         }
 
-        $post->update($request->except('tag_ids', 'slug'));
+        // A post keeps its language: its version in another language is another post
+        $post->update($request->except('tag_ids', 'slug', 'lang_id'));
 
         if (! empty($request->slug)) {
             $post->slug = $request->slug;

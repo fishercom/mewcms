@@ -1,5 +1,6 @@
 import { blocksFromContent } from '@/blocks/types';
 import ContentEditorTools, { RevisionData } from '@/components/content-editor-tools';
+import ContentTranslations, { ContentTranslation } from '@/components/content-translations';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
@@ -11,8 +12,29 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import PostFields from './partials/fields';
 
+/**
+ * Moving to the item's version in another language opens the same page component: a key
+ * per item starts its form afresh instead of keeping the previous item's fields.
+ */
 export default function Edit() {
-    const { item, schema, schemas, authors, tags, cpt, post_type, lang_id, autosave } = usePage<{
+    const { item } = usePage<{ item: { id: number } }>().props;
+
+    return <EditForm key={item.id} />;
+}
+
+function EditForm() {
+    const {
+        item,
+        schema,
+        schemas,
+        authors,
+        tags,
+        cpt,
+        post_type,
+        lang_id,
+        autosave,
+        translations = [],
+    } = usePage<{
         item: CmsPost & { tag_ids?: number[] };
         schema: CmsSchema | null;
         schemas: CmsSchema[];
@@ -22,6 +44,7 @@ export default function Edit() {
         post_type: string;
         lang_id: number;
         autosave?: (RevisionData & { updated_at?: string }) | null;
+        translations?: ContentTranslation[];
     }>().props;
 
     const [initial] = useState<Partial<CmsPost> & { tag_ids?: number[] }>({
@@ -86,6 +109,7 @@ export default function Edit() {
         <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <ContentTranslations module="posts" translations={translations} editUrl={(id) => route('posts.edit', { post: id, post_type })} />
                     <ContentEditorTools
                         module="posts"
                         id={item.id}

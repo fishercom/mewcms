@@ -3,6 +3,7 @@
  */
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
@@ -52,7 +53,7 @@ export default function Page({ article, recentPosts = [] }: PageProps) {
                             {article.children.map((child) => (
                                 <li key={child.id}>
                                     <Link
-                                        href={child.url ?? '/' + child.slug}
+                                        href={child.url ?? localePath('/' + child.slug)}
                                         className="group text-ink hover:text-sage-deep flex items-center justify-between py-5 transition-colors"
                                     >
                                         <span className="font-display text-2xl">{child.title}</span>

@@ -1,5 +1,7 @@
 import { BrandLockup } from '@/components/app-logo';
+import { LanguageSwitcher } from '@/components/front-language-switcher';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
+import { localePath } from '@/lib/locale-path';
 import { escapeHtml, useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
@@ -46,7 +48,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
     // Helper to format underscores back to slashes for URLs
     // The server sends each page's URL; the slug fallback covers older cached data
-    const getUrl = (item: { url?: string; slug: string }) => item.url ?? (!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
+    const getUrl = (item: { url?: string; slug: string }) => item.url ?? localePath(!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
 
     const renderNavLinks = () => {
         if (menuItems.length > 0) {
@@ -95,7 +97,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
         return (
             <>
-                <Link href="/" className="text-sm font-medium transition-colors hover:text-(--theme-accent)">
+                <Link href={localePath('/')} className="text-sm font-medium transition-colors hover:text-(--theme-accent)">
                     Inicio
                 </Link>
                 {navigation
@@ -130,7 +132,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                         <Link
-                            href="/"
+                            href={localePath('/')}
                             className="text-[#1b1b18] hover:opacity-85 dark:text-[#EDEDEC]"
                             aria-label={t('nav.home_link', { name: site?.title || name })}
                         >
@@ -151,6 +153,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
 
                     {/* Admin Access & Right Actions */}
                     <div className="flex items-center gap-4">
+                        <LanguageSwitcher linkClassName="hover:text-(--theme-accent)" />
                         <Link
                             href="/admin"
                             className="inline-flex h-9 items-center justify-center rounded-md border border-[#19140035] px-4 text-sm font-medium transition-colors hover:border-[#1915014a] dark:border-[#3E3E3A] dark:hover:border-[#62605b]"

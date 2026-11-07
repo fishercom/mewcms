@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import ReactDOMServer from 'react-dom/server';
 import { type RouteName, route } from 'ziggy-js';
+import { setLocalePrefix } from './lib/locale-path';
 import { resolvePage } from './lib/resolve-page';
 
 const appName = import.meta.env.VITE_APP_NAME || 'MewCMS';
@@ -18,6 +19,7 @@ createServer((page) =>
         },
         resolve: (name) => resolvePage(name, page.props.theme as string | undefined),
         setup: ({ App, props }) => {
+            setLocalePrefix((page.props.site as { prefix?: string } | null)?.prefix);
             /* eslint-disable */
             // @ts-expect-error
             global.route<RouteName> = (name, params, absolute) =>

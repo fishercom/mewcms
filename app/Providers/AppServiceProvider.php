@@ -5,11 +5,13 @@ namespace App\Providers;
 use App\Ai\AiManager;
 use App\Models\AdmAction;
 use App\Support\AdminActivity;
+use App\Support\Locales;
 use App\Support\PublicSsrGateway;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
@@ -33,6 +35,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Pagination links keep the language prefix the address came with ("/en/blog?page=2")
+        Paginator::currentPathResolver(function (): string {
+            $request = $this->app['request'];
+            $original = $request->attributes->get(Locales::ORIGINAL_URI);
+
+            return $original ? $request->getSchemeAndHttpHost().strtok($original, '?') : $request->url();
+        });
+
         Event::listen(function (Login $event): void {
             AdminActivity::record('login', AdmAction::LOGIN, 'Inicio de sesión', userId: $event->user->getAuthIdentifier());
         });

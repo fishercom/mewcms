@@ -1,5 +1,6 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
@@ -17,7 +18,7 @@ interface Props {
 export default function Show({ post, cpt, recentPosts = [] }: Props) {
     const { t } = useTexts();
     const settings = usePage<{ layout_settings?: Record<string, string> }>().props.layout_settings ?? {};
-    const parentUrl = cpt ? `/${cpt.slug}` : '/blog';
+    const parentUrl = localePath(cpt ? `/${cpt.slug}` : '/blog');
     const tags = post.tags ?? [];
     const meta = (post.metadata || {}) as Record<string, string | undefined>;
     const related = recentPosts.filter((item) => item.id !== post.id).slice(0, 3);

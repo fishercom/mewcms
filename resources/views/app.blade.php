@@ -6,7 +6,10 @@
     $site = $isThemePage ? \App\Support\Sites::current() : null;
     // Stylesheets and scripts the theme lists in theme.json (uploaded themes)
     $themeInfo = $isThemePage ? (\App\Support\Themes::all()[$siteTheme] ?? null) : null;
-    $lang = $site?->lang?->iso ?? str_replace('_', '-', app()->getLocale());
+    // The language of the page: the site's, or the extra language in the address ("/en/...")
+    $lang = ($site ? \App\Support\Locales::current()?->iso : null) ?? str_replace('_', '-', app()->getLocale());
+    // The same page in the site's other languages, for search engines; the main language is the x-default
+    $alternates = $isThemePage ? collect($page['props']['alternates'] ?? [])->reject(fn ($alternate) => $alternate['missing']) : collect();
 @endphp
 <html lang="{{ $lang }}" data-site-theme="{{ \App\Support\Themes::layout($siteTheme) }}" @if ($site) data-site-title="{{ $site->title ?: $site->name }}" @endif @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>
@@ -67,6 +70,12 @@
         @if ($site?->head_scripts)
             {{-- The site's own scripts (Admin → Sites), such as Google Analytics --}}
             {!! $site->head_scripts !!}
+        @endif
+        @foreach ($alternates as $alternate)
+            <link rel="alternate" hreflang="{{ $alternate['iso'] }}" href="{{ url($alternate['url']) }}">
+        @endforeach
+        @if ($alternates->isNotEmpty() && ($page['props']['alternates'][0]['missing'] ?? true) === false)
+            <link rel="alternate" hreflang="x-default" href="{{ url($page['props']['alternates'][0]['url']) }}">
         @endif
         @inertiaHead
         @if (empty($__inertiaSsrResponse))

@@ -7,9 +7,12 @@ use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\HasBlocks;
 use App\Models\Concerns\HasPublishing;
 use App\Models\Concerns\HasRevisions;
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\LogsAdminActivity;
 use App\Support\ContentSanitizer;
+use App\Support\Locales;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -20,6 +23,7 @@ class CmsPost extends Model
     use HasBlocks;
     use HasPublishing;
     use HasRevisions;
+    use HasTranslations;
     use LogsAdminActivity;
     use Sluggable;
     use SoftDeletes;
@@ -69,6 +73,31 @@ class CmsPost extends Model
                 'includeTrashed' => true,
             ],
         ];
+    }
+
+    /**
+     * Slugs are unique per language: a post and its translation may share one.
+     */
+    public function scopeWithUniqueSlugConstraints(Builder $query, Model $model, string $attribute, array $config, string $slug): Builder
+    {
+        return $query->where('lang_id', $model->lang_id);
+    }
+
+    /**
+     * Public address of the post, with its language prefix ("/en/blog/hello").
+     */
+    public function getUrlAttribute(): string
+    {
+        return Locales::url($this->path(), $this->lang_id);
+    }
+
+    /**
+     * Address of the post without its language prefix: "/blog/hello", or "/recipes/hello"
+     * for a custom post type.
+     */
+    public function path(): string
+    {
+        return ($this->post_type && $this->post_type !== 'post' ? '/'.$this->post_type : '/blog').'/'.$this->slug;
     }
 
     public function user()

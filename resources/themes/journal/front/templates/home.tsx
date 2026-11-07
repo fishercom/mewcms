@@ -5,6 +5,8 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
 import { isExternalLink } from '@/components/social-icon';
+import { localePath } from '@/lib/locale-path';
+import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
@@ -86,7 +88,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                             <Rule
                                 action={
                                     <Link
-                                        href="/blog"
+                                        href={localePath('/blog')}
                                         className="text-sage-deep hover:text-terracotta inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
                                     >
                                         {t('blog.all_stories')} <ArrowRight className="h-4 w-4" />
@@ -121,7 +123,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                                         {popularTags.map((tag) => (
                                             <li key={tag.id}>
                                                 <Link
-                                                    href={`/tag/${tag.slug}`}
+                                                    href={tagUrl(tag.slug)}
                                                     className="border-line bg-sheet text-ink/80 hover:border-sage hover:text-sage-deep inline-flex rounded-full border px-4 py-2 text-sm transition-colors"
                                                 >
                                                     {tag.name}
@@ -144,7 +146,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                         {topics.map((topic, index) => (
                             <Link
                                 key={index}
-                                href={topic.url || '/blog'}
+                                href={topic.url || localePath('/blog')}
                                 className="group bg-sheet hover:bg-sage-soft/50 flex flex-col p-8 transition-colors"
                             >
                                 <span className="font-display text-terracotta/80 text-4xl italic">{String(index + 1).padStart(2, '0')}</span>

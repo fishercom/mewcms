@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\CmsLang;
 use App\Models\CmsSite;
 use App\Rules\SafeUrl;
+use App\Support\FrontCache;
+use App\Support\Locales;
 use App\Support\Sites;
 use App\Support\Themes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -53,8 +56,10 @@ class SiteController extends Controller
 
     public function store(Request $request): Redirector|RedirectResponse
     {
-        $site = new CmsSite($this->validatedData($request));
+        $data = $this->validatedData($request);
+        $site = new CmsSite(Arr::except($data, 'lang_ids'));
         $site->save();
+        $this->syncLangs($site, $data);
 
         return redirect('admin/sites');
     }
@@ -65,6 +70,7 @@ class SiteController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = CmsSite::findOrFail($id);
+        $item->setAttribute('lang_ids', $item->langs()->pluck('cms_langs.id')->all());
 
         return Inertia::render('admin/sites/edit', [
             'item' => $item,
@@ -78,8 +84,10 @@ class SiteController extends Controller
     public function update($id, Request $request): RedirectResponse
     {
         $item = CmsSite::findOrFail($id);
-        $item->fill($this->validatedData($request, $item->id));
+        $data = $this->validatedData($request, $item->id);
+        $item->fill(Arr::except($data, 'lang_ids'));
         $item->save();
+        $this->syncLangs($item, $data);
 
         return redirect('admin/sites');
     }
@@ -129,6 +137,22 @@ class SiteController extends Controller
     }
 
     /**
+     * Save the site's extra languages (the main one is never listed among them).
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function syncLangs(CmsSite $site, array $data): void
+    {
+        $ids = array_values(array_diff(array_map('intval', $data['lang_ids'] ?? []), [(int) $site->lang_id]));
+        $changes = $site->langs()->sync($ids);
+
+        if (array_filter($changes) !== []) {
+            Sites::flush();
+            FrontCache::flush();
+        }
+    }
+
+    /**
      * Work on another site in the admin: content lists and editors show that site's
      * pages, posts, menus, forms, sliders, redirects and layout settings.
      */
@@ -138,6 +162,18 @@ class SiteController extends Controller
         $request->session()->put(Sites::SESSION_KEY, $site->id);
 
         return back()->with('success', __('Ahora trabajas en el sitio :name.', ['name' => $site->name]));
+    }
+
+    /**
+     * Edit the current site in another of its languages: page and post lists, editors and
+     * the theme texts show that language.
+     */
+    public function language(int $lang, Request $request): RedirectResponse
+    {
+        $chosen = Locales::choose($request, $lang);
+        abort_unless($chosen, 404);
+
+        return back()->with('success', __('Ahora editas en :name.', ['name' => $chosen->name]));
     }
 
     /**
@@ -157,6 +193,8 @@ class SiteController extends Controller
             'domains.*' => ['string', 'max:255', 'regex:/^(https?:\/\/)?[a-z0-9.-]+(:\d+)?\/?$/i'],
             'theme' => ['required', 'string', Rule::in(array_keys(Themes::all()))],
             'lang_id' => 'required|integer|exists:cms_langs,id',
+            'lang_ids' => 'nullable|array|max:50',
+            'lang_ids.*' => ['integer', Rule::exists('cms_langs', 'id')->where('active', true)],
             'currency' => ['nullable', 'string', 'size:3', 'regex:/^[A-Za-z]{3}$/'],
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',

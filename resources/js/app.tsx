@@ -4,6 +4,7 @@ import '@fontsource/sora/latin-700.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
+import { setLocalePrefix } from './lib/locale-path';
 import { resolvePage } from './lib/resolve-page';
 
 const appName = import.meta.env.VITE_APP_NAME || 'MewCMS';
@@ -18,6 +19,8 @@ createInertiaApp({
     // The site's theme is fixed for the whole visit: the server sets it on <html>
     resolve: (name) => resolvePage(name, document.documentElement.dataset.siteTheme),
     setup({ el, App, props }) {
+        // Links of a page in an extra language keep its prefix ("/en/...")
+        setLocalePrefix((props.initialPage.props.site as { prefix?: string } | null)?.prefix);
         const root = createRoot(el);
 
         root.render(<App {...props} />);

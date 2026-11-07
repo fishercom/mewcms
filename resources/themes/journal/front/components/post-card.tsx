@@ -1,4 +1,6 @@
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
+import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
@@ -16,7 +18,7 @@ export interface CardPost {
     tags?: { id: number; name: string; slug: string }[];
 }
 
-export const postUrl = (post: Pick<CardPost, 'slug'>, base = '/blog') => `${base}/${post.slug}`;
+export const postUrl = (post: Pick<CardPost, 'slug'>, base = '/blog') => localePath(`${base}/${post.slug}`);
 
 /** Publication date, written the way the site's language writes dates */
 export function PostDate({ date }: { date?: string | null }) {
@@ -40,7 +42,7 @@ export function Topic({ post, className }: { post: CardPost; className?: string 
 
     return (
         <Link
-            href={`/tag/${tag.slug}`}
+            href={tagUrl(tag.slug)}
             className={cn('text-terracotta hover:text-sage-deep text-[0.7rem] font-semibold tracking-[0.2em] uppercase transition-colors', className)}
         >
             {tag.name}

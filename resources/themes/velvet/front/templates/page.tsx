@@ -3,6 +3,7 @@
  */
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { type Price, useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -239,7 +240,7 @@ export default function Page({ article, navigation }: PageProps) {
                         {article.children.map((child) => (
                             <Link
                                 key={child.id}
-                                href={child.url ?? '/' + child.slug}
+                                href={child.url ?? localePath('/' + child.slug)}
                                 className="group bg-paper hover:border-brass flex items-center justify-between rounded-[1.5rem] border border-[#e2d7c5] p-7 transition-colors"
                             >
                                 <span className="font-display text-ink text-2xl">{child.title}</span>

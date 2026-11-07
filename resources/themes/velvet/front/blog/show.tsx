@@ -1,5 +1,6 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
@@ -15,7 +16,7 @@ export default function Show({ post, cpt }: { post: CmsPost; cpt: CmsPostType | 
             <Head title={post.title} />
             <article className="mx-auto max-w-3xl px-5 pt-16 pb-24 sm:px-8 sm:pt-24">
                 <Link
-                    href={cpt ? `/${cpt.slug}` : '/blog'}
+                    href={localePath(cpt ? `/${cpt.slug}` : '/blog')}
                     className="text-stone hover:text-forest inline-flex items-center gap-2 text-sm transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" /> {t('blog.all_stories')}

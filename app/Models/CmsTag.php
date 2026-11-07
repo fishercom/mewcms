@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
+use App\Support\Locales;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -104,8 +105,9 @@ class CmsTag extends Model
     public function scopeWithPublishedCounts(Builder $query): Builder
     {
         return $query->withCount([
-            'articles' => fn ($query) => $query->published(),
-            'posts' => fn ($query) => $query->published(),
+            // In the current language: a tag of a site with several languages counts per language
+            'articles' => fn ($query) => Locales::scope($query->published()),
+            'posts' => fn ($query) => Locales::scope($query->published()),
         ]);
     }
 
@@ -119,7 +121,7 @@ class CmsTag extends Model
 
     public function getUrlAttribute(): string
     {
-        return '/tag/'.$this->slug;
+        return Locales::url('/tag/'.$this->slug);
     }
 
     public function adminActivityModule(): string

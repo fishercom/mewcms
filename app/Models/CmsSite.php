@@ -125,6 +125,14 @@ class CmsSite extends Model
     }
 
     /**
+     * Extra languages of the site, besides its main language (see Locales).
+     */
+    public function langs()
+    {
+        return $this->belongsToMany(CmsLang::class, 'cms_site_langs', 'site_id', 'lang_id')->withTimestamps();
+    }
+
+    /**
      * Whether "/" shows something: the home page, or else the first published page
      * (see FrontController::show).
      */

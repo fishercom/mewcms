@@ -1,5 +1,6 @@
 import { blocksFromContent } from '@/blocks/types';
 import ContentEditorTools, { RevisionData } from '@/components/content-editor-tools';
+import ContentTranslations, { ContentTranslation } from '@/components/content-translations';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
 import FormLayout from '@/layouts/module/Form';
@@ -13,7 +14,17 @@ import { Image as ImageIcon } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import ArticleFields, { PageMenu, PageTemplate } from './partials/fields';
 
+/**
+ * Moving to the item's version in another language opens the same page component: a key
+ * per item starts its form afresh instead of keeping the previous item's fields.
+ */
 export default function Edit() {
+    const { item } = usePage<{ item: { id: number } }>().props;
+
+    return <EditForm key={item.id} />;
+}
+
+function EditForm() {
     const {
         item,
         schema,
@@ -24,6 +35,7 @@ export default function Edit() {
         parents = [],
         tags,
         autosave,
+        translations = [],
     } = usePage<{
         item: CmsArticle;
         schema?: CmsSchema;
@@ -34,6 +46,7 @@ export default function Edit() {
         parents?: CmsArticle[];
         tags?: import('@/types').CmsTag[];
         autosave?: (RevisionData & { updated_at?: string }) | null;
+        translations?: ContentTranslation[];
     }>().props;
 
     const initial: CmsArticleForm = {
@@ -90,6 +103,8 @@ export default function Edit() {
                     >
                         {t('← Volver a Páginas')}
                     </Link>
+
+                    <ContentTranslations module="articles" translations={translations} editUrl={(id) => route('articles.edit', id)} />
 
                     <div className="flex items-center gap-2.5">
                         <Button

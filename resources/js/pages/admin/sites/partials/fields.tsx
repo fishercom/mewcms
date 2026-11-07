@@ -99,10 +99,44 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                             ))}
                         </SelectContent>
                     </Select>
-                    <p className="text-muted-foreground text-xs">
-                        {t('El idioma del contenido de este sitio. Para otro idioma, crea otro sitio con su propio dominio.')}
-                    </p>
+                    <p className="text-muted-foreground text-xs">{t('Sus páginas no llevan prefijo en la dirección: /nosotros.')}</p>
                     <InputError message={errors.lang_id} />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label>{t('Otros idiomas')}</Label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-2">
+                        {langs
+                            .filter((lang) => lang.id.toString() !== data.lang_id)
+                            .map((lang) => {
+                                const checked = data.lang_ids.includes(lang.id);
+
+                                return (
+                                    <div key={lang.id} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`lang-${lang.id}`}
+                                            checked={checked}
+                                            disabled={processing}
+                                            onCheckedChange={() =>
+                                                setData({
+                                                    ...data,
+                                                    lang_ids: checked ? data.lang_ids.filter((id) => id !== lang.id) : [...data.lang_ids, lang.id],
+                                                })
+                                            }
+                                        />
+                                        <Label htmlFor={`lang-${lang.id}`} className="font-normal">
+                                            {lang.name} <span className="text-muted-foreground">/{lang.iso.toLowerCase()}</span>
+                                        </Label>
+                                    </div>
+                                );
+                            })}
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                        {t(
+                            'El mismo sitio en otros idiomas: sus páginas llevan el código del idioma delante, como /en/about. Cada página se traduce desde su editor.',
+                        )}
+                    </p>
+                    <InputError message={errors.lang_ids || Object.entries(errors).find(([key]) => key.startsWith('lang_ids.'))?.[1]} />
                 </div>
 
                 <div className="grid gap-2">
