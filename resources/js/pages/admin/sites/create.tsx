@@ -18,6 +18,7 @@ export default function Create() {
         domains: '',
         theme: themes[0]?.slug || 'default',
         lang_id: langs[0]?.id.toString() ?? '',
+        currency: 'USD',
         title: '',
         description: '',
         favicon: '',

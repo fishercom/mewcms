@@ -4,6 +4,7 @@
  */
 import Blocks from '@/components/blocks';
 import FrontSlider from '@/components/front-slider';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsSlider } from '@/types/models/cms-slider';
 import { Head, Link } from '@inertiajs/react';
@@ -92,69 +93,44 @@ const COLOR_MAP: Record<string, string> = {
 
 export default function Home({ article, navigation, slider }: HomeProps) {
     const meta = (article.metadata || {}) as HomeMetadata;
+    const { t } = useTexts();
 
     const heroTitle = meta.hero_title || article.title;
-    const heroSubtitle = meta.hero_subtitle || 'Un CMS ágil, potente y elegante con React, Inertia.js y Laravel 11.';
-    const heroDescription =
-        meta.hero_description ||
-        'Personaliza cada sección, gestiona taxonomías y administra contenidos con esquemas dinámicos directamente desde el panel de control.';
-    const badgeText = meta.badge_text || 'Gestor de Contenidos de Nueva Generación';
-    const sectionFeaturesTitle = meta.section_features_title || 'Todo lo que necesitas para tu proyecto web';
-    const sectionFeaturesSubtitle =
-        meta.section_features_subtitle ||
-        'Diseñado tanto para creadores de contenido no técnicos como para ingenieros que exigen código limpio y escalable.';
-    const ctaTitle = meta.cta_title || 'Comienza a administrar tu contenido hoy mismo';
-    const ctaDescription =
-        meta.cta_description ||
-        'Accede al panel de control para crear nuevas páginas, gestionar artículos de blog, configurar menús y personalizar cada aspecto de tu sitio.';
-    const ctaButtonText = meta.cta_button_text || 'Abrir Dashboard';
+    const heroSubtitle = meta.hero_subtitle || t('home.hero_subtitle');
+    const heroDescription = meta.hero_description || t('home.hero_description');
+    const badgeText = meta.badge_text || t('home.badge');
+    const sectionFeaturesTitle = meta.section_features_title || t('home.features_title');
+    const sectionFeaturesSubtitle = meta.section_features_subtitle || t('home.features_subtitle');
+    const ctaTitle = meta.cta_title || t('home.cta_title');
+    const ctaDescription = meta.cta_description || t('home.cta_description');
+    const ctaButtonText = meta.cta_button_text || t('home.cta_button');
     const ctaButtonUrl = meta.cta_button_url || '/admin';
 
     const defaultFeatures: FeatureItem[] = [
-        {
-            icon: 'Cpu',
-            title: 'Arquitectura SPA Unificada',
-            description: 'Combina la robustez de Laravel 11 con la velocidad instantánea de Inertia.js v2 y React 19 sin recargas de página.',
-            badge: 'Alto Rendimiento',
-            color: 'violet',
-        },
-        {
-            icon: 'Layers',
-            title: 'Esquemas y Campos a Medida',
-            description:
-                'Modela cualquier tipo de dato con campos de texto, repetidores, selecciones y metadatos dinámicos sin tocar código de base de datos.',
-            badge: 'Modular',
-            color: 'blue',
-        },
+        { icon: 'Cpu', title: t('home.feature_1_title'), description: t('home.feature_1_text'), badge: t('home.feature_1_badge'), color: 'violet' },
+        { icon: 'Layers', title: t('home.feature_2_title'), description: t('home.feature_2_text'), badge: t('home.feature_2_badge'), color: 'blue' },
         {
             icon: 'Palette',
-            title: 'Plantillas React & Tailwind',
-            description:
-                'Diseña tus páginas con componentes limpios en TypeScript y estilos con Tailwind CSS con soporte nativo para temas claro y oscuro.',
-            badge: 'UI Vanguardista',
+            title: t('home.feature_3_title'),
+            description: t('home.feature_3_text'),
+            badge: t('home.feature_3_badge'),
             color: 'amber',
         },
         {
             icon: 'Command',
-            title: 'Paleta de Comandos ⌘K',
-            description: 'Navegación ultra rápida por teclado para saltar a cualquier módulo, editar páginas o realizar acciones al vuelo.',
-            badge: 'Productividad',
+            title: t('home.feature_4_title'),
+            description: t('home.feature_4_text'),
+            badge: t('home.feature_4_badge'),
             color: 'emerald',
         },
         {
             icon: 'FileText',
-            title: 'Editor Enriquecido TipTap',
-            description: 'Crea y maqueta publicaciones, blogs y artículos con un editor de texto enriquecido moderno, potente e intuitivo.',
-            badge: 'Edición Ágil',
+            title: t('home.feature_5_title'),
+            description: t('home.feature_5_text'),
+            badge: t('home.feature_5_badge'),
             color: 'rose',
         },
-        {
-            icon: 'Lock',
-            title: 'Seguridad y Roles Granulares',
-            description: 'Control de acceso detallado por módulos y acciones, auditoría de eventos y protección integrada de datos.',
-            badge: 'Enterprise',
-            color: 'indigo',
-        },
+        { icon: 'Lock', title: t('home.feature_6_title'), description: t('home.feature_6_text'), badge: t('home.feature_6_badge'), color: 'indigo' },
     ];
 
     const rawFeatures: FeatureItem[] = Array.isArray(meta.features) && meta.features.length > 0 ? meta.features : defaultFeatures;
@@ -172,10 +148,10 @@ export default function Home({ article, navigation, slider }: HomeProps) {
     });
 
     const stats = [
-        { label: 'Tiempo de Respuesta', value: meta.stat_speed || '< 100ms', icon: Zap },
-        { label: 'Tipado Seguro', value: meta.stat_typesafe || '100% TS', icon: CheckCircle2 },
-        { label: 'Arquitectura', value: meta.stat_stack || 'Laravel + React', icon: Database },
-        { label: 'Navegación Fluida', value: meta.stat_navigation || 'Inertia v2', icon: Globe },
+        { label: t('home.stat_speed'), value: meta.stat_speed || '< 100ms', icon: Zap },
+        { label: t('home.stat_typesafe'), value: meta.stat_typesafe || '100% TS', icon: CheckCircle2 },
+        { label: t('home.stat_stack'), value: meta.stat_stack || 'Laravel + React', icon: Database },
+        { label: t('home.stat_navigation'), value: meta.stat_navigation || 'Inertia v2', icon: Globe },
     ];
 
     return (
@@ -210,7 +186,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                                     className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:bg-violet-700 active:scale-95 sm:text-sm"
                                 >
                                     <LayoutDashboard className="h-4 w-4" />
-                                    <span>Ir al Panel Administrativo</span>
+                                    <span>{t('home.hero_button')}</span>
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
 
@@ -218,7 +194,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                                     href="#caracteristicas"
                                     className="border-border/80 bg-background text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-semibold shadow-2xs transition-all active:scale-95 sm:text-sm"
                                 >
-                                    <span>Ver Características</span>
+                                    <span>{t('home.hero_secondary')}</span>
                                 </a>
                             </div>
                         </div>
@@ -250,7 +226,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 <div id="caracteristicas" className="scroll-mt-20 space-y-8">
                     <div className="mx-auto max-w-2xl space-y-3 text-center">
                         <span className="border-border/70 bg-muted/50 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold tracking-wider uppercase">
-                            Potencia & Modularidad
+                            {t('home.features_eyebrow')}
                         </span>
                         <h2 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl">{sectionFeaturesTitle}</h2>
                         <p className="text-muted-foreground text-sm leading-relaxed">{sectionFeaturesSubtitle}</p>
@@ -295,7 +271,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                         <div className="mx-auto max-w-3xl space-y-6">
                             <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
                                 <Sparkles className="h-5 w-5" />
-                                <span className="text-xs font-bold tracking-wider uppercase">Presentación Editorial</span>
+                                <span className="text-xs font-bold tracking-wider uppercase">{t('home.editorial')}</span>
                             </div>
                             <Blocks blocks={article.blocks} html={article.content} textClassName="text-foreground/90 leading-relaxed font-normal" />
                         </div>
@@ -307,7 +283,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                     <div className="border-border/60 bg-muted/10 space-y-6 rounded-3xl border p-6 sm:p-10">
                         <div className="flex items-center gap-2">
                             <Layers className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                            <h3 className="text-foreground text-lg font-bold">Campos Personalizados del Esquema</h3>
+                            <h3 className="text-foreground text-lg font-bold">{t('home.custom_fields')}</h3>
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -355,7 +331,7 @@ export default function Home({ article, navigation, slider }: HomeProps) {
                 <div className="border-border/80 relative overflow-hidden rounded-3xl border bg-gradient-to-r from-violet-900/90 via-purple-900/90 to-zinc-950 p-8 text-white shadow-2xl sm:p-12">
                     <div className="relative z-10 max-w-2xl space-y-4">
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wider text-white/90 uppercase backdrop-blur-md">
-                            Control Total
+                            {t('home.cta_eyebrow')}
                         </span>
                         <h2 className="text-2xl leading-tight font-black tracking-tight sm:text-4xl">{ctaTitle}</h2>
                         <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">{ctaDescription}</p>

@@ -1,0 +1,22 @@
+{
+    "blog.default_author": "La redacción",
+    "blog.description": "Guías prácticas, revisadas por veterinarios, sobre alimentación, aseo, adiestramiento y la vida diaria con los animales que queremos.",
+    "blog.empty": "Pronto habrá nuevos artículos.",
+    "blog.eyebrow": "El archivo",
+    "blog.title": "Todos los artículos",
+    "footer.explore": "El journal",
+    "footer.makers": "De los creadores de",
+    "footer.shop_name": "La boutique",
+    "home.latest": "Lo último",
+    "home.read_guides": "Leer las guías",
+    "home.topics": "Temas",
+    "home.topics_title": "Guías por tema",
+    "home.worth_a_read": "Para leer",
+    "page.eyebrow": "El journal",
+    "search.heading": "Buscar en el journal",
+    "search.placeholder": "Prueba «cachorro», «aseo» o «gatos mayores»",
+    "shop_band.button": "Visitar la tienda",
+    "shop_band.title": "Visita la boutique",
+    "tag.empty": "Todavía no hay nada publicado en este tema.",
+    "tag.eyebrow": "Tema"
+}

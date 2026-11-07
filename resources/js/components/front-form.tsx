@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsForm, CmsFormField } from '@/types/models/cms-form';
 import axios from 'axios';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
@@ -17,6 +18,7 @@ export default function FrontForm({ alias }: Props) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const { t } = useTexts();
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -39,12 +41,12 @@ export default function FrontForm({ alias }: Props) {
             })
             .catch((err) => {
                 console.error('Error fetching form config:', err);
-                setErrorMessage('No se pudo cargar el formulario.');
+                setErrorMessage(t('form.load_error'));
             })
             .finally(() => {
                 setLoading(false);
             });
-    }, [alias]);
+    }, [alias, t]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleInputChange = (fieldAlias: string, type: string, value: any, checked?: boolean) => {
@@ -76,7 +78,7 @@ export default function FrontForm({ alias }: Props) {
             })
             .then((res) => {
                 if (res.data.success) {
-                    setSuccessMessage(res.data.message || 'Formulario enviado con éxito.');
+                    setSuccessMessage(res.data.message || t('form.sent_title'));
                     // Reset form values
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const resetValues: Record<string, any> = {};
@@ -100,7 +102,7 @@ export default function FrontForm({ alias }: Props) {
                     });
                     setErrors(validationErrors);
                 } else {
-                    setErrorMessage(err.response?.data?.message || 'Ocurrió un error al enviar el formulario.');
+                    setErrorMessage(err.response?.data?.message || t('form.error'));
                 }
             })
             .finally(() => {
@@ -112,7 +114,7 @@ export default function FrontForm({ alias }: Props) {
         return (
             <div className="flex items-center justify-center py-10 text-zinc-500">
                 <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                <span>Cargando formulario...</span>
+                <span>{t('form.loading')}</span>
             </div>
         );
     }
@@ -121,7 +123,7 @@ export default function FrontForm({ alias }: Props) {
         return (
             <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
                 <AlertCircle className="h-5 w-5 shrink-0" />
-                <span>{errorMessage || 'Formulario no disponible.'}</span>
+                <span>{errorMessage || t('form.unavailable')}</span>
             </div>
         );
     }
@@ -150,7 +152,7 @@ export default function FrontForm({ alias }: Props) {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
                     <label>
-                        Leave this field empty
+                        {t('form.honeypot')}
                         <input
                             type="text"
                             name="_hp"
@@ -184,7 +186,7 @@ export default function FrontForm({ alias }: Props) {
                                         isInvalid ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'
                                     }`}
                                 >
-                                    <option value="">Selecciona una opción</option>
+                                    <option value="">{t('form.choose')}</option>
                                     {field.options?.map((opt, oIdx) => (
                                         <option key={oIdx} value={opt}>
                                             {opt}
@@ -242,10 +244,10 @@ export default function FrontForm({ alias }: Props) {
                         {submitting ? (
                             <>
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                <span>Enviando...</span>
+                                <span>{t('form.sending')}</span>
                             </>
                         ) : (
-                            <span>Enviar Mensaje</span>
+                            <span>{t('form.submit')}</span>
                         )}
                     </Button>
                 </div>

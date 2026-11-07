@@ -1,7 +1,7 @@
 import { MediaImage } from '@/components/media-image';
+import { useTexts } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { BookOpen } from 'lucide-react';
 
 /** The fields of a post the cards need (the shared "recentPosts" or a page of posts) */
@@ -18,7 +18,12 @@ export interface CardPost {
 
 export const postUrl = (post: Pick<CardPost, 'slug'>, base = '/blog') => `${base}/${post.slug}`;
 
-export const postDate = (date?: string | null) => (date ? format(new Date(date), 'MMMM d, yyyy') : '');
+/** Publication date, written the way the site's language writes dates */
+export function PostDate({ date }: { date?: string | null }) {
+    const { date: formatDate } = useTexts();
+
+    return date ? <time dateTime={date}>{formatDate(date, { dateStyle: 'long' })}</time> : null;
+}
 
 /** Minutes to read, from the words of the content (or the excerpt) */
 export const readingTime = (post: Pick<CardPost, 'content' | 'excerpt'>) => {
@@ -70,7 +75,9 @@ export function FeatureCard({ post }: { post: CardPost }) {
                     </Link>
                 </h2>
                 {post.excerpt && <p className="font-read text-graphite text-[1.3rem] leading-relaxed">{post.excerpt}</p>}
-                <p className="text-graphite text-sm">{postDate(post.published_at)}</p>
+                <p className="text-graphite text-sm">
+                    <PostDate date={post.published_at} />
+                </p>
             </div>
         </article>
     );
@@ -89,7 +96,9 @@ export function PostCard({ post, priority = false }: { post: CardPost; priority?
                     </Link>
                 </h3>
                 {post.excerpt && <p className="text-graphite line-clamp-3 leading-relaxed">{post.excerpt}</p>}
-                <p className="text-graphite/80 text-[0.8rem]">{postDate(post.published_at)}</p>
+                <p className="text-graphite/80 text-[0.8rem]">
+                    <PostDate date={post.published_at} />
+                </p>
             </div>
         </article>
     );

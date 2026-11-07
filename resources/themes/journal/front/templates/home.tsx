@@ -5,6 +5,7 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
 import { isExternalLink } from '@/components/social-icon';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
@@ -55,6 +56,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
     const [lead, ...rest] = recentPosts;
     const grid = rest.slice(0, 3);
     const more = rest.slice(3);
+    const { t } = useTexts();
 
     return (
         <JournalLayout>
@@ -87,11 +89,11 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                                         href="/blog"
                                         className="text-sage-deep hover:text-terracotta inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
                                     >
-                                        All articles <ArrowRight className="h-4 w-4" />
+                                        {t('blog.all_stories')} <ArrowRight className="h-4 w-4" />
                                     </Link>
                                 }
                             >
-                                Latest
+                                {t('home.latest')}
                             </Rule>
                             <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2">
                                 {grid.map((post, index) => (
@@ -104,7 +106,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                         <aside className="lg:col-span-4">
                             {more.length > 0 && (
                                 <>
-                                    <Rule>Worth a read</Rule>
+                                    <Rule>{t('home.worth_a_read')}</Rule>
                                     <div>
                                         {more.map((post, index) => (
                                             <PostRow key={post.id} post={post} index={index} />
@@ -114,7 +116,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                             )}
                             {popularTags.length > 0 && (
                                 <div className="mt-12">
-                                    <Rule>Topics</Rule>
+                                    <Rule>{t('home.topics')}</Rule>
                                     <ul className="flex flex-wrap gap-2">
                                         {popularTags.map((tag) => (
                                             <li key={tag.id}>
@@ -137,7 +139,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
             {/* Topic guides */}
             {topics.length > 0 && (
                 <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-                    <Rule>{m.topics_title || 'Guides by topic'}</Rule>
+                    <Rule>{m.topics_title || t('home.topics_title')}</Rule>
                     <div className="border-line grid gap-px overflow-hidden rounded-[1.75rem] border bg-[var(--color-line)] sm:grid-cols-2 lg:grid-cols-4">
                         {topics.map((topic, index) => (
                             <Link
@@ -149,7 +151,7 @@ export default function Home({ article, recentPosts = [], popularTags = [] }: Ho
                                 <h3 className="text-ink mt-6 text-[1.6rem] leading-tight">{topic.title}</h3>
                                 {topic.text && <p className="text-graphite mt-3 leading-relaxed">{topic.text}</p>}
                                 <span className="text-sage-deep mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold">
-                                    Read the guides <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                                    {t('home.read_guides')} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                                 </span>
                             </Link>
                         ))}

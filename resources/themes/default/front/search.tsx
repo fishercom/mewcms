@@ -1,3 +1,4 @@
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, Calendar, Search } from 'lucide-react';
@@ -24,6 +25,7 @@ interface Props {
 
 export default function SearchPage({ results, query, navigation, popularTags = [], recentArticles = [] }: Props) {
     const [searchText, setSearchText] = useState(query);
+    const { t, choice } = useTexts();
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,20 +34,20 @@ export default function SearchPage({ results, query, navigation, popularTags = [
 
     return (
         <FrontLayout navigation={navigation}>
-            <Head title={`Resultados de búsqueda para: "${query}"`} />
+            <Head title={query ? t('search.title_query', { query }) : t('search.title')} />
 
             {/* Header Title with gradient */}
             <div className="border-b border-[#19140010] py-12 dark:border-[#3E3E3A]/20">
                 <div className="max-w-3xl">
-                    <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl dark:text-white">Resultados de Búsqueda</h1>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl dark:text-white">{t('search.heading')}</h1>
                     <p className="mt-3 text-sm text-zinc-500 dark:text-[#A1A09A]">
                         {query ? (
                             <>
-                                Mostrando {results.length} coincidencias encontradas para{' '}
+                                {choice('search.showing', results.length)}{' '}
                                 <strong className="font-semibold text-red-600 dark:text-red-500">"{query}"</strong>
                             </>
                         ) : (
-                            'Introduce un término de búsqueda para comenzar.'
+                            t('search.prompt')
                         )}
                     </p>
                 </div>
@@ -60,11 +62,12 @@ export default function SearchPage({ results, query, navigation, popularTags = [
                             type="text"
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            placeholder="Buscar en el sitio..."
+                            placeholder={t('search.placeholder')}
                             className="border-zinc-205 block w-full rounded-xl border bg-white py-3 pr-12 pl-4 text-sm text-zinc-800 placeholder-zinc-400 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
                         />
                         <button
                             type="submit"
+                            aria-label={t('search.submit')}
                             className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded-lg bg-red-600 p-1.5 text-white transition-colors hover:bg-red-700"
                         >
                             <Search className="h-4 w-4" />
@@ -108,7 +111,7 @@ export default function SearchPage({ results, query, navigation, popularTags = [
                                             href={result.url}
                                             className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 hover:underline dark:text-red-500"
                                         >
-                                            <span>Ver contenido</span>
+                                            <span>{t('search.view')}</span>
                                             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                                         </Link>
                                     </div>
@@ -118,7 +121,7 @@ export default function SearchPage({ results, query, navigation, popularTags = [
                     ) : query ? (
                         <div className="rounded-xl border border-dashed border-zinc-200 py-16 text-center text-zinc-400 dark:border-zinc-800">
                             <Search className="mx-auto mb-2 h-8 w-8 text-zinc-300" />
-                            <p className="text-xs">No se encontraron resultados para tu búsqueda.</p>
+                            <p className="text-xs">{t('search.empty')}</p>
                         </div>
                     ) : null}
                 </div>

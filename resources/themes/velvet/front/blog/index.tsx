@@ -1,4 +1,5 @@
 import { MediaImage } from '@/components/media-image';
+import { useTexts } from '@/lib/theme-texts';
 import { Pagination } from '@/types';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -8,15 +9,16 @@ import VelvetLayout from '../layout';
 
 /** The boutique keeps its stories in the journal (another site); this lists any posts of its own */
 export default function Index({ posts, cpt }: { posts: Pagination<CmsPost>; cpt: CmsPostType | null }) {
+    const { t } = useTexts();
     const settings = usePage<{ layout_settings?: Record<string, string> }>().props.layout_settings ?? {};
     const base = cpt ? `/${cpt.slug}` : '/blog';
-    const title = cpt?.name || 'Notes from the boutique';
+    const title = cpt?.name || t('blog.title');
 
     return (
         <VelvetLayout>
             <Head title={title} />
             <section className="mx-auto max-w-7xl px-5 pt-16 pb-24 sm:px-8 sm:pt-24">
-                <Eyebrow>Stories</Eyebrow>
+                <Eyebrow>{t('blog.eyebrow')}</Eyebrow>
                 <DisplayTitle as="h1" text={title} className="text-ink mt-6 text-5xl sm:text-6xl" />
                 {posts.data.length > 0 ? (
                     <div className="mt-14 grid gap-x-8 gap-y-14 md:grid-cols-3">
@@ -41,15 +43,13 @@ export default function Index({ posts, cpt }: { posts: Pagination<CmsPost>; cpt:
                     </div>
                 ) : (
                     <div className="mt-12 max-w-xl space-y-6">
-                        <p className="text-stone text-lg leading-relaxed font-light">
-                            Our care guides, recipes and training notes live in the journal.
-                        </p>
+                        <p className="text-stone text-lg leading-relaxed font-light">{t('blog.empty')}</p>
                         {settings.layout_journal_url && (
                             <a
                                 href={settings.layout_journal_url}
                                 className="text-forest border-brass inline-flex items-center gap-2 border-b pb-1 text-xs font-semibold tracking-[0.2em] uppercase"
                             >
-                                Read the journal <ArrowUpRight className="h-4 w-4" />
+                                {t('journal.read')} <ArrowUpRight className="h-4 w-4" />
                             </a>
                         )}
                     </div>

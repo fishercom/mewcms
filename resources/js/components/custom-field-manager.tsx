@@ -98,6 +98,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                                 <SelectContent>
                                                     <SelectItem value="text">{t('Texto')}</SelectItem>
                                                     <SelectItem value="number">{t('Número')}</SelectItem>
+                                                    <SelectItem value="price">{t('Precio (monto y moneda)')}</SelectItem>
                                                     <SelectItem value="date">{t('Fecha')}</SelectItem>
                                                     <SelectItem value="url">{t('Enlace / URL')}</SelectItem>
                                                     <SelectItem value="textarea">{t('Área de Texto')}</SelectItem>
@@ -169,6 +170,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                 <SelectContent>
                                     <SelectItem value="text">{t('Texto')}</SelectItem>
                                     <SelectItem value="number">{t('Número')}</SelectItem>
+                                    <SelectItem value="price">{t('Precio (monto y moneda)')}</SelectItem>
                                     <SelectItem value="date">{t('Fecha')}</SelectItem>
                                     <SelectItem value="url">{t('Enlace / URL')}</SelectItem>
                                     <SelectItem value="textarea">{t('Área de Texto')}</SelectItem>

@@ -10,6 +10,7 @@ resources/themes/<slug>/
 ├── screenshot.png    preview shown in Admin → Sites (16:10, about 960×600)
 ├── css/theme.css     the theme's stylesheet (its own Vite entry)
 ├── assets/           images and fonts, imported from the pages or the CSS
+├── lang/             the theme's fixed texts per language: en.json, es.json, ...
 └── front/            the theme's pages, named like the Inertia components
     ├── layout.tsx
     ├── search.tsx
@@ -29,6 +30,49 @@ the default ones.
 
 Every theme is built in the same `npm run build`. Their pages are split into their own
 chunks, and only the active theme's stylesheet is loaded on a page.
+
+## Texts and translations
+
+A page never writes a fixed text ("Explore", "Send message", "from $48") straight into
+its markup. It writes a **key**, and the theme ships the text of that key in each
+language in `lang/<locale>.json` (BCP 47 names: `en.json`, `es.json`, `pt-BR.json`):
+
+```tsx
+import { useTexts } from '@/lib/theme-texts';
+
+const { t, choice, price, date } = useTexts();
+
+<h2>{t('footer.explore')}</h2>
+<p>{choice('search.results', results.length, { query })}</p>
+<span>{t('shop.from_price', { price: price(card.price) })}</span>
+<time>{date(post.published_at, { dateStyle: 'long' })}</time>
+```
+
+```json
+{
+    "footer.explore": "Explorar",
+    "search.results": "1 resultado para «:query»|:count resultados para «:query»",
+    "shop.from_price": "desde :price"
+}
+```
+
+- **Keys** are lowercase words joined by dots, grouped by section: `nav.*`, `footer.*`,
+  `shop.*`. The default theme holds the texts every theme shares (forms, search, tags,
+  galleries); a theme only lists the keys it words differently.
+- **A site changes any text** in **Admin → Translations**, without touching the theme.
+  A text resolves to: the site's change, then the theme's text in the site's language
+  (`es-PE`, then `es`), then in English, then the same in the default theme.
+- **Values are not text.** Prices, dates and counts go in as `:placeholders`, formatted
+  for the site's language: a price is a **Precio** custom field (`{ amount, currency }`,
+  the site's currency by default) shown with `price()`; dates with `date()`; plurals with
+  `choice()` and `one|other` forms ("zero|one|other" to say something else for none).
+- **Check a theme** with `php artisan cms:theme-texts [theme]`: it lists every key a page
+  uses without a text in one of the theme's languages, and fails when English lacks one.
+  `--write` adds the missing keys, empty, to the theme's files. The test suite runs it on
+  every built theme.
+
+Content an editor writes (titles, paragraphs, buttons of a section) stays in the page
+editor and its custom fields: theme texts are only the words the design itself needs.
 
 ## Design and scripts
 

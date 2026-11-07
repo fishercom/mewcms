@@ -14,7 +14,10 @@ class CmsSite extends Model
 
     protected $table = 'cms_sites';
 
-    protected $fillable = ['name', 'site_url', 'domains', 'theme', 'lang_id', 'title', 'description', 'favicon', 'head_scripts', 'body_scripts', 'default', 'active'];
+    protected $fillable = ['name', 'site_url', 'domains', 'theme', 'lang_id', 'currency', 'title', 'description', 'favicon', 'head_scripts', 'body_scripts', 'default', 'active'];
+
+    /** Currency of sites that have not chosen one */
+    public const DEFAULT_CURRENCY = 'USD';
 
     protected $casts = [
         'domains' => 'array',
@@ -35,6 +38,8 @@ class CmsSite extends Model
                 fn ($domain): string => self::normalizeDomain((string) $domain),
                 (array) $site->domains,
             ))));
+
+            $site->currency = filled($site->currency) ? strtoupper((string) $site->currency) : null;
 
             if (blank($site->theme) || ! Themes::exists($site->theme)) {
                 $site->theme = Themes::DEFAULT;
@@ -143,6 +148,8 @@ class CmsSite extends Model
             'title' => $this->title ?: $this->name,
             'url' => $this->publicUrl(),
             'locale' => $this->lang?->iso,
+            // ISO 4217, the default currency of price fields
+            'currency' => $this->currency ?: self::DEFAULT_CURRENCY,
         ];
     }
 

@@ -1,13 +1,15 @@
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
 import { DisplayTitle, Eyebrow } from '../components/brand';
 import VelvetLayout from '../layout';
 
 export default function Show({ post, cpt }: { post: CmsPost; cpt: CmsPostType | null }) {
+    const { t, date } = useTexts();
+
     return (
         <VelvetLayout>
             <Head title={post.title} />
@@ -16,9 +18,9 @@ export default function Show({ post, cpt }: { post: CmsPost; cpt: CmsPostType | 
                     href={cpt ? `/${cpt.slug}` : '/blog'}
                     className="text-stone hover:text-forest inline-flex items-center gap-2 text-sm transition-colors"
                 >
-                    <ArrowLeft className="h-4 w-4" /> All stories
+                    <ArrowLeft className="h-4 w-4" /> {t('blog.all_stories')}
                 </Link>
-                <Eyebrow className="mt-10">{format(new Date(post.published_at), 'MMMM d, yyyy')}</Eyebrow>
+                <Eyebrow className="mt-10">{date(post.published_at, { dateStyle: 'long' })}</Eyebrow>
                 <DisplayTitle as="h1" text={post.title} className="text-ink mt-6 text-5xl sm:text-6xl" />
                 {post.excerpt && <p className="text-stone mt-6 text-xl leading-relaxed font-light">{post.excerpt}</p>}
                 {post.featured_image && (

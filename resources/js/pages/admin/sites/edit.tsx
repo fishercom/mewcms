@@ -19,6 +19,7 @@ export default function Edit() {
         domains: (item.domains || []).join('\n'),
         theme: item.theme || 'default',
         lang_id: item.lang_id ? item.lang_id.toString() : '',
+        currency: item.currency ?? 'USD',
         title: item.title || '',
         description: item.description || '',
         favicon: item.favicon || '',

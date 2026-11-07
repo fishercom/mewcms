@@ -4,9 +4,9 @@ import { MediaImage } from '@/components/media-image';
  */
 import ContentRenderer from '@/components/content-renderer';
 import { tagUrl } from '@/lib/tag-url';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { Calendar, Tag } from 'lucide-react';
 import FrontSidebar from '../components/sidebar';
 import FrontLayout from '../layout';
@@ -30,6 +30,7 @@ interface PostMetadata {
 
 export default function Post({ article, navigation, popularTags = [], recentArticles = [] }: PostProps) {
     const meta = (article.metadata || {}) as PostMetadata;
+    const { t, date } = useTexts();
 
     // Try to locate common blog post fields
     const bodyContent = (meta.body || meta.content || meta.descripcion || '') as string;
@@ -49,8 +50,8 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                         <h1 className="text-3xl leading-tight font-extrabold tracking-tight capitalize sm:text-5xl">{article.title}</h1>
                         <div className="flex items-center justify-center gap-1.5 text-xs text-[#706f6c] dark:text-[#A1A09A]">
                             <Calendar className="h-3.5 w-3.5" />
-                            <span>Publicado el:</span>
-                            <time dateTime={article.created_at.toString()}>{format(new Date(article.created_at), 'dd/MM/yyyy')}</time>
+                            <span>{t('blog.published_on')}</span>
+                            <time dateTime={article.created_at.toString()}>{date(article.created_at)}</time>
                         </div>
                     </div>
 
@@ -70,7 +71,7 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                                 <p className="text-sm leading-relaxed whitespace-pre-line text-[#1b1b18] dark:text-[#EDEDEC]">{bodyContent}</p>
                             )
                         ) : (
-                            <p className="text-center text-xs text-[#706f6c] italic dark:text-[#A1A09A]">Sin contenido disponible.</p>
+                            <p className="text-center text-xs text-[#706f6c] italic dark:text-[#A1A09A]">{t('blog.no_content')}</p>
                         )}
                     </div>
 
@@ -79,7 +80,7 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                         <div className="border-t border-[#19140010] pt-6 dark:border-[#3E3E3A]/20">
                             <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
                                 <Tag className="h-3.5 w-3.5 text-(--theme-accent)" />
-                                <span>Etiquetas</span>
+                                <span>{t('tag.list_title')}</span>
                             </h4>
                             <div className="flex flex-wrap gap-2">
                                 {tags.map((term) => (
@@ -101,7 +102,7 @@ export default function Post({ article, navigation, popularTags = [], recentArti
                             !['body', 'content', 'descripcion', 'image', 'imagen', 'featured_image', '_id'].includes(key) && !key.startsWith('seo_'),
                     ).length > 0 && (
                         <div className="space-y-4 border-t border-[#19140010] pt-8 dark:border-[#3E3E3A]/20">
-                            <h4 className="text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">Detalles del Post</h4>
+                            <h4 className="text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">{t('blog.details')}</h4>
                             <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                                 {Object.entries(meta)
                                     .filter(

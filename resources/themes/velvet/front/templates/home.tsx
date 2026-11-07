@@ -6,6 +6,7 @@ import { BLOCK_ICONS } from '@/blocks/icons';
 import Blocks from '@/components/blocks';
 import { MediaImage } from '@/components/media-image';
 import { isExternalLink } from '@/components/social-icon';
+import { useTexts, type Price } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, ArrowUpRight, Bath, Bone, Cat, Dog, PawPrint, Quote, Scissors, Sparkles, Stethoscope, type LucideIcon } from 'lucide-react';
@@ -31,7 +32,8 @@ interface Card {
     url?: string;
     label?: string;
     icon?: string;
-    price?: string;
+    /** A price field ({ amount, currency }), or text saved before price fields existed */
+    price?: Price | string;
 }
 
 interface Testimonial {
@@ -112,6 +114,9 @@ export default function Home({ article, navigation }: HomeProps) {
     const testimonials = list<Testimonial>(m.testimonials);
     const gallery = list<Card>(m.gallery);
     const journal = list<Card>(m.journal_items);
+    const { t, price } = useTexts();
+    // "from $48": the amount is a field, "from" a text of the theme
+    const fromPrice = (value: Card['price']) => (typeof value === 'string' ? value : price(value) && t('shop.from_price', { price: price(value) }));
 
     return (
         <VelvetLayout navigation={navigation} overlay={Boolean(m.hero_image)}>
@@ -288,7 +293,9 @@ export default function Home({ article, navigation }: HomeProps) {
                                         <h3 className="font-display text-ink group-hover:text-forest text-[1.85rem] leading-tight transition-colors">
                                             {card.title}
                                         </h3>
-                                        {card.price && <span className="text-brass shrink-0 text-sm font-medium tracking-wide">{card.price}</span>}
+                                        {fromPrice(card.price) && (
+                                            <span className="text-brass shrink-0 text-sm font-medium tracking-wide">{fromPrice(card.price)}</span>
+                                        )}
                                     </div>
                                     {card.text && <p className="text-stone text-[0.95rem] leading-relaxed">{card.text}</p>}
                                 </div>
@@ -317,7 +324,9 @@ export default function Home({ article, navigation }: HomeProps) {
                                                 <span className="border-brass-light/40 text-brass-light inline-flex h-14 w-14 items-center justify-center rounded-full border">
                                                     <Icon className="h-6 w-6" strokeWidth={1.4} aria-hidden="true" />
                                                 </span>
-                                                {card.price && <span className="text-ivory/60 text-xs tracking-[0.2em] uppercase">{card.price}</span>}
+                                                {fromPrice(card.price) && (
+                                                    <span className="text-ivory/60 text-xs tracking-[0.2em] uppercase">{fromPrice(card.price)}</span>
+                                                )}
                                             </div>
                                             <h3 className="font-display text-ivory mt-8 text-[1.9rem] leading-tight">{card.title}</h3>
                                             {card.text && <p className="text-ivory/65 mt-3 leading-relaxed font-light">{card.text}</p>}
@@ -343,17 +352,17 @@ export default function Home({ article, navigation }: HomeProps) {
             {testimonials.length > 0 && (
                 <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
                     <div className="grid gap-10 md:grid-cols-3">
-                        {testimonials.map((t, index) => (
+                        {testimonials.map((item, index) => (
                             <figure key={index} className="bg-paper relative rounded-[1.75rem] border border-[#e8dece] p-9">
                                 <Quote className="text-brass/40 h-9 w-9" strokeWidth={1.2} aria-hidden="true" />
-                                <blockquote className="font-display text-ink mt-5 text-[1.55rem] leading-snug italic">{t.quote}</blockquote>
+                                <blockquote className="font-display text-ink mt-5 text-[1.55rem] leading-snug italic">{item.quote}</blockquote>
                                 <figcaption className="mt-7 flex items-center gap-3 border-t border-[#e8dece] pt-5">
                                     <span className="bg-cream text-forest inline-flex h-10 w-10 items-center justify-center rounded-full">
                                         <PawPrint className="h-4 w-4" strokeWidth={1.6} />
                                     </span>
                                     <span className="text-sm">
-                                        <span className="text-ink block font-medium">{t.author}</span>
-                                        {t.pet && <span className="text-stone block">{t.pet}</span>}
+                                        <span className="text-ink block font-medium">{item.author}</span>
+                                        {item.pet && <span className="text-stone block">{item.pet}</span>}
                                     </span>
                                 </figcaption>
                             </figure>
@@ -384,7 +393,7 @@ export default function Home({ article, navigation }: HomeProps) {
                                     href={m.journal_url}
                                     className="text-forest border-brass inline-flex shrink-0 items-center gap-2 border-b pb-1 text-xs font-semibold tracking-[0.2em] uppercase"
                                 >
-                                    Read the journal
+                                    {t('journal.read')}
                                     <ArrowUpRight className="h-4 w-4" />
                                 </a>
                             )}

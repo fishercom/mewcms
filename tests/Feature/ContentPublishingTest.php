@@ -208,7 +208,7 @@ it('requires the manage permission for bulk actions', function (): void {
 
 it('returns 404 when deleting a record that does not exist', function (string $resource): void {
     $this->actingAs($this->admin)->delete("/admin/{$resource}/999999")->assertNotFound();
-})->with(['articles', 'posts', 'configs', 'langs', 'notifies', 'parameters', 'sites', 'translates', 'tags']);
+})->with(['articles', 'posts', 'configs', 'langs', 'notifies', 'parameters', 'sites', 'translations', 'tags']);
 
 it('serves tag archives at /tag/{slug} and redirects legacy /category/{slug} URLs', function (): void {
     $tag = CmsTag::create(['name' => 'Viajes', 'slug' => 'viajes', 'active' => 1]);

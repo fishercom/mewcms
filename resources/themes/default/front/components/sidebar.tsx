@@ -1,7 +1,7 @@
 import { tagUrl } from '@/lib/tag-url';
+import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Link } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { Calendar, FileText, Tag } from 'lucide-react';
 
 /** A tag with how many published pages and posts use it. */
@@ -18,6 +18,7 @@ interface SidebarProps {
 }
 
 export default function FrontSidebar({ popularTags = [], recentArticles = [] }: SidebarProps) {
+    const { t, date } = useTexts();
     // Helper to format URLs
     const getArticleUrl = (item: { url?: string; slug: string }) => item.url ?? (!item.slug || item.slug === 'home' ? '/' : '/' + item.slug);
 
@@ -28,7 +29,7 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
                 <div className="rounded-2xl border border-[#19140015] bg-[#FDFDFC] p-6 shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-[#3E3E3A]/40 dark:bg-[#161615]">
                     <h3 className="mb-4 flex items-center gap-2 border-b border-[#19140015] pb-3 text-sm font-semibold text-[#1b1b18] dark:border-[#3E3E3A]/40 dark:text-[#EDEDEC]">
                         <FileText className="h-4 w-4 text-(--theme-accent)" />
-                        <span>Artículos Recientes</span>
+                        <span>{t('sidebar.recent')}</span>
                     </h3>
                     <ul className="space-y-4">
                         {recentArticles.map((art) => (
@@ -39,7 +40,7 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
                                     </h4>
                                     <div className="flex items-center gap-1.5 text-xs text-[#706f6c] dark:text-[#A1A09A]">
                                         <Calendar className="h-3 w-3" />
-                                        <time dateTime={art.created_at.toString()}>{format(new Date(art.created_at), 'dd/MM/yyyy')}</time>
+                                        <time dateTime={art.created_at.toString()}>{date(art.created_at)}</time>
                                     </div>
                                 </Link>
                             </li>
@@ -53,7 +54,7 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
                 <div className="rounded-2xl border border-[#19140015] bg-[#FDFDFC] p-6 shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-[#3E3E3A]/40 dark:bg-[#161615]">
                     <h3 className="mb-4 flex items-center gap-2 border-b border-[#19140015] pb-3 text-sm font-semibold text-[#1b1b18] dark:border-[#3E3E3A]/40 dark:text-[#EDEDEC]">
                         <Tag className="h-4 w-4 text-(--theme-accent)" />
-                        <span>Etiquetas</span>
+                        <span>{t('tag.list_title')}</span>
                     </h3>
                     <div className="flex flex-wrap gap-2">
                         {popularTags.map((tag) => (

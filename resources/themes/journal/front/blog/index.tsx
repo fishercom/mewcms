@@ -1,3 +1,4 @@
+import { useTexts } from '@/lib/theme-texts';
 import { Pagination } from '@/types';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
@@ -12,9 +13,9 @@ interface Props {
 }
 
 export default function Index({ posts, cpt, popularTags = [] }: Props) {
-    const title = cpt ? cpt.name : 'All articles';
-    const description =
-        cpt?.description || 'Practical, vet-informed guides to feeding, grooming, training and simply living well with the animals we love.';
+    const { t } = useTexts();
+    const title = cpt ? cpt.name : t('blog.title');
+    const description = cpt?.description || t('blog.description');
     // The newest article leads the first page only
     const [lead, ...others] = posts.current_page === 1 ? posts.data : [undefined, ...posts.data];
 
@@ -23,7 +24,7 @@ export default function Index({ posts, cpt, popularTags = [] }: Props) {
             <Head title={title} />
 
             <section className="mx-auto max-w-3xl px-5 pt-16 pb-10 text-center sm:px-8">
-                <p className="text-terracotta text-[0.72rem] font-semibold tracking-[0.3em] uppercase">The archive</p>
+                <p className="text-terracotta text-[0.72rem] font-semibold tracking-[0.3em] uppercase">{t('blog.eyebrow')}</p>
                 <h1 className="text-ink mt-4 text-[2.8rem] leading-[1.05] sm:text-[3.8rem]">{title}</h1>
                 <p className="font-read text-graphite mx-auto mt-5 max-w-2xl text-[1.25rem] leading-relaxed">{description}</p>
                 {popularTags.length > 0 && (
@@ -45,7 +46,7 @@ export default function Index({ posts, cpt, popularTags = [] }: Props) {
             {posts.data.length === 0 ? (
                 <div className="border-line text-graphite mx-auto max-w-xl rounded-[1.75rem] border border-dashed px-6 py-20 text-center">
                     <BookOpen className="mx-auto mb-4 h-9 w-9 opacity-50" />
-                    <p className="font-read text-xl">New articles are on their way.</p>
+                    <p className="font-read text-xl">{t('blog.empty')}</p>
                 </div>
             ) : (
                 <>
@@ -65,7 +66,10 @@ export default function Index({ posts, cpt, popularTags = [] }: Props) {
             )}
 
             {posts.last_page > 1 && (
-                <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2 px-5 pt-4 sm:px-8" aria-label="Pages">
+                <nav
+                    className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2 px-5 pt-4 sm:px-8"
+                    aria-label={t('pagination.label')}
+                >
                     {posts.links.map((link, index) =>
                         link.url === null ? null : (
                             <Link

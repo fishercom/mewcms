@@ -1,3 +1,4 @@
+import { useTexts } from '@/lib/theme-texts';
 import { CmsForm } from '@/types/models/cms-form';
 import axios from 'axios';
 import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
@@ -13,6 +14,7 @@ const field =
  * public endpoints as the shared form block.
  */
 export default function ContactForm({ alias }: { alias: string }) {
+    const { t } = useTexts();
     const [form, setForm] = useState<CmsForm | null>(null);
     const [values, setValues] = useState<Values>({});
     const [honeypot, setHoneypot] = useState('');
@@ -52,7 +54,7 @@ export default function ContactForm({ alias }: { alias: string }) {
     if (state === 'loading') {
         return (
             <p className="text-stone flex items-center gap-2 py-10">
-                <Loader2 className="h-5 w-5 animate-spin" /> Loading the form…
+                <Loader2 className="h-5 w-5 animate-spin" /> {t('form.loading')}
             </p>
         );
     }
@@ -61,21 +63,21 @@ export default function ContactForm({ alias }: { alias: string }) {
         return (
             <div className="bg-paper rounded-[1.75rem] border border-[#e2d7c5] p-10 text-center">
                 <CheckCircle2 className="text-forest mx-auto h-10 w-10" strokeWidth={1.4} />
-                <p className="font-display text-ink mt-5 text-3xl">Thank you — your note is with us.</p>
-                <p className="text-stone mt-3">We reply to every message within one working day.</p>
+                <p className="font-display text-ink mt-5 text-3xl">{t('form.sent_title')}</p>
+                <p className="text-stone mt-3">{t('form.sent_text')}</p>
             </div>
         );
     }
 
     if (!form) {
-        return <p className="text-stone">The form is not available right now. Please write to us by email instead.</p>;
+        return <p className="text-stone">{t('form.unavailable')}</p>;
     }
 
     return (
         <form onSubmit={submit} className="space-y-5" noValidate>
             <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
                 <label>
-                    Leave this field empty
+                    {t('form.honeypot')}
                     <input type="text" name="_hp" tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
                 </label>
             </div>
@@ -106,7 +108,7 @@ export default function ContactForm({ alias }: { alias: string }) {
                                     onChange={(e) => setValues((v) => ({ ...v, [f.alias]: e.target.value }))}
                                     className={`${field} h-14`}
                                 >
-                                    <option value="">Choose…</option>
+                                    <option value="">{t('form.choose')}</option>
                                     {f.options?.map((option) => (
                                         <option key={option} value={option}>
                                             {option}
@@ -152,13 +154,13 @@ export default function ContactForm({ alias }: { alias: string }) {
                                     className={`${field} h-14`}
                                 />
                             )}
-                            {errors[f.alias] && <p className="mt-1.5 text-sm text-[#a6402a]">Please fill in this field correctly.</p>}
+                            {errors[f.alias] && <p className="mt-1.5 text-sm text-[#a6402a]">{t('form.invalid_field')}</p>}
                         </div>
                     );
                 })}
             </div>
 
-            {state === 'error' && <p className="text-sm text-[#a6402a]">Something went wrong. Please try again in a moment.</p>}
+            {state === 'error' && <p className="text-sm text-[#a6402a]">{t('form.error')}</p>}
 
             <button
                 type="submit"
@@ -166,7 +168,7 @@ export default function ContactForm({ alias }: { alias: string }) {
                 className="bg-forest text-ivory hover:bg-forest-deep inline-flex items-center gap-3 rounded-full px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase transition-colors disabled:opacity-60"
             >
                 {state === 'sending' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Send message
+                {t('form.submit')}
                 <ArrowRight className="h-4 w-4" />
             </button>
         </form>
