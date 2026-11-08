@@ -1,5 +1,6 @@
 <?php
 
+use App\Ai\AiManager;
 use App\Models\AdmModule;
 use App\Models\CmsLang;
 use App\Models\CmsSite;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Fakes\FakeAiProvider;
 
 beforeEach(function (): void {
     $this->es = CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => 1]);
@@ -175,4 +177,37 @@ it('stores a site currency in capitals', function (): void {
 
     expect($this->shop->fresh()->currency)->toBe('PEN')
         ->and($this->shop->fresh()->summary()['currency'])->toBe('PEN');
+});
+
+it('suggests with the AI the texts the site language lacks, without saving them', function (): void {
+    config(['ai.model' => 'claude-opus-5-5', 'ai.fast_model' => 'claude-haiku-5-5', 'ai.key' => 'test-key', 'ai.base_url' => null]);
+    $fake = new FakeAiProvider(['translations' => [
+        ['key' => 'shop.from_price', 'text' => 'à partir de :price'],
+        // Lost its placeholder: dropped
+        ['key' => 'nav.home_link', 'text' => 'accueil'],
+        // Not asked for: ignored
+        ['key' => 'footer.explore', 'text' => 'Explorer'],
+    ]]);
+    app(AiManager::class)->fake($fake);
+    $fr = CmsLang::create(['name' => 'Français', 'iso' => 'fr', 'active' => 1]);
+    $this->shop->update(['lang_id' => $fr->id]);
+
+    $this->actingAs($this->admin)->postJson('/admin/translations/ai', ['keys' => ['shop.from_price', 'nav.home_link']])
+        ->assertOk()
+        ->assertExactJson(['texts' => ['shop.from_price' => 'à partir de :price'], 'skipped' => 1]);
+
+    // The English texts go to the model, into French
+    expect($fake->calls[0]['prompt'])->toContain('"text": "from :price"')->toContain('into French (fr)')
+        ->and(CmsTranslation::withoutGlobalScopes()->count())->toBe(0);
+
+    // Without keys, every text French lacks is sent
+    $this->actingAs($this->admin)->postJson('/admin/translations/ai')->assertOk();
+    expect($fake->calls[1]['prompt'])->toContain('"key": "gallery.close"');
+});
+
+it('needs the AI assistant to suggest translations', function (): void {
+    $user = User::factory()->create();
+    grantPermissions($user, ['translations' => 'administrar']);
+
+    $this->actingAs($user)->postJson('/admin/translations/ai', ['keys' => ['shop.from_price']])->assertForbidden();
 });

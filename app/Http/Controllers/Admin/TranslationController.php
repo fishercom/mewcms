@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Ai\AiException;
+use App\Ai\TextTranslator;
 use App\Http\Controllers\Controller;
 use App\Models\AdmAction;
 use App\Models\CmsTranslation;
@@ -9,6 +11,7 @@ use App\Support\AdminActivity;
 use App\Support\Sites;
 use App\Support\Themes;
 use App\Support\ThemeTexts;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -50,7 +53,7 @@ class TranslationController extends Controller
             'theme' => Themes::all()[$theme]['name'] ?? $theme,
             'locale' => $locale,
             'fallback' => ThemeTexts::FALLBACK,
-            'site' => Sites::current()?->name,
+            'site_name' => Sites::current()?->name,
         ]);
     }
 
@@ -93,6 +96,61 @@ class TranslationController extends Controller
         }
 
         return back()->with('success', __('Textos guardados.'));
+    }
+
+    /**
+     * "Traducir con IA": the theme's English texts of the keys sent (by default, every key
+     * the site's language lacks and the site has not changed), translated into the
+     * language being edited. Nothing is saved: the editor reviews the suggestions first.
+     */
+    public function suggest(Request $request, TextTranslator $translator): JsonResponse
+    {
+        abort_unless($request->user()->hasAdminPermission('ai', AdmAction::MANAGE), 403);
+
+        $data = $request->validate([
+            'keys' => 'nullable|array|max:'.TextTranslator::MAX_KEYS,
+            'keys.*' => ['string', 'max:191', 'regex:'.ThemeTexts::KEY_PATTERN],
+        ]);
+
+        $theme = Themes::current();
+        $locale = ThemeTexts::locale();
+        if ($locale === ThemeTexts::FALLBACK) {
+            return response()->json(['message' => __('Los textos del tema ya vienen en :locale.', ['locale' => $locale])], 422);
+        }
+
+        $source = ThemeTexts::defaults($theme, ThemeTexts::FALLBACK);
+        $keys = $data['keys'] ?? $this->missingKeys($theme, $locale);
+        $texts = array_intersect_key($source, array_flip($keys));
+        if ($texts === []) {
+            return response()->json(['texts' => [], 'skipped' => 0]);
+        }
+
+        $site = Sites::current()?->name;
+        $context = 'interface texts of the theme «'.(Themes::all()[$theme]['name'] ?? $theme).'»'.($site ? ' on the website «'.$site.'»' : '');
+
+        try {
+            $translated = $translator->translate($texts, TextTranslator::languageName(ThemeTexts::FALLBACK), TextTranslator::languageName($locale), $context, $request->user());
+        } catch (AiException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['texts' => $translated, 'skipped' => count($texts) - count($translated)]);
+    }
+
+    /**
+     * Keys the theme has no text for in $locale and the site has not changed.
+     *
+     * @return list<string>
+     */
+    protected function missingKeys(string $theme, string $locale): array
+    {
+        $translated = ThemeTexts::defaults($theme, $locale, false);
+        $changed = ThemeTexts::overrides($locale);
+
+        return array_values(array_filter(
+            ThemeTexts::keys($theme),
+            fn (string $key): bool => ! array_key_exists($key, $translated) && ! array_key_exists($key, $changed),
+        ));
     }
 
     /**

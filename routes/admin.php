@@ -59,6 +59,8 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     // Texts of the site's theme: listed and saved together, removed one by one
     Route::get('translations', [TranslationController::class, 'index'])->name('translations.index');
     Route::put('translations', [TranslationController::class, 'update'])->name('translations.update');
+    // Missing texts translated by the AI assistant, as suggestions to review before saving
+    Route::post('translations/ai', [TranslationController::class, 'suggest'])->middleware('throttle:ai')->name('translations.ai');
     Route::delete('translations/{translation}', [TranslationController::class, 'destroy'])->name('translations.destroy');
     Route::resource('configs', ConfigController::class);
 
