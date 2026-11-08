@@ -60,6 +60,17 @@ export default function Language() {
     // "Pausar" stops the run after the item being processed
     const pausing = useRef(false);
     const [pauseAsked, setPauseAsked] = useState(false);
+    // Seconds spent on the item being processed: a long page takes the AI a while
+    const [seconds, setSeconds] = useState(0);
+    useEffect(() => {
+        setSeconds(0);
+        if (!running) {
+            return;
+        }
+        const timer = window.setInterval(() => setSeconds((value) => value + 1), 1000);
+
+        return () => window.clearInterval(timer);
+    }, [running, current]);
 
     // Theme texts are only translated by the AI
     const queue = tasks.filter((task) => useAi || task.type !== 'texts');
@@ -107,9 +118,20 @@ export default function Language() {
             const task = queue[index];
             setCurrent(task.title);
             try {
-                await apiClient.post(route('sites.languages.step', [site_id, target.id]), { type: task.type, id: task.id, ai: useAi });
+                // A model that never answers must not leave the run hanging: give up after 5 minutes
+                await apiClient.post(
+                    route('sites.languages.step', [site_id, target.id]),
+                    { type: task.type, id: task.id, ai: useAi },
+                    { timeout: 5 * 60 * 1000 },
+                );
             } catch (e) {
-                setError((isAxiosError(e) && e.response?.data?.message) || t('No se pudo completar «:title».', { title: task.title }));
+                const timedOut = isAxiosError(e) && e.code === 'ECONNABORTED';
+                setError(
+                    (isAxiosError(e) && e.response?.data?.message) ||
+                        (timedOut
+                            ? t('La IA no respondió a tiempo con «:title». Pulsa Continuar para reintentar.', { title: task.title })
+                            : t('No se pudo completar «:title».', { title: task.title })),
+                );
                 setRunning(false);
                 return;
             }
@@ -296,11 +318,19 @@ export default function Language() {
                             <div className="bg-muted h-2 overflow-hidden rounded-full">
                                 <div className="bg-primary h-full transition-all" style={{ width: `${progress}%` }} />
                             </div>
-                            <p className="text-muted-foreground truncate text-xs">
-                                {current
-                                    ? t(':done de :total: :title', { done: String(done), total: String(queue.length), title: current })
-                                    : t(':done de :total', { done: String(done), total: String(queue.length) })}
+                            <p className="text-muted-foreground flex justify-between gap-2 text-xs">
+                                <span className="truncate">
+                                    {current
+                                        ? t(':done de :total: :title', { done: String(done), total: String(queue.length), title: current })
+                                        : t(':done de :total', { done: String(done), total: String(queue.length) })}
+                                </span>
+                                <span className="shrink-0 tabular-nums">{t(':seconds s', { seconds: String(seconds) })}</span>
                             </p>
+                            {useAi && seconds >= 15 && (
+                                <p className="text-muted-foreground text-xs">
+                                    {t('La IA está traduciendo esta página. Las páginas largas pueden tardar uno o dos minutos.')}
+                                </p>
+                            )}
                         </div>
                         <div className="text-foreground rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs">
                             {t(
