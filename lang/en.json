@@ -1183,7 +1183,6 @@
     "El modelo configurado no tiene precio: el costo no se puede estimar.": "The configured model has no price: the cost cannot be estimated.",
     "Enlaces entre páginas": "Links between pages",
     "Listo.": "Done.",
-    "No cierres esta página hasta que termine.": "Keep this page open until it finishes.",
     "No se pudo completar «:title».": "Could not complete “:title”.",
     "Posts": "Posts",
     "Preparando…": "Preparing…",
@@ -1197,5 +1196,11 @@
     "Traducir con IA": "Translate with AI",
     "Traducir todo con IA": "Translate everything with AI",
     "Versiones en otros idiomas": "Versions in other languages",
-    "¿Publicar las :count versiones en :lang?": "Publish the :count versions in :lang?"
+    "¿Publicar las :count versiones en :lang?": "Publish the :count versions in :lang?",
+    "La preparación se detendrá si sales de esta página. ¿Salir de todos modos?": "Preparing will stop if you leave this page. Leave anyway?",
+    "Mientras se prepara, el admin queda bloqueado en esta pestaña. Puedes pausar y continuar después sin perder lo hecho.": "While it runs, the admin is locked in this tab. You can pause and continue later without losing what was done.",
+    "Preparando versión en :lang": "Preparing :lang version",
+    "No cierres esta pestaña: es la que va procesando cada página. Puedes trabajar en otra pestaña mientras tanto. Si se cierra, se detiene sin perder lo hecho y puedes continuar después desde aquí.": "Do not close this tab: it is the one processing each page. You can work in another tab meanwhile. If it closes, it stops without losing what was done, and you can continue later from here.",
+    "Pausando…": "Pausing…",
+    "Pausar": "Pause"
 }

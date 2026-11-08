@@ -7,8 +7,8 @@ import { t } from '@/lib/i18n';
 import apiClient from '@/services/api';
 import { Link, router, usePage } from '@inertiajs/react';
 import { isAxiosError } from 'axios';
-import { CheckCircle2, FileText, List, Loader2, Newspaper, Play, Send, Sparkles, Type } from 'lucide-react';
-import { useState } from 'react';
+import { CheckCircle2, FileText, List, Loader2, Newspaper, Pause, Play, Send, Sparkles, Type } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Lang {
     id: number;
@@ -57,16 +57,53 @@ export default function Language() {
     const [current, setCurrent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [finished, setFinished] = useState(false);
+    // "Pausar" stops the run after the item being processed
+    const pausing = useRef(false);
+    const [pauseAsked, setPauseAsked] = useState(false);
 
     // Theme texts are only translated by the AI
     const queue = tasks.filter((task) => useAi || task.type !== 'texts');
     const work = queue.filter((task) => task.type !== 'links').length;
     const overBudget = ai !== null && summary.cost !== null && ai.spent + summary.cost > ai.budget;
 
+    // Leaving the page stops the run: the browser asks first
+    useEffect(() => {
+        if (!running) {
+            return;
+        }
+        const warn = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+            event.returnValue = '';
+        };
+        window.addEventListener('beforeunload', warn);
+        const removeRouterWarning = router.on('before', () =>
+            window.confirm(t('La preparación se detendrá si sales de esta página. ¿Salir de todos modos?')),
+        );
+
+        return () => {
+            window.removeEventListener('beforeunload', warn);
+            removeRouterWarning();
+        };
+    }, [running]);
+
+    // Once the run is over (and the leave warning gone), show the drafts it made
+    useEffect(() => {
+        if (finished) {
+            router.reload({ only: ['summary', 'tasks', 'drafts'] });
+        }
+    }, [finished]);
+
     const start = async () => {
         setRunning(true);
         setError(null);
+        pausing.current = false;
+        setPauseAsked(false);
         for (let index = done; index < queue.length; index++) {
+            if (pausing.current) {
+                setRunning(false);
+                setCurrent(null);
+                return;
+            }
             const task = queue[index];
             setCurrent(task.title);
             try {
@@ -81,7 +118,6 @@ export default function Language() {
         setRunning(false);
         setCurrent(null);
         setFinished(true);
-        router.reload({ only: ['summary', 'tasks', 'drafts'] });
     };
 
     const publishAll = () => {
@@ -169,7 +205,7 @@ export default function Language() {
                             </p>
                         )}
 
-                        {(running || done > 0) && (
+                        {!running && done > 0 && (
                             <div className="space-y-1.5">
                                 <div className="bg-muted h-2 overflow-hidden rounded-full">
                                     <div className="bg-primary h-full transition-all" style={{ width: `${progress}%` }} />
@@ -198,7 +234,13 @@ export default function Language() {
                                 {running ? t('Preparando…') : done > 0 ? t('Continuar') : useAi ? t('Traducir todo con IA') : t('Copiar todo')}
                             </Button>
                         )}
-                        {running && <p className="text-muted-foreground text-xs">{t('No cierres esta página hasta que termine.')}</p>}
+                        {!finished && (
+                            <p className="text-muted-foreground text-xs">
+                                {t(
+                                    'Mientras se prepara, el admin queda bloqueado en esta pestaña. Puedes pausar y continuar después sin perder lo hecho.',
+                                )}
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -239,6 +281,50 @@ export default function Language() {
                     </div>
                 )}
             </div>
+            {running && (
+                <div
+                    className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    <div className="border-border bg-card w-full max-w-md space-y-4 rounded-xl border p-6 shadow-xl">
+                        <div className="flex items-center gap-2">
+                            <Loader2 className="text-primary h-5 w-5 animate-spin" />
+                            <h2 className="text-foreground font-semibold">{t('Preparando versión en :lang', { lang: target.name })}</h2>
+                        </div>
+                        <div className="space-y-1.5">
+                            <div className="bg-muted h-2 overflow-hidden rounded-full">
+                                <div className="bg-primary h-full transition-all" style={{ width: `${progress}%` }} />
+                            </div>
+                            <p className="text-muted-foreground truncate text-xs">
+                                {current
+                                    ? t(':done de :total: :title', { done: String(done), total: String(queue.length), title: current })
+                                    : t(':done de :total', { done: String(done), total: String(queue.length) })}
+                            </p>
+                        </div>
+                        <div className="text-foreground rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs">
+                            {t(
+                                'No cierres esta pestaña: es la que va procesando cada página. Puedes trabajar en otra pestaña mientras tanto. Si se cierra, se detiene sin perder lo hecho y puedes continuar después desde aquí.',
+                            )}
+                        </div>
+                        <div className="flex justify-end">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1.5"
+                                disabled={pauseAsked}
+                                onClick={() => {
+                                    pausing.current = true;
+                                    setPauseAsked(true);
+                                }}
+                            >
+                                <Pause className="h-3.5 w-3.5" />
+                                {pauseAsked ? t('Pausando…') : t('Pausar')}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </ModuleLayout>
     );
 }
