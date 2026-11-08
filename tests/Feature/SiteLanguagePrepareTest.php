@@ -12,6 +12,7 @@ use App\Models\CmsSchemaGroup;
 use App\Models\CmsSite;
 use App\Models\CmsTranslation;
 use App\Models\User;
+use App\Support\ContentVersions;
 use App\Support\MenuCopier;
 use App\Support\Sites;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -272,4 +273,20 @@ it('copies without the AI, and refuses the AI to users without it', function ():
     $version = CmsArticle::withoutGlobalScopes()->where('lang_id', $this->en->id)->firstOrFail();
     expect($version->title)->toBe('Servicios')
         ->and($version->status)->toBe('draft');
+});
+
+it('does not make a second version when two requests translate the same page', function (): void {
+    $page = ($this->page)($this->es, 'Inicio', 'home');
+    // Both requests loaded the page before either made its version
+    $first = CmsArticle::withoutGlobalScopes()->find($page->id);
+    $second = CmsArticle::withoutGlobalScopes()->find($page->id);
+
+    Sites::as($this->shop->fresh(), function () use ($first, $second): void {
+        $a = ContentVersions::create($first, $this->en, null, ['title' => 'Home']);
+        $b = ContentVersions::create($second, $this->en, null, ['title' => 'Home again']);
+        expect($b->id)->toBe($a->id);
+    });
+
+    expect(CmsArticle::withoutGlobalScopes()->where('lang_id', $this->en->id)->count())->toBe(1)
+        ->and($page->fresh()->translation_group)->toBe(CmsArticle::withoutGlobalScopes()->where('lang_id', $this->en->id)->value('translation_group'));
 });
