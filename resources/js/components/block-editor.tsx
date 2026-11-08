@@ -1,6 +1,7 @@
 import { BLOCK_RENDERERS } from '@/blocks/registry';
 import { type BlockData, type BlockDefinition, type BlockPattern, type BlockValues, newBlockId, str, withNewIds } from '@/blocks/types';
 import AiBlockMenu, { hasAiText } from '@/components/ai-block-menu';
+import { confirmDialog } from '@/components/confirm-dialog';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
@@ -208,10 +209,17 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
         onChange(next);
     };
 
-    const remove = (index: number) => {
+    const remove = async (index: number) => {
         const block = value[index];
         const type = typeByKey[block.type];
-        if (summaryOf(block) && !window.confirm(t('¿Eliminar el bloque ":name"?', { name: type?.name ?? block.type }))) return;
+        if (
+            summaryOf(block) &&
+            !(await confirmDialog({
+                title: t('¿Eliminar el bloque ":name"?', { name: type?.name ?? block.type }),
+                description: t('Se quitará de la página con todo su contenido.'),
+            }))
+        )
+            return;
         onChange(value.filter((_, i) => i !== index));
     };
 

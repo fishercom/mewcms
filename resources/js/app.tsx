@@ -1,6 +1,7 @@
 import '@fontsource/sora/latin-500.css';
 import '@fontsource/sora/latin-700.css';
 
+import { ConfirmDialogHost } from '@/components/confirm-dialog';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
@@ -23,7 +24,12 @@ createInertiaApp({
         setLocalePrefix((props.initialPage.props.site as { prefix?: string } | null)?.prefix);
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        root.render(
+            <>
+                <App {...props} />
+                <ConfirmDialogHost />
+            </>,
+        );
     },
     progress: {
         color: '#4B5563',

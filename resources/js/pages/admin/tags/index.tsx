@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
@@ -60,13 +61,13 @@ export default function Index() {
         router.put(route('tags.update', tag.id), { name: tag.name, active: !tag.active }, { preserveScroll: true, onError: showErrors });
     };
 
-    const destroy = (tag: CmsTag) => {
+    const destroy = async (tag: CmsTag) => {
         const uses = (tag.articles_count ?? 0) + (tag.posts_count ?? 0);
-        const message =
-            uses > 0
-                ? t('":name" se quitará de :count contenido(s). ¿Eliminar la etiqueta?', { name: tag.name, count: uses })
-                : t('¿Eliminar la etiqueta ":name"?', { name: tag.name });
-        if (window.confirm(message)) {
+        const confirmed = await confirmDialog({
+            title: t('¿Eliminar la etiqueta ":name"?', { name: tag.name }),
+            description: uses > 0 ? t('Se quitará de :count contenido(s).', { count: uses }) : undefined,
+        });
+        if (confirmed) {
             router.delete(route('tags.destroy', tag.id), { preserveScroll: true, onError: showErrors });
         }
     };

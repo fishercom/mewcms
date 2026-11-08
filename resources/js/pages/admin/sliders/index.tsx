@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
@@ -28,8 +29,13 @@ export default function Index() {
         }
     }, [debouncedSearch]);
 
-    const handleDelete = (id: number, name: string) => {
-        if (window.confirm(t('¿Estás seguro de que deseas eliminar el slider ":name"? Se eliminarán también sus diapositivas.', { name }))) {
+    const handleDelete = async (id: number, name: string) => {
+        if (
+            await confirmDialog({
+                title: t('¿Eliminar el slider ":name"?', { name }),
+                description: t('Se eliminarán también sus diapositivas. Esta acción no se puede deshacer.'),
+            })
+        ) {
             router.delete(route('sliders.destroy', id));
         }
     };

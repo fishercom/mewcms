@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
@@ -74,8 +75,13 @@ export default function Index() {
         }
     };
 
-    const destroy = (item: CmsRedirect) => {
-        if (window.confirm(t('¿Eliminar la redirección de ":path"?', { path: item.from_path }))) {
+    const destroy = async (item: CmsRedirect) => {
+        if (
+            await confirmDialog({
+                title: t('¿Eliminar la redirección de ":path"?', { path: item.from_path }),
+                description: t('Esta acción no se puede deshacer.'),
+            })
+        ) {
             router.delete(route('redirects.destroy', item.id), { preserveScroll: true, onError: showErrors });
         }
     };

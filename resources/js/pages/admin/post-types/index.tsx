@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
@@ -32,14 +33,12 @@ export default function Index() {
         setQuery({ s: e.target.value });
     };
 
-    const handleDelete = (id: number, name: string) => {
+    const handleDelete = async (id: number, name: string) => {
         if (
-            window.confirm(
-                t(
-                    '¿Estás seguro de que deseas eliminar el tipo de contenido ":name"? Se eliminarán todas las entradas y módulos del menú asociados.',
-                    { name },
-                ),
-            )
+            await confirmDialog({
+                title: t('¿Eliminar el tipo de contenido ":name"?', { name }),
+                description: t('Se eliminarán todas las entradas y módulos del menú asociados. Esta acción no se puede deshacer.'),
+            })
         ) {
             router.delete(route('post-types.destroy', id), {
                 preserveScroll: true,

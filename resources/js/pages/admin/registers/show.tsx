@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import ModuleLayout from '@/layouts/module/layout';
 import { t } from '@/lib/i18n';
@@ -20,8 +21,8 @@ export default function Show() {
         );
     };
 
-    const handleDelete = () => {
-        if (confirm(t('¿Eliminar definitivamente este mensaje?'))) {
+    const handleDelete = async () => {
+        if (await confirmDialog({ title: t('¿Eliminar definitivamente este mensaje?'), description: t('Esta acción no se puede deshacer.') })) {
             router.delete(route('registers.destroy', item.id));
         }
     };

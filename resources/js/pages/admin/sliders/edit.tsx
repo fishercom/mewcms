@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -56,9 +57,15 @@ export default function Edit() {
         setSlides([...slides, newSlide]);
     };
 
-    const handleRemoveSlide = (index: number) => {
-        if (window.confirm(t('¿Deseas quitar esta diapositiva? Guarde los cambios para confirmar.'))) {
-            setSlides(slides.filter((_, i) => i !== index));
+    const handleRemoveSlide = async (index: number) => {
+        if (
+            await confirmDialog({
+                title: t('¿Quitar esta diapositiva?'),
+                description: t('Se quitará al guardar los cambios del slider.'),
+                confirmLabel: t('Quitar'),
+            })
+        ) {
+            setSlides((current) => current.filter((_, i) => i !== index));
         }
     };
 
