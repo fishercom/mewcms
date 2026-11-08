@@ -57,6 +57,8 @@ export default function Language() {
     const [current, setCurrent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [finished, setFinished] = useState(false);
+    // The estimate and the month's spending when the run started, to show what it cost
+    const costAtStart = useRef<{ estimate: number | null; spent: number } | null>(null);
     // "Pausar" stops the run after the item being processed
     const pausing = useRef(false);
     const request = useRef<AbortController | null>(null);
@@ -101,11 +103,14 @@ export default function Language() {
     // Once the run is over (and the leave warning gone), show the drafts it made
     useEffect(() => {
         if (finished) {
-            router.reload({ only: ['summary', 'tasks', 'drafts'] });
+            router.reload({ only: ['summary', 'tasks', 'drafts', 'ai'] });
         }
     }, [finished]);
 
     const start = async () => {
+        if (useAi && ai && costAtStart.current === null) {
+            costAtStart.current = { estimate: summary.cost, spent: ai.spent };
+        }
         setRunning(true);
         setError(null);
         pausing.current = false;
@@ -242,7 +247,9 @@ export default function Language() {
                                 </div>
                                 <p className="text-muted-foreground text-xs">
                                     {finished
-                                        ? t('Listo.')
+                                        ? useAi && ai && costAtStart.current
+                                            ? t('Listo. Costo de la IA: :cost.', { cost: money(Math.max(0, ai.spent - costAtStart.current.spent)) })
+                                            : t('Listo.')
                                         : current
                                           ? t(':done de :total: :title', { done: String(done), total: String(queue.length), title: current })
                                           : t(':done de :total', { done: String(done), total: String(queue.length) })}
@@ -340,6 +347,11 @@ export default function Language() {
                                 </p>
                             )}
                         </div>
+                        {useAi && costAtStart.current?.estimate != null && (
+                            <p className="text-muted-foreground text-xs">
+                                {t('Costo estimado de la IA: :cost.', { cost: money(costAtStart.current.estimate) })}
+                            </p>
+                        )}
                         <div className="text-foreground rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs">
                             {t(
                                 'No cierres esta pestaña: es la que va procesando cada página. Puedes trabajar en otra pestaña mientras tanto. Si se cierra, se detiene sin perder lo hecho y puedes continuar después desde aquí.',
