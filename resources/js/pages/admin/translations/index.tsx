@@ -180,6 +180,15 @@ export default function Index() {
                     </Button>
                 </div>
 
+                {ai_assistant && !aiMessage && untranslated.length === 0 && (
+                    <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        {locale === fallback
+                            ? t('Los textos del tema se escriben en :locale: elige otro idioma para traducirlos con IA.', { locale })
+                            : t('El tema ya trae todos sus textos en :locale: no queda nada que traducir con IA.', { locale })}
+                    </p>
+                )}
+
                 {aiMessage && (
                     <p
                         role="status"

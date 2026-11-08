@@ -119,7 +119,7 @@ class TranslationController extends Controller
         }
 
         $source = ThemeTexts::defaults($theme, ThemeTexts::FALLBACK);
-        $keys = $data['keys'] ?? $this->missingKeys($theme, $locale);
+        $keys = $data['keys'] ?? ThemeTexts::missing($theme, $locale);
         $texts = array_intersect_key($source, array_flip($keys));
         if ($texts === []) {
             return response()->json(['texts' => [], 'skipped' => 0]);
@@ -135,22 +135,6 @@ class TranslationController extends Controller
         }
 
         return response()->json(['texts' => $translated, 'skipped' => count($texts) - count($translated)]);
-    }
-
-    /**
-     * Keys the theme has no text for in $locale and the site has not changed.
-     *
-     * @return list<string>
-     */
-    protected function missingKeys(string $theme, string $locale): array
-    {
-        $translated = ThemeTexts::defaults($theme, $locale, false);
-        $changed = ThemeTexts::overrides($locale);
-
-        return array_values(array_filter(
-            ThemeTexts::keys($theme),
-            fn (string $key): bool => ! array_key_exists($key, $translated) && ! array_key_exists($key, $changed),
-        ));
     }
 
     /**

@@ -8,6 +8,8 @@ use App\Models\CmsMenu;
 use App\Models\CmsMenuItem;
 use App\Rules\SafeUrl;
 use App\Support\FrontCache;
+use App\Support\Locales;
+use App\Support\MenuCopier;
 use App\Support\Sites;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +24,7 @@ class MenuController extends Controller
     {
         $s = $request->get('s');
 
-        $items = CmsMenu::select()
+        $items = Locales::scope(CmsMenu::query())
             ->where(function ($query) use ($s): void {
                 if (! empty($s)) {
                     $query->where('name', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
@@ -30,8 +32,15 @@ class MenuController extends Controller
             })
             ->paginate(15);
 
+        // The menus a language lacks: the main language's ones it can copy (see translate)
+        $missing = Locales::isExtra()
+            ? Locales::scope(CmsMenu::query(), Locales::main()?->id)->whereNotIn('slug', Locales::scope(CmsMenu::query())->pluck('slug'))->get(['id', 'name', 'slug'])
+            : collect();
+
         return Inertia::render('admin/menus/index', [
             'items' => $items,
+            'missing' => $missing,
+            'language' => Locales::current()?->only(['id', 'name', 'iso']),
         ]);
     }
 
@@ -44,7 +53,7 @@ class MenuController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_menus', 'slug')],
+            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_menus', 'slug')->where('lang_id', Locales::currentId())],
             'description' => 'nullable|string',
             'auto_add_pages' => 'boolean',
             'auto_add_subpages' => 'boolean',
@@ -52,6 +61,7 @@ class MenuController extends Controller
         ]);
 
         $menu = new CmsMenu($data);
+        $menu->lang_id = Locales::currentId();
         $menu->save();
 
         return redirect('admin/menus');
@@ -63,7 +73,8 @@ class MenuController extends Controller
             $q->orderBy('position');
         }])->findOrFail($id);
 
-        $articles = CmsArticle::where('active', true)
+        // Its links go to pages of its own language
+        $articles = Locales::scope(CmsArticle::query(), Locales::forContent($item->lang_id)?->id)->where('active', true)
             ->orderBy('title')
             ->get(['id', 'title', 'slug']);
 
@@ -79,7 +90,7 @@ class MenuController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_menus', 'slug', $id)],
+            'slug' => ['nullable', 'string', 'max:255', Sites::unique('cms_menus', 'slug', $id)->where('lang_id', $item->lang_id)],
             'description' => 'nullable|string',
             'auto_add_pages' => 'boolean',
             'auto_add_subpages' => 'boolean',
@@ -97,6 +108,22 @@ class MenuController extends Controller
         $item->save();
 
         return redirect('admin/menus');
+    }
+
+    /**
+     * Copy a menu of the main language into the language being edited: same slug and tree,
+     * page links pointing at each page's version in that language.
+     */
+    public function translate($id): RedirectResponse
+    {
+        $menu = CmsMenu::findOrFail($id);
+        $lang = Locales::current();
+        abort_unless($lang && Locales::isExtra($lang->id), 404);
+
+        $copy = MenuCopier::copy($menu, $lang);
+        FrontCache::flush();
+
+        return redirect()->route('menus.edit', $copy->id)->with('success', __('Menú copiado a :lang.', ['lang' => $lang->name]));
     }
 
     public function destroy($id): RedirectResponse

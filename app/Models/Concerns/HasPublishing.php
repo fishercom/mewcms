@@ -32,6 +32,15 @@ trait HasPublishing
             ->where(fn (Builder $query) => $query->whereNull($table.'.published_at')->orWhere($table.'.published_at', '<=', now()));
     }
 
+    /**
+     * Whether the public site may show this item now (see scopePublished).
+     */
+    public function isLive(): bool
+    {
+        return $this->status === self::STATUS_PUBLISHED && (bool) $this->active
+            && ($this->published_at === null || ! $this->published_at->isFuture());
+    }
+
     public function getIsScheduledAttribute(): bool
     {
         return $this->status === self::STATUS_PUBLISHED && $this->published_at !== null && $this->published_at->isFuture();

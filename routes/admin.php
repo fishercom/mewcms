@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\SchemaController;
 use App\Http\Controllers\Admin\SeoReviewController;
 use App\Http\Controllers\Admin\SiteController;
+use App\Http\Controllers\Admin\SiteLanguageController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TemplateController;
@@ -74,6 +75,10 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
         Route::post('ai/draft', [AiController::class, 'draft'])->name('ai.draft');
     });
 
+    // "Preparar versión en …": a new language of the site built from its main language
+    Route::get('sites/{site}/languages/{lang}', [SiteLanguageController::class, 'show'])->whereNumber(['site', 'lang'])->name('sites.languages.show');
+    Route::post('sites/{site}/languages/{lang}/step', [SiteLanguageController::class, 'step'])->whereNumber(['site', 'lang'])->name('sites.languages.step');
+    Route::post('sites/{site}/languages/{lang}/publish', [SiteLanguageController::class, 'publish'])->whereNumber(['site', 'lang'])->name('sites.languages.publish');
     Route::resource('sites', SiteController::class);
     Route::resource('schemas', SchemaController::class);
     Route::resource('parameters', ParameterController::class);
@@ -100,6 +105,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::post('tags/quick', [TagController::class, 'quickStore'])->name('tags.quick');
     Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
 
+    Route::post('menus/{menu}/translate', [MenuController::class, 'translate'])->whereNumber('menu')->name('menus.translate');
     Route::resource('menus', MenuController::class);
     Route::post('menus/{menu}/items', [MenuController::class, 'storeItems'])->name('menus.items.store');
     Route::post('menus/{menu}/items/sort', [MenuController::class, 'sortItems'])->name('menus.items.sort');

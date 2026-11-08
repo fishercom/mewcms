@@ -1,3 +1,4 @@
+import { LanguageFilter } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
@@ -8,11 +9,15 @@ import { CmsMenu } from '@/types/models/cms-menu';
 import { Input } from '@headlessui/react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Check, Edit, List, Plus, Search, Trash2 } from 'lucide-react';
+import { Check, Copy, Edit, Languages, List, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Index() {
-    const { items } = usePage<{ items: Pagination<CmsMenu> }>().props;
+    const {
+        items,
+        missing = [],
+        language,
+    } = usePage<{ items: Pagination<CmsMenu>; missing?: { id: number; name: string; slug: string }[]; language?: { name: string } | null }>().props;
     const [query, setQuery] = useState({ s: '' });
 
     useEffect(() => {
@@ -52,6 +57,7 @@ export default function Index() {
                         </form>
                     </div>
                     <div className="flex w-full flex-shrink-0 flex-col items-stretch justify-end space-y-2 md:w-auto md:flex-row md:items-center md:space-y-0 md:space-x-3">
+                        <LanguageFilter />
                         <Link
                             href="/admin/menus/create"
                             className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors"
@@ -61,6 +67,28 @@ export default function Index() {
                         </Link>
                     </div>
                 </div>
+                {missing.length > 0 && (
+                    <div className="border-primary/20 bg-primary/5 mb-4 flex flex-wrap items-center gap-2 rounded-lg border px-4 py-3 text-sm">
+                        <Languages className="text-primary h-4 w-4" />
+                        <span className="text-foreground">
+                            {t('Estos menús todavía muestran los enlaces del idioma principal en :lang:', { lang: language?.name ?? '' })}
+                        </span>
+                        {missing.map((menu) => (
+                            <Button
+                                key={menu.id}
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                className="h-7 gap-1 text-xs"
+                                onClick={() => router.post(route('menus.translate', menu.id))}
+                                title={t('Crea una copia del menú en este idioma, con los enlaces a las páginas traducidas.')}
+                            >
+                                <Copy className="h-3.5 w-3.5" />
+                                {t('Copiar «:name»', { name: menu.name })}
+                            </Button>
+                        ))}
+                    </div>
+                )}
                 <div className="overflow-x-auto">
                     <table className="text-muted-foreground w-full text-left text-sm">
                         <thead className="bg-table-header text-muted-foreground text-xs uppercase">
