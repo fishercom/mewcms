@@ -59,6 +59,7 @@ export default function Language() {
     const [finished, setFinished] = useState(false);
     // "Pausar" stops the run after the item being processed
     const pausing = useRef(false);
+    const request = useRef<AbortController | null>(null);
     const [pauseAsked, setPauseAsked] = useState(false);
     // Seconds spent on the item being processed: a long page takes the AI a while
     const [seconds, setSeconds] = useState(0);
@@ -117,14 +118,21 @@ export default function Language() {
             }
             const task = queue[index];
             setCurrent(task.title);
+            request.current = new AbortController();
             try {
                 // A model that never answers must not leave the run hanging: give up after 5 minutes
                 await apiClient.post(
                     route('sites.languages.step', [site_id, target.id]),
                     { type: task.type, id: task.id, ai: useAi },
-                    { timeout: 5 * 60 * 1000 },
+                    { timeout: 5 * 60 * 1000, signal: request.current.signal },
                 );
             } catch (e) {
+                // Paused mid-item: the server finishes it on its own, "Continuar" picks up from there
+                if (pausing.current) {
+                    setRunning(false);
+                    setCurrent(null);
+                    return;
+                }
                 const timedOut = isAxiosError(e) && e.code === 'ECONNABORTED';
                 setError(
                     (isAxiosError(e) && e.response?.data?.message) ||
@@ -346,6 +354,7 @@ export default function Language() {
                                 onClick={() => {
                                     pausing.current = true;
                                     setPauseAsked(true);
+                                    request.current?.abort();
                                 }}
                             >
                                 <Pause className="h-3.5 w-3.5" />
