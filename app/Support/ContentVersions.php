@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\CmsArticle;
 use App\Models\CmsLang;
 use App\Models\CmsPost;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Starts the version of a page or post in another language of its site: a draft copy
@@ -20,6 +21,21 @@ class ContentVersions
      */
     public static function create(CmsArticle|CmsPost $item, CmsLang $lang, ?int $userId, array $attributes = []): CmsArticle|CmsPost
     {
+        // One version at a time per item and language: two requests (a retried step, a
+        // double click) must not both create one
+        return Cache::lock('content-version:'.$item->getMorphClass().':'.$item->getKey().':'.$lang->id, 30)
+            ->block(30, fn () => self::createNow($item, $lang, $userId, $attributes));
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    protected static function createNow(CmsArticle|CmsPost $item, CmsLang $lang, ?int $userId, array $attributes): CmsArticle|CmsPost
+    {
+        // Another request may have linked the item to a version since it was loaded
+        $item->translation_group = $item->newQuery()->whereKey($item->getKey())->value('translation_group');
+        $item->syncOriginalAttribute('translation_group');
+
         $existing = $item->translationIn($lang->id);
         if ($existing) {
             return $existing;
