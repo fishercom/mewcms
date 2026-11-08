@@ -1202,5 +1202,8 @@
     "Preparando versión en :lang": "Preparando versión en :lang",
     "No cierres esta pestaña: es la que va procesando cada página. Puedes trabajar en otra pestaña mientras tanto. Si se cierra, se detiene sin perder lo hecho y puedes continuar después desde aquí.": "No cierres esta pestaña: es la que va procesando cada página. Puedes trabajar en otra pestaña mientras tanto. Si se cierra, se detiene sin perder lo hecho y puedes continuar después desde aquí.",
     "Pausando…": "Pausando…",
-    "Pausar": "Pausar"
+    "Pausar": "Pausar",
+    ":seconds s": ":seconds s",
+    "La IA está traduciendo esta página. Las páginas largas pueden tardar uno o dos minutos.": "La IA está traduciendo esta página. Las páginas largas pueden tardar uno o dos minutos.",
+    "La IA no respondió a tiempo con «:title». Pulsa Continuar para reintentar.": "La IA no respondió a tiempo con «:title». Pulsa Continuar para reintentar."
 }

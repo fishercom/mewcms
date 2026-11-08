@@ -24,8 +24,8 @@ class ContentTranslator
     /** SEO texts kept in the item's metadata */
     public const SEO_KEYS = ['seo_title', 'seo_description', 'seo_keywords'];
 
-    /** Characters of text sent in one call */
-    protected const CHUNK_CHARS = 12000;
+    /** Characters of text sent in one call: small enough for the model to answer in well under a minute */
+    protected const CHUNK_CHARS = 5000;
 
     public function __construct(protected AiManager $ai) {}
 
@@ -235,7 +235,7 @@ class ContentTranslator
         $response = $this->ai->run('fast', 'translate_content', $system, $prompt, $schema, $user, [
             'module' => $item instanceof CmsArticle ? 'articles' : 'posts',
             'item_id' => $item->id,
-        ], 16000);
+        ], 8000);
 
         $out = [];
         foreach ((array) ($response->data['translations'] ?? []) as $row) {
