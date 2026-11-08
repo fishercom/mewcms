@@ -88,6 +88,7 @@ export default function Create() {
                         schema={activeSchema}
                         onChangeSchema={handleChangeSchema}
                         cptLabelSingular={singularName}
+                        postType={post_type}
                     />
 
                     <div className="border-border flex items-center gap-4 border-t pt-4">
