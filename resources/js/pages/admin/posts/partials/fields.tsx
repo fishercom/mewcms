@@ -4,19 +4,21 @@ import BlockEditor from '@/components/block-editor';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
-import SeoReview, { useSeoReview } from '@/components/seo-review';
+import SeoReview, { SeoScoreBadge, useSeoReview } from '@/components/seo-review';
 import TagField from '@/components/tag-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStarterLayout } from '@/hooks/use-starter-layout';
 import { t } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
+import { JsonValue } from '@/types/models/cms-article';
 import { CmsPost } from '@/types/models/cms-post';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
 import { usePage } from '@inertiajs/react';
-import { Calendar, Eye, Image as ImageIcon, Settings, Trash2, User } from 'lucide-react';
-import { useState } from 'react';
+import { Calendar, Eye, FileText, Globe, Image as ImageIcon, Sliders, Trash2, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
 
 interface Props {
@@ -31,13 +33,39 @@ interface Props {
     schema: CmsSchema | null;
     onChangeSchema: (schemaId: number) => void;
     cptLabelSingular: string;
+    /** The post type being edited; drives the URL prefix shown before the slug. */
+    postType: string;
 }
 
-export default function PostFields({ data, setData, errors, processing, schemas, authors, tags, schema, onChangeSchema, cptLabelSingular }: Props) {
+export default function PostFields({
+    data,
+    setData,
+    errors,
+    processing,
+    schemas,
+    authors,
+    tags,
+    schema,
+    onChangeSchema,
+    cptLabelSingular,
+    postType,
+}: Props) {
     const { blockTypes = [] } = usePage<{ blockTypes?: BlockDefinition[] }>().props;
     useStarterLayout(!data.id, schema, data.blocks ?? [], (blocks) => setData({ ...data, blocks }));
     const [mediaDrawerOpen, setMediaDrawerOpen] = useState(false);
     const seo = useSeoReview('posts', data);
+    // The dashboard links here with ?tab=seo (or #seo) to open the review directly
+    const [activeTab, setActiveTab] = useState<'content' | 'schema' | 'seo'>(() =>
+        typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('tab') === 'seo' || window.location.hash === '#seo')
+            ? 'seo'
+            : 'content',
+    );
+    const hasSchemaFields = Boolean(schema?.fields && schema.fields.length > 0);
+
+    // The fields tab disappears when the chosen template has no fields
+    useEffect(() => {
+        if (activeTab === 'schema' && !hasSchemaFields) setActiveTab('content');
+    }, [activeTab, hasSchemaFields]);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const titleVal = e.target.value;
@@ -76,90 +104,180 @@ export default function PostFields({ data, setData, errors, processing, schemas,
 
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-            {/* Left Column: Primary Post Content */}
+            {/* Left Column: Tabbed Content, Custom Fields & SEO (same layout as Pages) */}
             <div className="space-y-6 lg:col-span-8">
-                <div className="grid gap-2">
-                    <Label htmlFor="title" className="text-sm font-semibold">
-                        {t('Título del')} {cptLabelSingular}
-                    </Label>
-                    <Input
-                        id="title"
-                        type="text"
-                        required
-                        autoFocus
-                        value={data.title || ''}
-                        onChange={handleTitleChange}
-                        disabled={processing}
-                        className="py-5 text-base"
-                        placeholder={t('Escribe el título de tu :name...', { name: cptLabelSingular.toLowerCase() })}
-                    />
-                    <InputError message={errors.title} />
-                </div>
+                {/* Visual Tab Navigation Bar */}
+                <div className="border-border/70 flex flex-wrap items-center gap-1.5 border-b pb-3">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('content')}
+                        className={cn(
+                            'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
+                            activeTab === 'content'
+                                ? 'bg-primary shadow-primary/20 text-white'
+                                : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
+                        )}
+                    >
+                        <FileText className="h-3.5 w-3.5" />
+                        <span>{t('Contenido Principal')}</span>
+                    </button>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="slug" className="text-muted-foreground text-xs font-semibold">
-                        {t('Enlace Permanente (Slug)')}
-                    </Label>
-                    <div className="flex items-center gap-1 text-xs">
-                        <span className="text-muted-foreground font-mono">/{data.post_type !== 'post' ? `${data.post_type}/` : 'blog/'}</span>
-                        <input
-                            id="slug"
-                            type="text"
-                            required
-                            value={data.slug || ''}
-                            onChange={(e) => setData({ ...data, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                            disabled={processing}
-                            className="border-border text-destructive focus:border-border-strong max-w-full border-b border-dashed bg-transparent font-mono focus:outline-none"
-                        />
-                    </div>
-                    <InputError message={errors.slug} />
-                </div>
-
-                <div className="grid gap-2">
-                    <div className="flex items-center justify-between">
-                        <Label className="text-sm font-semibold">{t('Contenido')}</Label>
-                        <span className="text-muted-foreground text-xs">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
-                    </div>
-                    <BlockEditor
-                        value={data.blocks ?? []}
-                        onChange={(blocks) => setData({ ...data, blocks })}
-                        types={blockTypes}
-                        allowedTypes={schema?.allowed_blocks ?? null}
-                    />
-                    <InputError message={errors.blocks ?? errors.content} />
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="excerpt" className="text-sm font-semibold">
-                        {t('Extracto / Resumen Corto')}
-                    </Label>
-                    <textarea
-                        id="excerpt"
-                        rows={3}
-                        value={data.excerpt || ''}
-                        onChange={(e) => setData({ ...data, excerpt: e.target.value })}
-                        disabled={processing}
-                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder={t('Escribe una pequeña introducción o resumen...')}
-                    />
-                    <InputError message={errors.excerpt} />
-                </div>
-
-                {/* Dynamic Custom Fields Schema */}
-                {schema?.fields && schema.fields.length > 0 && (
-                    <div className="border-border space-y-4 border-t pt-5">
-                        <div className="text-foreground flex items-center gap-2 text-sm font-bold">
-                            <Settings className="text-primary h-4 w-4" />
-                            <span>
-                                {t('Campos Personalizados (')}
-                                {schema.name})
+                    {hasSchemaFields && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('schema')}
+                            className={cn(
+                                'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
+                                activeTab === 'schema'
+                                    ? 'bg-primary shadow-primary/20 text-white'
+                                    : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
+                            )}
+                        >
+                            <Sliders className="h-3.5 w-3.5" />
+                            <span>{t('Campos')}</span>
+                            <span
+                                className={cn(
+                                    'py-0.2 ml-0.5 rounded-full px-1.5 text-xs font-bold',
+                                    activeTab === 'schema' ? 'bg-white/25 text-white' : 'bg-muted text-muted-foreground',
+                                )}
+                            >
+                                {schema?.fields?.length}
                             </span>
+                        </button>
+                    )}
+
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('seo')}
+                        className={cn(
+                            'inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-2xs transition-all',
+                            activeTab === 'seo'
+                                ? 'bg-primary shadow-primary/20 text-white'
+                                : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
+                        )}
+                    >
+                        <Globe className="h-3.5 w-3.5" />
+                        <span>{t('SEO & Metadatos')}</span>
+                        <SeoScoreBadge result={seo.result} className={activeTab === 'seo' ? 'bg-white/25' : ''} />
+                    </button>
+
+                    <AiAssistant
+                        module="posts"
+                        input={data}
+                        className="ml-auto"
+                        onApply={(field, value) =>
+                            field === 'slug'
+                                ? setData({ ...data, slug: value })
+                                : setData({ ...data, metadata: { ...data.metadata, [field]: value } as CmsPost['metadata'] })
+                        }
+                        onDraft={(draft, mode) => {
+                            setData({
+                                ...data,
+                                title: data.title || draft.title,
+                                blocks: mode === 'append' ? [...(data.blocks ?? []), ...draft.blocks] : draft.blocks,
+                            });
+                            setActiveTab('content');
+                        }}
+                    />
+                </div>
+
+                {/* Tab 1: Main Content */}
+                {activeTab === 'content' && (
+                    <div className="animate-in fade-in space-y-6 duration-200">
+                        <div className="grid gap-2">
+                            <Label htmlFor="title" className="text-sm font-semibold">
+                                {t('Título del')} {cptLabelSingular}
+                            </Label>
+                            <Input
+                                id="title"
+                                type="text"
+                                required
+                                autoFocus
+                                value={data.title || ''}
+                                onChange={handleTitleChange}
+                                disabled={processing}
+                                className="py-5 text-base"
+                                placeholder={t('Escribe el título de tu :name...', { name: cptLabelSingular.toLowerCase() })}
+                            />
+                            <InputError message={errors.title} />
                         </div>
-                        <div className="border-border bg-muted/50 space-y-4 rounded-xl border p-5">
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="slug" className="text-muted-foreground text-xs font-semibold">
+                                {t('Enlace Permanente (Slug)')}
+                            </Label>
+                            <div className="flex items-center gap-1 text-xs">
+                                <span className="text-muted-foreground font-mono">/{postType === 'post' ? 'blog' : postType}/</span>
+                                <input
+                                    id="slug"
+                                    type="text"
+                                    required
+                                    value={data.slug || ''}
+                                    onChange={(e) => setData({ ...data, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                                    disabled={processing}
+                                    className="border-border text-destructive focus:border-border-strong max-w-full border-b border-dashed bg-transparent font-mono focus:outline-none"
+                                />
+                            </div>
+                            <InputError message={errors.slug} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-sm font-semibold">{t('Contenido')}</Label>
+                                <span className="text-muted-foreground text-xs">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
+                            </div>
+                            <BlockEditor
+                                value={data.blocks ?? []}
+                                onChange={(blocks) => setData({ ...data, blocks })}
+                                types={blockTypes}
+                                allowedTypes={schema?.allowed_blocks ?? null}
+                            />
+                            <InputError message={errors.blocks ?? errors.content} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="excerpt" className="text-sm font-semibold">
+                                {t('Extracto / Resumen Corto')}
+                            </Label>
+                            <textarea
+                                id="excerpt"
+                                rows={3}
+                                value={data.excerpt || ''}
+                                onChange={(e) => setData({ ...data, excerpt: e.target.value })}
+                                disabled={processing}
+                                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder={t('Escribe una pequeña introducción o resumen...')}
+                            />
+                            <InputError message={errors.excerpt} />
+                        </div>
+                    </div>
+                )}
+
+                {/* Tab 2: Custom fields of the template */}
+                {activeTab === 'schema' && hasSchemaFields && (
+                    <div className="animate-in fade-in space-y-6 duration-200">
+                        <div className="border-border/70 bg-card space-y-4 rounded-2xl border p-5 shadow-xs">
+                            <div className="border-border/60 flex items-center justify-between border-b pb-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="bg-primary/10 text-primary flex h-7 w-7 items-center justify-center rounded-lg">
+                                        <Sliders className="h-3.5 w-3.5" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
+                                            {t('Campos de')} {schema?.name}
+                                        </h4>
+                                        <p className="text-muted-foreground text-xs">{t('Valores dinámicos configurados para esta plantilla')}</p>
+                                    </div>
+                                </div>
+                                <span className="border-primary/20 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold">
+                                    {t(':count campos', { count: schema?.fields?.length ?? 0 })}
+                                </span>
+                            </div>
+
                             <CustomFieldRenderer
-                                fields={schema.fields}
-                                values={data.metadata as Record<string, import('@/types/models/cms-article').JsonValue>}
-                                onChange={(key: string, value: import('@/types/models/cms-article').JsonValue) => {
+                                fields={schema?.fields || []}
+                                values={data.metadata as Record<string, JsonValue>}
+                                onChange={(key: string, value: JsonValue) => {
                                     const next = { ...data.metadata, [key]: value };
                                     setData({ ...data, metadata: next });
                                 }}
@@ -168,37 +286,22 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                     </div>
                 )}
 
-                <div id="seo" className="border-border space-y-6 border-t pt-5">
-                    <div className="flex justify-end">
-                        <AiAssistant
-                            module="posts"
-                            input={data}
-                            onApply={(field, value) =>
-                                field === 'slug'
-                                    ? setData({ ...data, slug: value })
-                                    : setData({ ...data, metadata: { ...data.metadata, [field]: value } as CmsPost['metadata'] })
+                {/* Tab 3: SEO & Social Metadata */}
+                {activeTab === 'seo' && (
+                    <div className="animate-in fade-in space-y-6 duration-200">
+                        <SeoReview result={seo.result} loading={seo.loading} />
+                        <SeoFields
+                            values={
+                                (data.metadata as { seo_title?: string; seo_description?: string; seo_keywords?: string; seo_og_image?: string }) ||
+                                {}
                             }
-                            onDraft={(draft, mode) => {
-                                setData({
-                                    ...data,
-                                    title: data.title || draft.title,
-                                    blocks: mode === 'append' ? [...(data.blocks ?? []), ...draft.blocks] : draft.blocks,
-                                });
-                                document.getElementById('title')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            onChange={(key: string, value: string) => {
+                                const next = { ...data.metadata, [key]: value };
+                                setData({ ...data, metadata: next as Record<string, JsonValue> });
                             }}
                         />
                     </div>
-                    <SeoReview result={seo.result} loading={seo.loading} />
-                    <SeoFields
-                        values={
-                            (data.metadata as { seo_title?: string; seo_description?: string; seo_keywords?: string; seo_og_image?: string }) || {}
-                        }
-                        onChange={(key: string, value: string) => {
-                            const next = { ...data.metadata, [key]: value };
-                            setData({ ...data, metadata: next as Record<string, import('@/types/models/cms-article').JsonValue> });
-                        }}
-                    />
-                </div>
+                )}
             </div>
 
             {/* Right Column: Settings, Images & Metadata */}
