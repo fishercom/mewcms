@@ -113,10 +113,10 @@ export default function Themes() {
                             <div className="space-y-2 p-4">
                                 <div className="flex items-center justify-between gap-2">
                                     <span className="text-foreground text-sm font-semibold">{theme.name}</span>
-                                    {theme.version && <span className="text-muted-foreground text-[10px]">v{theme.version}</span>}
+                                    {theme.version && <span className="text-muted-foreground text-xs">v{theme.version}</span>}
                                 </div>
                                 {theme.description && <p className="text-muted-foreground line-clamp-2 text-xs">{theme.description}</p>}
-                                <div className="flex flex-wrap gap-1.5 text-[10px]">
+                                <div className="flex flex-wrap gap-1.5 text-xs">
                                     <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium">
                                         <Package className="h-3 w-3" />
                                         {theme.uploaded ? t('Subido') : t('Incluido en el código')}

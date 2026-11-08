@@ -177,7 +177,7 @@ export default function AiAssistant({
                                                 {group.max && (
                                                     <p
                                                         className={cn(
-                                                            'mt-1 text-[11px] tabular-nums',
+                                                            'mt-1 text-xs tabular-nums',
                                                             option.length > group.max ? 'text-warning' : 'text-muted-foreground',
                                                         )}
                                                     >

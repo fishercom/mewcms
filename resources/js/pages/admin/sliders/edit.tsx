@@ -330,7 +330,7 @@ export default function Edit() {
                                                             variant="secondary"
                                                             size="sm"
                                                             onClick={() => handleOpenMediaDrawer(index)}
-                                                            className="absolute right-1 bottom-1 h-7 border-0 bg-black/60 px-2 text-[10px] text-white backdrop-blur-xs hover:bg-black/80"
+                                                            className="absolute right-1 bottom-1 h-7 border-0 bg-black/60 px-2 text-xs text-white backdrop-blur-xs hover:bg-black/80"
                                                         >
                                                             {t('Cambiar')}
                                                         </Button>
@@ -341,7 +341,7 @@ export default function Edit() {
                                                         className="border-border-strong group bg-card hover:border-primary/50 hover:bg-muted/50 flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed text-center transition-all"
                                                     >
                                                         <UploadCloud className="text-muted-foreground group-hover:text-primary mb-1 h-5 w-5 transition-colors" />
-                                                        <span className="text-muted-foreground group-hover:text-primary text-[10px] font-semibold">
+                                                        <span className="text-muted-foreground group-hover:text-primary text-xs font-semibold">
                                                             {t('Elegir Imagen')}
                                                         </span>
                                                     </div>
@@ -351,7 +351,7 @@ export default function Edit() {
                                                     <button
                                                         type="button"
                                                         onClick={() => toggleManualUrl(index)}
-                                                        className="text-muted-foreground text-[9px] hover:underline"
+                                                        className="text-muted-foreground text-xs hover:underline"
                                                     >
                                                         {showManual ? t('Ocultar URL manual') : t('Editar URL manual')}
                                                     </button>
@@ -363,7 +363,7 @@ export default function Edit() {
                                                         placeholder={t('URL de la imagen')}
                                                         value={slide.image_url}
                                                         onChange={(e) => handleUpdateSlideField(index, 'image_url', e.target.value)}
-                                                        className="bg-card h-7 text-[10px]"
+                                                        className="bg-card h-7 text-xs"
                                                     />
                                                 )}
                                             </div>
@@ -371,7 +371,7 @@ export default function Edit() {
                                             {/* Slide Fields */}
                                             <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2">
                                                 <div className="grid gap-1">
-                                                    <Label className="text-muted-foreground text-[11px] font-medium">{t('Título')}</Label>
+                                                    <Label className="text-muted-foreground text-xs font-medium">{t('Título')}</Label>
                                                     <Input
                                                         type="text"
                                                         value={slide.title || ''}
@@ -382,7 +382,7 @@ export default function Edit() {
                                                 </div>
 
                                                 <div className="grid gap-1">
-                                                    <Label className="text-muted-foreground text-[11px] font-medium">
+                                                    <Label className="text-muted-foreground text-xs font-medium">
                                                         {t('Enlace / URL de destino')}
                                                     </Label>
                                                     <Input
@@ -395,7 +395,7 @@ export default function Edit() {
                                                 </div>
 
                                                 <div className="grid gap-1 md:col-span-2">
-                                                    <Label className="text-muted-foreground text-[11px] font-medium">
+                                                    <Label className="text-muted-foreground text-xs font-medium">
                                                         {t('Subtítulo / Leyenda (Caption)')}
                                                     </Label>
                                                     <Input

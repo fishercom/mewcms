@@ -74,7 +74,7 @@ export function NavMain({ items = [] }: { items: NavGroup[] }) {
                     <SidebarGroup className="p-0">
                         <SidebarGroupLabel
                             asChild
-                            className="text-muted-foreground/70 hover:text-foreground hover:bg-muted/50 w-full cursor-pointer px-2 text-[11px] font-semibold tracking-wider uppercase"
+                            className="text-muted-foreground/70 hover:text-foreground hover:bg-muted/50 w-full cursor-pointer px-2 text-xs font-semibold tracking-wider uppercase"
                         >
                             <CollapsibleTrigger disabled={iconOnly}>
                                 <span className="truncate">{menu.title}</span>

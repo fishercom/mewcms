@@ -113,7 +113,7 @@ export default function Index() {
                                         <td className="px-4 py-3 text-center font-medium">{item.fields_count ?? 0}</td>
                                         <td className="px-4 py-3 text-center">
                                             <span
-                                                className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${
+                                                className={`rounded-full px-2 py-1 text-xs font-bold uppercase ${
                                                     item.active ? 'bg-success-soft text-success' : 'bg-muted text-foreground'
                                                 }`}
                                             >

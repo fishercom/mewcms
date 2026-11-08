@@ -140,7 +140,7 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
             </div>
 
             <div className="border-border bg-muted/30 space-y-3 rounded-xl border border-dashed p-4">
-                <div className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">{t('Nuevo Campo')}</div>
+                <div className="text-muted-foreground text-xs font-bold tracking-wider uppercase">{t('Nuevo Campo')}</div>
                 <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
                     <div className="space-y-1.5">
                         <Label className="text-muted-foreground text-xs font-semibold">{t('Etiqueta')}</Label>

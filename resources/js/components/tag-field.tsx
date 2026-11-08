@@ -51,7 +51,7 @@ export default function TagField({ tags, selected, onChange }: Props) {
                 onCreate={canManage ? createTag : undefined}
                 placeholder={canManage ? t('Escribe una etiqueta...') : t('Busca una etiqueta...')}
             />
-            <p className="text-muted-foreground text-[11px]">
+            <p className="text-muted-foreground text-xs">
                 {canManage
                     ? t('Pulsa Enter o escribe una coma para añadir. Las etiquetas nuevas se crean al momento.')
                     : t('Elige entre las etiquetas existentes.')}

@@ -80,7 +80,7 @@ export function SeoScoreBadge({ result, className }: { result: SeoResult | null;
     if (!result) return null;
 
     return (
-        <span className={cn('bg-muted rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums', scoreTone(result.score), className)}>
+        <span className={cn('bg-muted rounded-full px-1.5 py-0.5 text-xs font-bold tabular-nums', scoreTone(result.score), className)}>
             {result.score}
         </span>
     );

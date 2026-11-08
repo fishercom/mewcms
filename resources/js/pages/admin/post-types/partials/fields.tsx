@@ -141,7 +141,7 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                                 <div className="border-border bg-card rounded-md border p-1 shadow-2xs">{renderIconPreview(icon.value)}</div>
                                 <div className="min-w-0">
                                     <div className="text-xs font-semibold">{icon.label}</div>
-                                    <div className="text-muted-foreground w-[130px] truncate text-[10px]">{icon.desc}</div>
+                                    <div className="text-muted-foreground w-[130px] truncate text-xs">{icon.desc}</div>
                                 </div>
                             </button>
                         );
