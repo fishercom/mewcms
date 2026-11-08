@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { RowCheckbox, runBulkAction, SelectAllCheckbox, TrashRowActions, TrashToggle, useRowSelection } from '@/components/content-bulk-actions';
 import { formatBytes, MEDIA_TYPE_LABELS, MediaThumb, uploadMedia, type UploadProgress } from '@/components/media-library';
 import { Button } from '@/components/ui/button';
@@ -285,14 +286,14 @@ export default function MediaIndex() {
                                     />
                                 </div>
                                 {item.type === 'image' && !item.alt && !trash && (
-                                    <span className="bg-warning-soft text-warning absolute top-2 right-2 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
+                                    <span className="bg-warning-soft text-warning absolute top-2 right-2 rounded-md px-1.5 py-0.5 text-xs font-semibold">
                                         {t('Sin alt')}
                                     </span>
                                 )}
                                 <p className="text-foreground mt-1.5 truncate text-xs font-medium" title={item.filename}>
                                     {item.title || item.filename}
                                 </p>
-                                <p className="text-muted-foreground text-[11px]">
+                                <p className="text-muted-foreground text-xs">
                                     {item.width && item.height ? `${item.width}×${item.height} · ` : ''}
                                     {formatBytes(item.size)}
                                 </p>
@@ -348,7 +349,7 @@ export default function MediaIndex() {
                                                     <span className="text-foreground block truncate font-medium hover:underline">
                                                         {item.title || item.filename}
                                                     </span>
-                                                    <span className="block truncate font-mono text-[11px]">{item.filename}</span>
+                                                    <span className="block truncate font-mono text-xs">{item.filename}</span>
                                                 </span>
                                             </button>
                                         </td>
@@ -474,8 +475,13 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
         setTimeout(() => setCopied(false), 1500);
     };
 
-    const moveToTrash = () => {
-        if (!window.confirm(t('¿Mover este archivo a la papelera?'))) return;
+    const moveToTrash = async () => {
+        const confirmed = await confirmDialog({
+            title: t('¿Mover este archivo a la papelera?'),
+            description: t('Podrás restaurarlo desde la papelera.'),
+            confirmLabel: t('Mover a la papelera'),
+        });
+        if (!confirmed) return;
         router.delete(route('media.destroy', item.id), { preserveScroll: true, onSuccess: onClose });
     };
 
@@ -571,7 +577,7 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
                                     {errors.alt ? (
                                         <p className="text-destructive text-xs">{errors.alt}</p>
                                     ) : (
-                                        <p className="text-muted-foreground text-[11px]">
+                                        <p className="text-muted-foreground text-xs">
                                             {t('Se usa en el sitio cuando la imagen no tiene su propio texto. Déjalo vacío si es decorativa.')}
                                         </p>
                                     )}

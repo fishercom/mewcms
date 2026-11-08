@@ -102,7 +102,7 @@ export default function Create() {
                                     placeholder={t('e.g. carrusel_inicio')}
                                     className="bg-card font-mono text-sm"
                                 />
-                                <span className="text-muted-foreground text-[10px]">
+                                <span className="text-muted-foreground text-xs">
                                     {t('Usada para cargar este slider en el código/plantillas. Caracteres alfanuméricos y guiones.')}
                                 </span>
                                 {errors.key && <span className="text-destructive text-xs">{errors.key}</span>}
@@ -184,7 +184,7 @@ export default function Create() {
                                     <Label htmlFor="autoplay" className="cursor-pointer">
                                         {t('Autoplay (Reproducción Automática)')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">{t('Las diapositivas avanzarán automáticamente.')}</span>
+                                    <span className="text-muted-foreground text-xs">{t('Las diapositivas avanzarán automáticamente.')}</span>
                                 </div>
                             </div>
 
@@ -194,7 +194,7 @@ export default function Create() {
                                     <Label htmlFor="loop" className="cursor-pointer">
                                         {t('Loop Infinito')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">{t('El slider volverá a empezar al llegar al final.')}</span>
+                                    <span className="text-muted-foreground text-xs">{t('El slider volverá a empezar al llegar al final.')}</span>
                                 </div>
                             </div>
 
@@ -204,7 +204,7 @@ export default function Create() {
                                     <Label htmlFor="dots" className="cursor-pointer">
                                         {t('Mostrar Paginación (Puntos)')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">
+                                    <span className="text-muted-foreground text-xs">
                                         {t('Muestra pequeños puntos indicadores en la parte inferior.')}
                                     </span>
                                 </div>
@@ -221,9 +221,7 @@ export default function Create() {
                                     <Label htmlFor="arrows" className="cursor-pointer">
                                         {t('Mostrar Flechas de Navegación')}
                                     </Label>
-                                    <span className="text-muted-foreground text-[10px]">
-                                        {t('Muestra flechas laterales para avanzar o retroceder.')}
-                                    </span>
+                                    <span className="text-muted-foreground text-xs">{t('Muestra flechas laterales para avanzar o retroceder.')}</span>
                                 </div>
                             </div>
                         </div>

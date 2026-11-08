@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 import ModuleLayout from '@/layouts/module/layout';
@@ -26,8 +27,8 @@ export default function Index() {
         });
     };
 
-    const handleDelete = (id: number, name: string) => {
-        if (window.confirm(t('¿Estás seguro de que deseas eliminar el formulario ":name"?', { name }))) {
+    const handleDelete = async (id: number, name: string) => {
+        if (await confirmDialog({ title: t('¿Eliminar el formulario ":name"?', { name }), description: t('Esta acción no se puede deshacer.') })) {
             router.delete(route('forms.destroy', id));
         }
     };
@@ -112,7 +113,7 @@ export default function Index() {
                                         <td className="px-4 py-3 text-center font-medium">{item.fields_count ?? 0}</td>
                                         <td className="px-4 py-3 text-center">
                                             <span
-                                                className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${
+                                                className={`rounded-full px-2 py-1 text-xs font-bold uppercase ${
                                                     item.active ? 'bg-success-soft text-success' : 'bg-muted text-foreground'
                                                 }`}
                                             >

@@ -1,4 +1,6 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import objectToFormData from '@/lib/form-data';
+import { t } from '@/lib/i18n';
 import { Page } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 
@@ -17,12 +19,16 @@ export const getSites = (query: Record<string, unknown>) => {
     });
 };
 
-export const deleteSite = (id: number) => {
+export const deleteSite = async (id: number) => {
+    const confirmed = await confirmDialog({
+        title: t('¿Eliminar este sitio?'),
+        description: t('Esta acción no se puede deshacer.'),
+        confirmLabel: t('Eliminar'),
+    });
+    if (!confirmed) return;
+
     router.delete(route('sites.destroy', id), {
         preserveScroll: true,
-        onBefore: () => {
-            return window.confirm('Esta seguro que desea eliminar este registro?');
-        },
         onError: (errors) => {
             alert(Object.values(errors)[0] || 'Ocurrió un error al eliminar el registro.');
         },

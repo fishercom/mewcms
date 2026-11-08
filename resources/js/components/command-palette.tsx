@@ -175,7 +175,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 <X className="h-4 w-4" />
                             </button>
                         )}
-                        <span className="border-border/70 bg-muted/60 text-muted-foreground rounded-md border px-1.5 py-0.5 text-[10px] font-semibold">
+                        <span className="border-border/70 bg-muted/60 text-muted-foreground rounded-md border px-1.5 py-0.5 text-xs font-semibold">
                             ESC
                         </span>
                     </div>
@@ -191,7 +191,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 {/* Quick Actions */}
                                 {filteredActions.length > 0 && (
                                     <div>
-                                        <div className="text-muted-foreground/70 px-2 py-1 text-[10px] font-bold tracking-wider uppercase">
+                                        <div className="text-muted-foreground/70 px-2 py-1 text-xs font-bold tracking-wider uppercase">
                                             {t('Acciones Rápidas')}
                                         </div>
                                         <div className="mt-1 space-y-0.5">
@@ -219,11 +219,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                             </div>
                                                             <div>
                                                                 <p className="font-semibold">{action.title}</p>
-                                                                <p
-                                                                    className={`text-[11px] ${
-                                                                        isSelected ? 'text-white/80' : 'text-muted-foreground'
-                                                                    }`}
-                                                                >
+                                                                <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
                                                                     {action.description}
                                                                 </p>
                                                             </div>
@@ -249,7 +245,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                 {/* Navigation Modules */}
                                 {filteredModules.length > 0 && (
                                     <div>
-                                        <div className="text-muted-foreground/70 px-2 py-1 text-[10px] font-bold tracking-wider uppercase">
+                                        <div className="text-muted-foreground/70 px-2 py-1 text-xs font-bold tracking-wider uppercase">
                                             {t('Módulos del Sistema')}
                                         </div>
                                         <div className="mt-1 space-y-0.5">
@@ -281,11 +277,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                             </div>
                                                             <div>
                                                                 <p className="font-semibold">{mod.title}</p>
-                                                                <p
-                                                                    className={`text-[11px] ${
-                                                                        isSelected ? 'text-white/80' : 'text-muted-foreground'
-                                                                    }`}
-                                                                >
+                                                                <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
                                                                     {mod.groupTitle} &bull; {mod.url}
                                                                 </p>
                                                             </div>
@@ -304,15 +296,15 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     </div>
 
                     {/* Footer shortcuts hint */}
-                    <div className="border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-between border-t px-4 py-2 text-[11px]">
+                    <div className="border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-between border-t px-4 py-2 text-xs">
                         <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1">
-                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↑</kbd>
-                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↓</kbd>
+                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-xs">↑</kbd>
+                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-xs">↓</kbd>
                                 {t('Navegar')}
                             </span>
                             <span className="flex items-center gap-1">
-                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-[10px]">↵</kbd>
+                                <kbd className="bg-background border-border/70 rounded border px-1.5 py-0.5 font-mono text-xs">↵</kbd>
                                 {t('Seleccionar')}
                             </span>
                         </div>

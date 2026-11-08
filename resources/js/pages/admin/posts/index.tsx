@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import {
     BulkActionsBar,
     RowCheckbox,
@@ -68,8 +69,14 @@ export default function Index() {
         setFilters((prev) => ({ ...prev, trash: showTrash }));
     };
 
-    const handleDelete = (id: number, title: string) => {
-        if (window.confirm(t('¿Mover ":title" a la papelera?', { title }))) {
+    const handleDelete = async (id: number, title: string) => {
+        if (
+            await confirmDialog({
+                title: t('¿Mover ":title" a la papelera?', { title }),
+                description: t('Podrás restaurarla desde la papelera.'),
+                confirmLabel: t('Mover a la papelera'),
+            })
+        ) {
             router.delete(route('posts.destroy', id), {
                 data: { post_type, lang_id },
                 preserveScroll: true,
@@ -174,7 +181,7 @@ export default function Index() {
                                                     {item.title}
                                                 </Link>
                                             </div>
-                                            <div className="text-muted-foreground font-mono text-[11px]">/{item.slug}</div>
+                                            <div className="text-muted-foreground font-mono text-xs">/{item.slug}</div>
                                         </td>
                                         <td className="text-muted-foreground px-4 py-3">
                                             {item.user ? (
@@ -189,7 +196,7 @@ export default function Index() {
                                                     {item.tags.map((t) => (
                                                         <span
                                                             key={t.id}
-                                                            className="bg-muted text-foreground hover:bg-muted inline-flex items-center rounded px-2 py-0.5 text-[10px]"
+                                                            className="bg-muted text-foreground hover:bg-muted inline-flex items-center rounded px-2 py-0.5 text-xs"
                                                         >
                                                             {t.name}
                                                         </span>

@@ -137,7 +137,7 @@ export default function PostFields({
                             <span>{t('Campos')}</span>
                             <span
                                 className={cn(
-                                    'py-0.2 ml-0.5 rounded-full px-1.5 text-[10px] font-bold',
+                                    'py-0.2 ml-0.5 rounded-full px-1.5 text-xs font-bold',
                                     activeTab === 'schema' ? 'bg-white/25 text-white' : 'bg-muted text-muted-foreground',
                                 )}
                             >
@@ -224,7 +224,7 @@ export default function PostFields({
                         <div className="grid gap-2">
                             <div className="flex items-center justify-between">
                                 <Label className="text-sm font-semibold">{t('Contenido')}</Label>
-                                <span className="text-muted-foreground text-[11px]">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
+                                <span className="text-muted-foreground text-xs">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
                             </div>
                             <BlockEditor
                                 value={data.blocks ?? []}
@@ -266,10 +266,10 @@ export default function PostFields({
                                         <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
                                             {t('Campos de')} {schema?.name}
                                         </h4>
-                                        <p className="text-muted-foreground text-[11px]">{t('Valores dinámicos configurados para esta plantilla')}</p>
+                                        <p className="text-muted-foreground text-xs">{t('Valores dinámicos configurados para esta plantilla')}</p>
                                     </div>
                                 </div>
-                                <span className="border-primary/20 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-[10px] font-semibold">
+                                <span className="border-primary/20 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold">
                                     {t(':count campos', { count: schema?.fields?.length ?? 0 })}
                                 </span>
                             </div>
@@ -341,7 +341,7 @@ export default function PostFields({
                             onChange={handlePublishedAtChange}
                             disabled={processing}
                         />
-                        <p className="text-muted-foreground text-[11px]">{t('Una fecha futura programa la entrada.')}</p>
+                        <p className="text-muted-foreground text-xs">{t('Una fecha futura programa la entrada.')}</p>
                         <InputError message={errors.published_at} />
                     </div>
 

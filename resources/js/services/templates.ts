@@ -1,4 +1,6 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import objectToFormData from '@/lib/form-data';
+import { t } from '@/lib/i18n';
 import { Page } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 
@@ -17,12 +19,16 @@ export const getTemplates = (query: Record<string, unknown>) => {
     });
 };
 
-export const deleteTemplate = (filename: string, errorCallback?: (err: string) => void) => {
+export const deleteTemplate = async (filename: string, errorCallback?: (err: string) => void) => {
+    const confirmed = await confirmDialog({
+        title: t('¿Eliminar este archivo de plantilla?'),
+        description: t('Esta acción no se puede deshacer.'),
+        confirmLabel: t('Eliminar'),
+    });
+    if (!confirmed) return;
+
     router.delete(route('templates.destroy', filename), {
         preserveScroll: true,
-        onBefore: () => {
-            return window.confirm('¿Está seguro de que desea eliminar este archivo de plantilla?');
-        },
         onError: (errors) => {
             if (errors.error && errorCallback) {
                 errorCallback(errors.error);

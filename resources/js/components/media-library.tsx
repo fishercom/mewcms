@@ -75,7 +75,7 @@ export function MediaThumb({ item, className, iconClassName }: { item: CmsMedia;
     return (
         <div className={cn('text-muted-foreground flex h-full w-full flex-col items-center justify-center gap-1', className)}>
             <Icon className={cn('h-8 w-8', iconClassName)} />
-            {extension && <span className="text-[10px] font-semibold tracking-wide">{extension}</span>}
+            {extension && <span className="text-xs font-semibold tracking-wide">{extension}</span>}
         </div>
     );
 }

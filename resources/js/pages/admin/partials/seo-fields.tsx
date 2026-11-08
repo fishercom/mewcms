@@ -40,9 +40,7 @@ export default function SeoFields({ values, onChange }: Props) {
                 <div className="space-y-1">
                     <div className="flex items-center justify-between">
                         <label className="text-muted-foreground text-xs font-semibold">{t('Meta Descripción')}</label>
-                        <span
-                            className={`font-mono text-[10px] ${descLength >= 120 && descLength <= 160 ? 'text-success' : 'text-muted-foreground'}`}
-                        >
+                        <span className={`font-mono text-xs ${descLength >= 120 && descLength <= 160 ? 'text-success' : 'text-muted-foreground'}`}>
                             {t(':count / 160 caracteres (Recomendado: 120-160)', { count: descLength })}
                         </span>
                     </div>

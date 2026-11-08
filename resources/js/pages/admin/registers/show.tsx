@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import ModuleLayout from '@/layouts/module/layout';
 import { t } from '@/lib/i18n';
@@ -20,8 +21,8 @@ export default function Show() {
         );
     };
 
-    const handleDelete = () => {
-        if (confirm(t('¿Eliminar definitivamente este mensaje?'))) {
+    const handleDelete = async () => {
+        if (await confirmDialog({ title: t('¿Eliminar definitivamente este mensaje?'), description: t('Esta acción no se puede deshacer.') })) {
             router.delete(route('registers.destroy', item.id));
         }
     };
@@ -62,11 +63,11 @@ export default function Show() {
                         <div>
                             <div className="mb-1 flex items-center gap-2">
                                 {item.review ? (
-                                    <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                                    <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold uppercase">
                                         <CheckCircle className="h-3 w-3" /> {t('Revisado')}
                                     </span>
                                 ) : (
-                                    <span className="bg-primary-soft text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                                    <span className="bg-primary-soft text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold uppercase">
                                         <Clock className="h-3 w-3" /> {t('Nuevo')}
                                     </span>
                                 )}

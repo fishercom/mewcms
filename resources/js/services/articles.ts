@@ -1,4 +1,6 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import objectToFormData from '@/lib/form-data';
+import { t } from '@/lib/i18n';
 import { Page } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 
@@ -17,12 +19,16 @@ export const getArticles = (query: Record<string, unknown>) => {
     });
 };
 
-export const deleteArticle = (id: number) => {
+export const deleteArticle = async (id: number) => {
+    const confirmed = await confirmDialog({
+        title: t('¿Mover esta página a la papelera?'),
+        description: t('Podrás restaurarla desde la papelera.'),
+        confirmLabel: t('Mover a la papelera'),
+    });
+    if (!confirmed) return;
+
     router.delete(route('articles.destroy', id), {
         preserveScroll: true,
-        onBefore: () => {
-            return window.confirm('¿Mover esta página a la papelera?');
-        },
         onError: (errors) => {
             alert(Object.values(errors)[0] ?? 'Ocurrió un error al eliminar el registro.');
         },

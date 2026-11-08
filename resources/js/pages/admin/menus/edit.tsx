@@ -249,7 +249,7 @@ export default function Edit() {
                                                         </button>
                                                         <div>
                                                             <span className="text-sm font-medium">{parent.title}</span>
-                                                            <span className="bg-muted text-muted-foreground ml-2.5 rounded px-1.5 py-0.5 text-[10px] tracking-wider uppercase">
+                                                            <span className="bg-muted text-muted-foreground ml-2.5 rounded px-1.5 py-0.5 text-xs tracking-wider uppercase">
                                                                 {parent.article_id ? t('Artículo') : t('Enlace')}
                                                             </span>
                                                             <span className="text-muted-foreground ml-1.5 block max-w-[200px] truncate text-xs sm:inline">
@@ -300,7 +300,7 @@ export default function Edit() {
                                                                     </button>
                                                                     <div className="flex items-center gap-1.5">
                                                                         <span className="text-xs font-medium">{sub.title}</span>
-                                                                        <span className="py-0.2 bg-muted/50 text-muted-foreground rounded border px-1 text-[9px]">
+                                                                        <span className="py-0.2 bg-muted/50 text-muted-foreground rounded border px-1 text-xs">
                                                                             {sub.resolved_url}
                                                                         </span>
                                                                     </div>
@@ -327,7 +327,7 @@ export default function Edit() {
                                                         ))}
                                                     </ReactSortable>
                                                     {subItems.length === 0 && (
-                                                        <div className="text-muted-foreground pt-2 text-[11px] italic">
+                                                        <div className="text-muted-foreground pt-2 text-xs italic">
                                                             {t('No hay sub-elementos. Arrastra aquí para anidar o cambia su ítem padre.')}
                                                         </div>
                                                     )}

@@ -124,9 +124,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                                             {t('Logo de Cabecera (Header)')}
                                         </h3>
-                                        <p className="text-muted-foreground mt-0.5 text-[10px]">
-                                            {t('Se muestra en la barra de navegación superior')}
-                                        </p>
+                                        <p className="text-muted-foreground mt-0.5 text-xs">{t('Se muestra en la barra de navegación superior')}</p>
                                     </div>
 
                                     {data.layout_header_logo ? (
@@ -144,7 +142,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                                         {t('Logo Seleccionado')}
                                                     </span>
                                                     <span
-                                                        className="text-muted-foreground mt-0.5 block truncate text-[9px]"
+                                                        className="text-muted-foreground mt-0.5 block truncate text-xs"
                                                         title={data.layout_header_logo}
                                                     >
                                                         {data.layout_header_logo}
@@ -179,7 +177,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         >
                                             <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-8 w-8 transition-colors" />
                                             <span className="text-foreground text-xs font-semibold">{t('Seleccionar Logo de Cabecera')}</span>
-                                            <span className="text-muted-foreground mt-1 text-[9px]">
+                                            <span className="text-muted-foreground mt-1 text-xs">
                                                 {t('Busca o sube un archivo en la biblioteca')}
                                             </span>
                                         </div>
@@ -192,7 +190,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                                             {t('Logo de Pie de Página (Footer)')}
                                         </h3>
-                                        <p className="text-muted-foreground mt-0.5 text-[10px]">{t('Se muestra en la zona inferior del sitio')}</p>
+                                        <p className="text-muted-foreground mt-0.5 text-xs">{t('Se muestra en la zona inferior del sitio')}</p>
                                     </div>
 
                                     {data.layout_footer_logo ? (
@@ -210,7 +208,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                                         {t('Logo Seleccionado')}
                                                     </span>
                                                     <span
-                                                        className="text-muted-foreground mt-0.5 block truncate text-[9px]"
+                                                        className="text-muted-foreground mt-0.5 block truncate text-xs"
                                                         title={data.layout_footer_logo}
                                                     >
                                                         {data.layout_footer_logo}
@@ -245,7 +243,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         >
                                             <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-8 w-8 transition-colors" />
                                             <span className="text-foreground text-xs font-semibold">{t('Seleccionar Logo de Footer')}</span>
-                                            <span className="text-muted-foreground mt-1 text-[9px]">
+                                            <span className="text-muted-foreground mt-1 text-xs">
                                                 {t('Busca o sube un archivo en la biblioteca')}
                                             </span>
                                         </div>
@@ -265,7 +263,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         className="bg-card h-9 w-full text-xs"
                                         placeholder={t('Ej: © 2026 MewCMS. Todos los derechos reservados.')}
                                     />
-                                    <p className="text-muted-foreground text-[11px]">
+                                    <p className="text-muted-foreground text-xs">
                                         {t('Admite enlaces simples, por ejemplo')} {t('<a href="https://tusitio.com" target="_blank">Tu empresa</a>')}
                                         {t('. Se elimina cualquier otro código.')}
                                     </p>
@@ -280,7 +278,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                     <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                                         {t('Redes sociales y contacto')}
                                     </h3>
-                                    <p className="text-muted-foreground mt-0.5 text-[10px]">
+                                    <p className="text-muted-foreground mt-0.5 text-xs">
                                         {t('Enlaces con https://, un correo o un teléfono. El texto es opcional y se usa para lectores de pantalla.')}
                                     </p>
                                 </div>
@@ -305,7 +303,7 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                     <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                                         {t('Estilos CSS Personalizados')}
                                     </h3>
-                                    <p className="text-muted-foreground mt-0.5 text-[10px]">
+                                    <p className="text-muted-foreground mt-0.5 text-xs">
                                         {t('Se inyectarán como un bloque inline global en la cabecera del frontend')}
                                     </p>
                                 </div>

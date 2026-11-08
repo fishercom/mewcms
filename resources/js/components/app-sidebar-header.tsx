@@ -45,7 +45,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     >
                         <Search className="text-muted-foreground h-3.5 w-3.5" />
                         <span>{t('Buscar o saltar a...')}</span>
-                        <kbd className="border-border/80 bg-background text-muted-foreground pointer-events-none ml-2 inline-flex h-4.5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-[10px] font-medium select-none">
+                        <kbd className="border-border/80 bg-background text-muted-foreground pointer-events-none ml-2 inline-flex h-4.5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-xs font-medium select-none">
                             <span>⌘</span>K
                         </kbd>
                     </button>

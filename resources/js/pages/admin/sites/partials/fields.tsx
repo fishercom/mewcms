@@ -217,7 +217,7 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                                 <div className="space-y-1 p-3">
                                     <div className="flex items-center justify-between gap-2">
                                         <span className="text-foreground text-sm font-semibold">{item.name}</span>
-                                        {item.version && <span className="text-muted-foreground text-[10px]">v{item.version}</span>}
+                                        {item.version && <span className="text-muted-foreground text-xs">v{item.version}</span>}
                                     </div>
                                     {item.description && <p className="text-muted-foreground line-clamp-2 text-xs">{item.description}</p>}
                                 </div>
@@ -308,7 +308,7 @@ export default function SiteFormFields({ data, setData, errors, processing, them
                         >
                             <UploadCloud className="text-muted-foreground group-hover:text-primary mb-2 h-7 w-7 transition-colors" />
                             <span className="text-foreground text-xs font-semibold">{t('Seleccionar favicon')}</span>
-                            <span className="text-muted-foreground mt-1 text-[10px]">
+                            <span className="text-muted-foreground mt-1 text-xs">
                                 {t('Una imagen cuadrada (PNG, SVG o ICO). Sin favicon se usa el de MewCMS.')}
                             </span>
                         </button>

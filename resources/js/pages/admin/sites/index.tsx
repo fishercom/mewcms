@@ -95,18 +95,18 @@ export default function Index() {
                                         <th scope="row" className="text-foreground px-4 py-3 font-medium whitespace-nowrap">
                                             {item.name}
                                             {item.default && (
-                                                <span className="bg-primary-soft text-primary-soft-foreground ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium">
+                                                <span className="bg-primary-soft text-primary-soft-foreground ml-2 rounded px-1.5 py-0.5 text-xs font-medium">
                                                     {t('Por defecto')}
                                                 </span>
                                             )}
                                             {!item.active && (
-                                                <span className="bg-muted text-muted-foreground ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium">
+                                                <span className="bg-muted text-muted-foreground ml-2 rounded px-1.5 py-0.5 text-xs font-medium">
                                                     {t('Inactivo')}
                                                 </span>
                                             )}
                                             {item.has_home === false && (
                                                 <span
-                                                    className="ml-2 inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
+                                                    className="ml-2 inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
                                                     title={t('Este sitio aún no tiene páginas publicadas: su dirección muestra un error 404.')}
                                                 >
                                                     <AlertTriangle className="h-3 w-3" />

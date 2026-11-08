@@ -1,6 +1,7 @@
 import { BLOCK_RENDERERS } from '@/blocks/registry';
 import { type BlockData, type BlockDefinition, type BlockPattern, type BlockValues, newBlockId, str, withNewIds } from '@/blocks/types';
 import AiBlockMenu, { hasAiText } from '@/components/ai-block-menu';
+import { confirmDialog } from '@/components/confirm-dialog';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
@@ -208,10 +209,17 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
         onChange(next);
     };
 
-    const remove = (index: number) => {
+    const remove = async (index: number) => {
         const block = value[index];
         const type = typeByKey[block.type];
-        if (summaryOf(block) && !window.confirm(t('¿Eliminar el bloque ":name"?', { name: type?.name ?? block.type }))) return;
+        if (
+            summaryOf(block) &&
+            !(await confirmDialog({
+                title: t('¿Eliminar el bloque ":name"?', { name: type?.name ?? block.type }),
+                description: t('Se quitará de la página con todo su contenido.'),
+            }))
+        )
+            return;
         onChange(value.filter((_, i) => i !== index));
     };
 
@@ -314,7 +322,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                         {isPattern ? (pattern?.name ?? type?.name ?? block.type) : (type?.name ?? block.type)}
                                     </span>
                                     {isPattern && (
-                                        <span className="bg-primary-soft text-primary-soft-foreground inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                                        <span className="bg-primary-soft text-primary-soft-foreground inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-semibold">
                                             <RefreshCw className="h-3 w-3" />
                                             {t('Sincronizado')}
                                         </span>
@@ -366,7 +374,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                                 const columns = columnsOf(block.data);
                                                 return (
                                                     <div key={columnIndex} className={cn('bg-muted/30 min-w-0 rounded-lg p-2', SPAN_CLASSES[span])}>
-                                                        <p className="text-muted-foreground mb-1.5 px-1 text-[10px] font-semibold tracking-wider uppercase">
+                                                        <p className="text-muted-foreground mb-1.5 px-1 text-xs font-semibold tracking-wider uppercase">
                                                             {t('Columna')} {columnIndex + 1}
                                                         </p>
                                                         <BlockEditor
@@ -683,9 +691,7 @@ function BlockPicker({
                 )}
                 {patternMatches.length > 0 && (
                     <div className="mb-1">
-                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-[10px] font-semibold tracking-wider uppercase">
-                            {t('Reutilizables')}
-                        </p>
+                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-xs font-semibold tracking-wider uppercase">{t('Reutilizables')}</p>
                         {patternMatches.map((pattern) => (
                             <button
                                 key={pattern.key}
@@ -698,7 +704,7 @@ function BlockPicker({
                                 </span>
                                 <span className="min-w-0">
                                     <span className="text-foreground block text-xs font-semibold">{pattern.name}</span>
-                                    <span className="text-muted-foreground block text-[11px] leading-snug">
+                                    <span className="text-muted-foreground block text-xs leading-snug">
                                         {pattern.description ||
                                             (pattern.synced
                                                 ? t('Sincronizado: se actualiza en todas las páginas.')
@@ -711,7 +717,7 @@ function BlockPicker({
                 )}
                 {categories.map((category) => (
                     <div key={category} className="mb-1">
-                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-[10px] font-semibold tracking-wider uppercase">
+                        <p className="text-muted-foreground px-2 pt-1 pb-1 text-xs font-semibold tracking-wider uppercase">
                             {CATEGORY_LABELS[category] ?? category}
                         </p>
                         {matches
@@ -728,7 +734,7 @@ function BlockPicker({
                                     </span>
                                     <span className="min-w-0">
                                         <span className="text-foreground block text-xs font-semibold">{type.name}</span>
-                                        <span className="text-muted-foreground block text-[11px] leading-snug">{type.description}</span>
+                                        <span className="text-muted-foreground block text-xs leading-snug">{type.description}</span>
                                     </span>
                                 </button>
                             ))}

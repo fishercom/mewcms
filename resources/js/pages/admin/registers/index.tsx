@@ -45,9 +45,8 @@ export default function Index() {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm(t('¿Eliminar este mensaje recibido?'))) {
-            deleteRegister(id);
-        }
+        // deleteRegister asks for confirmation itself
+        deleteRegister(id);
     };
 
     return (
@@ -149,11 +148,11 @@ export default function Index() {
                                         {/* Status */}
                                         <td className="px-4 py-3">
                                             {isNew ? (
-                                                <span className="bg-primary-soft text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                                                <span className="bg-primary-soft text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold uppercase">
                                                     <Clock className="h-2.5 w-2.5" /> {t('Nuevo')}
                                                 </span>
                                             ) : (
-                                                <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                                                <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold uppercase">
                                                     <CheckCircle className="h-2.5 w-2.5" /> {t('Revisado')}
                                                 </span>
                                             )}
@@ -197,7 +196,7 @@ export default function Index() {
                                                     </div>
                                                 ))}
                                                 {(item.fields?.length ?? 0) > 2 && (
-                                                    <span className="text-muted-foreground text-[10px] italic">
+                                                    <span className="text-muted-foreground text-xs italic">
                                                         +{(item.fields?.length ?? 0) - 2} {t('más')}
                                                     </span>
                                                 )}
