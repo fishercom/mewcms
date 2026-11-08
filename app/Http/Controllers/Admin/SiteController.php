@@ -87,7 +87,13 @@ class SiteController extends Controller
         $data = $this->validatedData($request, $item->id);
         $item->fill(Arr::except($data, 'lang_ids'));
         $item->save();
-        $this->syncLangs($item, $data);
+        $added = $this->syncLangs($item, $data);
+
+        // A language just added has nothing yet: offer to build it from the main language
+        $new = $item->langs()->whereIn('cms_langs.id', $added)->where('active', true)->first();
+        if ($new) {
+            return redirect()->route('sites.languages.show', [$item->id, $new->id]);
+        }
 
         return redirect('admin/sites');
     }
@@ -141,7 +147,12 @@ class SiteController extends Controller
      *
      * @param  array<string, mixed>  $data
      */
-    protected function syncLangs(CmsSite $site, array $data): void
+    /**
+     * Save the site's extra languages. Returns the ids of the ones just added.
+     *
+     * @return list<int>
+     */
+    protected function syncLangs(CmsSite $site, array $data): array
     {
         $ids = array_values(array_diff(array_map('intval', $data['lang_ids'] ?? []), [(int) $site->lang_id]));
         $changes = $site->langs()->sync($ids);
@@ -150,6 +161,8 @@ class SiteController extends Controller
             Sites::flush();
             FrontCache::flush();
         }
+
+        return array_map('intval', $changes['attached']);
     }
 
     /**

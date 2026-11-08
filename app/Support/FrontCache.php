@@ -67,19 +67,45 @@ class FrontCache
     }
 
     /**
-     * Active menus with their active items.
+     * Active menus of the current language with their active items. A language without
+     * its own copy of a menu (same slug) shows the main language's, whose page links go
+     * to each page's version in the current language when it has one.
      *
      * @return array<int, mixed>
      */
     public static function menus(): array
     {
-        return Cache::remember(self::key('menus'), self::ttl(...), fn (): array => CmsMenu::with(['items' => function ($query): void {
-            // Items pointing at a draft, scheduled or trashed page are hidden
-            $query->where('active', true)
-                ->where(fn ($query) => $query->whereNull('article_id')->orWhereHas('article', fn ($query) => $query->published()))
-                ->orderBy('position')
-                ->with('article');
-        }])->where('active', true)->get()->toArray());
+        return Cache::remember(self::key('menus'), self::ttl(...), function (): array {
+            $load = fn ($query) => $query->with(['items' => function ($query): void {
+                // Items pointing at a draft, scheduled or trashed page are hidden
+                $query->where('active', true)
+                    ->where(fn ($query) => $query->whereNull('article_id')->orWhereHas('article', fn ($query) => $query->published()))
+                    ->orderBy('position')
+                    ->with('article');
+            }])->where('active', true)->get();
+
+            $menus = $load(Locales::scope(CmsMenu::query()));
+            if (! Locales::isExtra()) {
+                return $menus->toArray();
+            }
+
+            $lang = Locales::current();
+            $borrowed = $load(Locales::scope(CmsMenu::query(), Locales::main()?->id)->whereNotIn('slug', $menus->pluck('slug')));
+            foreach ($borrowed as $menu) {
+                foreach ($menu->items as $item) {
+                    $version = $item->article ? MenuCopier::versionIn($item->article, $lang) : null;
+                    if ($version && $version->isLive()) {
+                        // A label that is the page's title follows the translated title
+                        if ($item->title === $item->article->title) {
+                            $item->title = $version->title;
+                        }
+                        $item->setRelation('article', $version);
+                    }
+                }
+            }
+
+            return $menus->concat($borrowed)->values()->toArray();
+        });
     }
 
     /**

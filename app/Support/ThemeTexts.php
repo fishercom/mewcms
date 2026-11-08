@@ -120,6 +120,22 @@ class ThemeTexts
     }
 
     /**
+     * Keys $theme has no text for in $locale and the site has not changed.
+     *
+     * @return list<string>
+     */
+    public static function missing(string $theme, string $locale): array
+    {
+        $translated = self::defaults($theme, $locale, false);
+        $changed = self::overrides($locale);
+
+        return array_values(array_filter(
+            self::keys($theme),
+            fn (string $key): bool => ! array_key_exists($key, $translated) && ! array_key_exists($key, $changed),
+        ));
+    }
+
+    /**
      * Every key $theme knows: those its pages use and those its catalogs hold.
      *
      * @return list<string>

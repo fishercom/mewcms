@@ -13,6 +13,7 @@ use App\Models\CmsPostType;
 use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Models\User;
+use App\Support\ContentVersions;
 use App\Support\FrontCache;
 use App\Support\Locales;
 use App\Support\Sites;
@@ -207,23 +208,13 @@ class PostController extends Controller
      */
     public function translate($id, int $lang, Request $request): RedirectResponse
     {
-        $item = CmsPost::with('tags')->findOrFail($id);
+        $item = CmsPost::findOrFail($id);
         $target = $this->targetLanguage($lang);
 
         $version = $item->translationIn($target->id);
         if (! $version) {
-            $version = $item->replicate();
-            $version->forceFill([
-                // The same address in the other language (replicating gives it a new slug)
-                'slug' => $item->slug,
-                'lang_id' => $target->id,
-                'translation_group' => $item->translationGroup(),
-                'status' => CmsPost::STATUS_DRAFT,
-            ]);
-            $version->save();
-            $version->tags()->sync($item->tags->modelKeys());
+            $version = ContentVersions::create($item, $target, $request->user()?->id);
             FrontCache::flush();
-            $version->recordSave($request->user()?->id);
         }
 
         Locales::choose($request, $target->id);

@@ -1,6 +1,7 @@
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
 import { Link, usePage } from '@inertiajs/react';
+import { Languages } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ export default function Edit() {
         default: Boolean(item.default),
         active: Boolean(item.active),
     });
+    // Extra languages already saved: each can be prepared from the main language
+    const savedLangs = langs.filter((lang) => (item.lang_ids ?? []).includes(lang.id) && lang.id !== item.lang_id);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
 
@@ -59,6 +62,25 @@ export default function Edit() {
                         <Link href="/admin/sites">{t('Cancelar')}</Link>
                     </div>
                 </form>
+
+                {savedLangs.length > 0 && (
+                    <div className="border-border mt-8 space-y-2 border-t pt-6">
+                        <h3 className="text-foreground text-sm font-semibold">{t('Versiones en otros idiomas')}</h3>
+                        <p className="text-muted-foreground text-xs">
+                            {t('Copia las páginas, los posts y los menús que falten en un idioma, traducidos con IA si quieres.')}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {savedLangs.map((lang) => (
+                                <Button key={lang.id} variant="outline" size="sm" className="gap-1.5" asChild>
+                                    <Link href={route('sites.languages.show', [item.id, lang.id])}>
+                                        <Languages className="h-3.5 w-3.5" />
+                                        {t('Preparar versión en :lang', { lang: lang.name })}
+                                    </Link>
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </FormLayout>
         </ModuleLayout>
     );

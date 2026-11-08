@@ -19,7 +19,8 @@ class PageMenus
      */
     public static function options(): Collection
     {
-        return CmsMenu::where('active', true)->orderBy('id')->get()->map(fn (CmsMenu $menu): array => [
+        // The menus of the language being edited (the editor works in the page's language)
+        return Locales::scope(CmsMenu::query())->where('active', true)->orderBy('id')->get()->map(fn (CmsMenu $menu): array => [
             'id' => $menu->id,
             'name' => $menu->name,
             'auto_add_pages' => (bool) $menu->auto_add_pages,
@@ -50,7 +51,9 @@ class PageMenus
      */
     public static function membership(CmsArticle $page): array
     {
-        return CmsMenuItem::where('article_id', $page->id)->distinct()->pluck('menu_id')->all();
+        return CmsMenuItem::where('article_id', $page->id)
+            ->whereIn('menu_id', Locales::scope(CmsMenu::query())->select('id'))
+            ->distinct()->pluck('menu_id')->all();
     }
 
     /**
