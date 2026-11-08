@@ -75,7 +75,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
                             placeholder={t('Ej. Formulario de Contacto')}
                         />
-                        {errors.name && <p className="text-destructive text-[11px]">{errors.name}</p>}
+                        {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
                     </div>
 
                     <div className="space-y-1">
@@ -88,7 +88,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 font-mono text-sm focus-visible:ring-2 focus-visible:outline-none"
                             placeholder={t('Ej. contacto_general')}
                         />
-                        {errors.alias && <p className="text-destructive text-[11px]">{errors.alias}</p>}
+                        {errors.alias && <p className="text-destructive text-xs">{errors.alias}</p>}
                     </div>
 
                     <div className="space-y-1">
@@ -100,7 +100,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                             className="border-border text-foreground focus-visible:ring-destructive/40 w-full rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
                             placeholder={t('Info de ayuda o descripción del propósito del formulario')}
                         />
-                        {errors.info && <p className="text-destructive text-[11px]">{errors.info}</p>}
+                        {errors.info && <p className="text-destructive text-xs">{errors.info}</p>}
                     </div>
 
                     <div className="flex items-center gap-3 pt-2">
@@ -144,7 +144,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                 <div key={idx} className="border-border bg-muted/50 relative space-y-3 rounded-xl border p-4">
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                         <div className="space-y-1">
-                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                                            <label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                                                 {t('Etiqueta')}
                                             </label>
                                             <input
@@ -158,7 +158,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                                            <label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                                                 {t('Clave')}
                                             </label>
                                             <input
@@ -172,7 +172,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                                            <label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                                                 {t('Tipo de Entrada')}
                                             </label>
                                             <select
@@ -194,7 +194,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                     {/* Render options list if type is select/checkbox/radio */}
                                     {['select', 'checkbox', 'radio'].includes(field.type) && (
                                         <div className="space-y-1">
-                                            <label className="text-muted-foreground flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase">
+                                            <label className="text-muted-foreground flex items-center gap-1 text-xs font-semibold tracking-wider uppercase">
                                                 <CircleDot className="text-primary h-3 w-3" />
                                                 <span>{t('Opciones (Valores separados por coma)')}</span>
                                             </label>
@@ -215,7 +215,7 @@ export default function FormFields({ data, setData, errors }: Props) {
                                         </div>
                                     )}
 
-                                    <div className="text-muted-foreground flex items-center justify-between pt-1 text-[11px]">
+                                    <div className="text-muted-foreground flex items-center justify-between pt-1 text-xs">
                                         <div className="flex items-center gap-2">
                                             <input
                                                 type="checkbox"

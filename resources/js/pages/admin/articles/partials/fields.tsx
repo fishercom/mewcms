@@ -154,7 +154,7 @@ export default function ArticleFields({
                             <span>{t('Campos')}</span>
                             <span
                                 className={cn(
-                                    'py-0.2 ml-0.5 rounded-full px-1.5 text-[10px] font-bold',
+                                    'py-0.2 ml-0.5 rounded-full px-1.5 text-xs font-bold',
                                     activeTab === 'schema' ? 'bg-white/25 text-white' : 'bg-muted text-muted-foreground',
                                 )}
                             >
@@ -225,7 +225,7 @@ export default function ArticleFields({
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label className="text-foreground font-semibold">{t('Contenido')}</Label>
-                                <span className="text-muted-foreground text-[11px]">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
+                                <span className="text-muted-foreground text-xs">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
                             </div>
                             <BlockEditor
                                 value={data.blocks ?? []}
@@ -267,10 +267,10 @@ export default function ArticleFields({
                                         <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
                                             {t('Campos de')} {schema?.name}
                                         </h4>
-                                        <p className="text-muted-foreground text-[11px]">{t('Valores dinámicos configurados para esta plantilla')}</p>
+                                        <p className="text-muted-foreground text-xs">{t('Valores dinámicos configurados para esta plantilla')}</p>
                                     </div>
                                 </div>
-                                <span className="border-primary/20 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-[10px] font-semibold">
+                                <span className="border-primary/20 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold">
                                     {t(':count campos', { count: schema?.fields?.length ?? 0 })}
                                 </span>
                             </div>
@@ -343,9 +343,7 @@ export default function ArticleFields({
                             onChange={(e) => setData({ ...data, published_at: e.target.value })}
                             className="border-input text-foreground focus:border-primary focus:ring-primary/20 h-9 w-full rounded-xl border bg-transparent px-3 text-xs transition-colors focus:ring-2 focus:outline-hidden"
                         />
-                        <p className="text-muted-foreground text-[11px]">
-                            {t('Vacío para publicar de inmediato. Una fecha futura programa la página.')}
-                        </p>
+                        <p className="text-muted-foreground text-xs">{t('Vacío para publicar de inmediato. Una fecha futura programa la página.')}</p>
                         <InputError message={errors.published_at} />
                     </div>
 
@@ -388,7 +386,7 @@ export default function ArticleFields({
                         )}
 
                         {schema && !hasSchemaFields && canManageSchemas && (
-                            <p className="text-muted-foreground text-[11px]">
+                            <p className="text-muted-foreground text-xs">
                                 {t('Esta plantilla no tiene campos personalizados.')}{' '}
                                 <a
                                     href={`/admin/schemas/${schema.id}/edit`}
@@ -404,7 +402,7 @@ export default function ArticleFields({
                     </div>
 
                     {schema?.unique ? (
-                        <div className="border-warning/20 bg-warning/10 text-warning grid gap-1.5 rounded-xl border p-3 text-[11px]">
+                        <div className="border-warning/20 bg-warning/10 text-warning grid gap-1.5 rounded-xl border p-3 text-xs">
                             <span className="font-semibold">{t('🔒 Plantilla Única')}</span>
                             <span className="opacity-90">{t('Las plantillas únicas no pueden tener páginas superiores.')}</span>
                         </div>
@@ -455,9 +453,7 @@ export default function ArticleFields({
                                 className="text-foreground h-full min-w-0 flex-1 bg-transparent px-2 font-mono outline-none"
                             />
                         </div>
-                        {data.id && (
-                            <p className="text-muted-foreground text-[11px]">{t('Si la cambias, la dirección anterior redirige a la nueva.')}</p>
-                        )}
+                        {data.id && <p className="text-muted-foreground text-xs">{t('Si la cambias, la dirección anterior redirige a la nueva.')}</p>}
                         <InputError message={errors.slug} />
                     </div>
 
@@ -554,7 +550,7 @@ export default function ArticleFields({
                                 );
                             })}
                         </div>
-                        <p className="text-muted-foreground text-[11px]">
+                        <p className="text-muted-foreground text-xs">
                             {canManageMenus
                                 ? t('Se añade al final del menú; el orden se cambia en Menús.')
                                 : t('Solo lectura: necesitas permiso para administrar Menús.')}

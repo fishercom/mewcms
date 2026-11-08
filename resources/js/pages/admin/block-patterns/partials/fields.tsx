@@ -120,7 +120,7 @@ export default function BlockPatternFormFields({ data, setData, errors, processi
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <Label className="text-foreground font-semibold">{t('Contenido del bloque')}</Label>
-                    <span className="text-muted-foreground text-[11px]">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
+                    <span className="text-muted-foreground text-xs">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
                 </div>
                 <BlockEditor allowPatterns={false} types={blockTypes} value={data.blocks ?? []} onChange={(blocks) => setData({ ...data, blocks })} />
                 <InputError message={errors.blocks} />

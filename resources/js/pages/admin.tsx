@@ -202,7 +202,7 @@ export default function Dashboard() {
                                                 <span className="min-w-0 flex-1">
                                                     <span className="flex items-baseline justify-between gap-2">
                                                         <span className="text-foreground truncate text-sm font-semibold">{message.name}</span>
-                                                        <span className="text-muted-foreground shrink-0 text-[11px]">{ago(message.created_at)}</span>
+                                                        <span className="text-muted-foreground shrink-0 text-xs">{ago(message.created_at)}</span>
                                                     </span>
                                                     <span className="text-muted-foreground block truncate text-xs">
                                                         {message.form && <span className="text-foreground/80 font-medium">{message.form} · </span>}
@@ -236,13 +236,13 @@ export default function Dashboard() {
                                             >
                                                 <span className="min-w-0 flex-1">
                                                     <span className="text-foreground block truncate text-sm font-medium">{item.title}</span>
-                                                    <span className="text-muted-foreground block text-[11px]">
+                                                    <span className="text-muted-foreground block text-xs">
                                                         {item.type} {t('· editado')} {ago(item.updated_at)}
                                                     </span>
                                                 </span>
                                                 <span
                                                     className={cn(
-                                                        'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                                                        'shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold',
                                                         STATES[item.state].className,
                                                     )}
                                                 >
@@ -281,7 +281,7 @@ export default function Dashboard() {
                                         {recentLogs.map((log) => (
                                             <li key={log.id} className="text-xs">
                                                 <p className="text-foreground line-clamp-1">{log.comment}</p>
-                                                <p className="text-muted-foreground text-[11px]">
+                                                <p className="text-muted-foreground text-xs">
                                                     {log.user_name} · {ago(log.created_at)}
                                                 </p>
                                             </li>
@@ -291,7 +291,7 @@ export default function Dashboard() {
                             {storage && (
                                 <Link
                                     href="/admin/media"
-                                    className="border-border/60 text-muted-foreground hover:text-foreground mt-4 flex items-center gap-2 border-t pt-3 text-[11px]"
+                                    className="border-border/60 text-muted-foreground hover:text-foreground mt-4 flex items-center gap-2 border-t pt-3 text-xs"
                                 >
                                     <HardDrive className="h-3.5 w-3.5" />
                                     {t('Biblioteca de medios:')} {storage.files} {t('archivos ·')} {storage.size}
@@ -348,7 +348,7 @@ function KpiCard({
                 </span>
             </div>
             <p className="text-foreground mt-2 text-3xl font-bold tracking-tight tabular-nums">{value}</p>
-            <div className="text-muted-foreground mt-1 flex items-center gap-1 text-[11px]">{footer}</div>
+            <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">{footer}</div>
         </Link>
     );
 }
@@ -448,11 +448,11 @@ function TrendChart({ data }: { data: DashboardProps['trend'] }) {
                                 />
                             )}
                         </div>
-                        <span className="text-muted-foreground text-[10px] capitalize">{d.label}</span>
+                        <span className="text-muted-foreground text-xs capitalize">{d.label}</span>
                     </div>
                 ))}
             </div>
-            <div className="text-muted-foreground mt-3 flex justify-center gap-4 text-[11px]">
+            <div className="text-muted-foreground mt-3 flex justify-center gap-4 text-xs">
                 {showPublished && (
                     <span className="flex items-center gap-1.5">
                         <span className="bg-primary h-2.5 w-2.5 rounded-sm" /> {t('Publicado')}

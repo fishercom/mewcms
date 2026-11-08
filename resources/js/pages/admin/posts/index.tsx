@@ -181,7 +181,7 @@ export default function Index() {
                                                     {item.title}
                                                 </Link>
                                             </div>
-                                            <div className="text-muted-foreground font-mono text-[11px]">/{item.slug}</div>
+                                            <div className="text-muted-foreground font-mono text-xs">/{item.slug}</div>
                                         </td>
                                         <td className="text-muted-foreground px-4 py-3">
                                             {item.user ? (
@@ -196,7 +196,7 @@ export default function Index() {
                                                     {item.tags.map((t) => (
                                                         <span
                                                             key={t.id}
-                                                            className="bg-muted text-foreground hover:bg-muted inline-flex items-center rounded px-2 py-0.5 text-[10px]"
+                                                            className="bg-muted text-foreground hover:bg-muted inline-flex items-center rounded px-2 py-0.5 text-xs"
                                                         >
                                                             {t.name}
                                                         </span>

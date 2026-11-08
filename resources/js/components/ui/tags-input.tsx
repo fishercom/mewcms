@@ -111,7 +111,7 @@ export function TagsInput({ value, onChange, options, onCreate, placeholder = 'A
                         )}
                     >
                         {value.map((tag) => (
-                            <Badge key={tag.id} variant="secondary" className="gap-1 py-0.5 pr-0.5 pl-2 text-[11px]">
+                            <Badge key={tag.id} variant="secondary" className="gap-1 py-0.5 pr-0.5 pl-2 text-xs">
                                 {tag.name}
                                 <button
                                     type="button"
@@ -182,7 +182,7 @@ export function TagsInput({ value, onChange, options, onCreate, placeholder = 'A
                     </Command>
                 </PopoverContent>
             </Popover>
-            {error && <p className="text-[11px] text-destructive">{error}</p>}
+            {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
     );
 }

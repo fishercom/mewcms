@@ -195,7 +195,7 @@ export default function Index() {
                                                         {(item.depth || 0) > 0 && <span className="text-muted-foreground/50 mr-1">└</span>}
                                                         <div className="flex flex-col">
                                                             <span className="text-foreground text-sm leading-snug font-semibold">{item.title}</span>
-                                                            <span className="text-muted-foreground/70 font-mono text-[11px] break-all">
+                                                            <span className="text-muted-foreground/70 font-mono text-xs break-all">
                                                                 /{item.uri ?? item.slug}
                                                             </span>
                                                         </div>
@@ -203,7 +203,7 @@ export default function Index() {
                                                 </th>
                                                 <td className="hidden px-4 py-3 xl:table-cell">
                                                     {item.schema ? (
-                                                        <span className="border-border/60 bg-muted/50 text-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium">
+                                                        <span className="border-border/60 bg-muted/50 text-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium">
                                                             {item.schema.name}
                                                         </span>
                                                     ) : (
@@ -230,12 +230,12 @@ export default function Index() {
                                                             <Check className="h-3 w-3" />
                                                         </span>
                                                     ) : (
-                                                        <span className="bg-muted text-muted-foreground/60 inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px]">
+                                                        <span className="bg-muted text-muted-foreground/60 inline-flex h-5 w-5 items-center justify-center rounded-full text-xs">
                                                             —
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="text-muted-foreground px-4 py-3 text-[11px]">
+                                                <td className="text-muted-foreground px-4 py-3 text-xs">
                                                     {(() => {
                                                         const date = trash ? item.deleted_at : (item.published_at ?? item.created_at);
                                                         return date ? format(new Date(date), 'dd/MM/yyyy HH:mm') : '—';

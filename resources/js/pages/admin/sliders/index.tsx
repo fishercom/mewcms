@@ -96,19 +96,19 @@ export default function Index() {
                                             <Link href={route('sliders.edit', item.id)} className="hover:underline">
                                                 {item.name}
                                             </Link>
-                                            <div className="text-muted-foreground font-mono text-[11px] font-normal">{item.key}</div>
+                                            <div className="text-muted-foreground font-mono text-xs font-normal">{item.key}</div>
                                         </th>
                                         <td className="px-4 py-3 text-center">{item.slides_count || 0}</td>
                                         <td className="hidden px-4 py-3 xl:table-cell">
                                             <div className="flex max-w-[160px] flex-wrap gap-1">
-                                                <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px]">
+                                                <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-xs">
                                                     {item.settings?.autoplay ? `Autoplay ${item.settings.autoplaySpeed}ms` : t('Manual')}
                                                 </span>
-                                                <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px] capitalize">
+                                                <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-xs capitalize">
                                                     {item.settings?.effect || 'slide'}
                                                 </span>
                                                 {item.settings?.loop && (
-                                                    <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-[10px]">
+                                                    <span className="bg-muted text-foreground inline-flex items-center rounded px-2 py-0.5 text-xs">
                                                         {t('Loop')}
                                                     </span>
                                                 )}

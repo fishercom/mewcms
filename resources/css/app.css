@@ -9,6 +9,18 @@
 @source not '../themes';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+/*
+ * The admin reads one step larger than Tailwind's defaults: small text is 13px
+ * (instead of 12px) and body text is 15px (instead of 14px). This only applies
+ * to the admin; public themes build their own stylesheet and keep the defaults.
+ */
+@theme {
+    --text-xs: 0.8125rem;
+    --text-xs--line-height: 1.125rem;
+    --text-sm: 0.9375rem;
+    --text-sm--line-height: 1.375rem;
+}
+
 /* Tiptap Editor Base Styles */
 /* These are minimal styles often needed for Tiptap to render correctly */
 .ProseMirror {

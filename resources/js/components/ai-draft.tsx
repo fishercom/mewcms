@@ -174,7 +174,7 @@ export default function AiDraftPanel({
                                         aria-label={t('Sección :number', { number: index + 1 })}
                                         className="h-8 text-xs"
                                     />
-                                    {section.summary && <p className="text-muted-foreground mt-0.5 px-1 text-[11px]">{section.summary}</p>}
+                                    {section.summary && <p className="text-muted-foreground mt-0.5 px-1 text-xs">{section.summary}</p>}
                                 </div>
                                 <Button
                                     type="button"

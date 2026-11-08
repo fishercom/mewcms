@@ -118,7 +118,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                 <div className="grid gap-2">
                     <div className="flex items-center justify-between">
                         <Label className="text-sm font-semibold">{t('Contenido')}</Label>
-                        <span className="text-muted-foreground text-[11px]">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
+                        <span className="text-muted-foreground text-xs">{t('Arrastra los bloques o usa Alt + ↑/↓ para ordenarlos')}</span>
                     </div>
                     <BlockEditor
                         value={data.blocks ?? []}
@@ -238,7 +238,7 @@ export default function PostFields({ data, setData, errors, processing, schemas,
                             onChange={handlePublishedAtChange}
                             disabled={processing}
                         />
-                        <p className="text-muted-foreground text-[11px]">{t('Una fecha futura programa la entrada.')}</p>
+                        <p className="text-muted-foreground text-xs">{t('Una fecha futura programa la entrada.')}</p>
                         <InputError message={errors.published_at} />
                     </div>
 

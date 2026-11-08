@@ -253,7 +253,7 @@ export default function QuickMediaDrawer({ isOpen, onClose, onSelect, initialTyp
                                             </span>
                                         )}
                                     </button>
-                                    {item.type !== 'image' && <p className="text-muted-foreground mt-1 truncate text-[10px]">{item.filename}</p>}
+                                    {item.type !== 'image' && <p className="text-muted-foreground mt-1 truncate text-xs">{item.filename}</p>}
                                 </li>
                             ))}
                         </ul>

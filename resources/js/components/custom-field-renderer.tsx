@@ -70,7 +70,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                         </div>
                         <div className="min-w-0 flex-1">
                             <div className="text-foreground truncate text-xs font-semibold">{filename}</div>
-                            <div className="text-muted-foreground mt-0.5 truncate text-[10px]">{value}</div>
+                            <div className="text-muted-foreground mt-0.5 truncate text-xs">{value}</div>
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -97,7 +97,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                     <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">
                         {t('Seleccionar Imagen')}
                     </span>
-                    <span className="text-muted-foreground mt-1 text-[10px]">{t('Biblioteca de Medios Rápida')}</span>
+                    <span className="text-muted-foreground mt-1 text-xs">{t('Biblioteca de Medios Rápida')}</span>
                 </div>
             )}
 
@@ -105,7 +105,7 @@ function ImageFieldRenderer({ field, value, onChange }: ImageFieldRendererProps)
                 <button
                     type="button"
                     onClick={() => setShowManualUrl(!showManualUrl)}
-                    className="text-muted-foreground hover:text-muted-foreground text-[10px] underline transition-colors focus:outline-none"
+                    className="text-muted-foreground hover:text-muted-foreground text-xs underline transition-colors focus:outline-none"
                 >
                     {showManualUrl ? t('Ocultar edición manual') : t('Editar URL manualmente')}
                 </button>
@@ -167,7 +167,7 @@ function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFie
                         </div>
                         <div className="min-w-0 flex-1">
                             <div className="text-foreground truncate text-xs font-semibold">{filename}</div>
-                            <div className="text-muted-foreground mt-0.5 truncate text-[10px]">{value}</div>
+                            <div className="text-muted-foreground mt-0.5 truncate text-xs">{value}</div>
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -194,7 +194,7 @@ function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFie
                     <span className="text-foreground group-hover:text-primary text-xs font-semibold transition-colors">
                         {t('Seleccionar Archivo / Documento')}
                     </span>
-                    <span className="text-muted-foreground mt-1 text-[10px]">{t('Biblioteca de Medios Rápida')}</span>
+                    <span className="text-muted-foreground mt-1 text-xs">{t('Biblioteca de Medios Rápida')}</span>
                 </div>
             )}
 
@@ -202,7 +202,7 @@ function DocumentFieldRenderer({ value, onChange, media = 'Files' }: DocumentFie
                 <button
                     type="button"
                     onClick={() => setShowManualUrl(!showManualUrl)}
-                    className="text-muted-foreground hover:text-muted-foreground text-[10px] underline transition-colors focus:outline-none"
+                    className="text-muted-foreground hover:text-muted-foreground text-xs underline transition-colors focus:outline-none"
                 >
                     {showManualUrl ? t('Ocultar edición manual') : t('Editar URL manualmente')}
                 </button>
@@ -358,7 +358,7 @@ function RepeaterField({ field, values, onChange, idPrefix = '' }: RepeaterField
                                 className="border-border bg-muted/50 hover:border-border relative rounded-xl border p-5 transition-all duration-200 hover:shadow-xs"
                             >
                                 <div className="border-border mb-4 flex items-center justify-between border-b pb-3">
-                                    <span className="bg-muted text-muted-foreground inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+                                    <span className="bg-muted text-muted-foreground inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold tracking-wider uppercase">
                                         {t('Elemento')} {idx + 1}
                                     </span>
                                     <Button

@@ -70,7 +70,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                             key={network.id}
                             type="button"
                             onClick={() => add(network.id)}
-                            className="hover:bg-primary-soft hover:text-primary-soft-foreground focus-visible:ring-primary/40 text-foreground relative flex flex-col items-center gap-1.5 rounded-lg px-1 py-2 text-[11px] leading-tight transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                            className="hover:bg-primary-soft hover:text-primary-soft-foreground focus-visible:ring-primary/40 text-foreground relative flex flex-col items-center gap-1.5 rounded-lg px-1 py-2 text-xs leading-tight transition-colors focus-visible:ring-2 focus-visible:outline-none"
                         >
                             <SocialIcon network={network.id} className="h-5 w-5" />
                             <span className="text-center">{network.name}</span>
@@ -159,7 +159,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                                     aria-invalid={!!urlError}
                                     className="h-9 text-xs"
                                 />
-                                {urlError && <p className="text-destructive mt-1 text-[11px]">{urlError}</p>}
+                                {urlError && <p className="text-destructive mt-1 text-xs">{urlError}</p>}
                             </div>
 
                             <div className="min-w-0 flex-[1_1_9rem] sm:max-w-44">
@@ -171,7 +171,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
                                     aria-label={t('Texto alternativo de :name', { name: network.name })}
                                     className="h-9 text-xs"
                                 />
-                                {labelError && <p className="text-destructive mt-1 text-[11px]">{labelError}</p>}
+                                {labelError && <p className="text-destructive mt-1 text-xs">{labelError}</p>}
                             </div>
                         </div>
                     );
@@ -180,7 +180,7 @@ export default function SocialLinksEditor({ links, onChange, errors }: Props) {
 
             <div className="flex flex-wrap items-center justify-between gap-2">
                 {picker}
-                <p className="text-muted-foreground text-[11px]">{t('Arrastra los enlaces para cambiar el orden en el pie de página.')}</p>
+                <p className="text-muted-foreground text-xs">{t('Arrastra los enlaces para cambiar el orden en el pie de página.')}</p>
             </div>
         </div>
     );

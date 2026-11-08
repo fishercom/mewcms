@@ -107,7 +107,7 @@ export default function Index() {
                             </h3>
                             <span
                                 className={cn(
-                                    'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold',
+                                    'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
                                     setup.enabled ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive',
                                 )}
                             >
