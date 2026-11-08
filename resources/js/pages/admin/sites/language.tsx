@@ -1,7 +1,9 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { useLeaveGuard } from '@/hooks/use-leave-guard';
 import ModuleLayout from '@/layouts/module/layout';
 import { t } from '@/lib/i18n';
 import apiClient from '@/services/api';
@@ -80,25 +82,13 @@ export default function Language() {
     const work = queue.filter((task) => task.type !== 'links').length;
     const overBudget = ai !== null && summary.cost !== null && ai.spent + summary.cost > ai.budget;
 
-    // Leaving the page stops the run: the browser asks first
-    useEffect(() => {
-        if (!running) {
-            return;
-        }
-        const warn = (event: BeforeUnloadEvent) => {
-            event.preventDefault();
-            event.returnValue = '';
-        };
-        window.addEventListener('beforeunload', warn);
-        const removeRouterWarning = router.on('before', () =>
-            window.confirm(t('La preparación se detendrá si sales de esta página. ¿Salir de todos modos?')),
-        );
-
-        return () => {
-            window.removeEventListener('beforeunload', warn);
-            removeRouterWarning();
-        };
-    }, [running]);
+    // Leaving the page stops the run: ask first
+    useLeaveGuard(running, {
+        title: t('¿Salir y detener la preparación?'),
+        description: t('La preparación se detendrá si sales de esta página.'),
+        confirmLabel: t('Salir'),
+        cancelLabel: t('Quedarme'),
+    });
 
     // Once the run is over (and the leave warning gone), show the drafts it made
     useEffect(() => {
@@ -155,8 +145,14 @@ export default function Language() {
         setFinished(true);
     };
 
-    const publishAll = () => {
-        if (window.confirm(t('¿Publicar las :count versiones en :lang?', { count: String(drafts.length), lang: target.name }))) {
+    const publishAll = async () => {
+        if (
+            await confirmDialog({
+                tone: 'info',
+                title: t('¿Publicar las :count versiones en :lang?', { count: String(drafts.length), lang: target.name }),
+                confirmLabel: t('Publicar'),
+            })
+        ) {
             router.post(route('sites.languages.publish', [site_id, target.id]), {}, { preserveScroll: true });
         }
     };

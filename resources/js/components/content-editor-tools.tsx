@@ -1,8 +1,10 @@
 import { type BlockData } from '@/blocks/types';
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useLeaveGuard } from '@/hooks/use-leave-guard';
 import { t } from '@/lib/i18n';
 import { diffWords, htmlToText } from '@/lib/word-diff';
 import apiClient from '@/services/api';
@@ -90,22 +92,12 @@ export default function ContentEditorTools({ module, id, data, initialData, auto
     }, [id, module, baseline]);
 
     // Warn before leaving with unsaved changes (browser close/reload and in-app links)
-    useEffect(() => {
-        if (!dirty) return;
-        const onBeforeUnload = (e: BeforeUnloadEvent) => {
-            e.preventDefault();
-        };
-        window.addEventListener('beforeunload', onBeforeUnload);
-        const removeInertiaGuard = router.on('before', (event) => {
-            if (event.detail.visit.method === 'get' && !window.confirm(t('Hay cambios sin guardar. ¿Salir de todos modos?'))) {
-                event.preventDefault();
-            }
-        });
-        return () => {
-            window.removeEventListener('beforeunload', onBeforeUnload);
-            removeInertiaGuard();
-        };
-    }, [dirty]);
+    useLeaveGuard(dirty, {
+        title: t('¿Salir sin guardar?'),
+        description: t('Tienes cambios sin guardar en esta página. Si sales ahora, se perderán.'),
+        confirmLabel: t('Salir sin guardar'),
+        cancelLabel: t('Seguir editando'),
+    });
 
     const preview = async () => {
         // Open the tab right away so the browser does not block it as a popup
@@ -217,11 +209,17 @@ function RevisionsSheet({ module, id, open, onOpenChange, current, dirty }: Shee
         setComparing(data);
     };
 
-    const restore = (revisionId: number) => {
-        const message = dirty
-            ? t('Tienes cambios sin guardar que se perderán. ¿Restaurar esta revisión?')
-            : t('¿Restaurar esta revisión? El estado actual se guardará como una revisión nueva.');
-        if (!window.confirm(message)) return;
+    const restore = async (revisionId: number) => {
+        const message = dirty ? t('Tienes cambios sin guardar que se perderán.') : t('El estado actual se guardará como una revisión nueva.');
+        if (
+            !(await confirmDialog({
+                tone: dirty ? 'warning' : 'info',
+                title: t('¿Restaurar esta revisión?'),
+                description: message,
+                confirmLabel: t('Restaurar'),
+            }))
+        )
+            return;
 
         // Reload the editor with the restored data
         router.post(route(`${module}.revisions.restore`, { id, revisionId }), {}, { preserveState: false, preserveScroll: true });

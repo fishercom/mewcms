@@ -1,4 +1,5 @@
 import { type BlockData } from '@/blocks/types';
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { t } from '@/lib/i18n';
@@ -81,9 +82,19 @@ export default function AiDraftPanel({
         }
     };
 
-    const insert = (mode: 'replace' | 'append') => {
+    const insert = async (mode: 'replace' | 'append') => {
         if (!draft) return;
-        if (mode === 'replace' && hasContent && !window.confirm(t('¿Reemplazar el contenido actual por el borrador?'))) return;
+        if (
+            mode === 'replace' &&
+            hasContent &&
+            !(await confirmDialog({
+                tone: 'warning',
+                title: t('¿Reemplazar el contenido actual por el borrador?'),
+                description: t('El contenido que tienes ahora en el editor se sustituirá por el borrador.'),
+                confirmLabel: t('Reemplazar'),
+            }))
+        )
+            return;
         onDraft(draft, mode);
         setDraft(null);
         setOutline(null);

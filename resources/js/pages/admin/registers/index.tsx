@@ -45,9 +45,8 @@ export default function Index() {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm(t('¿Eliminar este mensaje recibido?'))) {
-            deleteRegister(id);
-        }
+        // deleteRegister asks for confirmation itself
+        deleteRegister(id);
     };
 
     return (

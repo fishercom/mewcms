@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import ModuleLayout from '@/layouts/module/layout';
@@ -44,8 +45,12 @@ export default function Themes() {
         upload(e.dataTransfer.files[0]);
     };
 
-    const remove = (theme: CmsTheme) => {
-        if (!window.confirm(t('¿Eliminar el tema :name? Esta acción no se puede deshacer.').replace(':name', theme.name))) return;
+    const remove = async (theme: CmsTheme) => {
+        const confirmed = await confirmDialog({
+            title: t('¿Eliminar el tema :name?', { name: theme.name }),
+            description: t('Esta acción no se puede deshacer.'),
+        });
+        if (!confirmed) return;
         router.delete(route('themes.destroy', theme.slug), { preserveScroll: true });
     };
 

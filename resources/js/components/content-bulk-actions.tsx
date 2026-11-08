@@ -1,3 +1,4 @@
+import { confirmDialog, type ConfirmOptions } from '@/components/confirm-dialog';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -8,17 +9,25 @@ import { useState } from 'react';
 
 export type BulkAction = 'publish' | 'draft' | 'trash' | 'restore' | 'force_delete';
 
-const CONFIRMATIONS: Partial<Record<BulkAction, string>> = {
-    trash: t('¿Mover a la papelera los registros seleccionados?'),
-    force_delete: t('¿Eliminar definitivamente los registros seleccionados? Esta acción no se puede deshacer.'),
+const CONFIRMATIONS: Partial<Record<BulkAction, () => ConfirmOptions>> = {
+    trash: () => ({
+        title: t('¿Mover a la papelera los registros seleccionados?'),
+        description: t('Podrás restaurarlos desde la papelera.'),
+        confirmLabel: t('Mover a la papelera'),
+    }),
+    force_delete: () => ({
+        title: t('¿Eliminar definitivamente los registros seleccionados?'),
+        description: t('Esta acción no se puede deshacer.'),
+        confirmLabel: t('Eliminar definitivamente'),
+    }),
 };
 
 /**
  * Post a bulk action to a "{resource}.bulk" route and report validation errors.
  */
-export function runBulkAction(routeName: string, action: BulkAction, ids: number[], onSuccess?: () => void) {
+export async function runBulkAction(routeName: string, action: BulkAction, ids: number[], onSuccess?: () => void) {
     const confirmation = CONFIRMATIONS[action];
-    if (confirmation && !window.confirm(confirmation)) {
+    if (confirmation && !(await confirmDialog(confirmation()))) {
         return;
     }
 

@@ -1,4 +1,6 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import objectToFormData from '@/lib/form-data';
+import { t } from '@/lib/i18n';
 import { Page } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 
@@ -29,12 +31,16 @@ export const updateMenu = (id: number, data: Record<string, unknown>, callbacks:
     router.post(route('menus.update', id), objectToFormData(options), callbacks);
 };
 
-export const deleteMenu = (id: number) => {
+export const deleteMenu = async (id: number) => {
+    const confirmed = await confirmDialog({
+        title: t('¿Eliminar este menú?'),
+        description: t('Esta acción no se puede deshacer.'),
+        confirmLabel: t('Eliminar'),
+    });
+    if (!confirmed) return;
+
     router.delete(route('menus.destroy', id), {
         preserveScroll: true,
-        onBefore: () => {
-            return window.confirm('¿Está seguro que desea eliminar este menú?');
-        },
         onError: () => {
             alert('Ocurrió un error al eliminar el menú.');
         },
@@ -46,12 +52,16 @@ export const createMenuItem = (menuId: number, data: Record<string, unknown>, ca
     router.post(route('menus.items.store', menuId), objectToFormData(data), callbacks);
 };
 
-export const deleteMenuItem = (id: number) => {
+export const deleteMenuItem = async (id: number) => {
+    const confirmed = await confirmDialog({
+        title: t('¿Eliminar este ítem del menú?'),
+        description: t('Esta acción no se puede deshacer.'),
+        confirmLabel: t('Eliminar'),
+    });
+    if (!confirmed) return;
+
     router.delete(route('menus.items.destroy', id), {
         preserveScroll: true,
-        onBefore: () => {
-            return window.confirm('¿Está seguro que desea eliminar este ítem de menú?');
-        },
         onError: () => {
             alert('Ocurrió un error al eliminar el ítem.');
         },

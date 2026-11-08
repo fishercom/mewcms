@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PaginationNav } from '@/components/ui/pagination-nav';
@@ -21,8 +22,13 @@ export default function Index() {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
-    const handleDelete = (id: number, name: string) => {
-        if (window.confirm(t('¿Eliminar el bloque reutilizable ":name"? Las páginas que lo usen sincronizado dejarán de mostrarlo.', { name }))) {
+    const handleDelete = async (id: number, name: string) => {
+        if (
+            await confirmDialog({
+                title: t('¿Eliminar el bloque reutilizable ":name"?', { name }),
+                description: t('Las páginas que lo usen sincronizado dejarán de mostrarlo.'),
+            })
+        ) {
             router.delete(route('block-patterns.destroy', id), { preserveScroll: true });
         }
     };

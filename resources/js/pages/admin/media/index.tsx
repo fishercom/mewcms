@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { RowCheckbox, runBulkAction, SelectAllCheckbox, TrashRowActions, TrashToggle, useRowSelection } from '@/components/content-bulk-actions';
 import { formatBytes, MEDIA_TYPE_LABELS, MediaThumb, uploadMedia, type UploadProgress } from '@/components/media-library';
 import { Button } from '@/components/ui/button';
@@ -474,8 +475,13 @@ function MediaDetail({ item, trash, onClose }: { item: CmsMedia | null; trash: b
         setTimeout(() => setCopied(false), 1500);
     };
 
-    const moveToTrash = () => {
-        if (!window.confirm(t('¿Mover este archivo a la papelera?'))) return;
+    const moveToTrash = async () => {
+        const confirmed = await confirmDialog({
+            title: t('¿Mover este archivo a la papelera?'),
+            description: t('Podrás restaurarlo desde la papelera.'),
+            confirmLabel: t('Mover a la papelera'),
+        });
+        if (!confirmed) return;
         router.delete(route('media.destroy', item.id), { preserveScroll: true, onSuccess: onClose });
     };
 

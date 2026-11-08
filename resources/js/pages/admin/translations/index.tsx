@@ -1,3 +1,4 @@
+import { confirmDialog } from '@/components/confirm-dialog';
 import { LanguageFilter } from '@/components/language-switcher';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -108,8 +109,16 @@ export default function Index() {
         );
     };
 
-    const reset = (item: CmsTranslationItem) => {
-        if (item.id && window.confirm(t('¿Volver al texto del tema para ":key"?', { key: item.key }))) {
+    const reset = async (item: CmsTranslationItem) => {
+        if (
+            item.id &&
+            (await confirmDialog({
+                tone: 'warning',
+                title: t('¿Volver al texto del tema para ":key"?', { key: item.key }),
+                description: t('Se borrará tu traducción personalizada de este texto.'),
+                confirmLabel: t('Restablecer'),
+            }))
+        ) {
             router.delete(route('translations.destroy', item.id), { preserveScroll: true });
         }
     };
