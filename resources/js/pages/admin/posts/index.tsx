@@ -7,6 +7,7 @@ import {
     TrashToggle,
     useRowSelection,
 } from '@/components/content-bulk-actions';
+import { LanguageFilter } from '@/components/language-switcher';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { PaginationNav } from '@/components/ui/pagination-nav';
@@ -111,6 +112,7 @@ export default function Index() {
                     </div>
 
                     <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                        <LanguageFilter />
                         <TrashToggle trash={filters.trash} count={trashCount} onChange={handleTrashToggle} />
                         <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5">
                             <Link href={`/admin/posts/create?post_type=${post_type}&lang_id=${lang_id}`}>

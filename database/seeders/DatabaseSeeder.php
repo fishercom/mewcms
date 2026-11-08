@@ -182,7 +182,7 @@ class DatabaseSeeder extends Seeder
             // Estructura CMS
             [
                 'menu_id' => $menuCms->id,
-                'name' => 'Sites',
+                'name' => 'Sitios Web',
                 'url' => '/admin/sites',
                 'route' => 'sites.index',
                 'icon' => 'globe',

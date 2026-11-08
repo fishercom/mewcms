@@ -1151,5 +1151,15 @@
     "Otros idiomas": "Otros idiomas",
     "Sus páginas no llevan prefijo en la dirección: /nosotros.": "Sus páginas no llevan prefijo en la dirección: /nosotros.",
     "Versión en :lang lista para traducir.": "Versión en :lang lista para traducir.",
-    "principal": "principal"
+    "principal": "principal",
+    "La IA no devolvió traducciones que se puedan usar. Inténtalo de nuevo.": "La IA no devolvió traducciones que se puedan usar. Inténtalo de nuevo.",
+    "La IA sugirió :count textos. Revísalos y pulsa Guardar para usarlos.": "La IA sugirió :count textos. Revísalos y pulsa Guardar para usarlos.",
+    ":count quedaron sin traducir.": ":count quedaron sin traducir.",
+    "No se pudo traducir. Inténtalo de nuevo.": "No se pudo traducir. Inténtalo de nuevo.",
+    "Traduce del inglés los textos que el tema no trae en :locale. No se guarda nada hasta que pulses Guardar.": "Traduce del inglés los textos que el tema no trae en :locale. No se guarda nada hasta que pulses Guardar.",
+    "Traduciendo...": "Traduciendo...",
+    "Traducir con IA (:count)": "Traducir con IA (:count)",
+    "Sugerido por IA": "Sugerido por IA",
+    "Los textos del tema ya vienen en :locale.": "Los textos del tema ya vienen en :locale.",
+    "Sitios Web": "Sitios Web"
 }

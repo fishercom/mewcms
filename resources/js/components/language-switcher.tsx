@@ -57,3 +57,37 @@ export function LanguageSwitcher() {
         </DropdownMenu>
     );
 }
+
+/**
+ * The same choice as the header's language switcher, as a filter above a list (pages,
+ * posts, theme texts): one button per language of the site.
+ */
+export function LanguageFilter() {
+    const { site } = usePage<{ site: { locale?: string | null; languages?: SiteLanguage[] } | null }>().props;
+    const languages = site?.languages ?? [];
+
+    if (languages.length < 2) {
+        return null;
+    }
+
+    const current = languages.find((lang) => lang.iso === site?.locale) ?? languages[0];
+
+    return (
+        <div className="border-border/70 flex items-center gap-0.5 rounded-lg border p-0.5" role="group" aria-label={t('Idioma')}>
+            <Languages className="text-muted-foreground mx-1.5 h-3.5 w-3.5" aria-hidden="true" />
+            {languages.map((lang) => (
+                <Button
+                    key={lang.id}
+                    type="button"
+                    size="sm"
+                    variant={lang.id === current.id ? 'secondary' : 'ghost'}
+                    aria-pressed={lang.id === current.id}
+                    className="h-7 px-2.5 text-xs"
+                    onClick={() => lang.id !== current.id && switchLanguage(lang.id)}
+                >
+                    {lang.name}
+                </Button>
+            ))}
+        </div>
+    );
+}

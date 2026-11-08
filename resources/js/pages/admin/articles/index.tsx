@@ -1,3 +1,4 @@
+import { LanguageFilter } from '@/components/language-switcher';
 import { useEffect, useState } from 'react';
 
 import { deleteArticle, getArticles } from '@/services/articles';
@@ -103,6 +104,7 @@ export default function Index() {
                     </div>
 
                     <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                        <LanguageFilter />
                         <TrashToggle trash={trash} count={trashCount} onChange={handleTrashToggle} />
 
                         {!trash && (

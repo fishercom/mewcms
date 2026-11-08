@@ -1151,5 +1151,15 @@
     "Otros idiomas": "Other languages",
     "Sus páginas no llevan prefijo en la dirección: /nosotros.": "Its pages have no prefix in the address: /about.",
     "Versión en :lang lista para traducir.": ":lang version ready to translate.",
-    "principal": "main"
+    "principal": "main",
+    "La IA no devolvió traducciones que se puedan usar. Inténtalo de nuevo.": "The AI returned no usable translations. Try again.",
+    "La IA sugirió :count textos. Revísalos y pulsa Guardar para usarlos.": "The AI suggested :count texts. Review them and press Save to use them.",
+    ":count quedaron sin traducir.": ":count were left untranslated.",
+    "No se pudo traducir. Inténtalo de nuevo.": "Could not translate. Try again.",
+    "Traduce del inglés los textos que el tema no trae en :locale. No se guarda nada hasta que pulses Guardar.": "Translates from English the texts the theme lacks in :locale. Nothing is saved until you press Save.",
+    "Traduciendo...": "Translating...",
+    "Traducir con IA (:count)": "Translate with AI (:count)",
+    "Sugerido por IA": "Suggested by AI",
+    "Los textos del tema ya vienen en :locale.": "The theme's texts already come in :locale.",
+    "Sitios Web": "Sites"
 }
