@@ -1,5 +1,14 @@
 import { useBlockRenderer } from '@/blocks/registry';
-import { type BlockData, type BlockDefinition, type BlockPattern, type BlockValues, newBlockId, str, withNewIds } from '@/blocks/types';
+import {
+    type BlockData,
+    type BlockDefinition,
+    type BlockPattern,
+    type BlockRenderProps,
+    type BlockValues,
+    newBlockId,
+    str,
+    withNewIds,
+} from '@/blocks/types';
 import AiBlockMenu, { hasAiText } from '@/components/ai-block-menu';
 import { confirmDialog } from '@/components/confirm-dialog';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
@@ -30,7 +39,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
-import { KeyboardEvent, useMemo, useRef, useState } from 'react';
+import { type ComponentType, KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 
 interface Props {
@@ -105,6 +114,46 @@ const summaryOf = (block: BlockData): string => {
         str(data.html).replace(/<[^>]+>/g, ' ');
     return text.replace(/\s+/g, ' ').trim().slice(0, 90);
 };
+
+/** Field types whose content the server adds to the block on the public page */
+const SERVER_FIELDS = ['slider', 'posts'];
+
+/** Whether a block names a slider or a list of posts, so its preview has something to show */
+const picksContent = (type: BlockDefinition | undefined, block: BlockData): boolean =>
+    Boolean(
+        type?.fields.some(
+            (field) => SERVER_FIELDS.includes(field.type) && (str(block.data[field.key]) !== '' || (field.type === 'posts' && block.data[field.key])),
+        ),
+    );
+
+/**
+ * A block as the site shows it. A block with a slider or a list of posts gets them from the
+ * server (as the public page does), so its cards show while editing.
+ */
+function BlockPreview({ block, type, Render }: { block: BlockData; type: BlockDefinition | undefined; Render: ComponentType<BlockRenderProps> }) {
+    const needsServer = picksContent(type, block);
+    const request = needsServer ? JSON.stringify({ type: block.type, data: block.data }) : '';
+    const [extra, setExtra] = useState<BlockValues>({});
+
+    useEffect(() => {
+        if (!request) return;
+        let cancelled = false;
+        const timer = window.setTimeout(() => {
+            axios
+                .post<{ data: BlockValues }>(route('blocks.preview'), JSON.parse(request))
+                .then(({ data }) => {
+                    if (!cancelled) setExtra({ _sliders: data.data._sliders ?? {}, _posts: data.data._posts ?? {} });
+                })
+                .catch(() => undefined);
+        }, 300);
+        return () => {
+            cancelled = true;
+            window.clearTimeout(timer);
+        };
+    }, [request]);
+
+    return <Render data={needsServer ? { ...block.data, ...extra } : block.data} editing />;
+}
 
 /**
  * Page and post content as a list of blocks: add from the picker, drag (or Alt+↑/↓) to
@@ -409,9 +458,9 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                                         editing
                                                     />
                                                 </div>
-                                            ) : Render && summaryOf(block) !== '' ? (
+                                            ) : Render && (summaryOf(block) !== '' || picksContent(type, block)) ? (
                                                 <div className="pointer-events-none">
-                                                    <Render data={block.data} editing />
+                                                    <BlockPreview block={block} type={type} Render={Render} />
                                                 </div>
                                             ) : (
                                                 <span className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-xs">

@@ -89,3 +89,22 @@ it('gives a theme block its slider and its posts on the public page', function (
             ->and($resolved[0]['data']['_posts']['products'][0]['title'])->toBe('Sal de mesa');
     });
 });
+
+it('gives the editor a block as the public page shows it, without saving anything', function (): void {
+    $slider = Sites::as($this->site, function () {
+        $slider = CmsSlider::create(['name' => 'Historia', 'key' => 'historia']);
+        CmsSlide::create(['slider_id' => $slider->id, 'title' => '1950', 'image_url' => '/storage/a.jpg', 'active' => true]);
+
+        return $slider;
+    });
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->withSession([Sites::SESSION_KEY => $this->site->id])
+        ->postJson(route('blocks.preview'), ['type' => 'zz_cards', 'data' => ['title' => 'Hola', 'cards' => 'historia']])
+        ->assertOk()
+        ->assertJsonPath('data.title', 'Hola')
+        ->assertJsonPath('data._sliders.cards.slides.0.title', '1950');
+
+    $this->postJson(route('blocks.preview'), ['type' => 'nope', 'data' => []])->assertNotFound();
+    expect(CmsSlider::count())->toBe(1)->and($slider->exists)->toBeTrue();
+});

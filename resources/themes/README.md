@@ -188,7 +188,8 @@ export default function Timeline({ data }: BlockRenderProps) {
 - A `slider` field gives the renderer that slider with its active slides
   (`blockSlider(data, key)`), and a `posts` field the posts it asks for
   (`blockPosts(data, key)`, the shape of a `postLists` item). So the cards of a block are managed in **Sliders**
-  and a product list follows the catalog, rather than typed into the block.
+  and a product list follows the catalog, rather than typed into the block. The page editor
+  shows them too: it asks the server for them (`blocks.preview`), as the public page gets them.
 - `"category"` (default `theme`) and `"nestable": false` (a block that can't go inside
   columns) are optional. A key the CMS already uses is ignored.
 - `front/blocks/<key>.tsx` with the key of one of the CMS's blocks (`cta`, `form`, `hero`…)
