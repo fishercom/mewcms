@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\CmsArticle;
+use App\Models\CmsBlockPattern;
 use App\Models\CmsConfig;
 use App\Models\CmsForm;
 use App\Models\CmsFormField;
@@ -188,7 +189,9 @@ class ContentImporter
             $this->importPostTypes();
             $this->importTags();
 
+            // Inside the site, so the blocks of its theme are known
             Sites::as($site, function () use ($langId, $userId): void {
+                $this->importPatterns();
                 $this->importSettings();
                 $this->importForms();
                 $this->importSliders();
@@ -361,6 +364,30 @@ class ContentImporter
         $this->say('Field groups: '.count($schemas));
     }
 
+    /**
+     * Reusable blocks ("patterns"), shared by every site like field groups: each is
+     * found by its key and updated, so importing again does not duplicate them. A page
+     * shows a synced one with a block {"type": "pattern", "data": {"pattern": "..."}}.
+     */
+    private function importPatterns(): void
+    {
+        $patterns = (array) ($this->data['patterns'] ?? []);
+        foreach ($patterns as $key => $pattern) {
+            $key = (string) ($pattern['key'] ?? $key);
+            CmsBlockPattern::updateOrCreate(['key' => $key], [
+                'name' => $pattern['name'] ?? Str::headline($key),
+                'description' => $pattern['description'] ?? null,
+                'category' => $pattern['category'] ?? 'general',
+                'blocks' => $this->resolve($pattern['blocks'] ?? []),
+                'synced' => (bool) ($pattern['synced'] ?? true),
+                'active' => true,
+            ]);
+        }
+        if ($patterns !== []) {
+            $this->say('Reusable blocks: '.count($patterns));
+        }
+    }
+
     private function importPostTypes(): void
     {
         foreach ((array) ($this->data['post_types'] ?? []) as $type) {
@@ -428,7 +455,11 @@ class ContentImporter
                     'title' => $this->resolve($slide['title'] ?? null),
                     'caption' => $this->resolve($slide['caption'] ?? null),
                     'image_url' => $this->resolve($slide['image'] ?? ''),
+                    'image_mobile_url' => $this->resolve($slide['image_mobile'] ?? null),
+                    'video_url' => $this->resolve($slide['video'] ?? null),
+                    'secondary_image_url' => $this->resolve($slide['secondary_image'] ?? null),
                     'link_url' => $this->resolve($slide['url'] ?? null),
+                    'button_label' => $this->resolve($slide['button_label'] ?? null),
                     'position' => $position + 1,
                     'active' => true,
                 ]);

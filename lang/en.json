@@ -1265,5 +1265,14 @@
     "Entradas del blog": "Blog posts",
     "Solo con la etiqueta (slug, opcional)": "Only with the tag (slug, optional)",
     "Ej. recetas": "E.g. recipes",
-    "Cantidad": "Number"
+    "Cantidad": "Number",
+    "Elegir": "Choose",
+    "Ocultar más opciones": "Hide more options",
+    "Más opciones: botón, móvil, video e imagen secundaria": "More options: button, mobile, video and secondary image",
+    "Texto del botón": "Button text",
+    "Ej.: Conoce más (va al enlace de la diapositiva)": "E.g.: Learn more (goes to the slide link)",
+    "Imagen para móvil": "Mobile image",
+    "Video (reemplaza la imagen)": "Video (replaces the image)",
+    "Imagen secundaria (ícono, logo o recorte)": "Secondary image (icon, logo or cut-out)",
+    "Del tema": "From the theme"
 }

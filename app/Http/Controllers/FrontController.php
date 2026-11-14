@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -227,6 +228,7 @@ class FrontController extends Controller
 
         // Resolve slider from article metadata: any short string (root or nested) may be a slider key
         $slider = null;
+        $pageSliders = [];
         $metadata = $article->metadata;
         if ($metadata && is_array($metadata)) {
             $candidates = [];
@@ -245,11 +247,12 @@ class FrontController extends Controller
                     ->get()
                     ->keyBy('key');
 
-                // Keep metadata order: the first matching key wins
+                // Keep metadata order: the first matching key is "the" slider, and every
+                // match goes in "sliders" by key, for templates that show more than one
                 foreach ($candidates as $candidate) {
                     if ($sliders->has($candidate)) {
-                        $slider = $sliders->get($candidate);
-                        break;
+                        $slider ??= $sliders->get($candidate);
+                        $pageSliders[$candidate] = $sliders->get($candidate);
                     }
                 }
             }
@@ -269,10 +272,12 @@ class FrontController extends Controller
             'article' => $article,
             // Templates may list the recent posts, so their featured images get srcsets too
             'media' => $this->mediaFor($article, $article->metadata)
+                + MediaLibrary::lookup(collect($pageSliders)->push($slider)->filter()->flatMap(fn (CmsSlider $item) => $item->slides->flatMap(fn ($slide) => [$slide->image_url, $slide->image_mobile_url, $slide->secondary_image_url]))->filter()->unique()->values())
                 + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter())
                 + MediaLibrary::lookup(PostLists::images($postLists)),
             ...$shared,
             'slider' => $slider,
+            'sliders' => (object) $pageSliders,
             'postLists' => $postLists,
             'alternates' => Locales::alternates($article),
         ]);
@@ -379,13 +384,17 @@ class FrontController extends Controller
             ->tap(fn ($query) => Locales::scope($query))
             ->firstOrFail();
 
+        $related = $this->relatedPosts($post);
+
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => null,
             // The page may list the recent posts ("keep reading"), so their images get srcsets too
             'media' => $this->mediaFor($post, $post->metadata ?? null)
-                + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter()),
+                + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter())
+                + MediaLibrary::lookup($related->pluck('featured_image')->filter()),
             ...$shared,
+            'related' => $related,
             'alternates' => Locales::alternates($post),
         ]);
     }
@@ -423,13 +432,55 @@ class FrontController extends Controller
             ->tap(fn ($query) => Locales::scope($query))
             ->firstOrFail();
 
+        $related = $this->relatedPosts($post);
+
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => $cpt,
-            'media' => $this->mediaFor($post, $post->metadata ?? null),
+            'media' => $this->mediaFor($post, $post->metadata ?? null)
+                + MediaLibrary::lookup($related->pluck('featured_image')->filter()),
             ...$shared,
+            'related' => $related,
             'alternates' => Locales::alternates($post),
         ]);
+    }
+
+    /**
+     * Up to six published posts of the same type that share a tag with this one, those
+     * sharing the most tags first, then the latest posts of the type to fill the list.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    protected function relatedPosts(CmsPost $post, int $limit = 6): Collection
+    {
+        $base = fn () => CmsPost::published()
+            ->tap(fn ($query) => Locales::scope($query))
+            ->where('post_type', $post->post_type)
+            ->whereKeyNot($post->getKey())
+            ->with('tags:id,name,slug');
+
+        $tagIds = $post->tags->pluck('id');
+        $related = $tagIds->isEmpty() ? new \Illuminate\Database\Eloquent\Collection : $base()
+            ->whereHas('tags', fn ($query) => $query->whereIn('cms_taxonomy_terms.id', $tagIds))
+            ->withCount(['tags as shared_tags' => fn ($query) => $query->whereIn('cms_taxonomy_terms.id', $tagIds)])
+            ->orderByDesc('shared_tags')
+            ->latest('published_at')
+            ->take($limit)
+            ->get();
+
+        if ($related->count() < $limit) {
+            $related = $related->concat($base()
+                ->whereKeyNot($related->modelKeys())
+                ->latest('published_at')
+                ->take($limit - $related->count())
+                ->get());
+        }
+
+        return $related->map(fn (CmsPost $item): array => [
+            ...$item->only(['id', 'lang_id', 'post_type', 'title', 'slug', 'excerpt', 'featured_image', 'published_at', 'metadata']),
+            'tags' => $item->tags->map->only(['id', 'name', 'slug'])->values()->all(),
+            'url' => $item->url,
+        ])->values();
     }
 
     public function publicFormSubmit(Request $request): JsonResponse

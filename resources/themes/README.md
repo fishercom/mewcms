@@ -112,6 +112,13 @@ the end of `<body>` of its public pages.
 Besides `article` (the page, with its `metadata` custom fields), a page template gets:
 
 - `slider`: the slider whose key one of the page's fields holds (a **Slider** field).
+- `sliders`: every slider the page's fields name, by key, for a page that shows more than
+  one (`sliders[article.metadata.banners]`). Besides `title`, `caption`, `image_url` and
+  `link_url`, a slide may have `image_mobile_url` (shown on phones), `video_url` (plays
+  instead of the image), `secondary_image_url` (a cut-out, icon or logo over the slide)
+  and `button_label` (the text of the button that goes to `link_url`). So a list of cards
+  with a picture, a title, a text and a link can be a slider the editor manages in
+  **Sliders**, rather than a repeater field.
 - `postLists`: for each **Lista de posts** field (`type: "posts"`), the posts it asks for.
   The editor picks a post type (or the blog), an optional tag and how many; the page gets
   `{ id, title, slug, url, excerpt, featured_image, published_at, metadata, tags }` for
@@ -133,6 +140,57 @@ The listing of a post type (`/productos`) is drawn by `front/blog/index` with a 
 shows (0 for all) and their order (newest, oldest or by title) are set per post type in
 **Admin → Post types**.
 
+A post's page (`front/blog/show`) also gets `related`: up to six posts of the same type that
+share a tag with it (those sharing the most first), filled with the type's latest posts, in
+the same shape as a `postLists` item.
+
+## Theme blocks
+
+A theme may bring its own block types, which the page and post editors offer (under
+**Del tema**) on the sites that use the theme. Each is a JSON file in `blocks/`, named after
+the block's key (lowercase letters, digits and underscores), with its public rendering in
+`front/blocks/<key>.tsx`:
+
+```json
+{
+    "name": "Línea de tiempo",
+    "icon": "history",
+    "description": "Los hitos de la empresa, año por año.",
+    "fields": [
+        { "key": "title", "label": "Título", "type": "text" },
+        { "key": "milestones", "label": "Hitos", "type": "slider" },
+        { "key": "products", "label": "Productos", "type": "posts", "post_type": "productos" }
+    ]
+}
+```
+
+```tsx
+import { blockSlider, type BlockRenderProps } from '@/blocks/types';
+
+export default function Timeline({ data }: BlockRenderProps) {
+    const slides = blockSlider(data, 'milestones')?.slides ?? [];
+    return (
+        <ol>
+            {slides.map((slide) => (
+                <li key={slide.id}>{slide.title}</li>
+            ))}
+        </ol>
+    );
+}
+```
+
+- Fields take the custom field types (`text`, `textarea`, `html_editor`, `url`, `image`,
+  `video`, `document`, `number`, `select`, `repeater`, `slider`, `posts`). The block keeps
+  only its declared fields, cleaned by type, and its texts are searchable.
+- A `slider` field gives the renderer that slider with its active slides
+  (`blockSlider(data, key)`), and a `posts` field the posts it asks for
+  (`blockPosts(data, key)`, the shape of a `postLists` item). So the cards of a block are managed in **Sliders**
+  and a product list follows the catalog, rather than typed into the block.
+- `"category"` (default `theme`) and `"nestable": false` (a block that can't go inside
+  columns) are optional. A key the CMS already uses is ignored.
+- `front/blocks/<key>.tsx` with the key of one of the CMS's blocks (`cta`, `form`, `hero`…)
+  replaces how that block looks on the theme's sites.
+
 ## Starting content
 
 A theme may ship the content a new site starts with, in `content/content.json`. It is
@@ -143,7 +201,7 @@ theme:
 ```bash
 php artisan cms:content-import emsal              # resources/themes/emsal/content/content.json
 php artisan cms:content-import ../emsal/content.json --theme=emsal
-php artisan cms:content-import emsal --fresh      # delete the site's pages, posts, menus, forms and sliders first
+php artisan cms:content-import emsal --fresh      # delete the site's pages, posts, menus, forms and sliders first (reusable blocks are kept)
 ```
 
 ```json
@@ -170,7 +228,27 @@ php artisan cms:content-import emsal --fresh      # delete the site's pages, pos
     "post_types": [{ "slug": "productos", "name": "Productos", "singular_name": "Producto", "schema": "product", "per_page": 0, "order": "title" }],
     "tags": { "cocina": "Cocina", "parrilla": "Parrilla" },
     "forms": [{ "alias": "contacto", "name": "Contacto", "fields": [{ "name": "Nombre", "alias": "nombre", "type": "text" }] }],
-    "sliders": [{ "key": "proceso", "name": "Todo comienza en el mar", "slides": [{ "title": "El mar", "image": "@hero" }] }],
+    "sliders": [
+        {
+            "key": "proceso",
+            "name": "Todo comienza en el mar",
+            "slides": [
+                {
+                    "title": "El mar",
+                    "caption": "...",
+                    "image": "@hero",
+                    "image_mobile": "@hero",
+                    "video": "@clip",
+                    "secondary_image": "@icono",
+                    "url": "/productos",
+                    "button_label": "Conoce más"
+                }
+            ]
+        }
+    ],
+    "patterns": {
+        "contactanos": { "name": "Contáctanos", "category": "cta", "blocks": [{ "type": "cta", "data": { "title": "¿Tienes una consulta?" } }] }
+    },
     "pages": [
         {
             "slug": "home",
@@ -210,6 +288,11 @@ php artisan cms:content-import emsal --fresh      # delete the site's pages, pos
 - **pages** and **posts** take `body` (HTML, saved as a text block) or `blocks` (the block
   editor's JSON), `excerpt`, `featured_image`, `metadata`, `tags` and `days_ago` (publish date).
   A post's `type` is its post type (`post` for the blog).
+- **sliders** take, for each slide, `title`, `caption`, `image`, `image_mobile`, `video`,
+  `secondary_image`, `url` and `button_label`.
+- **patterns** are reusable blocks (Admin → Bloques reutilizables), shared by all sites and
+  found by key, so loading again updates them. They are synced unless `"synced": false`; a
+  page shows a synced one with the block `{ "type": "pattern", "data": { "pattern": "contactanos" } }`.
 - **menus** link to a page of the file (`page`) or an address (`url`), with `children`.
 - `{site}` is replaced with the site's address; more `{name}` values come from
   `--var name=value`. A theme's content is loaded all or nothing: a mistake leaves the site as it was.

@@ -16,7 +16,11 @@ class CmsSlide extends Model
         'title',
         'caption',
         'image_url',
+        'image_mobile_url',
+        'video_url',
+        'secondary_image_url',
         'link_url',
+        'button_label',
         'position',
         'active',
     ];

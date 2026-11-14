@@ -1,3 +1,5 @@
+import { type PostListItem } from '@/types/models/cms-post';
+import { type CmsSlider } from '@/types/models/cms-slider';
 import { type CustomField } from '@/types/models/custom-field';
 import { createContext } from 'react';
 
@@ -69,6 +71,16 @@ export const withNewIds = (blocks: BlockData[]): BlockData[] =>
     });
 
 export const str = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+/** The slider a theme block's "slider" field picked, with its active slides (null when none) */
+export const blockSlider = (data: BlockValues, key: string): CmsSlider | null =>
+    ((data._sliders as Record<string, unknown> | undefined)?.[key] as CmsSlider | undefined) ?? null;
+
+/** The posts a theme block's "posts" field lists */
+export const blockPosts = (data: BlockValues, key: string): PostListItem[] => {
+    const posts = (data._posts as Record<string, unknown> | undefined)?.[key];
+    return Array.isArray(posts) ? (posts as PostListItem[]) : [];
+};
 
 /** Typography classes a template applies to the text blocks (e.g. "prose-sm") */
 export const BlockTextContext = createContext<string>('');

@@ -1,4 +1,4 @@
-import { BLOCK_RENDERERS } from '@/blocks/registry';
+import { useBlockRenderer } from '@/blocks/registry';
 import { BlockTextContext, type BlockData } from '@/blocks/types';
 import ContentRenderer from '@/components/content-renderer';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,8 @@ interface Props {
  * item has no blocks yet.
  */
 export default function Blocks({ blocks, html, className, textClassName = '' }: Props) {
+    const renderer = useBlockRenderer();
+
     if (!Array.isArray(blocks)) {
         return html && html.trim() !== '' ? <ContentRenderer html={html} className={cn(textClassName, className)} /> : null;
     }
@@ -25,7 +27,7 @@ export default function Blocks({ blocks, html, className, textClassName = '' }: 
         <BlockTextContext.Provider value={textClassName}>
             <div className={cn('space-y-10', className)}>
                 {blocks.map((block) => {
-                    const Render = BLOCK_RENDERERS[block.type];
+                    const Render = renderer(block.type);
                     return Render ? (
                         <div key={block.id} data-block={block.type}>
                             <Render data={block.data} />

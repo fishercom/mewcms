@@ -4,7 +4,7 @@ import { localePath } from '@/lib/locale-path';
 import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
-import { CmsPost, CmsPostType } from '@/types/models/cms-post';
+import { CmsPost, CmsPostType, PostListItem } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Settings, Tag, User } from 'lucide-react';
 import FrontSidebar, { PopularTag } from '../components/sidebar';
@@ -16,9 +16,11 @@ interface Props {
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
     popularTags?: PopularTag[];
     recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
+    /** Posts of the same type that share a tag with this one */
+    related?: PostListItem[];
 }
 
-export default function Show({ post, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
+export default function Show({ post, cpt, navigation, popularTags = [], recentArticles = [], related = [] }: Props) {
     const { t, date } = useTexts();
     const parentLabel = cpt ? cpt.name : t('blog.title');
     const parentUrl = localePath(cpt ? `/${cpt.slug}` : '/blog');
@@ -134,6 +136,25 @@ export default function Show({ post, cpt, navigation, popularTags = [], recentAr
                                     </Link>
                                 ))}
                             </div>
+                        </div>
+                    )}
+
+                    {/* Related posts */}
+                    {related.length > 0 && (
+                        <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
+                            <h4 className="mb-3 text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('blog.related')}</h4>
+                            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                {related.map((item) => (
+                                    <li key={item.id}>
+                                        <Link
+                                            href={item.url}
+                                            className="block rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm font-medium text-zinc-700 transition-colors hover:text-red-600 dark:border-zinc-800 dark:bg-[#161615]/30 dark:text-zinc-300 dark:hover:text-red-400"
+                                        >
+                                            {item.title}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     )}
                 </article>

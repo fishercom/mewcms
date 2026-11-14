@@ -70,11 +70,26 @@ export default function FrontSlider({ slider }: FrontSliderProps) {
 
                     return (
                         <div key={slide.id || idx} className={slideClass} style={transitionStyle}>
-                            <img
-                                src={slide.image_url}
-                                alt={slide.title || ''}
-                                className="h-full w-full scale-105 object-cover brightness-[0.6] transition-transform duration-700 ease-out dark:brightness-[0.5]"
-                            />
+                            {slide.video_url ? (
+                                <video
+                                    src={slide.video_url}
+                                    poster={slide.image_url || undefined}
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className="h-full w-full object-cover brightness-[0.6] dark:brightness-[0.5]"
+                                />
+                            ) : (
+                                <picture>
+                                    {slide.image_mobile_url && <source srcSet={slide.image_mobile_url} media="(max-width: 768px)" />}
+                                    <img
+                                        src={slide.image_url}
+                                        alt={slide.title || ''}
+                                        className="h-full w-full scale-105 object-cover brightness-[0.6] transition-transform duration-700 ease-out dark:brightness-[0.5]"
+                                    />
+                                </picture>
+                            )}
 
                             {/* Slide Text Caption Content */}
                             {(slide.title || slide.caption) && (
@@ -99,7 +114,7 @@ export default function FrontSlider({ slider }: FrontSliderProps) {
                                                     href={slide.link_url}
                                                     className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-violet-500/30 transition-all hover:scale-[1.02] hover:from-violet-700 hover:to-indigo-700 active:scale-95 sm:text-sm"
                                                 >
-                                                    <span>{t('slider.button')}</span>
+                                                    <span>{slide.button_label || t('slider.button')}</span>
                                                     <span>&rarr;</span>
                                                 </a>
                                             </div>

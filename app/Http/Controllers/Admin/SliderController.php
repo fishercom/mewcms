@@ -88,8 +88,12 @@ class SliderController extends Controller
             'slides.*.id' => 'nullable',
             'slides.*.title' => 'nullable|string',
             'slides.*.caption' => 'nullable|string',
-            'slides.*.image_url' => 'required|string',
+            'slides.*.image_url' => 'required_without:slides.*.video_url|nullable|string',
+            'slides.*.image_mobile_url' => 'nullable|string|max:255',
+            'slides.*.video_url' => 'nullable|string|max:255',
+            'slides.*.secondary_image_url' => 'nullable|string|max:255',
             'slides.*.link_url' => ['nullable', 'string', new SafeUrl],
+            'slides.*.button_label' => 'nullable|string|max:255',
             'slides.*.active' => 'boolean',
         ]);
 
@@ -107,8 +111,7 @@ class SliderController extends Controller
                 $slide->update([
                     'title' => $slideData['title'] ?? null,
                     'caption' => $slideData['caption'] ?? null,
-                    'image_url' => $slideData['image_url'],
-                    'link_url' => $slideData['link_url'] ?? null,
+                    ...$this->slideMedia($slideData),
                     'active' => (bool) ($slideData['active'] ?? true),
                     'position' => $index,
                 ]);
@@ -119,8 +122,7 @@ class SliderController extends Controller
                     'slider_id' => $slider->id,
                     'title' => $slideData['title'] ?? null,
                     'caption' => $slideData['caption'] ?? null,
-                    'image_url' => $slideData['image_url'],
-                    'link_url' => $slideData['link_url'] ?? null,
+                    ...$this->slideMedia($slideData),
                     'active' => (bool) ($slideData['active'] ?? true),
                     'position' => $index,
                 ]);
@@ -133,6 +135,25 @@ class SliderController extends Controller
         $slider->slides()->whereNotIn('id', $updatedSlideIds)->delete();
 
         return redirect()->route('sliders.index');
+    }
+
+    /**
+     * The pictures, video and button of a slide as the form sent them. A video slide
+     * needs no image, and the column takes an empty string then.
+     *
+     * @param  array<string, mixed>  $slideData
+     * @return array<string, ?string>
+     */
+    private function slideMedia(array $slideData): array
+    {
+        return [
+            'image_url' => (string) ($slideData['image_url'] ?? ''),
+            'image_mobile_url' => ($slideData['image_mobile_url'] ?? null) ?: null,
+            'video_url' => ($slideData['video_url'] ?? null) ?: null,
+            'secondary_image_url' => ($slideData['secondary_image_url'] ?? null) ?: null,
+            'link_url' => $slideData['link_url'] ?? null,
+            'button_label' => ($slideData['button_label'] ?? null) ?: null,
+        ];
     }
 
     /**
