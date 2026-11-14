@@ -9,7 +9,12 @@ interface Props {
     alias: string;
 }
 
-export default function FrontForm({ alias }: Props) {
+/**
+ * The state and actions of a public form: its fields (read from /api/forms/{alias}), the
+ * values, the validation errors and the messages after sending. FrontForm draws it with the
+ * CMS's markup; a theme can draw its own with the same hook.
+ */
+export function useFrontForm(alias: string) {
     const [form, setForm] = useState<CmsForm | null>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [values, setValues] = useState<Record<string, any>>({});
@@ -109,6 +114,26 @@ export default function FrontForm({ alias }: Props) {
                 setSubmitting(false);
             });
     };
+
+    return {
+        form,
+        values,
+        errors,
+        loading,
+        submitting,
+        successMessage,
+        errorMessage,
+        honeypot,
+        setHoneypot,
+        handleInputChange,
+        handleSubmit,
+    };
+}
+
+export default function FrontForm({ alias }: Props) {
+    const { t } = useTexts();
+    const { form, values, errors, loading, submitting, successMessage, errorMessage, honeypot, setHoneypot, handleInputChange, handleSubmit } =
+        useFrontForm(alias);
 
     if (loading) {
         return (

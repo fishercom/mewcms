@@ -190,7 +190,8 @@ export default function Timeline({ data }: BlockRenderProps) {
 - `"category"` (default `theme`) and `"nestable": false` (a block that can't go inside
   columns) are optional. A key the CMS already uses is ignored.
 - `front/blocks/<key>.tsx` with the key of one of the CMS's blocks (`cta`, `form`, `hero`…)
-  replaces how that block looks on the theme's sites.
+  replaces how that block looks on the theme's sites. A theme's `form` can keep the CMS's
+  loading, validation and sending with `useFrontForm(alias)` from `@/components/front-form`.
 
 ## Starting content
 
