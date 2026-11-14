@@ -15,6 +15,7 @@ use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
 use App\Support\Locales;
 use App\Support\MediaLibrary;
+use App\Support\PostLists;
 use App\Support\Sites;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -261,13 +262,18 @@ class FrontController extends Controller
             }])->first();
         }
 
+        // "Lista de posts" fields: the posts they ask for, keyed by field
+        $postLists = PostLists::resolve($article->schema?->fields, is_array($metadata) ? $metadata : []);
+
         return Inertia::render($template, [
             'article' => $article,
             // Templates may list the recent posts, so their featured images get srcsets too
             'media' => $this->mediaFor($article, $article->metadata)
-                + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter()),
+                + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter())
+                + MediaLibrary::lookup(PostLists::images($postLists)),
             ...$shared,
             'slider' => $slider,
+            'postLists' => $postLists,
             'alternates' => Locales::alternates($article),
         ]);
     }
@@ -389,13 +395,14 @@ class FrontController extends Controller
         $shared = FrontCache::shared();
 
         // Load posts for this specific post type
-        $posts = CmsPost::with(['user', 'tags'])
+        // Paged and sorted as the post type says (Admin → Post types); 0 per page lists them all
+        $query = CmsPost::with(['user', 'tags'])
             ->where('post_type', $cpt->slug)
             ->published()
             ->tap(fn ($query) => Locales::scope($query))
-            ->latest('published_at')
-            ->paginate(6)
-            ->withQueryString();
+            ->tap(fn ($query) => $cpt->sort($query));
+        $perPage = (int) ($cpt->per_page ?? 6);
+        $posts = $query->paginate($perPage > 0 ? $perPage : CmsPostType::MAX_PER_PAGE * 10)->withQueryString();
 
         return Inertia::render('front/blog/index', [
             'posts' => $posts,

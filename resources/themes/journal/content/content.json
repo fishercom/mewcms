@@ -1,0 +1,473 @@
+{
+    "$comment": "Starting content of the theme: php artisan cms:content-import journal. The pet care journal of the demo (php artisan cms:demo-sites), with {shop} the address of the shop site.",
+    "site": {
+        "name": "Velvet Paw Journal",
+        "title": "Velvet Paw Journal",
+        "description": "Practical, kind and vet-informed advice for living well with dogs, cats and small pets.",
+        "lang": "en",
+        "currency": "USD"
+    },
+    "media": {
+        "food-bowl": {
+            "url": "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A white and blue bowl of kibble on a parquet floor, with a dog’s paws beside it",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1589924691995-400dc9ecc119), Unsplash License."
+        },
+        "yorkie-rug": {
+            "url": "https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A tiny Yorkshire terrier puppy on a colourful woven rug",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a), Unsplash License."
+        },
+        "cat-looking-up": {
+            "url": "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A tabby cat with green eyes looking up against a blue sky",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1574158622682-e40e69881006), Unsplash License."
+        },
+        "doodles-rug": {
+            "url": "https://images.unsplash.com/photo-1504595403659-9088ce801e29?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A cream doodle and a black dog sitting together on a rug",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1504595403659-9088ce801e29), Unsplash License."
+        },
+        "golden-portrait": {
+            "url": "https://images.unsplash.com/photo-1558788353-f76d92427f16?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "Portrait of a calm golden retriever against a blue backdrop",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1558788353-f76d92427f16), Unsplash License."
+        },
+        "cat-stretch": {
+            "url": "https://images.unsplash.com/photo-1571566882372-1598d88abd90?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A ginger cat stretching its front legs on a pale floor",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1571566882372-1598d88abd90), Unsplash License."
+        },
+        "rabbit": {
+            "url": "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A white rabbit sitting upright in a garden",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308), Unsplash License."
+        },
+        "dog-sea": {
+            "url": "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A red-coated dog splashing through the sea at sunset",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1530281700549-e82e7bf110d6), Unsplash License."
+        },
+        "cat-puppy-grass": {
+            "url": "https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A tabby cat and a black and white puppy lying on the lawn together",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1623387641168-d9803ddd3f35), Unsplash License."
+        },
+        "dog-glasses": {
+            "url": "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A dog wearing glasses resting its head on an open magazine",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a), Unsplash License."
+        },
+        "corgi-orange": {
+            "url": "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=2000&q=80&fm=jpg&fit=max",
+            "alt": "A corgi puppy sitting against a bright orange wall",
+            "caption": "Photo from Unsplash (https://images.unsplash.com/photo-1537151625747-768eb6cf92b2), Unsplash License."
+        }
+    },
+    "settings": {
+        "layout_tagline": "Pet care, thoughtfully written",
+        "layout_announcement": "New this week: settling a new puppy in, one calm day at a time",
+        "layout_cta_label": "Visit the Velvet Paw shop",
+        "layout_cta_url": "{shop}",
+        "layout_shop_name": "Velvet Paw Boutique",
+        "layout_shop_text": "Beds, bowls, bakery treats and gentle grooming in Hawthorne Village.",
+        "layout_copyright": "© 2026 Velvet Paw Journal. Articles are general guidance, not a substitute for advice from your vet. Photography from <a href=\"https://unsplash.com\" target=\"_blank\" rel=\"noopener\">Unsplash</a>.",
+        "layout_social_links": [
+            {
+                "network": "instagram",
+                "url": "https://instagram.com/",
+                "label": ""
+            },
+            {
+                "network": "pinterest",
+                "url": "https://pinterest.com/",
+                "label": ""
+            }
+        ]
+    },
+    "schemas": {
+        "journal_home": {
+            "name": "Journal Home",
+            "type": "HOME",
+            "template": "front/templates/home",
+            "fields": [
+                {
+                    "key": "intro_eyebrow",
+                    "label": "Intro: eyebrow",
+                    "type": "text"
+                },
+                {
+                    "key": "intro_title",
+                    "label": "Intro: title",
+                    "type": "text"
+                },
+                {
+                    "key": "intro_text",
+                    "label": "Intro: text",
+                    "type": "textarea"
+                },
+                {
+                    "key": "topics_title",
+                    "label": "Topics: title",
+                    "type": "text"
+                },
+                {
+                    "key": "topics",
+                    "label": "Topics",
+                    "type": "repeater",
+                    "fields": [
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "text",
+                            "label": "Text",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "url",
+                            "label": "Link",
+                            "type": "url"
+                        }
+                    ]
+                },
+                {
+                    "key": "promo_eyebrow",
+                    "label": "Shop band: eyebrow",
+                    "type": "text"
+                },
+                {
+                    "key": "promo_title",
+                    "label": "Shop band: title",
+                    "type": "text"
+                },
+                {
+                    "key": "promo_text",
+                    "label": "Shop band: text",
+                    "type": "textarea"
+                },
+                {
+                    "key": "promo_image",
+                    "label": "Shop band: image",
+                    "type": "image"
+                },
+                {
+                    "key": "promo_button_label",
+                    "label": "Shop band: button label",
+                    "type": "text"
+                },
+                {
+                    "key": "promo_button_url",
+                    "label": "Shop band: button link",
+                    "type": "url"
+                }
+            ]
+        },
+        "journal_page": {
+            "name": "Journal Page",
+            "type": "PAGE",
+            "template": "front/templates/page",
+            "fields": [
+                {
+                    "key": "eyebrow",
+                    "label": "Eyebrow",
+                    "type": "text"
+                },
+                {
+                    "key": "subtitle",
+                    "label": "Display title",
+                    "type": "text"
+                }
+            ]
+        },
+        "article": {
+            "name": "Article",
+            "type": null,
+            "template": null,
+            "fields": [
+                {
+                    "key": "author",
+                    "label": "Author",
+                    "type": "text"
+                },
+                {
+                    "key": "image_credit",
+                    "label": "Photo credit",
+                    "type": "text"
+                },
+                {
+                    "key": "image_credit_url",
+                    "label": "Photo credit link",
+                    "type": "url"
+                }
+            ]
+        }
+    },
+    "tags": {
+        "dogs": "Dogs",
+        "cats": "Cats",
+        "puppies": "Puppies",
+        "health": "Health",
+        "nutrition": "Nutrition",
+        "grooming": "Grooming",
+        "behaviour": "Behaviour",
+        "small-pets": "Small pets"
+    },
+    "pages": [
+        {
+            "slug": "home",
+            "schema": "journal_home",
+            "days_ago": 60,
+            "title": "Home",
+            "excerpt": "Practical, kind and vet-informed advice for living well with dogs, cats and small pets.",
+            "metadata": {
+                "intro_eyebrow": "The Velvet Paw Journal",
+                "intro_title": "Good care, explained kindly",
+                "intro_text": "Guides from groomers, trainers and veterinary nurses on feeding, grooming, behaviour and the small daily habits that keep animals happy.",
+                "topics_title": "Guides by topic",
+                "topics": [
+                    {
+                        "title": "Dogs",
+                        "text": "Puppies, walks, feeding and grooming.",
+                        "url": "/tag/dogs"
+                    },
+                    {
+                        "title": "Cats",
+                        "text": "Behaviour, enrichment and indoor life.",
+                        "url": "/tag/cats"
+                    },
+                    {
+                        "title": "Health",
+                        "text": "Seasonal safety, senior care and vet visits.",
+                        "url": "/tag/health"
+                    },
+                    {
+                        "title": "Small pets",
+                        "text": "Rabbits, hamsters and guinea pigs.",
+                        "url": "/tag/small-pets"
+                    }
+                ],
+                "promo_eyebrow": "From the boutique",
+                "promo_title": "Everything we write about, chosen with care",
+                "promo_text": "The Velvet Paw shop stocks the beds, bowls and bakery treats our writers actually use — plus gentle, one-at-a-time grooming.",
+                "promo_image": "@corgi-orange",
+                "promo_button_label": "Visit the shop",
+                "promo_button_url": "{shop}"
+            }
+        },
+        {
+            "schema": "journal_page",
+            "days_ago": 60,
+            "title": "About the Journal",
+            "slug": "about",
+            "excerpt": "Why we write, who writes, and how we keep our advice trustworthy.",
+            "featured_image": "@dog-glasses",
+            "body": "<p>The Velvet Paw Journal grew out of the questions people ask us every day in the boutique: how much should a puppy sleep, why does my cat knock things off tables, is this treat actually good for them? We started writing the answers down, and the journal was born.</p><h2>Who writes here</h2><p>Our articles are written by the Velvet Paw groomers and staff, together with the certified trainers and veterinary nurses we work with. Each piece is reviewed by someone with hands-on experience of the topic before it is published.</p><h2>What we believe</h2><ul><li>Kindness first: we only recommend reward-based training and low-stress handling.</li><li>Evidence over trends: if something is unproven, we say so.</li><li>Your vet knows your pet best: our guides are general, and we always point you to professional care when it matters.</li></ul><p>Have a question you would like us to answer? Ask in the <a href=\"{shop}/contact\">boutique</a> — the best articles start there.</p>",
+            "metadata": {
+                "eyebrow": "About",
+                "subtitle": "Why we write about animals"
+            }
+        },
+        {
+            "schema": "journal_page",
+            "days_ago": 60,
+            "title": "Editorial Policy",
+            "slug": "editorial-policy",
+            "excerpt": "How articles are researched, reviewed and kept up to date.",
+            "body": "<h2>Research and review</h2><p>Every article draws on veterinary guidance and the day-to-day experience of people who care for animals professionally. Health topics are reviewed by a registered veterinary nurse before publication.</p><h2>Not medical advice</h2><p>Our guides are general information. They can’t replace an examination by your own vet, who knows your pet’s history. If your animal seems unwell, in pain or in distress, contact a vet straight away.</p><h2>Products</h2><p>The journal is published by Velvet Paw Boutique. When we mention a product we stock, we say so, and we never accept payment from brands to feature them.</p><h2>Corrections</h2><p>We review articles regularly and update them when advice changes. If you spot something that looks wrong, please tell us in the boutique or by email at <a href=\"mailto:hello@velvetpaw.example\">hello@velvetpaw.example</a>.</p>",
+            "metadata": {
+                "eyebrow": "About",
+                "subtitle": "Our editorial policy"
+            }
+        }
+    ],
+    "posts": [
+        {
+            "slug": "first-week-home-new-puppy",
+            "title": "The First Week Home: A Calm Guide for New Puppy Parents",
+            "schema": "article",
+            "excerpt": "Sleep, routine and lots of quiet: how to help a new puppy feel safe in the days that shape everything after.",
+            "featured_image": "@yorkie-rug",
+            "body": "<p>Bringing a puppy home is a joyful kind of chaos. For the puppy, though, it is a huge change: new smells, new people and, for the first time, no littermates to curl up with. The kindest thing you can do in the first week is to keep life small, predictable and calm.</p><h2>Let them sleep — a lot</h2><p>Young puppies need 18 to 20 hours of sleep a day. An overtired puppy is a bitey, frantic puppy, so plan naps the way you would for a baby. A crate or a pen with a soft bed, covered on three sides, gives them a den to retreat to. Put it somewhere they can still hear the household.</p><h2>Build a simple routine</h2><p>Puppies learn fastest when the day has a rhythm. Try to keep the same order every day:</p><ul><li>Wake up and go straight outside to toilet.</li><li>Breakfast, then a short play session.</li><li>Toilet again, then a nap.</li><li>Repeat through the day, with the last meal two to three hours before bedtime.</li></ul><p>Take them out after every meal, nap and play session, and reward toileting in the right place with a treat and warm praise the moment they finish.</p><h2>Socialise gently</h2><p>The window between roughly three and fourteen weeks is when puppies form their idea of what is normal. Let them see, hear and sniff new things — the vacuum cleaner, a bicycle, a person in a hat — from a distance where they stay relaxed. Quality matters more than quantity: one calm, positive experience is worth more than ten overwhelming ones.</p><blockquote><p>If your puppy backs away, hides or freezes, increase the distance. You are building confidence, not testing it.</p></blockquote><h2>Book the vet early</h2><p>Arrange a health check in the first few days. Your vet will examine your puppy, plan vaccinations and parasite prevention, and talk you through when it is safe to walk in public places.</p><h2>Expect a few hard nights</h2><p>Crying at night is normal at first. Placing the bed beside yours for the first nights, with a worn T-shirt that smells of you, often helps. Within a week or two most puppies settle into the new rhythm — and so will you.</p>",
+            "tags": ["puppies", "dogs", "behaviour"],
+            "days_ago": 2,
+            "metadata": {
+                "author": "Elena Marsh, puppy trainer",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "read-your-cats-body-language",
+            "title": "How to Read Your Cat’s Body Language",
+            "schema": "article",
+            "excerpt": "Tails, ears, whiskers and the famous slow blink — a field guide to what your cat is really telling you.",
+            "featured_image": "@cat-looking-up",
+            "body": "<p>Cats are often called mysterious, but they are actually remarkably clear communicators. Most of what they say is said with their bodies, and once you learn the vocabulary, many “sudden” scratches and sulks turn out to have been announced well in advance.</p><h2>The tail</h2><ul><li><strong>Upright, with a little hook at the tip:</strong> a friendly greeting. This is the cat equivalent of a wave.</li><li><strong>Swishing or thumping:</strong> irritation or overstimulation. Time to stop stroking.</li><li><strong>Puffed up:</strong> fear. The cat is trying to look bigger than the threat.</li><li><strong>Tucked low or wrapped around the body:</strong> anxiety or discomfort.</li></ul><h2>Ears and whiskers</h2><p>Ears facing forward with whiskers relaxed to the side mean a calm, interested cat. Ears turned sideways or flattened back, with whiskers pulled tight against the face, signal fear or defensiveness. Whiskers pushed forward usually mean focus — often on something they would like to catch.</p><h2>Eyes and the slow blink</h2><p>A long, slow blink is a sign of trust. Try returning it: look at your cat with soft eyes and blink slowly. Many cats will blink back. A hard, unblinking stare, on the other hand, can feel threatening to a cat, so avoid staring at a nervous one.</p><h2>The belly</h2><p>A cat rolling over to show its belly is showing trust — not necessarily asking for a belly rub. Many cats will grab and kick if you take it as an invitation. Admire the view and stroke the cheeks instead.</p><h2>When body language changes</h2><p>Hiding more than usual, a hunched posture, or reacting to being touched in one area can all be signs of pain. Cats are very good at masking illness, so a change in behaviour is worth a call to your vet.</p>",
+            "tags": ["cats", "behaviour"],
+            "days_ago": 6,
+            "metadata": {
+                "author": "Sofia Lind, feline behaviour consultant",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "gentle-home-grooming-routine",
+            "title": "A Gentle Home Grooming Routine: Brushing, Bathing and Nails",
+            "schema": "article",
+            "excerpt": "Ten calm minutes a few times a week keeps coats healthy, nails short and visits to the groomer stress-free.",
+            "featured_image": "@doodles-rug",
+            "body": "<p>Regular grooming at home is about much more than looks. It keeps the skin healthy, stops painful mats before they form and gives you a chance to spot lumps, ticks or sore spots early. Most importantly, it teaches your dog that being handled is nothing to worry about.</p><h2>Brushing</h2><p>How often you brush depends on the coat. Short, smooth coats need a weekly once-over with a rubber curry brush. Double coats like retrievers and huskies need brushing two or three times a week, more when they shed. Curly and long coats — doodles, poodles, shih tzus — need a few minutes most days, with a slicker brush followed by a metal comb to check you have reached the skin.</p><p>Work in small sections, brushing in the direction the hair grows, and pay extra attention to the friction spots: behind the ears, the armpits and the back of the legs.</p><h2>Bathing</h2><p>Most dogs only need a bath every four to eight weeks, unless they have rolled in something memorable. Use a shampoo made for dogs — human products are the wrong pH for their skin — and rinse until the water runs completely clear. Leftover shampoo is one of the most common causes of itchy skin.</p><h2>Nails</h2><p>If you can hear your dog’s nails clicking on the floor, they are too long. Trim a little at a time, just the tip, and stop well short of the quick (the pink centre you can see in pale nails). For dark nails, take tiny slivers and look at the cut surface: when you see a darker dot in the centre, stop.</p><blockquote><p>Keep sessions short and finish before your dog wants to stop. One paw today and one tomorrow is real progress.</p></blockquote><h2>Make it pleasant</h2><p>Pair every step with something your dog loves: a lick mat spread with a little dog-safe peanut butter works wonders. Over time, the brush becomes a signal that good things are coming.</p>",
+            "tags": ["grooming", "dogs"],
+            "days_ago": 11,
+            "metadata": {
+                "author": "Tom Avery, head groomer at Velvet Paw",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "dog-nutrition-basics",
+            "title": "What Goes in the Bowl: Dog Nutrition Basics",
+            "schema": "article",
+            "excerpt": "Complete diets, sensible portions and how to tell whether your dog is at a healthy weight — without the marketing noise.",
+            "featured_image": "@food-bowl",
+            "body": "<p>Walk down any pet food aisle and you will be told about ancestral diets, superfoods and grain-free recipes. Underneath the packaging, though, the essentials of feeding a dog well are refreshingly simple.</p><h2>Choose a complete diet</h2><p>Look for the word <em>complete</em> on the label. It means the food contains every nutrient a dog needs in the right balance, and it can be fed on its own. Foods described as <em>complementary</em> — many toppers and treats — are not meant to be the whole meal. Choose a food made for your dog’s life stage: puppy, adult or senior.</p><h2>Portions: start with the label, then adjust</h2><p>Feeding guides on packets are a starting point, not a rule. Two dogs of the same weight can need very different amounts depending on age, activity and whether they are neutered. Weigh food rather than using a scoop, and adjust a little at a time based on your dog’s body condition.</p><h2>Check body condition with your hands</h2><ul><li>You should be able to feel the ribs easily under a thin layer of fat, without pressing hard.</li><li>From above, there should be a visible waist behind the ribs.</li><li>From the side, the belly should tuck up towards the back legs.</li></ul><p>More than half of dogs in many countries are overweight, and extra weight shortens lives. If you can’t feel the ribs, ask your vet for a weight plan.</p><h2>Treats count too</h2><p>Treats should make up no more than about 10% of daily calories. Use small pieces for training, or set aside part of the daily kibble to use as rewards.</p><h2>Foods to keep away from dogs</h2><p>Chocolate, grapes and raisins, onions and garlic, macadamia nuts, xylitol (a sweetener in some peanut butters and sugar-free gum) and cooked bones can all be dangerous. If your dog eats any of them, call your vet straight away.</p>",
+            "tags": ["nutrition", "dogs", "health"],
+            "days_ago": 17,
+            "metadata": {
+                "author": "Dr. Amara Okafor, veterinary nurse",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "caring-for-a-senior-dog",
+            "title": "Comfortable Golden Years: Caring for a Senior Dog",
+            "schema": "article",
+            "excerpt": "Softer beds, shorter walks and twice-yearly check-ups: small changes that make a big difference as dogs age.",
+            "featured_image": "@golden-portrait",
+            "body": "<p>Most dogs are considered seniors from around seven years old, a little earlier for giant breeds and later for small ones. Ageing is not an illness, but it does change what a dog needs to stay comfortable and content.</p><h2>See the vet more often</h2><p>Twice-yearly check-ups help catch common age-related problems — arthritis, dental disease, kidney or thyroid changes — while they are easiest to manage. Ask your vet whether a blood test is a good idea as part of the visit.</p><h2>Keep moving, but gently</h2><p>Exercise keeps joints supple and minds sharp. Swap one long walk for two or three shorter ones, choose softer ground where you can, and let your dog set the pace. Sniffing is excellent exercise for the brain.</p><h2>Make home easier</h2><ul><li>Choose a supportive, orthopaedic-style bed away from draughts.</li><li>Add rugs or runners on slippery floors so older legs don’t splay.</li><li>Use a ramp or step for the car or a favourite sofa.</li><li>Raise food and water bowls slightly for dogs with stiff necks.</li></ul><h2>Watch for subtle signs</h2><p>Older dogs rarely complain. Stiffness after rest, reluctance to climb stairs, drinking more, changes in sleep or seeming confused at night are all worth mentioning to your vet. Many of these have effective treatments.</p><blockquote><p>An old dog who is comfortable, well fed and still enjoys a sniff around the park is living a very good life.</p></blockquote><h2>Keep their mind busy</h2><p>Puzzle feeders, short training sessions and new walking routes help keep older brains engaged. It is never too late to learn a new trick.</p>",
+            "tags": ["health", "dogs"],
+            "days_ago": 24,
+            "metadata": {
+                "author": "Dr. Amara Okafor, veterinary nurse",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "enrichment-for-indoor-cats",
+            "title": "Enrichment Ideas for Happy Indoor Cats",
+            "schema": "article",
+            "excerpt": "Indoor cats can live rich, satisfying lives. These simple ideas let them hunt, climb, hide and explore every day.",
+            "featured_image": "@cat-stretch",
+            "body": "<p>Keeping a cat indoors protects them from traffic and other dangers, but it also means we have to bring the outdoors in. A bored cat may overeat, over-groom or invent their own entertainment — usually at 4 a.m.</p><h2>Let them hunt</h2><p>Cats are designed to stalk, chase and pounce several times a day. Two or three short play sessions with a wand toy, moving it like prey — darting, hiding, pausing — satisfy that instinct. Always end with a “catch” and a small meal or treat, so the hunt feels complete.</p><h2>Think vertically</h2><p>Height makes cats feel safe. Cat trees, cleared bookshelves and window perches add territory without adding floor space, which is especially helpful in homes with more than one cat.</p><h2>Make food a puzzle</h2><p>Puzzle feeders and treat balls turn mealtimes into foraging. You can also hide small portions of dry food around the house. Start easy so your cat succeeds, then make the puzzles harder over time.</p><h2>Provide good places to scratch</h2><p>Scratching keeps claws healthy and leaves scent marks. Offer at least one tall, sturdy post your cat can stretch out fully on, plus a horizontal scratcher, near where they sleep.</p><h2>Rotate and refresh</h2><ul><li>Put toys away and bring a few back each week so they feel new.</li><li>Grow a pot of cat grass on a sunny sill.</li><li>Leave out a cardboard box or a paper bag (handles removed) — cheap and endlessly popular.</li><li>A bird feeder outside a window becomes “cat television”.</li></ul><p>Every cat is different, so watch what yours enjoys most and give them more of it.</p>",
+            "tags": ["cats", "behaviour"],
+            "days_ago": 31,
+            "metadata": {
+                "author": "Sofia Lind, feline behaviour consultant",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "small-pets-big-needs",
+            "title": "Small Pets, Big Needs: Rabbits, Hamsters and Guinea Pigs",
+            "schema": "article",
+            "excerpt": "Space, company and the right diet matter just as much for small animals as for dogs and cats.",
+            "featured_image": "@rabbit",
+            "body": "<p>Small pets are sometimes thought of as easy starter animals. In reality, rabbits, guinea pigs and hamsters have very specific needs, and they thrive when we get them right.</p><h2>Rabbits</h2><p>Rabbits are social, intelligent and need far more space than a traditional hutch. Aim for an enclosure where they can hop, stand up fully and stretch out, with daily access to a larger exercise area. They are happiest with a neutered rabbit companion.</p><p>The most important part of a rabbit’s diet is hay — good-quality grass hay should be available at all times and make up most of what they eat. Add a handful of fresh leafy greens and a small portion of pellets. Their teeth grow continuously, and chewing hay keeps them healthy.</p><h2>Guinea pigs</h2><p>Guinea pigs are herd animals and should live in pairs or small groups. Like rabbits, they need unlimited hay. Unlike rabbits, they can’t make their own vitamin C, so they need fresh vegetables rich in it every day, such as peppers and leafy greens.</p><h2>Hamsters</h2><p>Hamsters are usually solitary — Syrian hamsters must live alone. They are most active at dusk and night, so keep their home somewhere quiet during the day. Give them a large enclosure with deep bedding to burrow in, a solid wheel big enough that their back stays straight, and places to hide.</p><h2>Signs a small pet needs the vet</h2><ul><li>Not eating or not passing droppings for more than a few hours — this is an emergency in rabbits and guinea pigs.</li><li>Drooling, weight loss or overgrown teeth.</li><li>Hunched posture or reluctance to move.</li><li>Wet or dirty fur around the tail.</li></ul><p>Look for a vet with experience of “exotic” small animals before you need one.</p>",
+            "tags": ["small-pets", "health"],
+            "days_ago": 38,
+            "metadata": {
+                "author": "The Velvet Paw team",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "summer-safety-for-pets",
+            "title": "Summer Safety: Heat, Paws and Hydration",
+            "schema": "article",
+            "excerpt": "Heatstroke can develop quickly. Here is how to keep pets cool, comfortable and safe when the temperature climbs.",
+            "featured_image": "@dog-sea",
+            "body": "<p>Dogs and cats can’t sweat the way we do. Dogs cool themselves mostly by panting, which becomes much less effective in hot, humid weather. Flat-faced breeds, older pets, overweight animals and those with heart or breathing problems are at the highest risk.</p><h2>Walk at the cool ends of the day</h2><p>Walk early in the morning or late in the evening. Before you set out, press the back of your hand on the pavement for seven seconds: if it is too hot for you, it is too hot for paws.</p><h2>Never leave a pet in a car</h2><p>Even on a mild day, the inside of a parked car can become dangerously hot within minutes, and opening a window makes little difference. If you can’t take your pet with you when you get out, leave them at home.</p><h2>Keep water and shade on hand</h2><ul><li>Carry water and a travel bowl on walks.</li><li>Put out extra water bowls at home, and add ice cubes on hot days.</li><li>Make sure there is always shade, and that pets can move away from sunny windows.</li><li>A cooling mat or a damp towel to lie on can help.</li></ul><h2>Know the signs of heatstroke</h2><p>Heavy panting, drooling, a bright red tongue, weakness, wobbling, vomiting or collapse are all warning signs.</p><blockquote><p>Heatstroke is an emergency. Move your pet somewhere cool, pour cool (not ice-cold) water over them, and call your vet immediately.</p></blockquote><h2>Don’t forget the cats</h2><p>Cats are usually good at finding cool spots, but pale-coated cats can burn on the ears and nose. Ask your vet about pet-safe sunscreen if yours loves to sunbathe.</p>",
+            "tags": ["health", "dogs", "cats"],
+            "days_ago": 46,
+            "metadata": {
+                "author": "Dr. Amara Okafor, veterinary nurse",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        },
+        {
+            "slug": "introducing-a-new-pet",
+            "title": "Introducing a New Pet to Your Resident Cat or Dog",
+            "schema": "article",
+            "excerpt": "Slow, scent-first introductions give cats and dogs the best chance of becoming friends — or at least peaceful housemates.",
+            "featured_image": "@cat-puppy-grass",
+            "body": "<p>First impressions matter between animals, too. A rushed meeting can create fear that takes months to undo, while a slow, planned introduction lets both pets learn that the newcomer is nothing to worry about.</p><h2>Start with separate spaces</h2><p>Give the new arrival their own room with food, water, a bed and, for cats, a litter tray. Your resident pet keeps the rest of the house. This lets everyone settle in without pressure.</p><h2>Introduce scent before sight</h2><p>Animals learn a great deal through smell. Swap bedding between the two, or stroke one pet with a soft cloth and leave it near the other’s food bowl. When both can eat calmly near the other’s scent, you are ready for the next step.</p><h2>The first look</h2><p>Let them see each other through a baby gate or a door open a crack, ideally at mealtimes or while you hand out treats. Keep dogs on a lead. Short, calm sessions are the goal — end before anyone becomes tense.</p><h2>Signs things are going well</h2><ul><li>Relaxed bodies, soft eyes and normal eating.</li><li>Curiosity followed by losing interest.</li><li>Choosing to rest in the same room.</li></ul><h2>Signs to slow down</h2><ul><li>Staring, stiffening, growling or hissing.</li><li>A dog fixating on a cat, or a cat hiding and refusing food.</li></ul><p>Always make sure a cat can escape upwards or into a dog-free room, and never leave a new pair unsupervised until you are completely confident. If progress stalls, a qualified behaviourist can help you build a plan for your particular animals.</p>",
+            "tags": ["behaviour", "cats", "dogs"],
+            "days_ago": 55,
+            "metadata": {
+                "author": "Elena Marsh, puppy trainer",
+                "image_credit": "Photo: Unsplash",
+                "image_credit_url": "https://unsplash.com"
+            }
+        }
+    ],
+    "menus": {
+        "main": [
+            {
+                "title": "Latest",
+                "url": "/blog"
+            },
+            {
+                "title": "Dogs",
+                "url": "/tag/dogs"
+            },
+            {
+                "title": "Cats",
+                "url": "/tag/cats"
+            },
+            {
+                "title": "Health",
+                "url": "/tag/health"
+            },
+            {
+                "title": "Small pets",
+                "url": "/tag/small-pets"
+            },
+            {
+                "title": "About",
+                "page": "about"
+            },
+            {
+                "title": "Shop ↗",
+                "url": "{shop}"
+            }
+        ],
+        "footer": [
+            {
+                "title": "All articles",
+                "url": "/blog"
+            },
+            {
+                "title": "About the Journal",
+                "page": "about"
+            },
+            {
+                "title": "Editorial Policy",
+                "page": "editorial-policy"
+            },
+            {
+                "title": "Velvet Paw Boutique",
+                "url": "{shop}"
+            }
+        ]
+    }
+}

@@ -124,6 +124,39 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                 </div>
             </div>
 
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                    <Label htmlFor="per_page">{t('Elementos por página del listado')}</Label>
+                    <Input
+                        id="per_page"
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={data.per_page ?? 6}
+                        onChange={(e) => setData({ ...data, per_page: e.target.value === '' ? 6 : Number(e.target.value) })}
+                        disabled={processing}
+                    />
+                    <p className="text-muted-foreground text-xs">{t('0 muestra todos en una sola página.')}</p>
+                    <InputError message={errors.per_page} />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="order">{t('Orden del listado')}</Label>
+                    <select
+                        id="order"
+                        value={data.order || 'newest'}
+                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        onChange={(e) => setData({ ...data, order: e.target.value })}
+                        disabled={processing}
+                    >
+                        <option value="newest">{t('Más recientes primero')}</option>
+                        <option value="oldest">{t('Más antiguos primero')}</option>
+                        <option value="title">{t('Por título (A-Z)')}</option>
+                    </select>
+                    <InputError message={errors.order} />
+                </div>
+            </div>
+
             <div className="grid gap-2">
                 <Label>{t('Icono del Menú (Sidebar)')}</Label>
                 <div className="border-border bg-muted/50 grid max-h-[220px] grid-cols-1 gap-2 overflow-y-auto rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-3 dark:bg-transparent">

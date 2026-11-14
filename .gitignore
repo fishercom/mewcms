@@ -25,3 +25,12 @@ yarn-error.log
 /.npm-cache
 
 .DS_Store
+
+# Themes kept in their own repository are linked or copied into resources/themes/<slug>
+# and never committed here. Only the themes that ship with MewCMS are tracked.
+/resources/themes/*
+!/resources/themes/README.md
+!/resources/themes/default/
+!/resources/themes/editorial/
+!/resources/themes/journal/
+!/resources/themes/velvet/

@@ -279,6 +279,78 @@ function SliderFieldRenderer({ value, onChange }: SliderFieldRendererProps) {
     );
 }
 
+interface PostListValue {
+    post_type?: string;
+    tag?: string;
+    limit?: number | null;
+}
+
+interface PostsFieldRendererProps {
+    id: string;
+    value: JsonValue | undefined;
+    onChange: (value: JsonObject) => void;
+}
+
+/** "Lista de posts": which posts the page lists (post type, optional tag, how many) */
+function PostsFieldRenderer({ id, value, onChange }: PostsFieldRendererProps) {
+    const [types, setTypes] = React.useState<Array<{ slug: string; name: string }>>([]);
+    const current: PostListValue = value && typeof value === 'object' && !Array.isArray(value) ? (value as PostListValue) : {};
+    const update = (patch: PostListValue) => onChange({ post_type: 'post', tag: '', limit: 6, ...current, ...patch } as JsonObject);
+
+    React.useEffect(() => {
+        axios
+            .get('/admin/api/post-types')
+            .then((res) => setTypes(res.data))
+            .catch((err) => console.error('Error loading post types:', err));
+    }, []);
+
+    return (
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="space-y-1.5">
+                <Label htmlFor={id} className="text-muted-foreground text-xs">
+                    {t('Tipo de contenido')}
+                </Label>
+                <Select value={current.post_type || 'post'} onValueChange={(next) => update({ post_type: next })}>
+                    <SelectTrigger id={id} className="bg-card w-full">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {(types.length > 0 ? types : [{ slug: 'post', name: t('Entradas del blog') }]).map((type) => (
+                            <SelectItem key={type.slug} value={type.slug}>
+                                {type.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-1.5">
+                <Label htmlFor={id + '_tag'} className="text-muted-foreground text-xs">
+                    {t('Solo con la etiqueta (slug, opcional)')}
+                </Label>
+                <Input
+                    id={id + '_tag'}
+                    value={current.tag ?? ''}
+                    placeholder={t('Ej. recetas')}
+                    onChange={(e) => update({ tag: e.target.value.trim() })}
+                />
+            </div>
+            <div className="space-y-1.5">
+                <Label htmlFor={id + '_limit'} className="text-muted-foreground text-xs">
+                    {t('Cantidad')}
+                </Label>
+                <Input
+                    id={id + '_limit'}
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={current.limit ?? 6}
+                    onChange={(e) => update({ limit: e.target.value === '' ? null : Number(e.target.value) })}
+                />
+            </div>
+        </div>
+    );
+}
+
 interface CustomFieldRendererProps {
     fields: CustomField[];
     values: Record<string, JsonValue>;
@@ -554,6 +626,16 @@ export default function CustomFieldRenderer({ fields, values, onChange, idPrefix
                         media={field.media === 'video' ? 'Videos' : 'Files'}
                     />
                 );
+            case 'video':
+                return (
+                    <DocumentFieldRenderer
+                        value={typeof value === 'string' ? value : ''}
+                        onChange={(val) => onChange(field.key, val)}
+                        media="Videos"
+                    />
+                );
+            case 'posts':
+                return <PostsFieldRenderer id={idPrefix + field.key} value={value} onChange={(val) => onChange(field.key, val)} />;
             case 'slider':
                 return <SliderFieldRenderer value={typeof value === 'string' ? value : ''} onChange={(val) => onChange(field.key, val)} />;
             case 'text':

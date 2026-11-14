@@ -1252,5 +1252,18 @@
     "¿Quitar esta diapositiva?": "¿Quitar esta diapositiva?",
     "¿Restaurar esta revisión?": "¿Restaurar esta revisión?",
     "¿Salir sin guardar?": "¿Salir sin guardar?",
-    "¿Salir y detener la preparación?": "¿Salir y detener la preparación?"
+    "¿Salir y detener la preparación?": "¿Salir y detener la preparación?",
+    "Elementos por página del listado": "Elementos por página del listado",
+    "0 muestra todos en una sola página.": "0 muestra todos en una sola página.",
+    "Orden del listado": "Orden del listado",
+    "Más recientes primero": "Más recientes primero",
+    "Más antiguos primero": "Más antiguos primero",
+    "Por título (A-Z)": "Por título (A-Z)",
+    "Video (Media)": "Video (Media)",
+    "Lista de posts": "Lista de posts",
+    "Tipo de contenido": "Tipo de contenido",
+    "Entradas del blog": "Entradas del blog",
+    "Solo con la etiqueta (slug, opcional)": "Solo con la etiqueta (slug, opcional)",
+    "Ej. recetas": "Ej. recetas",
+    "Cantidad": "Cantidad"
 }

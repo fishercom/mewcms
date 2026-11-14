@@ -18,6 +18,8 @@ export default function Edit() {
         icon: item.icon,
         description: item.description,
         default_schema_id: item.default_schema_id,
+        per_page: item.per_page ?? 6,
+        order: item.order ?? 'newest',
         active: item.active,
     });
     const [errors, setErrors] = useState<Record<string, string>>({});

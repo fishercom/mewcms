@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\FlushesFrontCache;
 use App\Models\Concerns\LogsAdminActivity;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsPostType extends Model
@@ -20,11 +21,20 @@ class CmsPostType extends Model
         'icon',
         'description',
         'default_schema_id',
+        'per_page',
+        'order',
         'active',
     ];
 
+    /** Sort orders of the public listing */
+    public const ORDERS = ['newest', 'oldest', 'title'];
+
+    /** Most items a listing shows on one page */
+    public const MAX_PER_PAGE = 100;
+
     protected $casts = [
         'active' => 'boolean',
+        'per_page' => 'integer',
     ];
 
     public function default_schema()
@@ -86,5 +96,20 @@ class CmsPostType extends Model
     public function adminActivityModule(): string
     {
         return 'post-types';
+    }
+
+    /**
+     * Sort a query of this type's posts as its listing shows them.
+     *
+     * @param  Builder<CmsPost>  $query
+     * @return Builder<CmsPost>
+     */
+    public function sort($query)
+    {
+        return match ($this->order) {
+            'oldest' => $query->oldest('published_at')->orderBy('id'),
+            'title' => $query->orderBy('title')->orderBy('id'),
+            default => $query->latest('published_at')->orderByDesc('id'),
+        };
     }
 }

@@ -17,6 +17,8 @@ export default function Create() {
         icon: 'book-open',
         description: '',
         default_schema_id: null,
+        per_page: 6,
+        order: 'newest',
         active: true,
     };
 
