@@ -1,4 +1,4 @@
-import { BLOCK_RENDERERS } from '@/blocks/registry';
+import { useBlockRenderer } from '@/blocks/registry';
 import { type BlockData, type BlockDefinition, type BlockPattern, type BlockValues, newBlockId, str, withNewIds } from '@/blocks/types';
 import AiBlockMenu, { hasAiText } from '@/components/ai-block-menu';
 import { confirmDialog } from '@/components/confirm-dialog';
@@ -79,6 +79,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     layout: t('Diseño'),
     media: t('Multimedia'),
     reusable: t('Reutilizables'),
+    theme: t('Del tema'),
 };
 
 /** Short text that identifies a block when it is collapsed */
@@ -112,6 +113,7 @@ const summaryOf = (block: BlockData): string => {
  */
 export default function BlockEditor({ value, onChange, types, nested = false, allowPatterns = true, allowedTypes = null }: Props) {
     const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+    const renderer = useBlockRenderer();
     const [editingId, setEditingId] = useState<string | null>(null);
     /** Index of the block being saved as a reusable block (its dialog is open) */
     const [patternDialogIndex, setPatternDialogIndex] = useState<number | null>(null);
@@ -281,7 +283,7 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
             <ReactSortable list={value} setList={onChange} handle={`.${handleClass}`} animation={150} ghostClass="opacity-40" className="space-y-1">
                 {value.map((block, index) => {
                     const type = typeByKey[block.type];
-                    const Render = BLOCK_RENDERERS[block.type];
+                    const Render = renderer(block.type);
                     const isCollapsed = collapsed.has(block.id);
                     const isText = block.type === 'rich_text';
                     const isPattern = block.type === 'pattern';

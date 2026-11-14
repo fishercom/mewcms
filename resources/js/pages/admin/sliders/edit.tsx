@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
 import { t } from '@/lib/i18n';
@@ -17,6 +18,34 @@ import { ReactSortable } from 'react-sortablejs';
 
 interface EditorSlide extends CmsSlide {
     id: number | string;
+}
+
+/** The slide fields that take a file from the media library */
+type SlideMediaField = 'image_url' | 'image_mobile_url' | 'video_url' | 'secondary_image_url';
+
+/** One of a slide's optional files: its URL, with a button that opens the media library */
+function SlideMediaInput({
+    label,
+    value,
+    onPick,
+    onChange,
+}: {
+    label: string;
+    value?: string | null;
+    onPick: () => void;
+    onChange: (value: string) => void;
+}) {
+    return (
+        <div className="grid gap-1">
+            <Label className="text-muted-foreground text-xs font-medium">{label}</Label>
+            <div className="flex gap-1.5">
+                <Input type="text" value={value || ''} onChange={(e) => onChange(e.target.value)} className="bg-card h-8 min-w-0 flex-1 text-xs" />
+                <Button type="button" variant="outline" size="sm" className="h-8 text-xs" onClick={onPick}>
+                    {t('Elegir')}
+                </Button>
+            </div>
+        </div>
+    );
 }
 
 export default function Edit() {
@@ -39,6 +68,8 @@ export default function Edit() {
     // Media Drawer state
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [activeSlideIndex, setActiveSlideIndex] = useState<number | null>(null);
+    const [activeMediaField, setActiveMediaField] = useState<SlideMediaField>('image_url');
+    const [moreOptions, setMoreOptions] = useState<Record<number, boolean>>({});
     const [manualUrls, setManualUrls] = useState<Record<number, boolean>>({});
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -50,7 +81,11 @@ export default function Edit() {
             title: '',
             caption: '',
             image_url: '',
+            image_mobile_url: '',
+            video_url: '',
+            secondary_image_url: '',
             link_url: '',
+            button_label: '',
             position: slides.length,
             active: true,
         };
@@ -75,14 +110,15 @@ export default function Edit() {
         setSlides(updated);
     };
 
-    const handleOpenMediaDrawer = (index: number) => {
+    const handleOpenMediaDrawer = (index: number, field: SlideMediaField = 'image_url') => {
         setActiveSlideIndex(index);
+        setActiveMediaField(field);
         setIsDrawerOpen(true);
     };
 
     const handleSelectMedia = (url: string) => {
         if (activeSlideIndex !== null) {
-            handleUpdateSlideField(activeSlideIndex, 'image_url', url);
+            handleUpdateSlideField(activeSlideIndex, activeMediaField, url);
         }
         setIsDrawerOpen(false);
         setActiveSlideIndex(null);
@@ -103,7 +139,11 @@ export default function Edit() {
             title: s.title,
             caption: s.caption,
             image_url: s.image_url,
+            image_mobile_url: s.image_mobile_url ?? null,
+            video_url: s.video_url ?? null,
+            secondary_image_url: s.secondary_image_url ?? null,
             link_url: s.link_url,
+            button_label: s.button_label ?? null,
             active: s.active,
             position: index,
         }));
@@ -398,14 +438,62 @@ export default function Edit() {
                                                     <Label className="text-muted-foreground text-xs font-medium">
                                                         {t('Subtítulo / Leyenda (Caption)')}
                                                     </Label>
-                                                    <Input
-                                                        type="text"
+                                                    <Textarea
+                                                        rows={2}
                                                         value={slide.caption || ''}
                                                         onChange={(e) => handleUpdateSlideField(index, 'caption', e.target.value)}
                                                         placeholder={t('Texto secundario o descripción...')}
-                                                        className="bg-card h-8 text-xs"
+                                                        className="bg-card min-h-8 text-xs"
                                                     />
                                                 </div>
+
+                                                <div className="md:col-span-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setMoreOptions((prev) => ({ ...prev, [index]: !prev[index] }))}
+                                                        className="text-muted-foreground text-xs font-medium hover:underline"
+                                                        aria-expanded={Boolean(moreOptions[index])}
+                                                    >
+                                                        {moreOptions[index]
+                                                            ? t('Ocultar más opciones')
+                                                            : t('Más opciones: botón, móvil, video e imagen secundaria')}
+                                                    </button>
+                                                </div>
+
+                                                {moreOptions[index] && (
+                                                    <>
+                                                        <div className="grid gap-1 md:col-span-2">
+                                                            <Label className="text-muted-foreground text-xs font-medium">
+                                                                {t('Texto del botón')}
+                                                            </Label>
+                                                            <Input
+                                                                type="text"
+                                                                value={slide.button_label || ''}
+                                                                onChange={(e) => handleUpdateSlideField(index, 'button_label', e.target.value)}
+                                                                placeholder={t('Ej.: Conoce más (va al enlace de la diapositiva)')}
+                                                                className="bg-card h-8 text-xs"
+                                                            />
+                                                        </div>
+                                                        <SlideMediaInput
+                                                            label={t('Imagen para móvil')}
+                                                            value={slide.image_mobile_url}
+                                                            onPick={() => handleOpenMediaDrawer(index, 'image_mobile_url')}
+                                                            onChange={(value) => handleUpdateSlideField(index, 'image_mobile_url', value)}
+                                                        />
+                                                        <SlideMediaInput
+                                                            label={t('Video (reemplaza la imagen)')}
+                                                            value={slide.video_url}
+                                                            onPick={() => handleOpenMediaDrawer(index, 'video_url')}
+                                                            onChange={(value) => handleUpdateSlideField(index, 'video_url', value)}
+                                                        />
+                                                        <SlideMediaInput
+                                                            label={t('Imagen secundaria (ícono, logo o recorte)')}
+                                                            value={slide.secondary_image_url}
+                                                            onPick={() => handleOpenMediaDrawer(index, 'secondary_image_url')}
+                                                            onChange={(value) => handleUpdateSlideField(index, 'secondary_image_url', value)}
+                                                        />
+                                                    </>
+                                                )}
                                             </div>
 
                                             {/* Slide Actions (Status & Trash) */}
@@ -468,7 +556,9 @@ export default function Edit() {
                     setActiveSlideIndex(null);
                 }}
                 onSelect={handleSelectMedia}
-                initialType="Images"
+                // The drawer opens on the kind of file the field takes
+                key={activeMediaField === 'video_url' ? 'videos' : 'images'}
+                initialType={activeMediaField === 'video_url' ? 'Videos' : 'Images'}
             />
         </ModuleLayout>
     );

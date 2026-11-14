@@ -1,4 +1,4 @@
-import { BLOCK_RENDERERS } from '../registry';
+import { useBlockRenderer } from '../registry';
 import { type BlockData, type BlockRenderProps, str } from '../types';
 
 /**
@@ -7,6 +7,7 @@ import { type BlockData, type BlockRenderProps, str } from '../types';
  */
 export default function PatternRender({ data, editing }: BlockRenderProps) {
     const blocks = (Array.isArray(data.blocks) ? data.blocks : []) as unknown as BlockData[];
+    const renderer = useBlockRenderer();
 
     if (blocks.length === 0) {
         return editing ? (
@@ -19,7 +20,7 @@ export default function PatternRender({ data, editing }: BlockRenderProps) {
     return (
         <div className="space-y-10">
             {blocks.map((block) => {
-                const Render = BLOCK_RENDERERS[block.type];
+                const Render = renderer(block.type);
                 return Render ? (
                     <div key={block.id} data-block={block.type}>
                         <Render data={block.data} editing={editing} />

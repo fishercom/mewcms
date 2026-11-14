@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Support\ContentSanitizer;
+use App\Support\Themes;
 use Illuminate\Support\Str;
 
 /**
@@ -29,23 +30,58 @@ class BlockRegistry
 
     public const MAX_BLOCKS = 200;
 
-    /** @var array<string, BlockType>|null */
-    protected static ?array $types = null;
+    /** @var array<string, array<string, BlockType>> block types by theme */
+    protected static array $types = [];
 
     /**
+     * The CMS's block types, then those of the current site's theme (a theme block
+     * cannot take the key of one of the CMS's).
+     *
      * @return array<string, BlockType>
      */
     public static function types(): array
     {
-        if (self::$types === null) {
-            self::$types = [];
+        $theme = Themes::layout();
+        if (! isset(self::$types[$theme])) {
+            $types = [];
             foreach (self::TYPES as $class) {
                 $type = new $class;
-                self::$types[$type->key()] = $type;
+                $types[$type->key()] = $type;
             }
+            foreach (self::themeBlocks($theme) as $key => $type) {
+                $types[$key] ??= $type;
+            }
+            self::$types[$theme] = $types;
         }
 
-        return self::$types;
+        return self::$types[$theme];
+    }
+
+    /**
+     * The block types a theme declares in its blocks folder, one JSON file each, named
+     * after the block's key (letters, digits and underscores).
+     *
+     * @return array<string, ThemeBlock>
+     */
+    public static function themeBlocks(string $theme): array
+    {
+        $types = [];
+        foreach (glob(Themes::path($theme, 'blocks').'/*.json') ?: [] as $file) {
+            $key = basename($file, '.json');
+            $definition = json_decode((string) file_get_contents($file), true);
+            if (preg_match('/^[a-z][a-z0-9_]{0,63}$/', $key) && is_array($definition)) {
+                $types[$key] = new ThemeBlock($key, $definition);
+            }
+        }
+        ksort($types);
+
+        return $types;
+    }
+
+    /** Forget the loaded block types (after a theme changes) */
+    public static function flush(): void
+    {
+        self::$types = [];
     }
 
     public static function get(string $key): ?BlockType

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { BLOCK_RENDERERS } from '../registry';
+import { useBlockRenderer } from '../registry';
 import { type BlockData, type BlockRenderProps, str } from '../types';
 
 /** Column spans (out of 12) per layout; keep in sync with App\Blocks\ColumnsBlock::LAYOUTS */
@@ -21,6 +21,7 @@ export interface ColumnData {
 
 export default function ColumnsRender({ data, editing }: BlockRenderProps) {
     const spans = COLUMN_LAYOUTS[str(data.layout)] ?? COLUMN_LAYOUTS['50-50'];
+    const renderer = useBlockRenderer();
     const columns = (Array.isArray(data.columns) ? data.columns : []) as unknown as ColumnData[];
 
     return (
@@ -28,7 +29,7 @@ export default function ColumnsRender({ data, editing }: BlockRenderProps) {
             {spans.map((span, index) => (
                 <div key={index} className={cn('min-w-0 space-y-6', SPANS[span])}>
                     {(columns[index]?.blocks ?? []).map((block) => {
-                        const Render = BLOCK_RENDERERS[block.type];
+                        const Render = renderer(block.type);
                         return Render ? (
                             <div key={block.id} data-block={block.type}>
                                 <Render data={block.data} editing={editing} />

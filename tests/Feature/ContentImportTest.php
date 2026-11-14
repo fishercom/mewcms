@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\CmsArticle;
+use App\Models\CmsBlockPattern;
 use App\Models\CmsForm;
 use App\Models\CmsMedia;
 use App\Models\CmsMenu;
@@ -191,4 +192,80 @@ it('refuses a theme without content, a menu link to a missing page and media out
     $file = writeContent($this->dir, ['media' => ['secret' => ['file' => '../../etc/passwd']]]);
     $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertFailed();
     expect(CmsMedia::count())->toBe(0);
+});
+
+it('loads slides with their extra media and button, and reusable blocks', function (): void {
+    $file = writeContent($this->dir, [
+        'media' => ['salinas' => ['file' => 'media/salinas.jpg', 'alt' => 'Las salinas']],
+        'schemas' => ['home' => ['name' => 'Inicio', 'type' => 'HOME', 'template' => 'front/templates/home', 'fields' => [
+            ['key' => 'banners', 'label' => 'Banners', 'type' => 'slider'],
+            ['key' => 'process', 'label' => 'Proceso', 'type' => 'slider'],
+        ]]],
+        'sliders' => [
+            ['key' => 'banners', 'slides' => [[
+                'title' => 'Naturalmente peruana',
+                'image' => '@salinas',
+                'image_mobile' => '@salinas',
+                'video' => '/storage/media/mar.mp4',
+                'secondary_image' => '@salinas',
+                'url' => '/productos',
+                'button_label' => 'Conoce más',
+            ]]],
+            ['key' => 'proceso', 'slides' => [['title' => 'El mar', 'image' => '@salinas']]],
+        ],
+        'patterns' => ['contactanos' => ['name' => 'Contáctanos', 'category' => 'cta', 'blocks' => [['type' => 'rich_text', 'data' => ['html' => '<p>Escríbenos</p>']]]]],
+        'pages' => [['slug' => 'home', 'title' => 'Inicio', 'schema' => 'home', 'metadata' => ['banners' => 'banners', 'process' => 'proceso'],
+            'blocks' => [['type' => 'pattern', 'data' => ['pattern' => 'contactanos']]]]],
+    ]);
+
+    $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertSuccessful();
+    $image = '/storage/'.CmsMedia::where('alt', 'Las salinas')->value('path');
+
+    $slide = CmsSlider::withoutGlobalScopes()->where('key', 'banners')->first()->slides()->first();
+    expect($slide->only(['image_mobile_url', 'video_url', 'secondary_image_url', 'link_url', 'button_label']))->toBe([
+        'image_mobile_url' => $image,
+        'video_url' => '/storage/media/mar.mp4',
+        'secondary_image_url' => $image,
+        'link_url' => '/productos',
+        'button_label' => 'Conoce más',
+    ]);
+
+    $pattern = CmsBlockPattern::where('key', 'contactanos')->sole();
+    expect($pattern->synced)->toBeTrue()->and($pattern->category)->toBe('cta');
+
+    // Both sliders reach the page by key; "slider" stays the first one
+    $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->where('slider.key', 'banners')
+        ->where('sliders.banners.slides.0.button_label', 'Conoce más')
+        ->where('sliders.proceso.slides.0.title', 'El mar')
+        // The synced reusable block brings its blocks
+        ->where('article.blocks.0.data.blocks.0.data.html', '<p>Escríbenos</p>'));
+
+    // Loading again updates the reusable block instead of repeating it
+    $this->artisan('cms:content-import', ['source' => $file, '--force' => true, '--fresh' => true])->assertSuccessful();
+    expect(CmsBlockPattern::where('key', 'contactanos')->count())->toBe(1);
+});
+
+it('gives a post the related posts of its type, those sharing tags first', function (): void {
+    $file = writeContent($this->dir, [
+        'post_types' => [['slug' => 'productos', 'name' => 'Productos', 'singular_name' => 'Producto']],
+        'tags' => ['cocina' => 'Cocina', 'mesa' => 'Mesa', 'parrilla' => 'Parrilla'],
+        'posts' => [
+            ['type' => 'productos', 'slug' => 'sal-de-mesa', 'title' => 'Sal de mesa', 'tags' => ['cocina', 'mesa']],
+            ['type' => 'productos', 'slug' => 'sal-fina', 'title' => 'Sal fina', 'tags' => ['cocina', 'mesa'], 'days_ago' => 5],
+            ['type' => 'productos', 'slug' => 'sal-gruesa', 'title' => 'Sal gruesa', 'tags' => ['cocina'], 'days_ago' => 1],
+            ['type' => 'productos', 'slug' => 'sal-parrillera', 'title' => 'Sal parrillera', 'tags' => ['parrilla'], 'days_ago' => 2],
+            ['type' => 'post', 'slug' => 'receta', 'title' => 'Receta', 'tags' => ['cocina']],
+        ],
+    ]);
+    $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertSuccessful();
+
+    $this->get('/productos/sal-de-mesa')->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->component('front/blog/show')
+        ->has('related', 3)
+        ->where('related.0.title', 'Sal fina')
+        ->where('related.1.title', 'Sal gruesa')
+        // No tag in common: it only fills the list
+        ->where('related.2.title', 'Sal parrillera')
+        ->where('related.0.url', fn ($url) => str_ends_with($url, '/productos/sal-fina')));
 });

@@ -1,4 +1,4 @@
-import { BLOCK_RENDERERS } from '@/blocks/registry';
+import { useBlockRenderer } from '@/blocks/registry';
 import { type BlockData, type BlockDefinition, type BlockValues } from '@/blocks/types';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -59,6 +59,7 @@ export function hasAiText(type: BlockDefinition | undefined): boolean {
  */
 export default function AiBlockMenu({ block, onApply }: { block: BlockData; onApply: (data: BlockValues) => void }) {
     const { ai_assistant } = usePage<{ ai_assistant?: boolean }>().props;
+    const renderer = useBlockRenderer();
     const [request, setRequest] = useState<Request | null>(null);
     const [result, setResult] = useState<BlockValues | null>(null);
     const [loading, setLoading] = useState(false);
@@ -96,7 +97,7 @@ export default function AiBlockMenu({ block, onApply }: { block: BlockData; onAp
         close();
     };
 
-    const Render = BLOCK_RENDERERS[block.type];
+    const Render = renderer(block.type);
 
     return (
         <>
