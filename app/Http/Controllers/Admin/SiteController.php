@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -174,7 +175,36 @@ class SiteController extends Controller
         $site = CmsSite::findOrFail($id);
         $request->session()->put(Sites::SESSION_KEY, $site->id);
 
-        return back()->with('success', __('Ahora trabajas en el sitio :name.', ['name' => $site->name]));
+        return redirect()->to($this->afterSwitchUrl())
+            ->with('success', __('Ahora trabajas en el sitio :name.', ['name' => $site->name]));
+    }
+
+    /**
+     * Where the admin lands after switching sites: back on the same screen, unless it shows
+     * one record (an editor such as /admin/articles/4/edit). That record belongs to the
+     * previous site and is not found on the new one, so the admin lands on its list instead.
+     */
+    protected function afterSwitchUrl(): string
+    {
+        $previous = url()->previous();
+
+        try {
+            $route = app('router')->getRoutes()->match(Request::create($previous, 'GET'));
+        } catch (\Throwable) {
+            return $previous;
+        }
+
+        $name = (string) $route->getName();
+        // Sites themselves are shared by every site: their screens stay valid after a switch
+        if ($route->parameters() === [] || $name === '' || str_starts_with($name, 'sites.') || str_starts_with($name, 'themes.')) {
+            return $previous;
+        }
+
+        // Keep the list's filters, such as the post type of /admin/posts/7/edit?post_type=news
+        parse_str((string) parse_url($previous, PHP_URL_QUERY), $query);
+        $index = Str::before($name, '.').'.index';
+
+        return app('router')->has($index) ? route($index, $query) : route('admin');
     }
 
     /**

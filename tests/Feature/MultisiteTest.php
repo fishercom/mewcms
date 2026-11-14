@@ -327,3 +327,20 @@ it('prints an uploaded theme\'s stylesheets and scripts on the sites that use it
         Themes::flush();
     }
 });
+
+it('lands on the list when switching sites from an editor of the previous site', function (): void {
+    $about = ($this->page)($this->siteA, 'About A');
+
+    $this->actingAs($this->user)->from("http://a.test/admin/articles/{$about->id}/edit")
+        ->post("http://a.test/admin/sites/{$this->siteB->id}/switch")
+        ->assertRedirect('http://a.test/admin/articles');
+
+    $this->actingAs($this->user)->from('http://a.test/admin/posts/9/edit?post_type=news')
+        ->post("http://a.test/admin/sites/{$this->siteA->id}/switch")
+        ->assertRedirect('http://a.test/admin/posts?post_type=news');
+
+    // Screens that show no single record stay where they were
+    $this->actingAs($this->user)->from('http://a.test/admin/menus?s=main')
+        ->post("http://a.test/admin/sites/{$this->siteB->id}/switch")
+        ->assertRedirect('http://a.test/admin/menus?s=main');
+});
