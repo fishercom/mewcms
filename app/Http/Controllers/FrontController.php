@@ -99,8 +99,9 @@ class FrontController extends Controller
             abort(404);
         }
 
-        // Eager load schema to extract rendering templates
-        $article->load(['schema', 'tags', 'children' => function ($query): void {
+        // Eager load schema to extract rendering templates; the parent page (title and
+        // address) lets a template show a breadcrumb and a way back
+        $article->load(['schema', 'tags', 'parent:id,title,slug,uri,lang_id', 'children' => function ($query): void {
             $query->published()->orderBy('position');
         }]);
 

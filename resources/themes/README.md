@@ -109,7 +109,8 @@ the end of `<body>` of its public pages.
 
 ## Page data from the CMS
 
-Besides `article` (the page, with its `metadata` custom fields), a page template gets:
+Besides `article` (the page, with its `metadata` custom fields, its `parent` page's `title`
+and `uri`, and its published `children`), a page template gets:
 
 - `slider`: the slider whose key one of the page's fields holds (a **Slider** field).
 - `sliders`: every slider the page's fields name, by key, for a page that shows more than
