@@ -150,7 +150,9 @@ the same shape as a `postLists` item.
 A theme may bring its own block types, which the page and post editors offer (under
 **Del tema**) on the sites that use the theme. Each is a JSON file in `blocks/`, named after
 the block's key (lowercase letters, digits and underscores), with its public rendering in
-`front/blocks/<key>.tsx`:
+`front/blocks/<key>.tsx`. A key the CMS already uses (`rich_text`, `image`, `gallery`, `video`,
+`form`, `columns`...) keeps the CMS's block, so give theme blocks their own names; a
+`front/blocks/<core key>.tsx` only changes how that CMS block looks on the site:
 
 ```json
 {
