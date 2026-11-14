@@ -160,6 +160,8 @@ sequenceDiagram
 - **Content per site**: pages, posts, menus, sliders, forms (and their submissions), redirects and the layout settings belong to one site. Slugs, page addresses, form aliases and slider keys only have to be unique within their site. Tags, media, post types, schemas and languages are shared by all sites. A setting with no site applies to every site until a site saves its own.
 - **Admin**: the site switcher in the header picks the site you work on; every list and editor then shows that site's content.
 - **Themes** carry each site's whole design. Built themes live in `resources/themes/<theme>` (`theme.json`, `screenshot.png`, `css/theme.css`, `front/` pages, `assets/`) and are built in the same `npm run build`; only the site's theme stylesheet is loaded. Uploaded themes are a .zip with `theme.json`, stylesheets, scripts, images and fonts (Admin → Sites → Themes) that use the pages of a built theme, with no build. Each site has its own head and body scripts for Google Analytics and the like. See [`resources/themes/README.md`](resources/themes/README.md) to make one.
+- **Themes in their own repository**: a site's theme (and its starting content) can live in a repository of its own. Link or copy it into `resources/themes/<theme>` before building (`ln -s ../../../my-site/theme resources/themes/my-site`): Vite follows the link, and git ignores every theme folder that does not ship with MewCMS, so this repository stays clean.
+- **Starting content**: a theme may ship `content/content.json` with its pages, posts, post types, menus, forms, sliders, settings and media. It is optional and only loaded when asked: `php artisan cms:content-import <theme>` (see [Starting content](resources/themes/README.md#starting-content)).
 - **Deploying**: point every site's domain at the same app, and add each domain to the site in the admin. No separate builds are needed.
 
 ---
@@ -282,17 +284,25 @@ DB_PASSWORD=your_password
 
 ### Step 5: Run Database Migrations & Seeders
 
-Populate the database with the initial CMS structure, default modules, permissions, schema groups, and demo content:
+Create the tables and what the admin needs to work: languages, a default site, profiles, the administrator, the admin modules and permissions, and an empty field group for each page template. The seeder adds no site content:
 
 ```bash
 php artisan migrate --seed
 ```
 
 > **Default Administrator Credentials:**
-> - **Username**: `dummyadmin` (or email: `dummyadmin@domain.com`)
-> - **Password**: `adminPwd/247`
+> - **Username**: `admincms` (or email: `adminc@mewcms.com`)
+> - **Password**: `pwdMewCMS+77`
 >
 > *(Remember to change these credentials immediately in production!)*
+
+Optionally, load a theme's starting content into the default site. The default theme ships a home page that presents MewCMS, two sliders, the main and footer menus and a contact form:
+
+```bash
+php artisan cms:content-import default
+```
+
+`php artisan cms:demo-sites` instead builds the two demo sites (a pet boutique with the `velvet` theme and its journal with the `journal` theme) from the starting content of those themes. It replaces all the content, so use it on a fresh install.
 
 #### Access control & security settings
 

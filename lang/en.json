@@ -1252,5 +1252,18 @@
     "¿Quitar esta diapositiva?": "Remove this slide?",
     "¿Restaurar esta revisión?": "Restore this revision?",
     "¿Salir sin guardar?": "Leave without saving?",
-    "¿Salir y detener la preparación?": "Leave and stop the preparation?"
+    "¿Salir y detener la preparación?": "Leave and stop the preparation?",
+    "Elementos por página del listado": "Items per listing page",
+    "0 muestra todos en una sola página.": "0 shows them all on one page.",
+    "Orden del listado": "Listing order",
+    "Más recientes primero": "Newest first",
+    "Más antiguos primero": "Oldest first",
+    "Por título (A-Z)": "By title (A–Z)",
+    "Video (Media)": "Video (Media)",
+    "Lista de posts": "Post list",
+    "Tipo de contenido": "Content type",
+    "Entradas del blog": "Blog posts",
+    "Solo con la etiqueta (slug, opcional)": "Only with the tag (slug, optional)",
+    "Ej. recetas": "E.g. recipes",
+    "Cantidad": "Number"
 }

@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Route;
 // Endpoints any admin user may call from shared editor components
 Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function (): void {
     Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
+    Route::get('api/post-types', [PostTypeController::class, 'apiList'])->name('post-types.api_list');
     // Site switcher: every admin user picks the site they work on
     Route::post('sites/{site}/switch', [SiteController::class, 'switch'])->name('sites.switch');
     // Language switcher: the language whose pages, posts and texts the admin edits

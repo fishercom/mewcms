@@ -8,6 +8,25 @@ import { GripVertical, Plus, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 
+/** Field types an editor can add: [type, label] (labels are translated with t()) */
+const FIELD_TYPES: Array<[string, string]> = [
+    ['text', 'Texto'],
+    ['number', 'Número'],
+    ['price', 'Precio (monto y moneda)'],
+    ['date', 'Fecha'],
+    ['url', 'Enlace / URL'],
+    ['textarea', 'Área de Texto'],
+    ['image', 'Imagen (Media)'],
+    ['video', 'Video (Media)'],
+    ['document', 'Documento / Archivo'],
+    ['html_editor', 'Editor HTML (Rich Text)'],
+    ['embed', 'Embed (Código/Vídeo)'],
+    ['slider', 'Control Deslizante (Slider)'],
+    ['posts', 'Lista de posts'],
+    ['repeater', 'Repeater (Repetidor)'],
+    ['container', 'Contenedor (Grupo)'],
+];
+
 interface CustomFieldManagerProps {
     fields: CustomField[];
     setFields: (fields: CustomField[]) => void;
@@ -96,19 +115,11 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                                     <SelectValue placeholder={t('Tipo')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="text">{t('Texto')}</SelectItem>
-                                                    <SelectItem value="number">{t('Número')}</SelectItem>
-                                                    <SelectItem value="price">{t('Precio (monto y moneda)')}</SelectItem>
-                                                    <SelectItem value="date">{t('Fecha')}</SelectItem>
-                                                    <SelectItem value="url">{t('Enlace / URL')}</SelectItem>
-                                                    <SelectItem value="textarea">{t('Área de Texto')}</SelectItem>
-                                                    <SelectItem value="image">{t('Imagen (Media)')}</SelectItem>
-                                                    <SelectItem value="document">{t('Documento / Archivo')}</SelectItem>
-                                                    <SelectItem value="html_editor">{t('Editor HTML (Rich Text)')}</SelectItem>
-                                                    <SelectItem value="embed">{t('Embed (Código/Vídeo)')}</SelectItem>
-                                                    <SelectItem value="slider">{t('Control Deslizante (Slider)')}</SelectItem>
-                                                    <SelectItem value="repeater">{t('Repeater (Repetidor)')}</SelectItem>
-                                                    <SelectItem value="container">{t('Contenedor (Grupo)')}</SelectItem>
+                                                    {FIELD_TYPES.map(([value, label]) => (
+                                                        <SelectItem key={value} value={value}>
+                                                            {t(label)}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                             <Button
@@ -168,19 +179,11 @@ export default function CustomFieldManager({ fields, setFields }: CustomFieldMan
                                     <SelectValue placeholder={t('Tipo')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="text">{t('Texto')}</SelectItem>
-                                    <SelectItem value="number">{t('Número')}</SelectItem>
-                                    <SelectItem value="price">{t('Precio (monto y moneda)')}</SelectItem>
-                                    <SelectItem value="date">{t('Fecha')}</SelectItem>
-                                    <SelectItem value="url">{t('Enlace / URL')}</SelectItem>
-                                    <SelectItem value="textarea">{t('Área de Texto')}</SelectItem>
-                                    <SelectItem value="image">{t('Imagen (Media)')}</SelectItem>
-                                    <SelectItem value="document">{t('Documento / Archivo')}</SelectItem>
-                                    <SelectItem value="html_editor">{t('Editor HTML (Rich Text)')}</SelectItem>
-                                    <SelectItem value="embed">{t('Embed (Código/Vídeo)')}</SelectItem>
-                                    <SelectItem value="slider">{t('Control Deslizante (Slider)')}</SelectItem>
-                                    <SelectItem value="repeater">{t('Repeater (Repetidor)')}</SelectItem>
-                                    <SelectItem value="container">{t('Contenedor (Grupo)')}</SelectItem>
+                                    {FIELD_TYPES.map(([value, label]) => (
+                                        <SelectItem key={value} value={value}>
+                                            {t(label)}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <Button

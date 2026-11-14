@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsPostType;
 use App\Models\CmsSchema;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -48,10 +50,12 @@ class PostTypeController extends Controller
             'icon' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'default_schema_id' => 'nullable|integer|exists:cms_schemas,id',
+            'per_page' => 'nullable|integer|min:0|max:'.CmsPostType::MAX_PER_PAGE,
+            'order' => ['nullable', Rule::in(CmsPostType::ORDERS)],
             'active' => 'boolean',
         ]);
 
-        $cpt = new CmsPostType($data);
+        $cpt = new CmsPostType($this->withDefaults($data));
         $cpt->save();
 
         return redirect()->route('post-types.index');
@@ -79,10 +83,12 @@ class PostTypeController extends Controller
             'icon' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'default_schema_id' => 'nullable|integer|exists:cms_schemas,id',
+            'per_page' => 'nullable|integer|min:0|max:'.CmsPostType::MAX_PER_PAGE,
+            'order' => ['nullable', Rule::in(CmsPostType::ORDERS)],
             'active' => 'boolean',
         ]);
 
-        $item->update($data);
+        $item->update($this->withDefaults($data));
 
         return redirect()->route('post-types.index');
     }
@@ -93,5 +99,25 @@ class PostTypeController extends Controller
         $item->delete();
 
         return redirect()->route('post-types.index');
+    }
+
+    /**
+     * The blog and the active post types, for the "Lista de posts" field of the editor.
+     */
+    public function apiList(): JsonResponse
+    {
+        $types = CmsPostType::where('active', true)->orderBy('name')->get(['slug', 'name'])
+            ->map(fn (CmsPostType $type): array => ['slug' => $type->slug, 'name' => $type->name]);
+
+        return response()->json([['slug' => 'post', 'name' => __('Entradas del blog')], ...$types]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withDefaults(array $data): array
+    {
+        return ['per_page' => $data['per_page'] ?? 6, 'order' => $data['order'] ?? 'newest'] + $data;
     }
 }
