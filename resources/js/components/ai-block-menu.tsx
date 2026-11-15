@@ -1,5 +1,6 @@
 import { useBlockRenderer } from '@/blocks/registry';
 import { type BlockData, type BlockDefinition, type BlockValues } from '@/blocks/types';
+import ThemeFrame from '@/components/theme-frame';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -193,7 +194,9 @@ export default function AiBlockMenu({ block, onApply }: { block: BlockData; onAp
                     {error && <p className="text-destructive text-sm">{error}</p>}
                     {result && Render && (
                         <div className="border-border pointer-events-none rounded-xl border p-3">
-                            <Render data={result} editing />
+                            <ThemeFrame>
+                                <Render data={result} editing />
+                            </ThemeFrame>
                         </div>
                     )}
 

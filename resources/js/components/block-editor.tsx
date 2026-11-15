@@ -12,6 +12,7 @@ import {
 import AiBlockMenu, { hasAiText } from '@/components/ai-block-menu';
 import { confirmDialog } from '@/components/confirm-dialog';
 import CustomFieldRenderer from '@/components/custom-field-renderer';
+import ThemeFrame from '@/components/theme-frame';
 import TiptapEditor from '@/components/tiptap-editor';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -152,7 +153,11 @@ function BlockPreview({ block, type, Render }: { block: BlockData; type: BlockDe
         };
     }, [request]);
 
-    return <Render data={needsServer ? { ...block.data, ...extra } : block.data} editing />;
+    return (
+        <ThemeFrame>
+            <Render data={needsServer ? { ...block.data, ...extra } : block.data} editing />
+        </ThemeFrame>
+    );
 }
 
 /**
@@ -453,10 +458,15 @@ export default function BlockEditor({ value, onChange, types, nested = false, al
                                         >
                                             {Render && isPattern ? (
                                                 <div className="pointer-events-none">
-                                                    <Render
-                                                        data={{ ...block.data, blocks: (pattern?.blocks ?? []) as unknown as BlockValues[string] }}
-                                                        editing
-                                                    />
+                                                    <ThemeFrame>
+                                                        <Render
+                                                            data={{
+                                                                ...block.data,
+                                                                blocks: (pattern?.blocks ?? []) as unknown as BlockValues[string],
+                                                            }}
+                                                            editing
+                                                        />
+                                                    </ThemeFrame>
                                                 </div>
                                             ) : Render && (summaryOf(block) !== '' || picksContent(type, block)) ? (
                                                 <div className="pointer-events-none">

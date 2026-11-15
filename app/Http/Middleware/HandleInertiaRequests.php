@@ -92,6 +92,8 @@ class HandleInertiaRequests extends Middleware
             'adm_menu' => fn (): array => $this->adminMenu($request),
             // The built theme whose pages the site uses (an uploaded theme borrows one)
             'theme' => fn (): string => Themes::layout(),
+            // The site's stylesheets, for the block editor's previews
+            'block_preview' => fn (): ?array => $request->is('admin', 'admin/*') ? Themes::preview() : null,
             'site' => fn (): ?array => Sites::current() ? [
                 ...Sites::current()->summary(),
                 // The language of this page (an extra language in the address, or picked in the admin)

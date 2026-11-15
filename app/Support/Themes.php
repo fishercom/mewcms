@@ -2,6 +2,9 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Vite;
+use Throwable;
+
 /**
  * Public site themes. A theme comes from one of two places:
  *
@@ -256,6 +259,28 @@ class Themes
         $theme = self::layout($theme);
 
         return 'resources/themes/'.(is_file(self::path($theme, 'css/theme.css')) ? $theme : self::DEFAULT).'/css/theme.css';
+    }
+
+    /**
+     * What the admin needs to show blocks as the site does: the site's built theme and its
+     * stylesheets (the compiled one and those its theme.json lists, such as web fonts). The
+     * block editor draws its previews in a frame with them, apart from the admin's styles.
+     *
+     * @return array{theme: string, styles: list<string>}|null
+     */
+    public static function preview(): ?array
+    {
+        $theme = self::current();
+        try {
+            $style = Vite::asset(self::styleFile($theme));
+        } catch (Throwable) {
+            return null; // Not built yet
+        }
+
+        return [
+            'theme' => self::layout($theme),
+            'styles' => [$style, ...array_column(self::all()[$theme]['styles'] ?? [], 'href')],
+        ];
     }
 
     /**

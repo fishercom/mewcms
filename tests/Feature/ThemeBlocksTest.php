@@ -108,3 +108,10 @@ it('gives the editor a block as the public page shows it, without saving anythin
     $this->postJson(route('blocks.preview'), ['type' => 'nope', 'data' => []])->assertNotFound();
     expect(CmsSlider::count())->toBe(1)->and($slider->exists)->toBeTrue();
 });
+
+it('gives the admin the site\'s stylesheets, so the editor draws blocks as the site does', function (): void {
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->withSession([Sites::SESSION_KEY => $this->site->id])
+        ->get('/admin/articles')
+        ->assertInertia(fn ($page) => $page->where('block_preview.theme', 'editorial')->has('block_preview.styles', fn ($styles) => $styles->etc()));
+});
