@@ -90,7 +90,7 @@ class ConfigController extends Controller
         return $request->validate([
             'type' => 'nullable|string|max:50',
             'name' => 'required|string|max:255',
-            'alias' => 'required|string|max:255',
+            'alias' => 'required|string|max:100',
             'value' => 'nullable|string',
         ]);
     }

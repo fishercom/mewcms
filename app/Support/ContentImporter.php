@@ -511,7 +511,8 @@ class ContentImporter
                 'featured_image' => $this->resolve($data['featured_image'] ?? null),
                 'metadata' => $this->resolve($data['metadata'] ?? []),
                 'status' => $data['status'] ?? 'published',
-                'published_at' => now()->subDays((int) ($data['days_ago'] ?? 0))->setTime(8, 30),
+                // 8:30 on that day, or now when that is still to come (a post dated later stays hidden)
+                'published_at' => now()->subDays((int) ($data['days_ago'] ?? 0))->setTime(8, 30)->min(now()),
                 'active' => true,
             ]);
             $post->blocks = $this->blocks($data);
