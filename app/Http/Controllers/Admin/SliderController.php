@@ -94,6 +94,7 @@ class SliderController extends Controller
             'slides.*.secondary_image_url' => 'nullable|string|max:255',
             'slides.*.link_url' => ['nullable', 'string', new SafeUrl],
             'slides.*.button_label' => 'nullable|string|max:255',
+            'slides.*.dark_text' => 'boolean',
             'slides.*.active' => 'boolean',
         ]);
 
@@ -138,11 +139,11 @@ class SliderController extends Controller
     }
 
     /**
-     * The pictures, video and button of a slide as the form sent them. A video slide
+     * The pictures, video, button and text tone of a slide as the form sent them. A video slide
      * needs no image, and the column takes an empty string then.
      *
      * @param  array<string, mixed>  $slideData
-     * @return array<string, ?string>
+     * @return array<string, string|bool|null>
      */
     private function slideMedia(array $slideData): array
     {
@@ -153,6 +154,7 @@ class SliderController extends Controller
             'secondary_image_url' => ($slideData['secondary_image_url'] ?? null) ?: null,
             'link_url' => $slideData['link_url'] ?? null,
             'button_label' => ($slideData['button_label'] ?? null) ?: null,
+            'dark_text' => (bool) ($slideData['dark_text'] ?? false),
         ];
     }
 

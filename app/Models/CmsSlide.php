@@ -21,6 +21,7 @@ class CmsSlide extends Model
         'secondary_image_url',
         'link_url',
         'button_label',
+        'dark_text',
         'position',
         'active',
     ];
@@ -31,6 +32,7 @@ class CmsSlide extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'dark_text' => 'boolean',
         'position' => 'integer',
     ];
 
