@@ -80,6 +80,11 @@ export function escapeHtml(text: string): string {
     return text.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] as string);
 }
 
+/** The footer credit as the admin wrote it, with "{year}" as the current year */
+export function withYear(text: string): string {
+    return text.replace(/\{year\}/g, String(new Date().getFullYear()));
+}
+
 export function isPrice(value: unknown): value is Price {
     return typeof value === 'object' && value !== null && 'amount' in value;
 }

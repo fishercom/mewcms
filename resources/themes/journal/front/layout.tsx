@@ -1,7 +1,7 @@
 import { LanguageSwitcher } from '@/components/front-language-switcher';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
 import { localePath } from '@/lib/locale-path';
-import { escapeHtml, useTexts } from '@/lib/theme-texts';
+import { escapeHtml, useTexts, withYear } from '@/lib/theme-texts';
 import { cn } from '@/lib/utils';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
@@ -282,7 +282,8 @@ export default function JournalLayout({ children }: LayoutProps) {
                         className="text-graphite [&_a:hover]:text-sage-deep mx-auto max-w-7xl px-5 py-6 text-xs sm:px-8 [&_a]:underline [&_a]:underline-offset-2"
                         dangerouslySetInnerHTML={{
                             __html:
-                                settings.layout_copyright || escapeHtml(t('footer.copyright', { year: new Date().getFullYear(), name: brandName })),
+                                (settings.layout_copyright && withYear(settings.layout_copyright)) ||
+                                escapeHtml(t('footer.copyright', { year: new Date().getFullYear(), name: brandName })),
                         }}
                     />
                 </div>
