@@ -103,6 +103,15 @@ theme built on it changes those in its stylesheet:
 }
 ```
 
+A theme without a dark version says so in its theme.json with `"dark_mode": false`: its
+public pages then stay light even when the visitor's system or saved choice is dark (the
+`dark:` classes of the CMS's blocks never apply there). The admin keeps the user's choice.
+
+`"ai_blocks"` lists the block types the AI assistant may draft a page with on the sites
+that use the theme, from `hero`, `rich_text`, `features` and `cta` (all of them when it is
+missing; a template's allowed blocks narrow it further). A theme whose pages already open
+with a banner can leave `hero` out, for example `"ai_blocks": ["rich_text"]`.
+
 Tracking code that differs per site (Google Analytics, Tag Manager, a pixel) does not go
 in the theme: each site has **Scripts** fields in Admin → Sites, printed in `<head>` and at
 the end of `<body>` of its public pages.
@@ -356,6 +365,7 @@ aurora.zip
   can override it. A path in the theme or an `https://` URL; `media` is optional.
 - `scripts`: `position` is `head` or `body` (end of `<body>`); `defer`, `async` and
   `"type": "module"` are optional.
+- `dark_mode` and `ai_blocks`: as in [Design and scripts](#design-and-scripts).
 - `slug`: the folder name; without it the name of the zipped folder or of the file is
   used. Uploading a theme with the slug of an installed one updates it.
 

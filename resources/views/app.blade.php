@@ -6,12 +6,15 @@
     $site = $isThemePage ? \App\Support\Sites::current() : null;
     // Stylesheets and scripts the theme lists in theme.json (uploaded themes)
     $themeInfo = $isThemePage ? (\App\Support\Themes::all()[$siteTheme] ?? null) : null;
+    // A theme without a dark version ("dark_mode": false) is never shown dark
+    $lightOnly = ($themeInfo['dark_mode'] ?? true) === false;
+    $appearance = $lightOnly ? 'light' : ($appearance ?? 'system');
     // The language of the page: the site's, or the extra language in the address ("/en/...")
     $lang = ($site ? \App\Support\Locales::current()?->iso : null) ?? str_replace('_', '-', app()->getLocale());
     // The same page in the site's other languages, for search engines; the main language is the x-default
     $alternates = $isThemePage ? collect($page['props']['alternates'] ?? [])->reject(fn ($alternate) => $alternate['missing']) : collect();
 @endphp
-<html lang="{{ $lang }}" data-site-theme="{{ \App\Support\Themes::layout($siteTheme) }}" @if ($site) data-site-title="{{ $site->title ?: $site->name }}" @endif @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ $lang }}" data-site-theme="{{ \App\Support\Themes::layout($siteTheme) }}" @if ($site) data-site-title="{{ $site->title ?: $site->name }}" @endif @class(['dark' => $appearance == 'dark']) @if ($lightOnly) data-light-only @endif>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

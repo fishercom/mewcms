@@ -6,7 +6,10 @@ use App\Ai\AiSettings;
 use App\Models\CmsAiUsage;
 use App\Models\CmsSchema;
 use App\Models\CmsSchemaGroup;
+use App\Models\CmsSite;
 use App\Models\User;
+use App\Support\Themes;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -360,6 +363,29 @@ test('the draft only offers the blocks the template allows', function (): void {
         ->assertOk();
 
     expect($fake->calls[0]['schema']['properties']['blocks']['items']['anyOf'])->toHaveCount(1);
+});
+
+test('the draft only offers the blocks the site\'s theme drafts with', function (): void {
+    Themes::$uploadRoot = sys_get_temp_dir().'/mewcms-themes-'.uniqid();
+    File::ensureDirectoryExists(Themes::uploadPath('aurora'));
+    File::put(Themes::uploadPath('aurora').'/theme.json', json_encode(['name' => 'Aurora', 'ai_blocks' => ['rich_text']]));
+    Themes::flush();
+    CmsSite::create(['name' => 'Aurora', 'domains' => ['localhost'], 'theme' => 'aurora', 'active' => true]);
+    $fake = fakeAi(['blocks' => [['type' => 'hero', 'title' => 'Hola'], ['type' => 'rich_text', 'html' => '<p>Hola</p>']]]);
+
+    try {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->postJson(route('ai.draft'), [...draftBrief(), 'outline' => ['title' => 'T', 'sections' => [['heading' => 'A']]]])
+            ->assertOk()
+            ->assertJsonCount(1, 'blocks')
+            ->assertJsonPath('blocks.0.type', 'rich_text');
+
+        expect($fake->calls[0]['schema']['properties']['blocks']['items']['anyOf'])->toHaveCount(1);
+    } finally {
+        File::deleteDirectory(Themes::uploadPath());
+        Themes::$uploadRoot = null;
+        Themes::flush();
+    }
 });
 
 test('drafting needs the content module', function (): void {
