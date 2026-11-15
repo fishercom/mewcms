@@ -28,6 +28,8 @@ class SliderController extends Controller
                         ->orWhere('key', 'LIKE', '%'.str_replace(' ', '%', $s).'%');
                 }
             })
+            // By name, as the block editor's slider picker lists them
+            ->orderBy('name')
             ->paginate(15);
 
         return Inertia::render('admin/sliders/index', [
