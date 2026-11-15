@@ -2,7 +2,7 @@ import { BrandLockup } from '@/components/app-logo';
 import { LanguageSwitcher } from '@/components/front-language-switcher';
 import { isExternalLink, SocialIcon, socialLinkName, type SocialLink } from '@/components/social-icon';
 import { localePath } from '@/lib/locale-path';
-import { escapeHtml, useTexts } from '@/lib/theme-texts';
+import { escapeHtml, useTexts, withYear } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsMenu } from '@/types/models/cms-menu';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -223,7 +223,7 @@ export default function FrontLayout({ children, navigation }: LayoutProps) {
                         className="[&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-colors [&_a:hover]:text-(--theme-accent)"
                         dangerouslySetInnerHTML={{
                             __html:
-                                layout_settings?.layout_copyright ||
+                                (layout_settings?.layout_copyright && withYear(layout_settings.layout_copyright)) ||
                                 `${escapeHtml(t('footer.copyright', { year: new Date().getFullYear(), name: 'MewCMS' }))} ${escapeHtml(t('footer.powered_by'))} <a href="https://deepsoft.lat" target="_blank" rel="noopener noreferrer">DeepSoft</a>.`,
                         }}
                     />

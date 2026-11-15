@@ -261,11 +261,12 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                         value={data.layout_copyright}
                                         onChange={(e) => setData('layout_copyright', e.target.value)}
                                         className="bg-card h-9 w-full text-xs"
-                                        placeholder={t('Ej: © 2026 MewCMS. Todos los derechos reservados.')}
+                                        placeholder={t('Ej: © {year} MewCMS. Todos los derechos reservados.')}
                                     />
                                     <p className="text-muted-foreground text-xs">
                                         {t('Admite enlaces simples, por ejemplo')} {t('<a href="https://tusitio.com" target="_blank">Tu empresa</a>')}
-                                        {t('. Se elimina cualquier otro código.')}
+                                        {t('. Se elimina cualquier otro código.')}{' '}
+                                        {t('Escribe {year} para mostrar el año actual. Vacío, el tema usa su propio texto.')}
                                     </p>
                                 </div>
                             </div>
