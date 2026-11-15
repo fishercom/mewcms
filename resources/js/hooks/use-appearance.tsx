@@ -19,8 +19,11 @@ const setCookie = (name: string, value: string, days = 365) => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
+/** A public page whose theme has no dark version (theme.json "dark_mode": false) */
+const lightOnly = () => typeof document !== 'undefined' && document.documentElement.hasAttribute('data-light-only');
+
 const applyTheme = (appearance: Appearance) => {
-    const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
+    const isDark = !lightOnly() && (appearance === 'dark' || (appearance === 'system' && prefersDark()));
 
     document.documentElement.classList.toggle('dark', isDark);
 };

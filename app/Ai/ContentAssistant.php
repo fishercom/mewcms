@@ -9,6 +9,7 @@ use App\Models\CmsPost;
 use App\Models\CmsSchema;
 use App\Models\User;
 use App\Support\SeoAnalyzer;
+use App\Support\Themes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -232,15 +233,24 @@ class ContentAssistant
     }
 
     /**
-     * Draft block types the item's template allows (all of them when it sets no limit).
+     * Draft block types the item's template allows and the site's theme drafts with
+     * (theme.json "ai_blocks"); all of them when neither sets a limit.
      *
      * @return list<string>
      */
     protected function draftTypes(mixed $schemaId): array
     {
+        $types = self::DRAFT_TYPES;
         $allowed = is_numeric($schemaId) ? CmsSchema::find($schemaId)?->allowed_blocks : null;
+        if (is_array($allowed)) {
+            $types = array_intersect($types, $allowed);
+        }
+        $themed = Themes::all()[Themes::current()]['ai_blocks'] ?? null;
+        if (is_array($themed)) {
+            $types = array_intersect($types, $themed);
+        }
 
-        return array_values(is_array($allowed) ? array_intersect(self::DRAFT_TYPES, $allowed) : self::DRAFT_TYPES);
+        return array_values($types);
     }
 
     /**

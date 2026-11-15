@@ -102,6 +102,15 @@ describe('uploaded themes', function (): void {
             ->and($theme['scripts'][0])->toMatchArray(['position' => 'head', 'defer' => true, 'async' => false]);
     });
 
+    it('has a dark version and drafts with every block unless it says otherwise', function (): void {
+        expect(Themes::all()['aurora'])->toMatchArray(['dark_mode' => true, 'ai_blocks' => null]);
+
+        File::put($this->themeDir.'/theme.json', json_encode(['name' => 'Aurora', 'dark_mode' => false, 'ai_blocks' => ['rich_text', 3]]));
+        Themes::flush();
+
+        expect(Themes::all()['aurora'])->toMatchArray(['dark_mode' => false, 'ai_blocks' => ['rich_text']]);
+    });
+
     it('uses the pages and stylesheet of its layout', function (): void {
         expect(Themes::pageFile('front/templates/page', 'aurora'))->toBe('resources/themes/default/front/templates/page.tsx')
             ->and(Themes::styleFile('aurora'))->toBe('resources/themes/editorial/css/theme.css');

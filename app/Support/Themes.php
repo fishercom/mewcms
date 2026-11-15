@@ -154,6 +154,10 @@ class Themes
             'layout' => $layout,
             'styles' => $styles,
             'scripts' => $scripts,
+            // "dark_mode": false keeps its public pages light whatever the visitor's system says
+            'dark_mode' => ($info['dark_mode'] ?? true) !== false,
+            // "ai_blocks": the block types the AI may draft pages with (all when missing)
+            'ai_blocks' => is_array($info['ai_blocks'] ?? null) ? array_values(array_filter($info['ai_blocks'], 'is_string')) : null,
         ];
     }
 

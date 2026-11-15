@@ -344,3 +344,28 @@ it('lands on the list when switching sites from an editor of the previous site',
         ->post("http://a.test/admin/sites/{$this->siteB->id}/switch")
         ->assertRedirect('http://a.test/admin/menus?s=main');
 });
+
+it('never shows a light-only theme dark, whatever the visitor chose', function (): void {
+    Themes::$uploadRoot = sys_get_temp_dir().'/mewcms-themes-'.uniqid();
+    File::ensureDirectoryExists(Themes::uploadPath('aurora'));
+    File::put(Themes::uploadPath('aurora', 'theme.json'), json_encode(['name' => 'Aurora', 'dark_mode' => false]));
+    Themes::flush();
+
+    try {
+        $this->siteB->update(['theme' => 'aurora']);
+        ($this->page)($this->siteB, 'About B');
+        ($this->page)($this->siteA, 'About A');
+
+        $this->withUnencryptedCookie('appearance', 'dark')->get('http://b.test/about')->assertOk()
+            ->assertSee('data-light-only', false)
+            ->assertSee("const appearance = 'light'", false)
+            ->assertDontSee('class="dark"', false);
+        $this->withUnencryptedCookie('appearance', 'dark')->get('http://a.test/about')->assertOk()
+            ->assertDontSee('data-light-only', false)
+            ->assertSee('class="dark"', false);
+    } finally {
+        File::deleteDirectory(Themes::uploadPath());
+        Themes::$uploadRoot = null;
+        Themes::flush();
+    }
+});
