@@ -120,6 +120,11 @@ it('loads a content file into a site: media, field groups, post types, posts and
         ->and($type->default_schema_id)->toBe(CmsSchema::where('name', 'Producto')->value('id'));
 
     $about = CmsArticle::withoutGlobalScopes()->where('slug', 'quienes-somos')->first();
+
+    // A page knows its parent, for a breadcrumb
+    $this->get('/quienes-somos/historia')->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->where('article.parent.title', 'Quiénes somos')
+        ->where('article.parent.uri', 'quienes-somos'));
     expect($about->content)->toContain('Más de 70 años en http://')
         ->and(CmsArticle::withoutGlobalScopes()->where('slug', 'historia')->value('parent_id'))->toBe($about->id)
         ->and(CmsMenuItem::whereNotNull('parent_id')->value('title'))->toBe('Historia')

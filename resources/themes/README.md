@@ -109,7 +109,8 @@ the end of `<body>` of its public pages.
 
 ## Page data from the CMS
 
-Besides `article` (the page, with its `metadata` custom fields), a page template gets:
+Besides `article` (the page, with its `metadata` custom fields, its `parent` page's `title`
+and `uri`, and its published `children`), a page template gets:
 
 - `slider`: the slider whose key one of the page's fields holds (a **Slider** field).
 - `sliders`: every slider the page's fields name, by key, for a page that shows more than
@@ -149,7 +150,9 @@ the same shape as a `postLists` item.
 A theme may bring its own block types, which the page and post editors offer (under
 **Del tema**) on the sites that use the theme. Each is a JSON file in `blocks/`, named after
 the block's key (lowercase letters, digits and underscores), with its public rendering in
-`front/blocks/<key>.tsx`:
+`front/blocks/<key>.tsx`. A key the CMS already uses (`rich_text`, `image`, `gallery`, `video`,
+`form`, `columns`...) keeps the CMS's block, so give theme blocks their own names; a
+`front/blocks/<core key>.tsx` only changes how that CMS block looks on the site:
 
 ```json
 {
@@ -185,11 +188,13 @@ export default function Timeline({ data }: BlockRenderProps) {
 - A `slider` field gives the renderer that slider with its active slides
   (`blockSlider(data, key)`), and a `posts` field the posts it asks for
   (`blockPosts(data, key)`, the shape of a `postLists` item). So the cards of a block are managed in **Sliders**
-  and a product list follows the catalog, rather than typed into the block.
+  and a product list follows the catalog, rather than typed into the block. The page editor
+  shows them too: it asks the server for them (`blocks.preview`), as the public page gets them.
 - `"category"` (default `theme`) and `"nestable": false` (a block that can't go inside
   columns) are optional. A key the CMS already uses is ignored.
 - `front/blocks/<key>.tsx` with the key of one of the CMS's blocks (`cta`, `form`, `hero`…)
-  replaces how that block looks on the theme's sites.
+  replaces how that block looks on the theme's sites. A theme's `form` can keep the CMS's
+  loading, validation and sending with `useFrontForm(alias)` from `@/components/front-form`.
 
 ## Starting content
 

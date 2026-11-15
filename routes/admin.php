@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AiController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\BlockPatternController;
+use App\Http\Controllers\Admin\BlockPreviewController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\ContentRevisionController;
 use App\Http\Controllers\Admin\FormController;
@@ -34,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'admin.access'])->prefix('admin')->group(function (): void {
     Route::get('api/sliders', [SliderController::class, 'apiList'])->name('sliders.api_list');
     Route::get('api/post-types', [PostTypeController::class, 'apiList'])->name('post-types.api_list');
+    Route::post('api/blocks/preview', BlockPreviewController::class)->name('blocks.preview');
     // Site switcher: every admin user picks the site they work on
     Route::post('sites/{site}/switch', [SiteController::class, 'switch'])->name('sites.switch');
     // Language switcher: the language whose pages, posts and texts the admin edits
