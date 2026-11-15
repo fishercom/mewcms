@@ -13,6 +13,8 @@ export interface CmsSlide {
     link_url: string | null;
     /** The text of the slide's button (link_url is where it goes) */
     button_label?: string | null;
+    /** The slide's picture is light: the theme writes its text in a dark colour */
+    dark_text?: boolean;
     position: number;
     active: boolean;
     created_at?: string;

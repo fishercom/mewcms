@@ -181,10 +181,10 @@ class ContentImporter
 
         // All or nothing: a mistake in the file leaves the site as it was
         DB::transaction(function () use ($site, $theme, $userId): void {
+            // The media first: the site's favicon can point to one ("@favicon")
+            $this->importMedia($userId);
             $this->updateSite($site, $theme);
             $langId = $site->lang_id;
-
-            $this->importMedia($userId);
             $this->importSchemas();
             $this->importPostTypes();
             $this->importTags();
@@ -460,6 +460,7 @@ class ContentImporter
                     'secondary_image_url' => $this->resolve($slide['secondary_image'] ?? null),
                     'link_url' => $this->resolve($slide['url'] ?? null),
                     'button_label' => $this->resolve($slide['button_label'] ?? null),
+                    'dark_text' => (bool) ($slide['dark_text'] ?? false),
                     'position' => $position + 1,
                     'active' => true,
                 ]);

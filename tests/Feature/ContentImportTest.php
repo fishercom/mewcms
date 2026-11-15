@@ -215,6 +215,7 @@ it('loads slides with their extra media and button, and reusable blocks', functi
                 'secondary_image' => '@salinas',
                 'url' => '/productos',
                 'button_label' => 'Conoce más',
+                'dark_text' => true,
             ]]],
             ['key' => 'proceso', 'slides' => [['title' => 'El mar', 'image' => '@salinas']]],
         ],
@@ -233,7 +234,8 @@ it('loads slides with their extra media and button, and reusable blocks', functi
         'secondary_image_url' => $image,
         'link_url' => '/productos',
         'button_label' => 'Conoce más',
-    ]);
+    ])->and($slide->dark_text)->toBeTrue()
+        ->and(CmsSlider::withoutGlobalScopes()->where('key', 'proceso')->first()->slides()->first()->dark_text)->toBeFalse();
 
     $pattern = CmsBlockPattern::where('key', 'contactanos')->sole();
     expect($pattern->synced)->toBeTrue()->and($pattern->category)->toBe('cta');
@@ -242,6 +244,7 @@ it('loads slides with their extra media and button, and reusable blocks', functi
     $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
         ->where('slider.key', 'banners')
         ->where('sliders.banners.slides.0.button_label', 'Conoce más')
+        ->where('sliders.banners.slides.0.dark_text', true)
         ->where('sliders.proceso.slides.0.title', 'El mar')
         // The synced reusable block brings its blocks
         ->where('article.blocks.0.data.blocks.0.data.html', '<p>Escríbenos</p>'));
@@ -273,4 +276,15 @@ it('gives a post the related posts of its type, those sharing tags first', funct
         // No tag in common: it only fills the list
         ->where('related.2.title', 'Sal parrillera')
         ->where('related.0.url', fn ($url) => str_ends_with($url, '/productos/sal-fina')));
+});
+
+it('points the site favicon to a media item of the file', function (): void {
+    $file = writeContent($this->dir, [
+        'site' => ['favicon' => '@favicon'],
+        'media' => ['favicon' => ['file' => 'media/salinas.jpg', 'alt' => 'Favicon']],
+    ]);
+
+    $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertSuccessful();
+
+    expect($this->site->fresh()->favicon)->toBe('/storage/'.CmsMedia::where('alt', 'Favicon')->value('path'));
 });

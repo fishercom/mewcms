@@ -86,6 +86,7 @@ export default function Edit() {
             secondary_image_url: '',
             link_url: '',
             button_label: '',
+            dark_text: false,
             position: slides.length,
             active: true,
         };
@@ -144,6 +145,7 @@ export default function Edit() {
             secondary_image_url: s.secondary_image_url ?? null,
             link_url: s.link_url,
             button_label: s.button_label ?? null,
+            dark_text: Boolean(s.dark_text),
             active: s.active,
             position: index,
         }));
@@ -456,7 +458,7 @@ export default function Edit() {
                                                     >
                                                         {moreOptions[index]
                                                             ? t('Ocultar más opciones')
-                                                            : t('Más opciones: botón, móvil, video e imagen secundaria')}
+                                                            : t('Más opciones: botón, texto oscuro, móvil, video e imagen secundaria')}
                                                     </button>
                                                 </div>
 
@@ -473,6 +475,18 @@ export default function Edit() {
                                                                 placeholder={t('Ej.: Conoce más (va al enlace de la diapositiva)')}
                                                                 className="bg-card h-8 text-xs"
                                                             />
+                                                        </div>
+                                                        <div className="flex items-center gap-2 md:col-span-2">
+                                                            <Checkbox
+                                                                id={`dark_text_${index}`}
+                                                                checked={Boolean(slide.dark_text)}
+                                                                onCheckedChange={(checked) =>
+                                                                    handleUpdateSlideField(index, 'dark_text', Boolean(checked))
+                                                                }
+                                                            />
+                                                            <Label htmlFor={`dark_text_${index}`} className="cursor-pointer text-xs font-medium">
+                                                                {t('Texto oscuro (para imágenes claras)')}
+                                                            </Label>
                                                         </div>
                                                         <SlideMediaInput
                                                             label={t('Imagen para móvil')}
