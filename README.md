@@ -441,4 +441,3 @@ MewCMS is free software licensed under the **[GNU Affero General Public License 
 
 - You can use it to build commercial or non-commercial websites, and you can modify and redistribute it.
 - If you modify MewCMS and run it on a server that people use over a network (a website, a hosted CMS, a SaaS), you must offer those users the source code of your modified version under the same license.
-- Versions published before this change remain available under the MIT License they were released with.
