@@ -15,7 +15,7 @@ class CmsRegister extends Model
      */
     protected $table = 'cms_registers';
 
-    protected $fillable = ['form_id', 'contact_id', 'name', 'email', 'phone', 'message', 'acceptance', 'review', 'review_date'];
+    protected $fillable = ['form_id', 'name', 'email', 'phone', 'message', 'acceptance', 'review', 'review_date'];
 
     protected static function booted(): void
     {
@@ -30,11 +30,6 @@ class CmsRegister extends Model
     public function form()
     {
         return $this->hasOne(CmsForm::class, 'id', 'form_id');
-    }
-
-    public function contact()
-    {
-        return $this->hasOne(CmsParameter::class, 'id', 'contact_id');
     }
 
     public function fields()

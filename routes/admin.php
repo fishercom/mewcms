@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\NotifyController;
-use App\Http\Controllers\Admin\ParameterController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PostTypeController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -84,7 +83,6 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::post('sites/{site}/languages/{lang}/publish', [SiteLanguageController::class, 'publish'])->whereNumber(['site', 'lang'])->name('sites.languages.publish');
     Route::resource('sites', SiteController::class);
     Route::resource('schemas', SchemaController::class);
-    Route::resource('parameters', ParameterController::class);
     Route::resource('forms', FormController::class);
     Route::resource('registers', RegisterController::class);
     Route::resource('notifies', NotifyController::class);
