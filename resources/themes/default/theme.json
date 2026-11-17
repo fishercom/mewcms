@@ -1,6 +1,7 @@
 {
     "name": "Default",
-    "description": "El sitio público estándar de MewCMS: limpio, neutro, en modo claro u oscuro.",
-    "version": "1.2.0",
-    "author": "MewCMS"
+    "description": "El sitio público estándar de MewCMS: claro y moderno, con acento violeta, Plus Jakarta Sans y modo oscuro.",
+    "version": "2.0.0",
+    "author": "MewCMS",
+    "styles": ["https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap"]
 }

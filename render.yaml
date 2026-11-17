@@ -31,6 +31,9 @@ services:
         value: "true"
       - key: RUN_SEED
         value: "true"
+      # Public demo: reload the default theme's content.json when it changes
+      - key: DEMO_CONTENT
+        value: default
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE

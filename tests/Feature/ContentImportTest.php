@@ -64,15 +64,36 @@ it('seeds only what the admin needs, with no site content', function (): void {
 it('loads the starting content of the default theme', function (): void {
     $this->artisan('cms:content-import', ['source' => 'default', '--force' => true])->assertSuccessful();
 
-    expect(CmsArticle::withoutGlobalScopes()->where('site_id', $this->site->id)->where('slug', 'home')->exists())->toBeTrue()
-        ->and(CmsSlider::withoutGlobalScopes()->pluck('key')->all())->toEqualCanonicalizing(['default', 'home_slider'])
+    $home = CmsArticle::withoutGlobalScopes()->where('site_id', $this->site->id)->where('slug', 'home')->first();
+    expect($home)->not->toBeNull()
+        ->and(collect($home->blocks)->pluck('type')->first())->toBe('hero')
+        ->and(CmsArticle::withoutGlobalScopes()->pluck('slug')->all())->toContain('funcionalidades', 'nosotros', 'contacto')
+        ->and(CmsPost::withoutGlobalScopes()->count())->toBe(4)
+        ->and(CmsMedia::count())->toBe(6)
         ->and(CmsMenu::withoutGlobalScopes()->pluck('slug')->all())->toEqualCanonicalizing(['main', 'footer'])
         ->and(CmsForm::withoutGlobalScopes()->where('alias', 'contacto')->exists())->toBeTrue();
 
     $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
         ->component('front/templates/home')
-        ->where('article.metadata.slider', 'home_slider')
-        ->where('slider.key', 'home_slider'));
+        ->where('article.blocks.0.type', 'hero')
+        ->has('recentPosts', 4));
+});
+
+it('reloads a content file only when it changed, with --if-changed', function (): void {
+    $file = writeContent($this->dir, ['pages' => [['slug' => 'home', 'title' => 'Inicio']]]);
+    $import = fn () => $this->artisan('cms:content-import', ['source' => $file, '--fresh' => true, '--force' => true, '--if-changed' => true]);
+
+    $import()->expectsOutputToContain('Content loaded')->assertSuccessful();
+    CmsArticle::withoutGlobalScopes()->where('slug', 'home')->update(['title' => 'Edited in the admin']);
+
+    // Same file: nothing is replaced
+    $import()->expectsOutputToContain('already loaded')->assertSuccessful();
+    expect(CmsArticle::withoutGlobalScopes()->where('slug', 'home')->value('title'))->toBe('Edited in the admin');
+
+    // A new version of the file replaces the content
+    writeContent($this->dir, ['pages' => [['slug' => 'home', 'title' => 'Bienvenidos']]]);
+    $import()->expectsOutputToContain('Content loaded')->assertSuccessful();
+    expect(CmsArticle::withoutGlobalScopes()->where('slug', 'home')->value('title'))->toBe('Bienvenidos');
 });
 
 it('loads a content file into a site: media, field groups, post types, posts and menus', function (): void {

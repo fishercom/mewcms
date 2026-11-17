@@ -18,6 +18,7 @@ interface SidebarProps {
     recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'url' | 'created_at'>[];
 }
 
+/** Recent pages and popular tags, for themes that build on the default pages with a sidebar */
 export default function FrontSidebar({ popularTags = [], recentArticles = [] }: SidebarProps) {
     const { t, date } = useTexts();
     // Helper to format URLs
@@ -28,8 +29,8 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
         <aside className="space-y-8 lg:sticky lg:top-24">
             {/* Recent Articles Widget */}
             {recentArticles.length > 0 && (
-                <div className="rounded-2xl border border-[#19140015] bg-[#FDFDFC] p-6 shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-[#3E3E3A]/40 dark:bg-[#161615]">
-                    <h3 className="mb-4 flex items-center gap-2 border-b border-[#19140015] pb-3 text-sm font-semibold text-[#1b1b18] dark:border-[#3E3E3A]/40 dark:text-[#EDEDEC]">
+                <div className="rounded-3xl border border-(--theme-line) bg-(--theme-surface) p-6">
+                    <h3 className="mb-4 flex items-center gap-2 border-b border-(--theme-line) pb-3 text-sm font-semibold">
                         <FileText className="h-4 w-4 text-(--theme-accent)" />
                         <span>{t('sidebar.recent')}</span>
                     </h3>
@@ -37,10 +38,10 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
                         {recentArticles.map((art) => (
                             <li key={art.id} className="group">
                                 <Link href={getArticleUrl(art)} className="block space-y-1">
-                                    <h4 className="line-clamp-2 text-sm leading-snug font-medium text-[#1b1b18] capitalize transition-colors group-hover:text-(--theme-accent) dark:text-[#EDEDEC]">
+                                    <h4 className="line-clamp-2 text-sm leading-snug font-medium transition-colors group-hover:text-(--theme-accent)">
                                         {art.title}
                                     </h4>
-                                    <div className="flex items-center gap-1.5 text-xs text-[#706f6c] dark:text-[#A1A09A]">
+                                    <div className="flex items-center gap-1.5 text-xs text-(--theme-muted)">
                                         <Calendar className="h-3 w-3" />
                                         <time dateTime={art.created_at.toString()}>{date(art.created_at)}</time>
                                     </div>
@@ -53,8 +54,8 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
 
             {/* Tag Cloud Widget */}
             {popularTags.length > 0 && (
-                <div className="rounded-2xl border border-[#19140015] bg-[#FDFDFC] p-6 shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-[#3E3E3A]/40 dark:bg-[#161615]">
-                    <h3 className="mb-4 flex items-center gap-2 border-b border-[#19140015] pb-3 text-sm font-semibold text-[#1b1b18] dark:border-[#3E3E3A]/40 dark:text-[#EDEDEC]">
+                <div className="rounded-3xl border border-(--theme-line) bg-(--theme-surface) p-6">
+                    <h3 className="mb-4 flex items-center gap-2 border-b border-(--theme-line) pb-3 text-sm font-semibold">
                         <Tag className="h-4 w-4 text-(--theme-accent)" />
                         <span>{t('tag.list_title')}</span>
                     </h3>
@@ -63,10 +64,10 @@ export default function FrontSidebar({ popularTags = [], recentArticles = [] }: 
                             <Link
                                 key={tag.id}
                                 href={tagUrl(tag.slug)}
-                                className="inline-flex items-center gap-1 rounded-lg border border-[#19140010] bg-gray-50 px-2.5 py-1.5 text-xs text-[#706f6c] transition-all duration-200 hover:bg-[#fff2f2] hover:text-(--theme-accent) dark:border-[#3E3E3A]/50 dark:bg-[#222] dark:text-[#c5c4c0] dark:hover:bg-[#1D0002]"
+                                className="inline-flex items-center gap-1 rounded-full border border-(--theme-line) bg-(--theme-bg) px-3 py-1.5 text-xs text-(--theme-muted) transition-colors hover:border-(--theme-accent) hover:text-(--theme-accent)"
                             >
                                 <span>#{tag.name}</span>
-                                <span className="text-[10px] text-[#a1a09a] dark:text-[#706f6c]">({tag.count})</span>
+                                <span className="text-[10px] opacity-60">({tag.count})</span>
                             </Link>
                         ))}
                     </div>

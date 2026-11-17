@@ -92,17 +92,49 @@ class CmsSite extends Model
     }
 
     /**
-     * Address of the public site: its site URL, or its first domain.
+     * Address of the public site: its site URL, or its first domain. A local address
+     * (localhost, 127.0.0.1, *.test, *.localhost) is skipped while the CMS is reached on a
+     * public one, since it was written on a developer's machine (a seeded APP_URL, an
+     * imported database) and would send "View site" to that machine.
      */
     public function publicUrl(): ?string
     {
-        if (filled($this->site_url)) {
+        // On the command line this is a stand-in request for localhost, so nothing is skipped
+        $request = request();
+        $local = self::isLocalHost($request->getHost());
+        $usable = fn (string $host): bool => $local || ! self::isLocalHost($host);
+
+        if (filled($this->site_url) && $usable(self::normalizeDomain($this->site_url))) {
             return rtrim($this->site_url, '/');
         }
 
-        $domain = ((array) $this->domains)[0] ?? null;
+        $scheme = $request->isSecure() ? 'https://' : 'http://';
+        foreach ((array) $this->domains as $domain) {
+            if (filled($domain) && $usable(self::normalizeDomain($domain))) {
+                return $scheme.$domain;
+            }
+        }
 
-        return $domain ? (request()->isSecure() ? 'https://' : 'http://').$domain : null;
+        // Only local addresses on record: the site is the one this request is served on
+        if (Sites::currentId() === $this->id || ($this->default && Sites::forHost($request->getHost()) === null)) {
+            return $request->getSchemeAndHttpHost();
+        }
+
+        return filled($this->site_url) ? rtrim($this->site_url, '/') : null;
+    }
+
+    /**
+     * Whether $host only answers on a developer's machine.
+     */
+    public static function isLocalHost(string $host): bool
+    {
+        $host = self::normalizeDomain($host);
+
+        return $host === 'localhost'
+            || $host === '::1'
+            || str_starts_with($host, '127.')
+            || str_ends_with($host, '.localhost')
+            || str_ends_with($host, '.test');
     }
 
     /**

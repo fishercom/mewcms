@@ -35,6 +35,14 @@ if [ "$RUN_SEED" = "true" ]; then
   fi
 fi
 
+# Demo deploys: keep the default site's content in step with a theme's content.json.
+# DEMO_CONTENT=<theme> replaces the site's pages, posts, menus, forms and sliders whenever
+# that file changes (edits made in the admin are lost then). Leave it unset on real sites.
+if [ -n "$DEMO_CONTENT" ]; then
+  echo "🎨 Syncing demo content from the \"$DEMO_CONTENT\" theme..."
+  php artisan cms:content-import "$DEMO_CONTENT" --fresh --force --if-changed || echo "⚠️ Demo content import failed, keeping the current content."
+fi
+
 # Cache production routes, views and config
 echo "⚡ Optimizing Laravel for production..."
 php artisan config:cache

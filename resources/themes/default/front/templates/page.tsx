@@ -1,181 +1,153 @@
-import { MediaImage } from '@/components/media-image';
 /**
  * Template Name: Standard Page
  */
 import Blocks from '@/components/blocks';
+import { MediaImage } from '@/components/media-image';
 import { localePath } from '@/lib/locale-path';
 import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { Head, Link } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
+import { PageHero } from '../components/post-card';
 import FrontLayout from '../layout';
 
 interface PageProps {
     article: CmsArticle;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-interface PageMetadata {
-    [key: string]: unknown;
+const isImageUrl = (value: string) => /\.(jpe?g|gif|png|webp|avif|svg)(\?|$)/i.test(value) && (value.startsWith('http') || value.startsWith('/'));
+const label = (key: string) => key.replace(/_/g, ' ');
+
+/**
+ * Custom fields of the page's field group that the template does not place itself: shown
+ * after the content so nothing an editor fills in goes missing.
+ */
+function CustomFields({ meta }: { meta: Record<string, unknown> }) {
+    const entries = Object.entries(meta).filter(([key, value]) => key !== '_id' && !key.startsWith('seo_') && value !== null && value !== '');
+    if (entries.length === 0) return null;
+
+    return (
+        <div className="space-y-8 border-t border-(--theme-line) pt-10">
+            {entries.map(([key, value]) => {
+                if (typeof value === 'string') {
+                    if (value.startsWith('<') && value.endsWith('>')) {
+                        return (
+                            <section key={key} className="space-y-2">
+                                <h3 className="text-xs font-semibold tracking-wider text-(--theme-muted) uppercase">{label(key)}</h3>
+                                <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: value }} />
+                            </section>
+                        );
+                    }
+                    if (isImageUrl(value)) {
+                        return (
+                            <figure key={key} className="space-y-2">
+                                <MediaImage
+                                    src={value}
+                                    fallbackAlt={label(key)}
+                                    sizes="(max-width: 768px) 100vw, 768px"
+                                    className="h-auto max-w-full rounded-2xl"
+                                />
+                                <figcaption className="text-xs text-(--theme-muted) capitalize">{label(key)}</figcaption>
+                            </figure>
+                        );
+                    }
+                    return (
+                        <div key={key} className="space-y-1">
+                            <h3 className="text-xs font-semibold tracking-wider text-(--theme-muted) uppercase">{label(key)}</h3>
+                            <p className="leading-relaxed">{value}</p>
+                        </div>
+                    );
+                }
+
+                if (Array.isArray(value)) {
+                    return (
+                        <section key={key} className="space-y-3">
+                            <h3 className="text-xs font-semibold tracking-wider text-(--theme-muted) uppercase">{label(key)}</h3>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {(value as Record<string, unknown>[]).map((item, index) => (
+                                    <dl
+                                        key={(item?._id as string) || index}
+                                        className="space-y-1.5 rounded-2xl border border-(--theme-line) bg-(--theme-surface) p-5 text-sm"
+                                    >
+                                        {Object.entries(item ?? {})
+                                            .filter(([subKey]) => subKey !== '_id')
+                                            .map(([subKey, subValue]) => (
+                                                <div key={subKey}>
+                                                    <dt className="inline font-semibold capitalize">{label(subKey)}: </dt>
+                                                    <dd className="inline text-(--theme-muted)">{String(subValue)}</dd>
+                                                </div>
+                                            ))}
+                                    </dl>
+                                ))}
+                            </div>
+                        </section>
+                    );
+                }
+
+                return null;
+            })}
+        </div>
+    );
 }
 
 export default function Page({ article, navigation }: PageProps) {
-    const meta = (article.metadata || {}) as PageMetadata;
     const { t } = useTexts();
-
-    // Helpers to format URL
-    const getUrl = (item: { url?: string; slug: string }) => item.url ?? localePath('/' + item.slug);
-
     const tags = article.tags ?? [];
+    const childUrl = (item: { url?: string; slug: string }) => item.url ?? localePath('/' + item.slug);
 
     return (
         <FrontLayout navigation={navigation}>
             <Head title={article.title} />
 
-            <div className="mx-auto max-w-3xl space-y-8 py-6">
-                {/* Page Header */}
-                <div className="space-y-2 border-b border-[#19140015] pb-6 dark:border-[#3E3E3A]/40">
-                    <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{article.title}</h1>
-
+            <div className="space-y-12">
+                <PageHero eyebrow={article.parent?.title} title={article.title} text={article.excerpt}>
                     {tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 pt-2">
                             {tags.map((tag) => (
                                 <Link
                                     key={tag.id}
                                     href={tagUrl(tag.slug)}
-                                    className="rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60"
+                                    className="rounded-full border border-(--theme-line) bg-(--theme-bg) px-3 py-1 text-xs font-semibold text-(--theme-muted) transition-colors hover:border-(--theme-accent) hover:text-(--theme-accent)"
                                 >
                                     #{tag.name}
                                 </Link>
                             ))}
                         </div>
                     )}
-                </div>
+                </PageHero>
 
-                {/* Main default page content (WordPress-style) */}
                 {article.featured_image && (
-                    <div className="aspect-video w-full overflow-hidden rounded-xl border border-zinc-200 shadow-xs md:aspect-[21/9] dark:border-zinc-800">
+                    <div className="aspect-video overflow-hidden rounded-[2rem] md:aspect-[21/9]">
                         <MediaImage src={article.featured_image} fallbackAlt={article.title} loading="eager" className="h-full w-full object-cover" />
                     </div>
                 )}
 
-                {article.excerpt && (
-                    <p className="text-zinc-650 border-l-2 border-red-500 py-1 pl-4 text-sm leading-relaxed font-medium italic dark:border-red-600 dark:text-[#A1A09A]">
-                        {article.excerpt}
-                    </p>
-                )}
+                <div className="mx-auto max-w-4xl space-y-12">
+                    <Blocks blocks={article.blocks} html={article.content} className="space-y-12" textClassName="*:prose-lg leading-relaxed" />
 
-                <Blocks blocks={article.blocks} html={article.content} textClassName="text-sm leading-relaxed" />
+                    <CustomFields meta={(article.metadata || {}) as Record<string, unknown>} />
 
-                {/* Custom Metadata Render */}
-                <div className="space-y-6">
-                    {Object.entries(meta)
-                        .filter(([key]) => key !== '_id' && !key.startsWith('seo_'))
-                        .map(([key, val]) => {
-                            const readableKey = key.replace(/_/g, ' ');
-
-                            // Render text blocks
-                            if (typeof val === 'string') {
-                                // Simple HTML detector
-                                const isHtml = val.startsWith('<') && val.endsWith('>');
-                                if (isHtml) {
-                                    return (
-                                        <div key={key} className="space-y-2">
-                                            <h3 className="text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
-                                                {readableKey}
-                                            </h3>
-                                            <div
-                                                className="prose dark:prose-invert max-w-none text-sm leading-relaxed"
-                                                dangerouslySetInnerHTML={{ __html: val }}
-                                            />
-                                        </div>
-                                    );
-                                }
-
-                                // Image URL check
-                                const isImage = /\.(jpeg|jpg|gif|png|webp)/i.test(val);
-                                if (isImage && (val.startsWith('http') || val.startsWith('/'))) {
-                                    return (
-                                        <div key={key} className="space-y-2">
-                                            <h3 className="text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
-                                                {readableKey}
-                                            </h3>
-                                            <div className="overflow-hidden rounded-lg border border-[#19140010] dark:border-[#3E3E3A]/20">
-                                                <MediaImage
-                                                    src={val}
-                                                    fallbackAlt={readableKey}
-                                                    sizes="(max-width: 768px) 100vw, 768px"
-                                                    className="h-auto max-w-full object-cover"
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                }
-
-                                return (
-                                    <div key={key} className="space-y-1">
-                                        <h3 className="text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
-                                            {readableKey}
-                                        </h3>
-                                        <p className="text-sm leading-relaxed text-[#1b1b18] dark:text-[#EDEDEC]">{val}</p>
-                                    </div>
-                                );
-                            }
-
-                            // Render Repeaters
-                            if (Array.isArray(val)) {
-                                const list = val as Record<string, unknown>[];
-                                return (
-                                    <div key={key} className="space-y-3 pt-4">
-                                        <h3 className="border-b pb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
-                                            {readableKey}
-                                        </h3>
-                                        <div className="grid gap-4 sm:grid-cols-2">
-                                            {list.map((item, idx) => (
-                                                <div
-                                                    key={(item._id as string) || idx}
-                                                    className="space-y-2 rounded-lg border border-[#19140015] bg-[#FDFDFC] p-4 text-xs dark:border-[#3E3E3A]/40 dark:bg-[#161615]"
-                                                >
-                                                    {Object.entries(item)
-                                                        .filter(([k]) => k !== '_id')
-                                                        .map(([subK, subVal]) => (
-                                                            <div key={subK}>
-                                                                <span className="font-semibold text-[#706f6c] capitalize dark:text-[#A1A09A]">
-                                                                    {subK.replace(/_/g, ' ')}:
-                                                                </span>{' '}
-                                                                <span>{String(subVal)}</span>
-                                                            </div>
-                                                        ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            }
-
-                            return null;
-                        })}
+                    {article.children?.length ? (
+                        <section className="space-y-5 border-t border-(--theme-line) pt-10">
+                            <h2 className="text-2xl font-bold tracking-tight">{t('page.children')}</h2>
+                            <ul className="grid gap-4 sm:grid-cols-2">
+                                {article.children.map((child) => (
+                                    <li key={child.id}>
+                                        <Link
+                                            href={childUrl(child)}
+                                            className="group flex items-center justify-between gap-3 rounded-2xl border border-(--theme-line) bg-(--theme-bg) p-5 font-semibold transition-all hover:-translate-y-0.5 hover:border-(--theme-accent)/50"
+                                        >
+                                            {child.title}
+                                            <ArrowRight className="h-4 w-4 text-(--theme-accent) transition-transform group-hover:translate-x-0.5" />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    ) : null}
                 </div>
-
-                {/* Subpages / Child Articles List */}
-                {article.children?.length ? (
-                    <div className="space-y-4 border-t border-[#19140015] pt-8 dark:border-[#3E3E3A]/40">
-                        <h2 className="text-lg font-bold">{t('page.children')}</h2>
-                        <ul className="grid gap-4 sm:grid-cols-2">
-                            {article.children.map((child) => (
-                                <li key={child.id}>
-                                    <Link
-                                        href={getUrl(child)}
-                                        className="block rounded-lg border border-[#19140015] bg-white p-4 shadow-sm transition-all hover:border-(--theme-accent)/50 dark:border-[#3E3E3A]/40 dark:bg-[#161615]"
-                                    >
-                                        <h4 className="text-sm font-semibold capitalize">{child.title}</h4>
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ) : null}
             </div>
         </FrontLayout>
     );

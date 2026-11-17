@@ -1,10 +1,12 @@
 import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowRight, Calendar, Search } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { Search } from 'lucide-react';
 import React, { useState } from 'react';
-import FrontSidebar, { PopularTag } from './components/sidebar';
+import { PageHero } from './components/post-card';
+import ResultList, { TagCloud } from './components/result-list';
+import { PopularTag } from './components/sidebar';
 import FrontLayout from './layout';
 
 interface SearchResult {
@@ -21,10 +23,9 @@ interface Props {
     query: string;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
     popularTags?: PopularTag[];
-    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-export default function SearchPage({ results, query, navigation, popularTags = [], recentArticles = [] }: Props) {
+export default function SearchPage({ results, query, navigation, popularTags = [] }: Props) {
     const [searchText, setSearchText] = useState(query);
     const { t, choice } = useTexts();
 
@@ -37,99 +38,44 @@ export default function SearchPage({ results, query, navigation, popularTags = [
         <FrontLayout navigation={navigation}>
             <Head title={query ? t('search.title_query', { query }) : t('search.title')} />
 
-            {/* Header Title with gradient */}
-            <div className="border-b border-[#19140010] py-12 dark:border-[#3E3E3A]/20">
-                <div className="max-w-3xl">
-                    <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl dark:text-white">{t('search.heading')}</h1>
-                    <p className="mt-3 text-sm text-zinc-500 dark:text-[#A1A09A]">
-                        {query ? (
-                            <>
-                                {choice('search.showing', results.length)}{' '}
-                                <strong className="font-semibold text-red-600 dark:text-red-500">"{query}"</strong>
-                            </>
-                        ) : (
-                            t('search.prompt')
-                        )}
-                    </p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 py-8 lg:grid-cols-12">
-                {/* Results Column */}
-                <div className="space-y-6 lg:col-span-8">
-                    {/* Search Bar Form */}
-                    <form onSubmit={handleSearchSubmit} className="relative">
+            <div className="space-y-12">
+                <PageHero
+                    eyebrow={t('search.title')}
+                    title={t('search.heading')}
+                    text={query ? choice('search.results', results.length, { query }) : t('search.prompt')}
+                >
+                    <form onSubmit={handleSearchSubmit} role="search" className="relative max-w-xl pt-4">
+                        <label htmlFor="front-search" className="sr-only">
+                            {t('search.terms')}
+                        </label>
+                        <Search className="pointer-events-none absolute top-[calc(50%+0.5rem)] left-5 h-5 w-5 -translate-y-1/2 text-(--theme-muted)" />
                         <input
-                            type="text"
+                            id="front-search"
+                            type="search"
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                             placeholder={t('search.placeholder')}
-                            className="border-zinc-205 block w-full rounded-xl border bg-white py-3 pr-12 pl-4 text-sm text-zinc-800 placeholder-zinc-400 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
+                            className="block w-full rounded-full border border-(--theme-line) bg-(--theme-bg) py-4 pr-32 pl-13 text-base text-(--theme-ink) shadow-sm placeholder:text-(--theme-muted) focus:border-(--theme-accent) focus:ring-4 focus:ring-(--theme-accent)/15 focus:outline-none"
                         />
                         <button
                             type="submit"
-                            aria-label={t('search.submit')}
-                            className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded-lg bg-red-600 p-1.5 text-white transition-colors hover:bg-red-700"
+                            className="absolute top-[calc(50%+0.5rem)] right-2 -translate-y-1/2 rounded-full bg-(--theme-accent) px-5 py-2.5 text-sm font-semibold text-(--theme-on-accent) transition-colors hover:bg-(--theme-accent-strong)"
                         >
-                            <Search className="h-4 w-4" />
+                            {t('search.submit')}
                         </button>
                     </form>
+                </PageHero>
 
-                    {/* Results lists */}
+                <div className="mx-auto max-w-4xl space-y-12">
                     {results.length > 0 ? (
-                        <div className="space-y-4">
-                            {results.map((result, idx) => (
-                                <article
-                                    key={`${result.type}-${result.id}-${idx}`}
-                                    className="hover:border-zinc-250 group rounded-xl border border-[#19140010] bg-white p-5 transition-all hover:shadow-xs dark:border-[#3E3E3A]/40 dark:bg-[#161615]/20 dark:hover:border-zinc-700"
-                                >
-                                    <div className="mb-2 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                                        {/* Result dynamic type badge */}
-                                        <span className="self-start rounded-md border border-red-100 bg-red-50 px-2 py-0.5 text-[9px] font-bold tracking-wider text-red-700 uppercase dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400">
-                                            {result.type}
-                                        </span>
-
-                                        {result.date && (
-                                            <div className="flex items-center gap-1 text-[10px] text-zinc-400">
-                                                <Calendar className="h-3 w-3" />
-                                                <span>{result.date}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <h3 className="text-base font-bold text-zinc-950 capitalize transition-colors group-hover:text-red-600 dark:text-white dark:group-hover:text-red-500">
-                                        <Link href={result.url}>{result.title}</Link>
-                                    </h3>
-
-                                    {result.excerpt && (
-                                        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-500 dark:text-[#A1A09A]">
-                                            {result.excerpt}
-                                        </p>
-                                    )}
-
-                                    <div className="mt-3 flex justify-end">
-                                        <Link
-                                            href={result.url}
-                                            className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 hover:underline dark:text-red-500"
-                                        >
-                                            <span>{t('search.view')}</span>
-                                            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                                        </Link>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
+                        <ResultList items={results} formatDates={false} />
                     ) : query ? (
-                        <div className="rounded-xl border border-dashed border-zinc-200 py-16 text-center text-zinc-400 dark:border-zinc-800">
-                            <Search className="mx-auto mb-2 h-8 w-8 text-zinc-300" />
-                            <p className="text-xs">{t('search.empty')}</p>
-                        </div>
+                        <p className="rounded-3xl border border-dashed border-(--theme-line) py-16 text-center text-sm text-(--theme-muted)">
+                            {t('search.empty')}
+                        </p>
                     ) : null}
-                </div>
 
-                {/* Sidebar Column */}
-                <div className="lg:col-span-4">
-                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
+                    <TagCloud tags={popularTags} title={t('tag.list_title')} />
                 </div>
             </div>
         </FrontLayout>

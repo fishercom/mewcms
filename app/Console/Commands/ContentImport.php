@@ -6,6 +6,7 @@ use App\Models\CmsSite;
 use App\Support\ContentImporter;
 use App\Support\Themes;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 
 /**
@@ -21,7 +22,8 @@ class ContentImport extends Command
         {--theme= : Theme the site uses afterwards (default: the theme of the source, when it is one)}
         {--fresh : Delete the site\'s pages, posts, menus, forms and sliders first}
         {--var=* : Values for {name} placeholders in the file, as name=value}
-        {--force : Do not ask for confirmation}';
+        {--force : Do not ask for confirmation}
+        {--if-changed : Skip the import when this file was already loaded into the site as it is now (for demo deploys)}';
 
     protected $description = 'Load a site\'s starting content from a theme\'s content.json';
 
@@ -51,6 +53,14 @@ class ContentImport extends Command
             return self::FAILURE;
         }
 
+        $stamp = 'content-import.'.$site->id.'.'.md5(realpath($file) ?: $file);
+        $hash = (string) md5_file($file).':'.($theme ?? '');
+        if ($this->option('if-changed') && Cache::get($stamp) === $hash) {
+            $this->info("{$file} is already loaded into \"{$site->name}\".");
+
+            return self::SUCCESS;
+        }
+
         $fresh = (bool) $this->option('fresh');
         $question = $fresh
             ? "This deletes every page, post, menu, form and slider of the site \"{$site->name}\" and loads {$file}. Continue?"
@@ -74,6 +84,7 @@ class ContentImport extends Command
             return self::FAILURE;
         }
 
+        Cache::forever($stamp, $hash);
         $this->info("Content loaded into \"{$site->name}\"".($theme ? " (theme {$theme})" : '').'.');
 
         return self::SUCCESS;

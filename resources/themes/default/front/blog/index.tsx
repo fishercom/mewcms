@@ -1,13 +1,15 @@
-import { MediaImage } from '@/components/media-image';
 import { localePath } from '@/lib/locale-path';
+import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
+import { cn } from '@/lib/utils';
 import { Pagination } from '@/types';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType } from '@/types/models/cms-post';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, BookOpen, Calendar, Search, User } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 import { useState } from 'react';
-import FrontSidebar, { PopularTag } from '../components/sidebar';
+import PostCard from '../components/post-card';
+import { PopularTag } from '../components/sidebar';
 import FrontLayout from '../layout';
 
 interface Props {
@@ -15,160 +17,103 @@ interface Props {
     cpt: CmsPostType | null;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
     popularTags?: PopularTag[];
-    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-export default function Index({ posts, cpt, navigation, popularTags = [], recentArticles = [] }: Props) {
+export default function Index({ posts, cpt, navigation, popularTags = [] }: Props) {
     const [search, setSearch] = useState('');
-    const { t, date } = useTexts();
+    const { t } = useTexts();
 
     const pageTitle = cpt ? cpt.name : t('blog.title');
     const pageDesc = cpt ? cpt.description || t('blog.type_description', { type: cpt.name.toLowerCase() }) : t('blog.description');
+    const query = search.trim().toLowerCase();
 
-    const filteredPosts = posts.data.filter(
-        (post) =>
-            post.title.toLowerCase().includes(search.toLowerCase()) || (post.excerpt && post.excerpt.toLowerCase().includes(search.toLowerCase())),
-    );
+    const items = posts.data
+        .filter((post) => !query || post.title.toLowerCase().includes(query) || (post.excerpt ?? '').toLowerCase().includes(query))
+        .map((post) => ({
+            id: post.id,
+            title: post.title,
+            url: localePath(cpt ? `/${cpt.slug}/${post.slug}` : `/blog/${post.slug}`),
+            excerpt: post.excerpt,
+            featured_image: post.featured_image,
+            published_at: post.published_at,
+            tags: post.tags,
+        }));
+
+    // The newest post leads the first page, bigger
+    const [lead, ...rest] = posts.current_page === 1 && !query ? items : [undefined, ...items];
 
     return (
         <FrontLayout navigation={navigation}>
             <Head title={pageTitle} />
 
-            {/* Header section with gradient */}
-            <div className="border-b border-[#19140010] py-12 dark:border-[#3E3E3A]/20">
-                <div className="max-w-3xl">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 capitalize sm:text-6xl dark:text-white">{pageTitle}</h1>
-                    <p className="mt-4 text-base text-zinc-500 dark:text-[#A1A09A]">{pageDesc}</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 py-8 lg:grid-cols-12">
-                {/* Posts Grid Column */}
-                <div className="space-y-8 lg:col-span-8">
-                    {/* Search catalog */}
-                    <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <Search className="h-4 w-4 text-zinc-400" />
-                        </div>
+            <div className="space-y-12">
+                <header className="flex flex-col gap-8 border-b border-(--theme-line) pb-10 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="max-w-2xl space-y-3">
+                        <p className="text-xs font-semibold tracking-[0.18em] text-(--theme-accent) uppercase">{t('blog.eyebrow')}</p>
+                        <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl">{pageTitle}</h1>
+                        <p className="text-lg text-(--theme-muted)">{pageDesc}</p>
+                    </div>
+                    <label className="relative block w-full lg:max-w-xs">
+                        <span className="sr-only">{t('search.title')}</span>
+                        <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-(--theme-muted)" />
                         <input
-                            type="text"
+                            type="search"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder={t('blog.search_placeholder', { name: pageTitle.toLowerCase() })}
-                            className="block w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-3 pl-10 text-sm text-zinc-800 placeholder-zinc-400 transition-all focus:border-transparent focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-zinc-800 dark:bg-transparent dark:text-zinc-200"
+                            className="block w-full rounded-full border border-(--theme-line) bg-(--theme-bg) py-2.5 pr-4 pl-10 text-sm text-(--theme-ink) placeholder:text-(--theme-muted) focus:border-(--theme-accent) focus:ring-4 focus:ring-(--theme-accent)/15 focus:outline-none"
                         />
+                    </label>
+                </header>
+
+                {popularTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {popularTags.map((tag) => (
+                            <Link
+                                key={tag.id}
+                                href={tagUrl(tag.slug)}
+                                className="rounded-full border border-(--theme-line) px-3.5 py-1.5 text-sm text-(--theme-muted) transition-colors hover:border-(--theme-accent) hover:text-(--theme-accent)"
+                            >
+                                {tag.name}
+                                <span className="ml-1.5 text-xs opacity-60">{tag.count}</span>
+                            </Link>
+                        ))}
                     </div>
+                )}
 
-                    {filteredPosts.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            {filteredPosts.map((post) => {
-                                const detailUrl = localePath(cpt ? `/${cpt.slug}/${post.slug}` : `/blog/${post.slug}`);
+                {items.length > 0 ? (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {lead && <PostCard item={lead} large className="md:col-span-2 lg:col-span-3" />}
+                        {rest.map((item) => item && <PostCard key={item.id} item={item} />)}
+                    </div>
+                ) : (
+                    <div className="rounded-3xl border border-dashed border-(--theme-line) py-20 text-center text-(--theme-muted)">
+                        <BookOpen className="mx-auto mb-3 h-10 w-10 opacity-50" />
+                        <p className="text-sm font-medium">{t('blog.empty')}</p>
+                    </div>
+                )}
 
-                                return (
-                                    <article
-                                        key={post.id}
-                                        className="group flex flex-col overflow-hidden rounded-2xl border border-[#19140010] bg-white shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md dark:border-[#3E3E3A]/40 dark:bg-[#161615]/20"
-                                    >
-                                        {/* Post Thumbnail */}
-                                        <Link href={detailUrl} className="relative block aspect-[16/10] overflow-hidden bg-zinc-100">
-                                            {post.featured_image ? (
-                                                <MediaImage
-                                                    src={post.featured_image}
-                                                    fallbackAlt={post.title}
-                                                    sizes="(max-width: 768px) 100vw, 33vw"
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center text-zinc-300 dark:text-zinc-700">
-                                                    <BookOpen className="h-12 w-12" />
-                                                </div>
-                                            )}
-                                        </Link>
-
-                                        {/* Post Description */}
-                                        <div className="flex flex-1 flex-col justify-between space-y-4 p-5">
-                                            <div className="space-y-2">
-                                                {/* Tag badges */}
-                                                {post.tags && post.tags.length > 0 && (
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {post.tags.slice(0, 2).map((term) => (
-                                                            <span
-                                                                key={term.id}
-                                                                className="text-[10px] font-semibold tracking-wider text-red-600 uppercase dark:text-red-400"
-                                                            >
-                                                                #{term.name}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                )}
-
-                                                <h3 className="text-lg leading-snug font-bold text-zinc-900 capitalize transition-colors group-hover:text-red-600 dark:text-white dark:group-hover:text-red-500">
-                                                    <Link href={detailUrl}>{post.title}</Link>
-                                                </h3>
-
-                                                <p className="line-clamp-3 text-xs leading-relaxed text-zinc-500 dark:text-[#A1A09A]">
-                                                    {post.excerpt || t('blog.no_excerpt')}
-                                                </p>
-                                            </div>
-
-                                            {/* Footer metadata */}
-                                            <div className="flex items-center justify-between border-t border-zinc-100 pt-4 text-[11px] text-zinc-400 dark:border-zinc-800">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="flex items-center gap-1">
-                                                        <Calendar className="h-3 w-3" />
-                                                        <span>{date(post.published_at)}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <User className="h-3 w-3" />
-                                                        <span>{post.user?.name || t('blog.default_author')}</span>
-                                                    </div>
-                                                </div>
-                                                <Link
-                                                    href={detailUrl}
-                                                    className="inline-flex items-center gap-0.5 font-bold text-red-600 hover:underline dark:text-red-500"
-                                                >
-                                                    <span>{t('blog.read')}</span>
-                                                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </article>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <div className="rounded-2xl border border-dashed border-zinc-200 py-16 text-center text-zinc-400 dark:border-zinc-800">
-                            <BookOpen className="mx-auto mb-3 h-10 w-10 text-zinc-300" />
-                            <p className="text-sm font-medium">{t('blog.empty')}</p>
-                        </div>
-                    )}
-
-                    {/* Pagination */}
-                    {posts.last_page > 1 && (
-                        <div className="flex items-center justify-center gap-2 pt-4">
-                            {posts.links.map((link, idx) => {
-                                if (link.url === null) return null;
-                                return (
-                                    <Link
-                                        key={idx}
-                                        href={link.url}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                        className={`rounded-lg border px-3 py-1.5 text-xs transition-all ${
-                                            link.active
-                                                ? 'border-red-600 bg-red-600 text-white'
-                                                : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800/40'
-                                        }`}
-                                    />
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-
-                {/* Sidebar Column */}
-                <div className="lg:col-span-4">
-                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
-                </div>
+                {posts.last_page > 1 && (
+                    <nav aria-label={t('pagination.label')} className="flex flex-wrap items-center justify-center gap-2 pt-4">
+                        {posts.links.map((link, idx) =>
+                            link.url === null ? null : (
+                                <Link
+                                    key={idx}
+                                    href={link.url}
+                                    preserveScroll={false}
+                                    aria-current={link.active ? 'page' : undefined}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                    className={cn(
+                                        'min-w-10 rounded-full border px-3.5 py-2 text-center text-sm font-medium transition-colors',
+                                        link.active
+                                            ? 'border-(--theme-accent) bg-(--theme-accent) text-(--theme-on-accent)'
+                                            : 'border-(--theme-line) text-(--theme-muted) hover:border-(--theme-accent) hover:text-(--theme-accent)',
+                                    )}
+                                />
+                            ),
+                        )}
+                    </nav>
+                )}
             </div>
         </FrontLayout>
     );
