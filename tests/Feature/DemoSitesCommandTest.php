@@ -34,7 +34,7 @@ beforeEach(function (): void {
     CmsSchemaGroup::create(['name' => 'Default', 'layout' => 'front', 'default' => 1, 'active' => 1]);
 
     $this->shop = CmsSite::create(['name' => 'Main', 'domains' => ['old.test'], 'theme' => 'default', 'default' => true, 'active' => true]);
-    $this->journal = CmsSite::create(['name' => 'Blog', 'domains' => ['old-blog.test'], 'theme' => 'editorial', 'active' => true]);
+    $this->journal = CmsSite::create(['name' => 'Blog', 'domains' => ['old-blog.test'], 'theme' => 'velvet', 'active' => true]);
 
     // Old content that must go
     Sites::as($this->shop, fn () => CmsArticle::create(['lang_id' => $this->english->id, 'title' => 'Old page', 'slug' => 'old', 'active' => 1, 'metadata' => []]));
