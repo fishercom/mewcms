@@ -14,15 +14,193 @@
 @source '../../../js/lib';
 
 /*
- * Accent colour and font. A theme that builds on this one (or an uploaded theme that
- * uses its pages) changes them by setting --site-accent, --site-accent-dark and
- * --site-font in its own stylesheet.
+ * Palette and font. A theme that builds on this one (or an uploaded theme that uses its
+ * pages) changes them by setting --site-accent, --site-accent-dark and --site-font in its
+ * own stylesheet; the pages only use the --theme-* colours below.
  */
 .front-theme {
-    --theme-accent: var(--site-accent, #f53003);
-    font-family: var(--site-font, inherit);
+    --theme-accent: var(--site-accent, #6d28d9);
+    --theme-accent-strong: color-mix(in oklab, var(--theme-accent) 82%, black);
+    --theme-accent-soft: color-mix(in oklab, var(--theme-accent) 9%, transparent);
+    --theme-on-accent: #ffffff;
+    --theme-bg: #ffffff;
+    --theme-surface: #f7f7fa;
+    --theme-ink: #17171c;
+    --theme-muted: #5e5e6b;
+    --theme-line: #e8e8ef;
+
+    font-family: var(--site-font, 'Plus Jakarta Sans', var(--font-sans));
+    -webkit-font-smoothing: antialiased;
 }
 
 .dark .front-theme {
-    --theme-accent: var(--site-accent-dark, #ff4433);
+    --theme-accent: var(--site-accent-dark, #a78bfa);
+    --theme-accent-strong: color-mix(in oklab, var(--theme-accent) 85%, white);
+    --theme-accent-soft: color-mix(in oklab, var(--theme-accent) 14%, transparent);
+    --theme-on-accent: #120b24;
+    --theme-bg: #0c0c10;
+    --theme-surface: #15151b;
+    --theme-ink: #f3f3f6;
+    --theme-muted: #a3a3b0;
+    --theme-line: #26262f;
+}
+
+.front-theme ::selection {
+    background: color-mix(in oklab, var(--theme-accent) 22%, transparent);
+}
+
+/* Long-form text (pages, posts and the text blocks) in the theme's colours */
+.front-theme .prose {
+    --tw-prose-body: var(--theme-ink);
+    --tw-prose-headings: var(--theme-ink);
+    --tw-prose-lead: var(--theme-muted);
+    --tw-prose-links: var(--theme-accent);
+    --tw-prose-bold: var(--theme-ink);
+    --tw-prose-counters: var(--theme-muted);
+    --tw-prose-bullets: var(--theme-accent);
+    --tw-prose-hr: var(--theme-line);
+    --tw-prose-quotes: var(--theme-ink);
+    --tw-prose-quote-borders: var(--theme-accent);
+    --tw-prose-captions: var(--theme-muted);
+    --tw-prose-code: var(--theme-ink);
+    --tw-prose-th-borders: var(--theme-line);
+    --tw-prose-td-borders: var(--theme-line);
+}
+
+/*
+ * The CMS's content blocks are drawn in the MewCMS red; on this theme they take its
+ * accent and neutrals instead (so a theme that changes --site-accent recolours them too).
+ */
+.front-theme [data-block] :is(.text-\[\#f53003\]) {
+    color: var(--theme-accent);
+}
+.front-theme [data-block] :is(.bg-\[\#f53003\]) {
+    background-color: var(--theme-accent);
+    color: var(--theme-on-accent);
+}
+.front-theme [data-block] :is(.hover\:bg-\[\#d92a02\]:hover) {
+    background-color: var(--theme-accent-strong);
+}
+.front-theme [data-block] :is(.bg-\[\#f53003\]\/5, .bg-\[\#f53003\]\/10) {
+    background-color: var(--theme-accent-soft);
+}
+.front-theme [data-block] :is(.border-\[\#f53003\]) {
+    border-color: var(--theme-accent);
+}
+.front-theme [data-block] :is(.text-\[\#706f6c\]) {
+    color: var(--theme-muted);
+}
+.front-theme [data-block] :is(.border-\[\#19140015\]) {
+    border-color: var(--theme-line);
+}
+.front-theme [data-block] :is(.focus-visible\:ring-\[\#f53003\]\/50:focus-visible) {
+    --tw-ring-color: color-mix(in oklab, var(--theme-accent) 50%, transparent);
+}
+
+/*
+ * The default theme's own finish for the blocks. Scoped to sites that use its pages, so a
+ * theme that imports this stylesheet (and has its own block designs) keeps them as they are.
+ */
+
+/* Banner without a photo: a soft wash of the accent */
+[data-site-theme='default'] .front-theme [data-block='hero'] > section:not(.text-white) {
+    border: 1px solid var(--theme-line);
+    background:
+        radial-gradient(60rem 28rem at 85% -10%, color-mix(in oklab, var(--theme-accent) 16%, transparent), transparent 70%),
+        radial-gradient(40rem 22rem at 0% 110%, color-mix(in oklab, var(--theme-accent) 10%, transparent), transparent 70%), var(--theme-surface);
+}
+[data-site-theme='default'] .front-theme [data-block='hero'] > section {
+    border-radius: 1.75rem;
+}
+[data-site-theme='default'] .front-theme [data-block='hero'] h2 {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+[data-site-theme='default'] .front-theme [data-block='hero'] a {
+    border-radius: 9999px;
+    padding-inline: 1.4rem;
+}
+
+/* Feature lists as cards */
+[data-site-theme='default'] .front-theme [data-block='features'] h2,
+[data-site-theme='default'] .front-theme [data-block='cta'] h2 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+[data-site-theme='default'] .front-theme [data-block='features'] ul > li {
+    border: 1px solid var(--theme-line);
+    border-radius: 1.25rem;
+    background: var(--theme-bg);
+    padding: 1.5rem;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+[data-site-theme='default'] .front-theme [data-block='features'] ul > li:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--theme-accent) 35%, var(--theme-line));
+    box-shadow: 0 12px 32px -18px color-mix(in oklab, var(--theme-accent) 45%, transparent);
+}
+[data-site-theme='default'] .front-theme [data-block='features'] ul > li > span:first-child {
+    border-radius: 0.85rem;
+    height: 2.75rem;
+    width: 2.75rem;
+}
+
+/* Figures: big numbers, cards on the theme's surface */
+[data-site-theme='default'] .front-theme [data-block='stats'] dl > div {
+    border-radius: 1.25rem;
+}
+[data-site-theme='default'] .front-theme [data-block='stats'] dl > div.bg-white {
+    border-color: var(--theme-line);
+    background: var(--theme-surface);
+    box-shadow: none;
+}
+
+/* Call to action: rounder, with a glow on the accent version */
+[data-site-theme='default'] .front-theme [data-block='cta'] > section {
+    border-radius: 1.75rem;
+}
+[data-site-theme='default'] .front-theme [data-block='cta'] > section.bg-\[\#f53003\] {
+    background:
+        radial-gradient(36rem 18rem at 100% 0%, color-mix(in oklab, white 22%, transparent), transparent 70%),
+        linear-gradient(135deg, var(--theme-accent), var(--theme-accent-strong));
+}
+[data-site-theme='default'] .front-theme [data-block='cta'] a {
+    border-radius: 9999px;
+}
+
+/* Quotes and images round like the rest */
+[data-site-theme='default'] .front-theme [data-block='image'] img,
+[data-site-theme='default'] .front-theme [data-block='gallery'] img {
+    border-radius: 1rem;
+}
+
+/* Inline code without the typography plugin's backticks */
+.front-theme .prose :where(code):not(:where(pre *))::before,
+.front-theme .prose :where(code):not(:where(pre *))::after {
+    content: none;
+}
+.front-theme .prose :where(code):not(:where(pre *)) {
+    border-radius: 0.375rem;
+    background: var(--theme-surface);
+    padding: 0.15em 0.4em;
+    font-weight: 500;
+}
+
+/* Public forms in the accent colour */
+[data-site-theme='default'] .front-theme form :is(.bg-red-600, .dark\:bg-red-500) {
+    border-radius: 9999px;
+    background-color: var(--theme-accent);
+    color: var(--theme-on-accent);
+}
+[data-site-theme='default'] .front-theme form :is(.hover\:bg-red-700:hover, .dark\:hover\:bg-red-600:hover) {
+    background-color: var(--theme-accent-strong);
+}
+[data-site-theme='default'] .front-theme form :is(.focus\:ring-red-500:focus) {
+    --tw-ring-color: color-mix(in oklab, var(--theme-accent) 45%, transparent);
+}
+[data-site-theme='default'] .front-theme form :is(.text-red-600) {
+    color: var(--theme-accent);
 }

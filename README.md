@@ -396,12 +396,13 @@ The container automatically:
 2. Creates the storage symlink.
 3. Executes database migrations (`php artisan migrate --force`).
 4. Seeds the database on first boot if `RUN_SEED=true`.
-5. Caches routes, configurations, and views (`config:cache`, `route:cache`, `view:cache`).
-6. Starts the high-performance runtime server.
+5. With `DEMO_CONTENT=<theme>` (a public demo), reloads that theme's `content/content.json` into the default site whenever the file changes, replacing its pages, posts, menus, forms and sliders. Leave it unset on real sites.
+6. Caches routes, configurations, and views (`config:cache`, `route:cache`, `view:cache`).
+7. Starts the high-performance runtime server.
 
 ### Deploying to Render or VPS
 
-A ready-to-use [`render.yaml`](file:///Users/fischer/Projects/mewcms/render.yaml) configuration is included in the project for zero-friction cloud deployment.
+A ready-to-use [`render.yaml`](render.yaml) configuration is included in the project for zero-friction cloud deployment.
 
 #### Server-Side Rendering & Caching
 

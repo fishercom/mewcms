@@ -1,169 +1,43 @@
-import Blocks from '@/components/blocks';
-import { MediaImage } from '@/components/media-image';
 import { localePath } from '@/lib/locale-path';
-import { tagUrl } from '@/lib/tag-url';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsPost, CmsPostType, PostListItem } from '@/types/models/cms-post';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Settings, Tag, User } from 'lucide-react';
-import FrontSidebar, { PopularTag } from '../components/sidebar';
+import { Head } from '@inertiajs/react';
+import ArticleView from '../components/article-view';
 import FrontLayout from '../layout';
 
 interface Props {
     post: CmsPost;
     cpt: CmsPostType | null;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    popularTags?: PopularTag[];
-    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
     /** Posts of the same type that share a tag with this one */
     related?: PostListItem[];
 }
 
-export default function Show({ post, cpt, navigation, popularTags = [], recentArticles = [], related = [] }: Props) {
-    const { t, date } = useTexts();
-    const parentLabel = cpt ? cpt.name : t('blog.title');
-    const parentUrl = localePath(cpt ? `/${cpt.slug}` : '/blog');
+export default function Show({ post, cpt, navigation, related = [] }: Props) {
+    const { t } = useTexts();
 
-    const tags = post.tags ?? [];
-
-    // Filter out standard fields from custom metadata keys to print remaining fields cleanly
-    const metadataEntries = Object.entries(post.metadata || {}).filter(
-        ([key]) => !['_id'].includes(key) && !key.startsWith('seo_') && post.metadata[key] !== null && post.metadata[key] !== '',
+    // Custom fields of the post's field group, listed under the text
+    const details = Object.entries(post.metadata || {}).filter(
+        ([key, value]) => key !== '_id' && !key.startsWith('seo_') && value !== null && value !== '',
     );
 
     return (
         <FrontLayout navigation={navigation}>
             <Head title={post.title} />
-
-            {/* Back to archive link */}
-            <div className="pt-6">
-                <Link
-                    href={parentUrl}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-500 transition-colors hover:text-red-600 dark:text-[#A1A09A] dark:hover:text-red-500"
-                >
-                    <ArrowLeft className="h-3.5 w-3.5" />
-                    <span>{t('blog.back_to', { name: parentLabel })}</span>
-                </Link>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 py-6 lg:grid-cols-12">
-                {/* Main Content Article */}
-                <article className="space-y-6 lg:col-span-8">
-                    <div className="space-y-4">
-                        <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-zinc-900 capitalize sm:text-5xl dark:text-white">
-                            {post.title}
-                        </h1>
-
-                        <div className="flex items-center gap-4 border-b border-zinc-100 pb-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-[#A1A09A]">
-                            <div className="flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5" />
-                                <span>{t('blog.published_on')}</span>
-                                <time dateTime={post.published_at}>{date(post.published_at, { dateStyle: 'medium', timeStyle: 'short' })}</time>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <User className="h-3.5 w-3.5" />
-                                <span>{t('blog.by', { author: post.user?.name || t('blog.default_author') })}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Featured Image */}
-                    {post.featured_image && (
-                        <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-xs dark:border-zinc-800">
-                            <MediaImage src={post.featured_image} fallbackAlt={post.title} loading="eager" className="h-full w-full object-cover" />
-                        </div>
-                    )}
-
-                    {/* Post Excerpt (Lead Paragraph) */}
-                    {post.excerpt && (
-                        <p className="border-l-4 border-red-600 py-1 pl-4 text-base leading-relaxed font-medium text-zinc-600 italic dark:text-[#c5c4c0]">
-                            {post.excerpt}
-                        </p>
-                    )}
-
-                    {/* Content body */}
-                    <div className="pt-2">
-                        {post.content ? (
-                            <Blocks
-                                blocks={post.blocks}
-                                html={post.content}
-                                textClassName="prose-red prose-sm sm:prose-base leading-relaxed text-zinc-800 dark:text-[#EDEDEC]"
-                            />
-                        ) : (
-                            <p className="py-6 text-center text-xs text-zinc-400 italic">{t('blog.no_content')}</p>
-                        )}
-                    </div>
-
-                    {/* Dynamic Custom Metadata fields */}
-                    {metadataEntries.length > 0 && (
-                        <div className="space-y-4 border-t border-zinc-100 pt-6 dark:border-zinc-800">
-                            <h4 className="flex items-center gap-1.5 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
-                                <Settings className="h-3.5 w-3.5" />
-                                <span>{t('blog.details')}</span>
-                            </h4>
-                            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                {metadataEntries.map(([key, val]) => (
-                                    <div
-                                        key={key}
-                                        className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-xs dark:border-zinc-800 dark:bg-[#161615]/30"
-                                    >
-                                        <dt className="mb-1 font-semibold text-zinc-700 capitalize dark:text-zinc-300">{key.replace(/_/g, ' ')}</dt>
-                                        <dd className="break-words text-zinc-500 dark:text-[#c5c4c0]">
-                                            {typeof val === 'object' ? JSON.stringify(val) : String(val)}
-                                        </dd>
-                                    </div>
-                                ))}
-                            </dl>
-                        </div>
-                    )}
-
-                    {/* Tags section */}
-                    {tags.length > 0 && (
-                        <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
-                            <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
-                                <Tag className="h-3.5 w-3.5 text-red-600 dark:text-red-500" />
-                                <span>{t('tag.list_title')}</span>
-                            </h4>
-                            <div className="flex flex-wrap gap-2">
-                                {tags.map((term) => (
-                                    <Link
-                                        key={term.id}
-                                        href={tagUrl(term.slug)}
-                                        className="inline-flex items-center rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs text-zinc-600 transition-colors hover:bg-red-50/20 hover:text-red-600 dark:border-zinc-800 dark:bg-[#161615]/40 dark:text-zinc-400 dark:hover:text-red-400"
-                                    >
-                                        #{term.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Related posts */}
-                    {related.length > 0 && (
-                        <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
-                            <h4 className="mb-3 text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('blog.related')}</h4>
-                            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                {related.map((item) => (
-                                    <li key={item.id}>
-                                        <Link
-                                            href={item.url}
-                                            className="block rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm font-medium text-zinc-700 transition-colors hover:text-red-600 dark:border-zinc-800 dark:bg-[#161615]/30 dark:text-zinc-300 dark:hover:text-red-400"
-                                        >
-                                            {item.title}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </article>
-
-                {/* Sidebar Column */}
-                <div className="lg:col-span-4">
-                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
-                </div>
-            </div>
+            <ArticleView
+                title={post.title}
+                excerpt={post.excerpt}
+                image={post.featured_image}
+                date={post.published_at}
+                author={post.user?.name}
+                blocks={post.blocks}
+                html={post.content}
+                tags={post.tags ?? []}
+                details={details}
+                back={{ label: cpt ? cpt.name : t('blog.title'), url: localePath(cpt ? `/${cpt.slug}` : '/blog') }}
+                related={related}
+            />
         </FrontLayout>
     );
 }

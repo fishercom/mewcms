@@ -1,166 +1,59 @@
 {
-    "$comment": "Starting content of the default theme: php artisan cms:content-import default. A home page that presents MewCMS, two sliders, the main and footer menus and a contact form.",
+    "$comment": "Starting content of the default theme: php artisan cms:content-import default. A site that presents MewCMS: a home made of blocks, a features page, about, contact (with its form), legal pages, four blog posts and the main and footer menus. The illustrations are in content/media.",
+    "site": {
+        "name": "MewCMS",
+        "title": "MewCMS",
+        "description": "El gestor de contenidos de código abierto con Laravel 12, React 19 e Inertia 2: rápido, multisitio y fácil de editar.",
+        "lang": "es"
+    },
+    "media": {
+        "bloques": {
+            "file": "media/bloques.jpg",
+            "alt": "Ilustración del editor por bloques de MewCMS"
+        },
+        "multisitio": {
+            "file": "media/multisitio.jpg",
+            "alt": "Ilustración de varios sitios en distintos idiomas"
+        },
+        "temas": {
+            "file": "media/temas.jpg",
+            "alt": "Ilustración de tres temas con colores distintos"
+        },
+        "seo": {
+            "file": "media/seo.jpg",
+            "alt": "Ilustración de un gráfico de visitas y una puntuación SEO"
+        },
+        "equipo": {
+            "file": "media/equipo.jpg",
+            "alt": "Ilustración de tarjetas de un equipo de trabajo"
+        },
+        "panel": {
+            "file": "media/panel.jpg",
+            "alt": "Ilustración del panel de administración de MewCMS"
+        }
+    },
+    "settings": {
+        "layout_copyright": "© {year} MewCMS. Software libre bajo licencia AGPL v3, desarrollado junto a <a href=\"https://deepsoft.lat\" target=\"_blank\" rel=\"noopener noreferrer\">DeepSoft</a>."
+    },
     "schemas": {
         "home": {
             "name": "Página de Inicio",
             "type": "PAGE",
             "template": "front/templates/home",
-            "fields": [
-                {
-                    "key": "slider",
-                    "label": "Clave del Slider",
-                    "name": "Clave del Slider",
-                    "alias": "slider",
-                    "type": "text"
-                },
-                {
-                    "key": "badge_text",
-                    "label": "Texto de la Insignia",
-                    "name": "Texto de la Insignia",
-                    "alias": "badge_text",
-                    "type": "text"
-                },
-                {
-                    "key": "hero_title",
-                    "label": "Título Hero (H1)",
-                    "name": "Título Hero (H1)",
-                    "alias": "hero_title",
-                    "type": "text"
-                },
-                {
-                    "key": "hero_subtitle",
-                    "label": "Subtítulo Hero",
-                    "name": "Subtítulo Hero",
-                    "alias": "hero_subtitle",
-                    "type": "text"
-                },
-                {
-                    "key": "hero_description",
-                    "label": "Descripción Hero",
-                    "name": "Descripción Hero",
-                    "alias": "hero_description",
-                    "type": "textarea"
-                },
-                {
-                    "key": "stat_speed",
-                    "label": "Métrica: Rendimiento",
-                    "name": "Métrica: Rendimiento",
-                    "alias": "stat_speed",
-                    "type": "text"
-                },
-                {
-                    "key": "stat_typesafe",
-                    "label": "Métrica: Tipado Seguro",
-                    "name": "Métrica: Tipado Seguro",
-                    "alias": "stat_typesafe",
-                    "type": "text"
-                },
-                {
-                    "key": "stat_stack",
-                    "label": "Métrica: Stack Tecnológico",
-                    "name": "Métrica: Stack Tecnológico",
-                    "alias": "stat_stack",
-                    "type": "text"
-                },
-                {
-                    "key": "stat_navigation",
-                    "label": "Métrica: Navegación SPA",
-                    "name": "Métrica: Navegación SPA",
-                    "alias": "stat_navigation",
-                    "type": "text"
-                },
-                {
-                    "key": "section_features_title",
-                    "label": "Título Sección Características",
-                    "name": "Título Sección Características",
-                    "alias": "section_features_title",
-                    "type": "text"
-                },
-                {
-                    "key": "section_features_subtitle",
-                    "label": "Subtítulo Sección Características",
-                    "name": "Subtítulo Sección Características",
-                    "alias": "section_features_subtitle",
-                    "type": "textarea"
-                },
-                {
-                    "key": "features",
-                    "label": "Tarjetas de Características (Repeater)",
-                    "name": "Tarjetas de Características (Repeater)",
-                    "alias": "features",
-                    "type": "repeater",
-                    "fields": [
-                        {
-                            "key": "title",
-                            "label": "Título de la Tarjeta",
-                            "name": "Título",
-                            "alias": "title",
-                            "type": "text"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Descripción",
-                            "name": "Descripción",
-                            "alias": "description",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "badge",
-                            "label": "Insignia (Badge)",
-                            "name": "Insignia",
-                            "alias": "badge",
-                            "type": "text"
-                        },
-                        {
-                            "key": "icon",
-                            "label": "Icono (Cpu, Layers, Palette, Command, FileText, Lock, Zap, Sparkles, Database, Globe)",
-                            "name": "Icono",
-                            "alias": "icon",
-                            "type": "text"
-                        },
-                        {
-                            "key": "color",
-                            "label": "Color (violet, blue, amber, emerald, rose, indigo)",
-                            "name": "Color",
-                            "alias": "color",
-                            "type": "text"
-                        }
-                    ]
-                },
-                {
-                    "key": "cta_title",
-                    "label": "Título Call to Action",
-                    "name": "Título Call to Action",
-                    "alias": "cta_title",
-                    "type": "text"
-                },
-                {
-                    "key": "cta_description",
-                    "label": "Descripción Call to Action",
-                    "name": "Descripción Call to Action",
-                    "alias": "cta_description",
-                    "type": "textarea"
-                },
-                {
-                    "key": "cta_button_text",
-                    "label": "Texto Botón CTA",
-                    "name": "Texto Botón CTA",
-                    "alias": "cta_button_text",
-                    "type": "text"
-                },
-                {
-                    "key": "cta_button_url",
-                    "label": "URL Botón CTA",
-                    "name": "URL Botón CTA",
-                    "alias": "cta_button_url",
-                    "type": "url"
-                }
-            ]
+            "fields": []
         }
+    },
+    "tags": {
+        "novedades": "Novedades",
+        "guias": "Guías",
+        "editor": "Editor",
+        "multisitio": "Multisitio",
+        "temas": "Temas",
+        "seo": "SEO"
     },
     "forms": [
         {
-            "name": "Formulario de Contacto",
+            "name": "Escríbenos",
             "alias": "contacto",
             "fields": [
                 {
@@ -181,151 +74,444 @@
             ]
         }
     ],
-    "sliders": [
-        {
-            "key": "default",
-            "name": "Slider Predeterminado",
-            "description": "Slider predeterminado del sistema para páginas principales y secciones de bienvenida",
-            "settings": {
-                "autoplay": true,
-                "autoplaySpeed": 5000,
-                "transitionSpeed": 600,
-                "effect": "fade",
-                "loop": true,
-                "dots": true,
-                "arrows": true
-            },
-            "slides": [
-                {
-                    "title": "Bienvenido a MewCMS",
-                    "caption": "La plataforma de contenidos flexible, ágil y de código abierto construida para desarrolladores y creadores.",
-                    "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2072&q=80",
-                    "url": "/admin"
-                },
-                {
-                    "title": "Estructura Dinámica y Extensible",
-                    "caption": "Crea campos personalizados a medida, colecciones complejas y taxonomías sin límites de diseño.",
-                    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2070&q=80",
-                    "url": "/admin/schemas"
-                },
-                {
-                    "title": "Rendimiento Extremo con React e Inertia",
-                    "caption": "Carga instantánea de páginas, navegación fluida tipo aplicación móvil y diseño adaptable.",
-                    "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=2070&q=80",
-                    "url": "/admin/articles"
-                }
-            ]
-        },
-        {
-            "key": "home_slider",
-            "name": "Slider Principal Home",
-            "description": "Slider visual destacado para la página de inicio",
-            "settings": {
-                "autoplay": true,
-                "autoplaySpeed": 5000,
-                "transitionSpeed": 600,
-                "effect": "fade",
-                "loop": true,
-                "dots": true,
-                "arrows": true
-            },
-            "slides": [
-                {
-                    "title": "Construye Experiencias Web Extraordinarias",
-                    "caption": "Plataforma CMS moderna impulsada por la potencia y robustez de Laravel 11 y la velocidad de React 19.",
-                    "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2072&q=80",
-                    "url": "/admin"
-                },
-                {
-                    "title": "Gestión Dinámica de Contenidos y Esquemas",
-                    "caption": "Modela campos dinámicos personalizados, taxonomías, repetidores y menús jerárquicos con facilidad.",
-                    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2070&q=80",
-                    "url": "/admin/schemas"
-                },
-                {
-                    "title": "Diseño de Vanguardia y Máxima Velocidad",
-                    "caption": "Paleta de comandos ⌘K, modo oscuro impecable, y componentes de alta fidelidad en TypeScript.",
-                    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2015&q=80",
-                    "url": "/admin/articles"
-                }
-            ]
-        }
-    ],
     "pages": [
         {
             "slug": "home",
             "title": "Inicio",
             "schema": "home",
-            "featured_image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
-            "excerpt": "Gestor de contenidos moderno con navegación fluida sin recargas, esquemas dinámicos y arquitectura en TypeScript.",
-            "body": "<h2>Potencia, Agilidad y Control Total</h2><p>MewCMS une la solidez y seguridad de <strong>Laravel 11</strong> con la interactividad y fluidez de una Single Page Application con <strong>React 19</strong> e <strong>Inertia.js v2</strong>.</p><p>Administra con total comodidad estructuras de datos complejas mediante esquemas dinámicos, organiza tus publicaciones con taxonomías jerárquicas y diseña presentaciones visuales impactantes con sliders y galerías adaptables a cualquier dispositivo.</p>",
-            "metadata": {
-                "slider": "home_slider",
-                "badge_text": "Plataforma Web de Nueva Generación",
-                "hero_title": "Construye experiencias web extraordinarias",
-                "hero_subtitle": "Un CMS ágil, potente y elegante con React e Inertia.js.",
-                "hero_description": "Personaliza cada sección, gestiona taxonomías y administra contenidos con esquemas dinámicos directamente desde el panel de control.",
-                "stat_speed": "< 100ms",
-                "stat_typesafe": "100% Type-Safe",
-                "stat_stack": "Laravel 11 + React 19",
-                "stat_navigation": "Inertia.js v2 SPA",
-                "section_features_title": "Todo lo que necesitas para tu proyecto web",
-                "section_features_subtitle": "Diseñado tanto para creadores de contenido no técnicos como para ingenieros que exigen código limpio, modular y escalable.",
-                "features": [
-                    {
-                        "_id": "feat-1",
-                        "title": "Arquitectura SPA Unificada",
-                        "description": "Combina la robustez de Laravel 11 con la velocidad instantánea de Inertia.js v2 y React 19 sin recargas de página.",
-                        "badge": "Alto Rendimiento",
-                        "icon": "Cpu",
-                        "color": "violet"
-                    },
-                    {
-                        "_id": "feat-2",
-                        "title": "Esquemas y Campos a Medida",
-                        "description": "Modela cualquier tipo de dato con campos de texto, repetidores, selecciones y metadatos dinámicos sin tocar código de base de datos.",
-                        "badge": "Modular",
-                        "icon": "Layers",
-                        "color": "blue"
-                    },
-                    {
-                        "_id": "feat-3",
-                        "title": "Plantillas React & Tailwind",
-                        "description": "Diseña tus páginas con componentes limpios en TypeScript y estilos con Tailwind CSS con soporte nativo para temas claro y oscuro.",
-                        "badge": "UI Vanguardista",
-                        "icon": "Palette",
-                        "color": "amber"
-                    },
-                    {
-                        "_id": "feat-4",
-                        "title": "Paleta de Comandos ⌘K",
-                        "description": "Navegación ultra rápida por teclado para saltar a cualquier módulo, editar páginas o realizar acciones al vuelo.",
-                        "badge": "Productividad",
-                        "icon": "Command",
-                        "color": "emerald"
-                    },
-                    {
-                        "_id": "feat-5",
-                        "title": "Editor Enriquecido TipTap",
-                        "description": "Crea y maqueta publicaciones, blogs y artículos con un editor de texto enriquecido moderno, potente e intuitivo.",
-                        "badge": "Edición Ágil",
-                        "icon": "FileText",
-                        "color": "rose"
-                    },
-                    {
-                        "_id": "feat-6",
-                        "title": "Seguridad y Roles Granulares",
-                        "description": "Control de acceso detallado por módulos y acciones, auditoría de eventos y protección integrada de datos.",
-                        "badge": "Enterprise",
-                        "icon": "Lock",
-                        "color": "indigo"
+            "excerpt": "MewCMS: el gestor de contenidos de código abierto con Laravel 12, React 19 e Inertia 2.",
+            "blocks": [
+                {
+                    "id": "home-hero",
+                    "type": "hero",
+                    "data": {
+                        "eyebrow": "CMS de código abierto · Laravel 12 + React 19",
+                        "title": "Crea sitios rápidos que tu equipo sí puede editar",
+                        "subtitle": "MewCMS une Laravel 12, React 19 e Inertia 2 en un gestor de contenidos moderno: páginas armadas con bloques, varios sitios e idiomas en una sola instalación y un panel pensado para quien escribe.",
+                        "align": "center",
+                        "height": "lg",
+                        "button_label": "Entrar al panel",
+                        "button_url": "/admin",
+                        "secondary_label": "Ver funcionalidades",
+                        "secondary_url": "/funcionalidades"
                     }
-                ],
-                "cta_title": "Comienza a administrar tu contenido hoy mismo",
-                "cta_description": "Accede al panel de control para crear nuevas páginas, gestionar artículos de blog, configurar menús y personalizar cada aspecto de tu sitio.",
-                "cta_button_text": "Abrir Dashboard",
-                "cta_button_url": "/admin"
-            }
+                },
+                {
+                    "id": "home-stats",
+                    "type": "stats",
+                    "data": {
+                        "style": "cards",
+                        "items": [
+                            {
+                                "value": "13",
+                                "label": "tipos de bloque listos para usar"
+                            },
+                            {
+                                "value": "1",
+                                "label": "instalación para todos tus sitios"
+                            },
+                            {
+                                "value": "SSR",
+                                "label": "páginas renderizadas en el servidor"
+                            },
+                            {
+                                "value": "AGPL",
+                                "suffix": " v3",
+                                "label": "código abierto, sin licencias"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "home-features",
+                    "type": "features",
+                    "data": {
+                        "title": "Todo lo que necesitas para publicar",
+                        "intro": "Un gestor completo desde el primer día, sin plugins de terceros ni código para lo de siempre.",
+                        "columns": "3",
+                        "items": [
+                            {
+                                "icon": "layers",
+                                "title": "Editor por bloques",
+                                "text": "Arma cada página con banners, columnas, galerías, formularios y más. Guarda secciones como bloques reutilizables."
+                            },
+                            {
+                                "icon": "globe",
+                                "title": "Multisitio y multilingüe",
+                                "text": "Varios sitios con su propio dominio, tema e idiomas, todos desde un mismo panel y una misma base de código."
+                            },
+                            {
+                                "icon": "palette",
+                                "title": "Temas a tu medida",
+                                "text": "Cada sitio elige su tema. Un tema solo cambia lo que necesita y hereda el resto del tema Default."
+                            },
+                            {
+                                "icon": "sparkles",
+                                "title": "Asistente con IA",
+                                "text": "Redacta borradores, resume textos y sugiere títulos y metadatos sin salir del editor."
+                            },
+                            {
+                                "icon": "search",
+                                "title": "SEO de serie",
+                                "text": "Renderizado en el servidor, sitemap, redirecciones, Open Graph y una revisión SEO de cada página."
+                            },
+                            {
+                                "icon": "lock",
+                                "title": "Roles y auditoría",
+                                "text": "Perfiles con permisos por módulo y acción, historial de revisiones y registro de cada cambio."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "home-editor",
+                    "type": "columns",
+                    "data": {
+                        "layout": "50-50",
+                        "gap": "lg",
+                        "align": "center",
+                        "columns": [
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "home-editor-img",
+                                        "type": "image",
+                                        "data": {
+                                            "src": "@bloques",
+                                            "alt": "Ilustración del editor por bloques de MewCMS",
+                                            "size": "content"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "home-editor-text",
+                                        "type": "rich_text",
+                                        "data": {
+                                            "html": "<h2>Edita como en un documento, publica como un profesional</h2><p>El editor muestra cada bloque tal como se verá en el sitio, con el diseño del tema activo. Mientras escribes, MewCMS guarda borradores automáticos y cada versión publicada queda en el historial para volver atrás cuando quieras.</p><ul><li>Vista previa de los cambios antes de publicar.</li><li>Programación de publicaciones.</li><li>Bloques reutilizables que se actualizan en todas las páginas a la vez.</li></ul>"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "home-quote",
+                    "type": "quote",
+                    "data": {
+                        "text": "Queríamos un CMS con la solidez de Laravel y la fluidez de una aplicación moderna, sin renunciar a que cualquier persona del equipo pueda editar su sitio.",
+                        "author": "Equipo de MewCMS",
+                        "role": "Desarrollado junto a DeepSoft",
+                        "style": "simple"
+                    }
+                },
+                {
+                    "id": "home-cta",
+                    "type": "cta",
+                    "data": {
+                        "title": "Empieza a construir tu sitio hoy",
+                        "text": "Entra al panel, cambia este contenido y elige o crea el tema que mejor vaya con tu marca.",
+                        "button_label": "Abrir el panel",
+                        "button_url": "/admin",
+                        "style": "accent"
+                    }
+                }
+            ]
+        },
+        {
+            "slug": "funcionalidades",
+            "title": "Funcionalidades",
+            "excerpt": "Todo lo que trae MewCMS para editar, publicar y hacer crecer tus sitios.",
+            "featured_image": "@panel",
+            "blocks": [
+                {
+                    "id": "feat-intro",
+                    "type": "rich_text",
+                    "data": {
+                        "html": "<p>MewCMS está pensado para dos tipos de personas: quien escribe y publica cada día, y quien desarrolla el sitio. Estas son las piezas con las que trabajan.</p>"
+                    }
+                },
+                {
+                    "id": "feat-content",
+                    "type": "features",
+                    "data": {
+                        "title": "Contenido",
+                        "columns": "2",
+                        "items": [
+                            {
+                                "icon": "layers",
+                                "title": "Páginas con bloques",
+                                "text": "Banner, texto, imagen, galería, video, columnas, cifras, cita, llamada a la acción, formulario y slider, más los bloques propios de cada tema."
+                            },
+                            {
+                                "icon": "calendar",
+                                "title": "Blog y tipos de contenido",
+                                "text": "Entradas con etiquetas, autores y fecha de publicación, y tipos propios (productos, eventos, proyectos) con sus campos."
+                            },
+                            {
+                                "icon": "image",
+                                "title": "Biblioteca de medios",
+                                "text": "Carpetas, textos alternativos y versiones optimizadas de cada imagen para que el sitio cargue rápido en cualquier pantalla."
+                            },
+                            {
+                                "icon": "mail",
+                                "title": "Formularios",
+                                "text": "Formularios de contacto con los campos que necesites, protección contra spam y los mensajes recibidos en el panel."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "feat-sites",
+                    "type": "columns",
+                    "data": {
+                        "layout": "50-50",
+                        "gap": "lg",
+                        "align": "center",
+                        "columns": [
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "feat-sites-text",
+                                        "type": "rich_text",
+                                        "data": {
+                                            "html": "<h2>Varios sitios, varios idiomas</h2><p>Una sola instalación sirve a todos tus sitios. Cada uno responde en su dominio, con su tema, sus menús y su contenido, y puede publicarse en varios idiomas con direcciones como <code>/en/about</code>.</p><p>Las traducciones de cada página están enlazadas entre sí, y el selector de idioma del sitio lleva a la versión correcta.</p>"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "feat-sites-img",
+                                        "type": "image",
+                                        "data": {
+                                            "src": "@multisitio",
+                                            "alt": "Ilustración de varios sitios en distintos idiomas",
+                                            "size": "content"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "feat-themes",
+                    "type": "columns",
+                    "data": {
+                        "layout": "50-50",
+                        "gap": "lg",
+                        "align": "center",
+                        "columns": [
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "feat-themes-img",
+                                        "type": "image",
+                                        "data": {
+                                            "src": "@temas",
+                                            "alt": "Ilustración de tres temas con colores distintos",
+                                            "size": "content"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "feat-themes-text",
+                                        "type": "rich_text",
+                                        "data": {
+                                            "html": "<h2>Temas con React y Tailwind</h2><p>Un tema es una carpeta con sus páginas en React, su hoja de estilos y sus textos. Solo necesita las páginas que cambia: el resto lo toma del tema Default, que también define los colores con variables para que cambiar la marca sea una línea de CSS.</p>"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "feat-dev",
+                    "type": "features",
+                    "data": {
+                        "title": "Para quien desarrolla",
+                        "columns": "3",
+                        "items": [
+                            {
+                                "icon": "code",
+                                "title": "Laravel 12 + Inertia 2",
+                                "text": "Un monolito moderno: rutas, validación y permisos en Laravel, interfaz en React 19 sin escribir una API."
+                            },
+                            {
+                                "icon": "server",
+                                "title": "Listo para producción",
+                                "text": "Imagen Docker, renderizado en el servidor, caché de navegación y despliegue en Render o en tu propio servidor."
+                            },
+                            {
+                                "icon": "database",
+                                "title": "Contenido importable",
+                                "text": "Cada tema puede traer su contenido inicial en un archivo JSON, ideal para demos y para arrancar proyectos nuevos."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "feat-cta",
+                    "type": "cta",
+                    "data": {
+                        "title": "¿Quieres verlo por dentro?",
+                        "text": "Entra al panel y prueba el editor, los bloques y la vista previa.",
+                        "button_label": "Ir al panel",
+                        "button_url": "/admin",
+                        "style": "soft"
+                    }
+                }
+            ]
+        },
+        {
+            "slug": "nosotros",
+            "title": "Acerca de MewCMS",
+            "excerpt": "Un CMS abierto, hecho para colaborar.",
+            "featured_image": "@equipo",
+            "blocks": [
+                {
+                    "id": "about-text",
+                    "type": "rich_text",
+                    "data": {
+                        "html": "<p>MewCMS nació de una idea sencilla: un gestor de contenidos debería ser tan agradable para quien escribe como para quien programa. Por eso combina la solidez de Laravel con la rapidez de una aplicación en React, y un panel donde editar una página no da miedo.</p><h2>Código abierto</h2><p>MewCMS se publica bajo la licencia AGPL v3. Puedes usarlo, estudiarlo y adaptarlo a tus proyectos, y si lo ofreces como servicio, compartir tus mejoras con la comunidad.</p><h2>Hecho en colaboración</h2><p>El proyecto se desarrolla junto a <a href=\"https://deepsoft.lat\" target=\"_blank\" rel=\"noopener\">DeepSoft</a>. Más información en <a href=\"https://mewcms.com\" target=\"_blank\" rel=\"noopener\">mewcms.com</a>.</p>"
+                    }
+                },
+                {
+                    "id": "about-stats",
+                    "type": "stats",
+                    "data": {
+                        "style": "cards",
+                        "items": [
+                            {
+                                "value": "PHP",
+                                "suffix": " 8.3",
+                                "label": "o superior"
+                            },
+                            {
+                                "value": "React",
+                                "suffix": " 19",
+                                "label": "con TypeScript"
+                            },
+                            {
+                                "value": "Tailwind",
+                                "suffix": " 4",
+                                "label": "en el panel y en los temas"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "slug": "contacto",
+            "title": "Contacto",
+            "excerpt": "Escríbenos y te responderemos pronto.",
+            "blocks": [
+                {
+                    "id": "contact-columns",
+                    "type": "columns",
+                    "data": {
+                        "layout": "33-67",
+                        "gap": "lg",
+                        "align": "start",
+                        "columns": [
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "contact-text",
+                                        "type": "rich_text",
+                                        "data": {
+                                            "html": "<h2>Hablemos</h2><p>¿Tienes una pregunta sobre MewCMS o quieres usarlo en tu próximo proyecto? Déjanos un mensaje.</p><p>Este formulario es parte de la demo: los mensajes llegan a <strong>Formularios</strong> en el panel.</p>"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "blocks": [
+                                    {
+                                        "id": "contact-form",
+                                        "type": "form",
+                                        "data": {
+                                            "alias": "contacto"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "slug": "politica-de-privacidad",
+            "title": "Política de privacidad",
+            "excerpt": "Cómo trata este sitio de demostración tus datos.",
+            "body": "<p>Este es un sitio de demostración de MewCMS. Los datos que envíes por el formulario de contacto se guardan en el panel del sitio y solo se usan para responderte.</p><p>El sitio no usa cookies de publicidad. Puedes pedir que se borren tus mensajes escribiendo desde la página de contacto.</p><p><em>Reemplaza este texto por la política de privacidad de tu organización.</em></p>"
+        },
+        {
+            "slug": "terminos-de-uso",
+            "title": "Términos de uso",
+            "excerpt": "Condiciones para usar este sitio.",
+            "body": "<p>Este sitio muestra las funciones de MewCMS con contenido de ejemplo. Su contenido puede cambiar o reiniciarse sin aviso.</p><p>MewCMS es software libre bajo la licencia AGPL v3.</p><p><em>Reemplaza este texto por los términos de uso de tu sitio.</em></p>"
+        }
+    ],
+    "posts": [
+        {
+            "slug": "editor-por-bloques-y-vista-previa",
+            "title": "Editor por bloques, borradores automáticos y vista previa",
+            "featured_image": "@bloques",
+            "tags": [
+                "novedades",
+                "editor"
+            ],
+            "days_ago": 2,
+            "excerpt": "Así se arma una página en MewCMS: bloques que se ven como en el sitio, borradores que se guardan solos y una vista previa antes de publicar.",
+            "body": "<p>Cada página de MewCMS es una lista de bloques: un banner, un texto, una galería, un formulario. Los agregas, los reordenas arrastrando y ves cada uno con el diseño del tema del sitio, sin adivinar cómo quedará.</p><h2>Borradores que se guardan solos</h2><p>Mientras editas, el panel guarda un borrador automático cada pocos segundos. Si cierras la pestaña por error, al volver te ofrece recuperar lo que estabas escribiendo.</p><h2>Vista previa y revisiones</h2><p>El botón <strong>Vista previa</strong> abre la página con tus cambios sin publicarlos, en un enlace temporal. Y cada vez que publicas, la versión anterior queda en el historial de revisiones para compararla o restaurarla.</p><blockquote><p>Los bloques reutilizables te permiten guardar una sección, como un formulario de contacto con su texto, y usarla en varias páginas: si la cambias, cambia en todas.</p></blockquote>"
+        },
+        {
+            "slug": "multisitio-y-multilingue",
+            "title": "Un panel, varios sitios y varios idiomas",
+            "featured_image": "@multisitio",
+            "tags": [
+                "guias",
+                "multisitio"
+            ],
+            "days_ago": 6,
+            "excerpt": "Cómo servir varios sitios con sus propios dominios, temas e idiomas desde una sola instalación de MewCMS.",
+            "body": "<p>En <strong>Sitios</strong> del panel puedes crear tantos sitios como necesites. Cada uno tiene sus dominios, su tema, sus menús, sus formularios y su contenido, y MewCMS elige cuál mostrar según el dominio de cada visita.</p><h2>Idiomas</h2><p>Un sitio tiene un idioma principal y puede sumar otros. El idioma principal no lleva prefijo (<code>/nosotros</code>) y cada idioma adicional responde bajo su código (<code>/en/about</code>), con sus propias páginas enlazadas a la original.</p><h2>Textos del tema</h2><p>Los textos fijos del diseño, como «Leer» o «Buscar», salen de los archivos de idioma del tema y se pueden cambiar en <strong>Traducciones</strong> sin tocar código.</p>"
+        },
+        {
+            "slug": "crea-tu-propio-tema",
+            "title": "Crea tu propio tema a partir del tema Default",
+            "featured_image": "@temas",
+            "tags": [
+                "guias",
+                "temas"
+            ],
+            "days_ago": 11,
+            "excerpt": "Un tema de MewCMS solo necesita las páginas que cambia. Así se empieza uno nuevo sin partir de cero.",
+            "body": "<p>Los temas viven en <code>resources/themes/&lt;nombre&gt;</code>. Cada uno tiene su hoja de estilos, sus textos y las páginas que quiera cambiar, escritas en React con Tailwind CSS.</p><h2>Empieza por los colores</h2><p>El tema Default usa variables para el color de acento y la tipografía. Un tema nuevo puede cambiar toda la marca con tres líneas:</p><pre><code>.front-theme {\n    --site-accent: #0f766e;\n    --site-font: 'Lora', serif;\n}</code></pre><h2>Cambia solo lo que necesitas</h2><p>Si tu tema no tiene una página, por ejemplo la de búsqueda, MewCMS usa la del tema Default. Así puedes empezar con un inicio propio y sumar páginas a medida que el diseño lo pida.</p><h2>Bloques propios</h2><p>Un tema también puede traer bloques nuevos para el editor, con sus campos en JSON y su diseño en React.</p>"
+        },
+        {
+            "slug": "seo-desde-el-primer-dia",
+            "title": "SEO desde el primer día",
+            "featured_image": "@seo",
+            "tags": [
+                "seo",
+                "guias"
+            ],
+            "days_ago": 17,
+            "excerpt": "Renderizado en el servidor, sitemap, redirecciones y una revisión SEO en cada página: lo que MewCMS hace por tu posicionamiento.",
+            "body": "<p>Las páginas públicas de MewCMS se renderizan en el servidor, así que los buscadores y las redes sociales reciben el HTML completo: títulos, encabezados y etiquetas Open Graph.</p><h2>Lo que viene incluido</h2><ul><li>Sitemap en <code>/sitemap.xml</code> y <code>robots.txt</code> configurable.</li><li>Título, descripción e imagen para compartir en cada página.</li><li>Redirecciones cuando cambias la dirección de una página.</li><li>Imágenes en varios tamaños para que el sitio cargue rápido.</li></ul><h2>Revisión SEO</h2><p>El editor revisa cada página antes de publicarla: largo del título, descripción, encabezados y textos alternativos de las imágenes, con sugerencias para mejorarla.</p>"
         }
     ],
     "menus": {
@@ -333,20 +519,36 @@
             {
                 "title": "Inicio",
                 "page": "home"
+            },
+            {
+                "title": "Funcionalidades",
+                "page": "funcionalidades"
+            },
+            {
+                "title": "Blog",
+                "url": "/blog"
+            },
+            {
+                "title": "Nosotros",
+                "page": "nosotros"
+            },
+            {
+                "title": "Contacto",
+                "page": "contacto"
             }
         ],
         "footer": [
             {
-                "title": "Políticas de Privacidad",
-                "url": "/politicas-de-privacidad"
+                "title": "Política de privacidad",
+                "page": "politica-de-privacidad"
             },
             {
-                "title": "Términos y Condiciones",
-                "url": "/terminos-y-condiciones"
+                "title": "Términos de uso",
+                "page": "terminos-de-uso"
             },
             {
-                "title": "Contáctenos",
-                "url": "/contactenos"
+                "title": "Contacto",
+                "page": "contacto"
             }
         ]
     }

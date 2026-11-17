@@ -1,131 +1,43 @@
-import { MediaImage } from '@/components/media-image';
 /**
  * Template Name: Blog Post Detail
  */
-import ContentRenderer from '@/components/content-renderer';
-import { tagUrl } from '@/lib/tag-url';
-import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
-import { Head, Link } from '@inertiajs/react';
-import { Calendar, Tag } from 'lucide-react';
-import FrontSidebar from '../components/sidebar';
+import { Head } from '@inertiajs/react';
+import ArticleView from '../components/article-view';
 import FrontLayout from '../layout';
 
 interface PostProps {
     article: CmsArticle;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    popularTags?: import('../components/sidebar').PopularTag[];
-    recentArticles?: Pick<CmsArticle, 'id' | 'title' | 'slug' | 'created_at'>[];
 }
 
-interface PostMetadata {
-    body?: string;
-    content?: string;
-    descripcion?: string;
-    image?: string;
-    imagen?: string;
-    featured_image?: string;
-    [key: string]: unknown;
-}
+/** Older field groups kept the text and the picture in custom fields with these names */
+const BODY_FIELDS = ['body', 'content', 'descripcion'];
+const IMAGE_FIELDS = ['image', 'imagen', 'featured_image'];
 
-export default function Post({ article, navigation, popularTags = [], recentArticles = [] }: PostProps) {
-    const meta = (article.metadata || {}) as PostMetadata;
-    const { t, date } = useTexts();
+/** A page laid out like a blog post */
+export default function Post({ article, navigation }: PostProps) {
+    const meta = (article.metadata || {}) as Record<string, unknown>;
+    const field = (keys: string[]) => keys.map((key) => meta[key]).find((value): value is string => typeof value === 'string' && value !== '');
+    const legacyBody = field(BODY_FIELDS);
 
-    // Try to locate common blog post fields
-    const bodyContent = (meta.body || meta.content || meta.descripcion || '') as string;
-    const featuredImage = (meta.image || meta.imagen || meta.featured_image || '') as string;
-
-    const tags = article.tags ?? [];
+    const details = Object.entries(meta).filter(
+        ([key, value]) => ![...BODY_FIELDS, ...IMAGE_FIELDS, '_id'].includes(key) && !key.startsWith('seo_') && value !== null && value !== '',
+    );
 
     return (
         <FrontLayout navigation={navigation}>
             <Head title={article.title} />
-
-            <div className="grid grid-cols-1 gap-8 py-6 lg:grid-cols-12">
-                {/* Main Article Content */}
-                <article className="space-y-8 lg:col-span-8">
-                    {/* Meta details */}
-                    <div className="space-y-4 text-center">
-                        <h1 className="text-3xl leading-tight font-extrabold tracking-tight capitalize sm:text-5xl">{article.title}</h1>
-                        <div className="flex items-center justify-center gap-1.5 text-xs text-[#706f6c] dark:text-[#A1A09A]">
-                            <Calendar className="h-3.5 w-3.5" />
-                            <span>{t('blog.published_on')}</span>
-                            <time dateTime={article.created_at.toString()}>{date(article.created_at)}</time>
-                        </div>
-                    </div>
-
-                    {/* Featured Image */}
-                    {featuredImage && (
-                        <div className="aspect-[16/9] w-full overflow-hidden rounded-xl border border-[#19140010] shadow-sm dark:border-[#3E3E3A]/25">
-                            <MediaImage src={featuredImage} fallbackAlt={article.title} loading="eager" className="h-full w-full object-cover" />
-                        </div>
-                    )}
-
-                    {/* Main Article Body */}
-                    <div className="border-t border-[#19140010] pt-4 dark:border-[#3E3E3A]/20">
-                        {bodyContent ? (
-                            bodyContent.startsWith('<') && bodyContent.endsWith('>') ? (
-                                <ContentRenderer html={bodyContent} className="leading-relaxed text-[#1b1b18] dark:text-[#EDEDEC]" />
-                            ) : (
-                                <p className="text-sm leading-relaxed whitespace-pre-line text-[#1b1b18] dark:text-[#EDEDEC]">{bodyContent}</p>
-                            )
-                        ) : (
-                            <p className="text-center text-xs text-[#706f6c] italic dark:text-[#A1A09A]">{t('blog.no_content')}</p>
-                        )}
-                    </div>
-
-                    {/* Tags Section */}
-                    {tags.length > 0 && (
-                        <div className="border-t border-[#19140010] pt-6 dark:border-[#3E3E3A]/20">
-                            <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">
-                                <Tag className="h-3.5 w-3.5 text-(--theme-accent)" />
-                                <span>{t('tag.list_title')}</span>
-                            </h4>
-                            <div className="flex flex-wrap gap-2">
-                                {tags.map((term) => (
-                                    <Link
-                                        key={term.id}
-                                        href={tagUrl(term.slug)}
-                                        className="inline-flex items-center rounded-lg border border-[#19140010] bg-gray-50 px-3 py-1.5 text-xs text-[#706f6c] transition-colors hover:bg-[#fff2f2] hover:text-(--theme-accent) dark:border-[#3E3E3A]/50 dark:bg-[#222] dark:text-[#c5c4c0] dark:hover:bg-[#1D0002]"
-                                    >
-                                        #{term.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Additional custom metadata listing */}
-                    {Object.entries(meta).filter(
-                        ([key]) =>
-                            !['body', 'content', 'descripcion', 'image', 'imagen', 'featured_image', '_id'].includes(key) && !key.startsWith('seo_'),
-                    ).length > 0 && (
-                        <div className="space-y-4 border-t border-[#19140010] pt-8 dark:border-[#3E3E3A]/20">
-                            <h4 className="text-xs font-semibold tracking-wider text-[#706f6c] uppercase dark:text-[#A1A09A]">{t('blog.details')}</h4>
-                            <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                                {Object.entries(meta)
-                                    .filter(
-                                        ([key]) =>
-                                            !['body', 'content', 'descripcion', 'image', 'imagen', 'featured_image', '_id'].includes(key) &&
-                                            !key.startsWith('seo_'),
-                                    )
-                                    .map(([key, val]) => (
-                                        <div key={key} className="rounded-lg bg-gray-50 p-3 text-xs dark:bg-[#161615]">
-                                            <dt className="text-primary mb-1 font-semibold capitalize">{key.replace(/_/g, ' ')}</dt>
-                                            <dd className="break-words text-[#706f6c] dark:text-[#c5c4c0]">{String(val)}</dd>
-                                        </div>
-                                    ))}
-                            </dl>
-                        </div>
-                    )}
-                </article>
-
-                {/* Sidebar Column */}
-                <div className="lg:col-span-4">
-                    <FrontSidebar popularTags={popularTags} recentArticles={recentArticles} />
-                </div>
-            </div>
+            <ArticleView
+                title={article.title}
+                excerpt={article.excerpt}
+                image={article.featured_image || field(IMAGE_FIELDS)}
+                date={article.published_at ?? article.created_at?.toString()}
+                blocks={article.blocks?.length ? article.blocks : null}
+                html={article.content || legacyBody}
+                tags={article.tags ?? []}
+                details={details}
+            />
         </FrontLayout>
     );
 }

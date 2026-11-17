@@ -369,3 +369,21 @@ it('never shows a light-only theme dark, whatever the visitor chose', function (
         Themes::flush();
     }
 });
+
+it('does not send "View site" to a local address recorded on a developer machine', function (): void {
+    $this->siteA->update(['site_url' => 'http://localhost/lasbambas-reconocimientos']);
+    ($this->page)($this->siteA, 'About A');
+
+    // Served on a public address: the local URL is skipped and the site's own address is used
+    $this->get('http://demo.example.com/about')->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('site.url', 'http://demo.example.com'));
+
+    // On the developer's machine the recorded URL still applies
+    $this->get('http://a.test/about')->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('site.url', 'http://localhost/lasbambas-reconocimientos'));
+
+    // A public domain wins over the request's address
+    $this->siteA->update(['site_url' => null, 'domains' => ['a.test', 'www.site-a.com']]);
+    $this->get('http://demo.example.com/about')->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('site.url', 'http://www.site-a.com'));
+});

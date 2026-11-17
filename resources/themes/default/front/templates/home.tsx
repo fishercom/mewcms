@@ -4,352 +4,77 @@
  */
 import Blocks from '@/components/blocks';
 import FrontSlider from '@/components/front-slider';
+import { localePath } from '@/lib/locale-path';
 import { useTexts } from '@/lib/theme-texts';
 import { CmsArticle } from '@/types/models/cms-article';
 import { CmsSlider } from '@/types/models/cms-slider';
 import { Head, Link } from '@inertiajs/react';
-import {
-    ArrowRight,
-    CheckCircle2,
-    Command,
-    Cpu,
-    Database,
-    FileText,
-    Globe,
-    Layers,
-    LayoutDashboard,
-    Lock,
-    Palette,
-    Sparkles,
-    Zap,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import PostCard, { type CardItem, SectionHeading } from '../components/post-card';
 import FrontLayout from '../layout';
 
 interface HomeProps {
     article: CmsArticle;
     navigation: Pick<CmsArticle, 'id' | 'title' | 'slug'>[];
-    slider?: CmsSlider;
+    slider?: CmsSlider | null;
+    recentPosts?: CardItem[];
 }
 
-interface FeatureItem {
-    _id?: string;
-    title?: string;
-    description?: string;
-    badge?: string;
-    icon?: string;
-    color?: string;
-}
-
-interface HomeMetadata {
-    hero_title?: string;
-    hero_subtitle?: string;
-    hero_description?: string;
-    badge_text?: string;
-    stat_speed?: string;
-    stat_typesafe?: string;
-    stat_stack?: string;
-    stat_navigation?: string;
-    section_features_title?: string;
-    section_features_subtitle?: string;
-    cta_title?: string;
-    cta_description?: string;
-    cta_button_text?: string;
-    cta_button_url?: string;
-    features?: FeatureItem[];
-    [key: string]: unknown;
-}
-
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-    Cpu,
-    Layers,
-    Palette,
-    Command,
-    FileText,
-    Lock,
-    Zap,
-    Sparkles,
-    Database,
-    Globe,
-    LayoutDashboard,
-    CheckCircle2,
-    ArrowRight,
-};
-
-const COLOR_MAP: Record<string, string> = {
-    violet: 'from-violet-500/20 to-purple-500/10 text-violet-600 dark:text-violet-400',
-    purple: 'from-violet-500/20 to-purple-500/10 text-violet-600 dark:text-violet-400',
-    blue: 'from-blue-500/20 to-cyan-500/10 text-blue-600 dark:text-blue-400',
-    cyan: 'from-cyan-500/20 to-blue-500/10 text-cyan-600 dark:text-cyan-400',
-    amber: 'from-amber-500/20 to-orange-500/10 text-amber-600 dark:text-amber-400',
-    orange: 'from-orange-500/20 to-amber-500/10 text-orange-600 dark:text-orange-400',
-    emerald: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
-    teal: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
-    green: 'from-emerald-500/20 to-teal-500/10 text-emerald-600 dark:text-emerald-400',
-    rose: 'from-rose-500/20 to-pink-500/10 text-rose-600 dark:text-rose-400',
-    pink: 'from-pink-500/20 to-rose-500/10 text-pink-600 dark:text-pink-400',
-    red: 'from-rose-500/20 to-pink-500/10 text-rose-600 dark:text-rose-400',
-    indigo: 'from-indigo-500/20 to-blue-500/10 text-indigo-600 dark:text-indigo-400',
-};
-
-export default function Home({ article, navigation, slider }: HomeProps) {
-    const meta = (article.metadata || {}) as HomeMetadata;
+/**
+ * The home page is made of blocks (banner, features, figures, call to action...), written
+ * in the page editor. A slider is shown on top when the page has one and does not already
+ * open with a banner block, and the latest posts close the page.
+ */
+export default function Home({ article, navigation, slider, recentPosts = [] }: HomeProps) {
     const { t } = useTexts();
-
-    const heroTitle = meta.hero_title || article.title;
-    const heroSubtitle = meta.hero_subtitle || t('home.hero_subtitle');
-    const heroDescription = meta.hero_description || t('home.hero_description');
-    const badgeText = meta.badge_text || t('home.badge');
-    const sectionFeaturesTitle = meta.section_features_title || t('home.features_title');
-    const sectionFeaturesSubtitle = meta.section_features_subtitle || t('home.features_subtitle');
-    const ctaTitle = meta.cta_title || t('home.cta_title');
-    const ctaDescription = meta.cta_description || t('home.cta_description');
-    const ctaButtonText = meta.cta_button_text || t('home.cta_button');
-    const ctaButtonUrl = meta.cta_button_url || '/admin';
-
-    const defaultFeatures: FeatureItem[] = [
-        { icon: 'Cpu', title: t('home.feature_1_title'), description: t('home.feature_1_text'), badge: t('home.feature_1_badge'), color: 'violet' },
-        { icon: 'Layers', title: t('home.feature_2_title'), description: t('home.feature_2_text'), badge: t('home.feature_2_badge'), color: 'blue' },
-        {
-            icon: 'Palette',
-            title: t('home.feature_3_title'),
-            description: t('home.feature_3_text'),
-            badge: t('home.feature_3_badge'),
-            color: 'amber',
-        },
-        {
-            icon: 'Command',
-            title: t('home.feature_4_title'),
-            description: t('home.feature_4_text'),
-            badge: t('home.feature_4_badge'),
-            color: 'emerald',
-        },
-        {
-            icon: 'FileText',
-            title: t('home.feature_5_title'),
-            description: t('home.feature_5_text'),
-            badge: t('home.feature_5_badge'),
-            color: 'rose',
-        },
-        { icon: 'Lock', title: t('home.feature_6_title'), description: t('home.feature_6_text'), badge: t('home.feature_6_badge'), color: 'indigo' },
-    ];
-
-    const rawFeatures: FeatureItem[] = Array.isArray(meta.features) && meta.features.length > 0 ? meta.features : defaultFeatures;
-
-    const features = rawFeatures.map((feature) => {
-        const IconComponent = (feature.icon && ICON_MAP[feature.icon]) || Sparkles;
-        const colorClass =
-            (feature.color && COLOR_MAP[feature.color.toLowerCase()]) || (feature.color?.startsWith('from-') ? feature.color : COLOR_MAP.violet);
-
-        return {
-            ...feature,
-            iconComponent: IconComponent,
-            colorClass,
-        };
-    });
-
-    const stats = [
-        { label: t('home.stat_speed'), value: meta.stat_speed || '< 100ms', icon: Zap },
-        { label: t('home.stat_typesafe'), value: meta.stat_typesafe || '100% TS', icon: CheckCircle2 },
-        { label: t('home.stat_stack'), value: meta.stat_stack || 'Laravel + React', icon: Database },
-        { label: t('home.stat_navigation'), value: meta.stat_navigation || 'Inertia v2', icon: Globe },
-    ];
+    const blocks = Array.isArray(article.blocks) ? article.blocks : null;
+    const opensWithBanner = blocks?.[0]?.type === 'hero' || blocks?.[0]?.type === 'slider';
+    const showSlider = !!slider?.slides?.length && !opensWithBanner;
+    const latest = recentPosts.slice(0, 3);
+    const hasContent = (blocks && blocks.length > 0) || !!article.content?.trim();
 
     return (
         <FrontLayout navigation={navigation}>
             <Head title={article.title} />
 
-            <div className="space-y-20 py-4 sm:py-8">
-                {/* 1. Hero / Slider Section */}
-                {slider && slider.slides && slider.slides.length > 0 ? (
-                    <FrontSlider slider={slider} />
+            <div className="space-y-16 sm:space-y-24">
+                {showSlider && slider && <FrontSlider slider={slider} />}
+
+                {hasContent ? (
+                    <Blocks
+                        blocks={blocks}
+                        html={article.content}
+                        className="space-y-16 sm:space-y-24"
+                        textClassName="*:prose-lg mx-auto max-w-3xl!"
+                    />
                 ) : (
-                    <div className="border-border/60 via-background dark:via-background dark:to-background relative overflow-hidden rounded-3xl border bg-gradient-to-br from-violet-500/10 to-amber-500/5 px-6 py-20 text-center shadow-2xl sm:px-12 sm:py-28 dark:from-violet-950/20">
-                        <div className="mx-auto max-w-3xl space-y-6">
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3.5 py-1 text-xs font-semibold text-violet-700 backdrop-blur-md dark:text-violet-300">
-                                <Sparkles className="h-3.5 w-3.5" />
-                                <span>{badgeText}</span>
-                            </span>
-
-                            <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight sm:text-6xl md:text-7xl">
-                                <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-amber-600 bg-clip-text text-transparent dark:from-violet-400 dark:via-purple-300 dark:to-amber-400">
-                                    {heroTitle}
-                                </span>
-                            </h1>
-
-                            <p className="text-foreground/80 text-lg leading-relaxed font-medium sm:text-xl">{heroSubtitle}</p>
-
-                            <p className="text-muted-foreground mx-auto max-w-2xl text-sm leading-relaxed">{heroDescription}</p>
-
-                            <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
-                                <Link
-                                    href="/admin"
-                                    className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:bg-violet-700 active:scale-95 sm:text-sm"
-                                >
-                                    <LayoutDashboard className="h-4 w-4" />
-                                    <span>{t('home.hero_button')}</span>
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-
-                                <a
-                                    href="#caracteristicas"
-                                    className="border-border/80 bg-background text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-semibold shadow-2xs transition-all active:scale-95 sm:text-sm"
-                                >
-                                    <span>{t('home.hero_secondary')}</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    !showSlider && (
+                        <section className="py-10 text-center">
+                            <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl">{article.title}</h1>
+                            {article.excerpt && <p className="mx-auto mt-4 max-w-2xl text-lg text-(--theme-muted)">{article.excerpt}</p>}
+                        </section>
+                    )
                 )}
 
-                {/* 2. Key Stats Strip */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-                    {stats.map((stat, idx) => {
-                        const StatIcon = stat.icon;
-                        return (
-                            <div
-                                key={idx}
-                                className="border-border/60 bg-card hover:border-border flex items-center gap-3 rounded-2xl border p-4 shadow-2xs transition-all hover:shadow-xs sm:p-5"
-                            >
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
-                                    <StatIcon className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-foreground text-base font-bold sm:text-lg">{stat.value}</p>
-                                    <p className="text-muted-foreground text-[11px] font-medium">{stat.label}</p>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* 3. Graphical Features Grid */}
-                <div id="caracteristicas" className="scroll-mt-20 space-y-8">
-                    <div className="mx-auto max-w-2xl space-y-3 text-center">
-                        <span className="border-border/70 bg-muted/50 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold tracking-wider uppercase">
-                            {t('home.features_eyebrow')}
-                        </span>
-                        <h2 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl">{sectionFeaturesTitle}</h2>
-                        <p className="text-muted-foreground text-sm leading-relaxed">{sectionFeaturesSubtitle}</p>
-                    </div>
-
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {features.map((feature, idx) => {
-                            const FeatureIcon = feature.iconComponent;
-                            return (
-                                <div
-                                    key={feature._id || idx}
-                                    className="group border-border/70 bg-card relative overflow-hidden rounded-2xl border p-6 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-md dark:hover:border-violet-500/30"
-                                >
-                                    <div className="mb-4 flex items-center justify-between">
-                                        <div
-                                            className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.colorClass} shadow-2xs`}
-                                        >
-                                            <FeatureIcon className="h-6 w-6 stroke-[1.8]" />
-                                        </div>
-                                        {feature.badge && (
-                                            <span className="border-border/60 bg-muted/60 text-muted-foreground rounded-full border px-2.5 py-0.5 text-[10px] font-semibold">
-                                                {feature.badge}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <h3 className="text-foreground text-base font-bold transition-colors group-hover:text-violet-600 dark:group-hover:text-violet-400">
-                                        {feature.title}
-                                    </h3>
-                                    {feature.description && (
-                                        <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{feature.description}</p>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* 4. Editorial Content Showcase (if article content is set) */}
-                {article.content && article.content.trim().length > 0 && (
-                    <div className="border-border/70 from-card via-card relative overflow-hidden rounded-3xl border bg-gradient-to-br to-violet-500/5 p-8 shadow-2xs sm:p-12 dark:to-violet-950/20">
-                        <div className="mx-auto max-w-3xl space-y-6">
-                            <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
-                                <Sparkles className="h-5 w-5" />
-                                <span className="text-xs font-bold tracking-wider uppercase">{t('home.editorial')}</span>
-                            </div>
-                            <Blocks blocks={article.blocks} html={article.content} textClassName="text-foreground/90 leading-relaxed font-normal" />
-                        </div>
-                    </div>
-                )}
-
-                {/* 5. Custom Metadata Blocks (if extra fields are set in admin) */}
-                {Object.keys(meta).length > 4 && (
-                    <div className="border-border/60 bg-muted/10 space-y-6 rounded-3xl border p-6 sm:p-10">
-                        <div className="flex items-center gap-2">
-                            <Layers className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                            <h3 className="text-foreground text-lg font-bold">{t('home.custom_fields')}</h3>
-                        </div>
-
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            {Object.entries(meta)
-                                .filter(
-                                    ([key]) =>
-                                        ![
-                                            'slider',
-                                            'hero_title',
-                                            'hero_subtitle',
-                                            'hero_description',
-                                            'badge_text',
-                                            'stat_speed',
-                                            'stat_typesafe',
-                                            'stat_stack',
-                                            'stat_navigation',
-                                            'section_features_title',
-                                            'section_features_subtitle',
-                                            'cta_title',
-                                            'cta_description',
-                                            'cta_button_text',
-                                            'cta_button_url',
-                                            'features',
-                                            '_id',
-                                        ].includes(key) && !key.startsWith('seo_'),
-                                )
-                                .map(([key, val]) => {
-                                    if (typeof val !== 'object' && val) {
-                                        return (
-                                            <div key={key} className="border-border/60 bg-card space-y-1.5 rounded-xl border p-4 shadow-2xs">
-                                                <h4 className="text-[11px] font-bold tracking-wider text-violet-600 uppercase dark:text-violet-400">
-                                                    {key.replace(/_/g, ' ')}
-                                                </h4>
-                                                <p className="text-foreground/80 text-xs leading-relaxed break-words">{String(val)}</p>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                })}
-                        </div>
-                    </div>
-                )}
-
-                {/* 6. Call to Action Banner */}
-                <div className="border-border/80 relative overflow-hidden rounded-3xl border bg-gradient-to-r from-violet-900/90 via-purple-900/90 to-zinc-950 p-8 text-white shadow-2xl sm:p-12">
-                    <div className="relative z-10 max-w-2xl space-y-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wider text-white/90 uppercase backdrop-blur-md">
-                            {t('home.cta_eyebrow')}
-                        </span>
-                        <h2 className="text-2xl leading-tight font-black tracking-tight sm:text-4xl">{ctaTitle}</h2>
-                        <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">{ctaDescription}</p>
-                        <div className="pt-2">
+                {latest.length > 0 && (
+                    <section className="space-y-10">
+                        <div className="flex flex-wrap items-end justify-between gap-4">
+                            <SectionHeading eyebrow={t('blog.eyebrow')} title={t('blog.latest')} />
                             <Link
-                                href={ctaButtonUrl}
-                                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs font-bold text-zinc-950 shadow-lg transition-all hover:scale-[1.02] hover:bg-zinc-100 active:scale-95 sm:text-sm"
+                                href={localePath('/blog')}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-(--theme-line) px-4 py-2 text-sm font-semibold transition-colors hover:border-(--theme-accent) hover:text-(--theme-accent)"
                             >
-                                <span>{ctaButtonText}</span>
+                                {t('blog.all_stories')}
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
-                    </div>
-
-                    {/* Decorative Background Accents */}
-                    <div className="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
-                    <div className="pointer-events-none absolute right-40 -bottom-20 h-60 w-60 rounded-full bg-amber-500/15 blur-2xl" />
-                </div>
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {latest.map((post) => (
+                                <PostCard key={post.id} item={post} />
+                            ))}
+                        </div>
+                    </section>
+                )}
             </div>
         </FrontLayout>
     );
