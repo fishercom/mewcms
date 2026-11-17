@@ -274,15 +274,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'menu_id' => $menuAdmin->id,
-                'name' => 'Parámetros',
-                'url' => '/admin/parameters',
-                'route' => 'parameters.index',
-                'icon' => 'settings',
-                'position' => 4,
-                'visible' => true,
-            ],
-            [
-                'menu_id' => $menuAdmin->id,
                 'name' => 'Idiomas',
                 'url' => '/admin/langs',
                 'route' => 'langs.index',

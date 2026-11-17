@@ -12,8 +12,6 @@ export * from './models/cms-form';
 export * from './models/cms-lang';
 export * from './models/cms-menu';
 export * from './models/cms-notify';
-export * from './models/cms-parameter';
-export * from './models/cms-parameter-group';
 export * from './models/cms-register';
 export * from './models/cms-schema';
 export * from './models/cms-schema-group';
