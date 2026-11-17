@@ -26,8 +26,7 @@ resources/themes/<slug>/
 The server renders a component name such as `front/templates/page` (the schema's
 template). The page comes from `resources/themes/<site theme>/front/templates/page.tsx`
 when the theme has that file, and from the **default** theme otherwise. So a theme only
-needs the pages it changes; the `editorial` theme has no pages at all and only restyles
-the default ones.
+needs the pages it changes; a theme with no pages at all only restyles the default ones.
 
 Every theme is built in the same `npm run build`. Their pages are split into their own
 chunks, and only the active theme's stylesheet is loaded on a page.

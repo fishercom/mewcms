@@ -32,7 +32,7 @@ beforeEach(function (): void {
     $this->schema = CmsSchema::create(['group_id' => $group->id, 'name' => 'Page', 'type' => 'PAGE', 'active' => 1, 'fields' => [], 'front_view' => 'front/templates/page']);
 
     $this->siteA = CmsSite::create(['name' => 'Site A', 'domains' => ['a.test', 'www.a.test'], 'theme' => 'default', 'default' => true, 'active' => true]);
-    $this->siteB = CmsSite::create(['name' => 'Site B', 'domains' => ['b.test'], 'theme' => 'editorial', 'active' => true]);
+    $this->siteB = CmsSite::create(['name' => 'Site B', 'domains' => ['b.test'], 'theme' => 'velvet', 'active' => true]);
 
     $this->page = fn (CmsSite $site, string $title, string $slug = 'about') => Sites::as($site, fn () => CmsArticle::create([
         'schema_id' => $this->schema->id,
@@ -53,7 +53,7 @@ it('serves each site its own pages by domain, with the same address on both', fu
     $this->get('http://www.a.test/about')->assertOk()
         ->assertInertia(fn (Assert $page) => $page->where('article.title', 'About A'));
     $this->get('http://b.test/about')->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->where('article.title', 'About B')->where('theme', 'editorial'));
+        ->assertInertia(fn (Assert $page) => $page->where('article.title', 'About B')->where('theme', 'velvet'));
 
     // Both pages kept the plain slug: addresses are unique per site only
     expect(CmsArticle::withoutGlobalScopes()->pluck('uri')->all())->toBe(['about', 'about']);
@@ -165,14 +165,14 @@ it('saves a site with its domains and theme', function (): void {
     $this->actingAs($this->user)->post('http://a.test/admin/sites', [
         'name' => 'Site C',
         'domains' => "https://C.test/\nwww.c.test",
-        'theme' => 'editorial',
+        'theme' => 'velvet',
         'lang_id' => $this->lang->id,
         'active' => 1,
     ])->assertRedirect('/admin/sites');
 
     $site = CmsSite::where('name', 'Site C')->first();
     expect($site->domains)->toBe(['c.test', 'www.c.test'])
-        ->and($site->theme)->toBe('editorial')
+        ->and($site->theme)->toBe('velvet')
         ->and($site->lang_id)->toBe($this->lang->id);
 });
 
@@ -190,7 +190,7 @@ it('saves a site\'s language, SEO data, favicon and scripts', function (): void 
     $this->actingAs($this->user)->put("http://a.test/admin/sites/{$this->siteB->id}", [
         'name' => 'Site B',
         'domains' => 'b.test',
-        'theme' => 'editorial',
+        'theme' => 'velvet',
         'lang_id' => $this->lang->id,
         'title' => 'El blog de B',
         'description' => 'Notas y novedades',
@@ -213,7 +213,7 @@ it('refuses an unsafe favicon address', function (): void {
     $this->actingAs($this->user)->put("http://a.test/admin/sites/{$this->siteB->id}", [
         'name' => 'Site B',
         'domains' => 'b.test',
-        'theme' => 'editorial',
+        'theme' => 'velvet',
         'favicon' => 'javascript:alert(1)',
     ])->assertSessionHasErrors('favicon');
 });
@@ -307,7 +307,7 @@ it('prints an uploaded theme\'s stylesheets and scripts on the sites that use it
     File::ensureDirectoryExists(Themes::uploadPath('aurora', 'css'));
     File::put(Themes::uploadPath('aurora', 'css/main.css'), 'body { color: red }');
     File::put(Themes::uploadPath('aurora', 'menu.js'), '');
-    File::put(Themes::uploadPath('aurora', 'theme.json'), json_encode(['name' => 'Aurora', 'layout' => 'editorial', 'styles' => ['css/main.css'], 'scripts' => ['menu.js']]));
+    File::put(Themes::uploadPath('aurora', 'theme.json'), json_encode(['name' => 'Aurora', 'layout' => 'velvet', 'styles' => ['css/main.css'], 'scripts' => ['menu.js']]));
     Themes::flush();
 
     try {
@@ -318,8 +318,8 @@ it('prints an uploaded theme\'s stylesheets and scripts on the sites that use it
         $this->get('http://b.test/about')->assertOk()
             ->assertSee('href="/storage/themes/aurora/css/main.css?v=', false)
             ->assertSee('src="/storage/themes/aurora/menu.js?v=', false)
-            ->assertSee('data-site-theme="editorial"', false)
-            ->assertInertia(fn (Assert $page) => $page->where('theme', 'editorial'));
+            ->assertSee('data-site-theme="velvet"', false)
+            ->assertInertia(fn (Assert $page) => $page->where('theme', 'velvet'));
         $this->get('http://a.test/about')->assertOk()->assertDontSee('/storage/themes/aurora', false);
     } finally {
         File::deleteDirectory(Themes::uploadPath());

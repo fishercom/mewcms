@@ -12,6 +12,8 @@ use App\Models\CmsSchema;
 use App\Models\CmsSite;
 use App\Models\CmsSlider;
 use App\Models\User;
+use App\Support\Themes;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -189,7 +191,17 @@ it('downloads linked media once', function (): void {
 });
 
 it('refuses a theme without content, a menu link to a missing page and media outside its folder', function (): void {
-    $this->artisan('cms:content-import', ['source' => 'editorial', '--force' => true])->assertFailed();
+    Themes::$uploadRoot = sys_get_temp_dir().'/mewcms-themes-'.uniqid();
+    File::ensureDirectoryExists(Themes::uploadPath('bare'));
+    File::put(Themes::uploadPath('bare', 'theme.json'), json_encode(['name' => 'Bare']));
+    Themes::flush();
+    try {
+        $this->artisan('cms:content-import', ['source' => 'bare', '--force' => true])->assertFailed();
+    } finally {
+        File::deleteDirectory(Themes::uploadPath());
+        Themes::$uploadRoot = null;
+        Themes::flush();
+    }
 
     $file = writeContent($this->dir, ['menus' => ['main' => [['title' => 'Nada', 'page' => 'nada']]]]);
     $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertFailed();

@@ -10,31 +10,32 @@ it('lists the installed themes, default first', function (): void {
     $themes = Themes::all();
 
     expect(array_key_first($themes))->toBe('default')
-        ->and($themes)->toHaveKey('editorial')
-        ->and($themes['editorial']['name'])->toBe('Editorial');
+        ->and($themes)->toHaveKey('velvet')
+        ->and($themes['velvet']['name'])->toBe('Velvet Paw Boutique');
 });
 
 it('takes a page from the theme, or from the default theme when it has none', function (): void {
     expect(Themes::pageFile('front/templates/page', 'default'))->toBe('resources/themes/default/front/templates/page.tsx')
-        ->and(Themes::pageFile('front/templates/page', 'editorial'))->toBe('resources/themes/default/front/templates/page.tsx')
-        ->and(Themes::pageFile('admin/sites/index', 'editorial'))->toBe('resources/js/pages/admin/sites/index.tsx');
+        ->and(Themes::pageFile('front/templates/page', 'velvet'))->toBe('resources/themes/velvet/front/templates/page.tsx')
+        ->and(Themes::pageFile('front/templates/post', 'velvet'))->toBe('resources/themes/default/front/templates/post.tsx')
+        ->and(Themes::pageFile('admin/sites/index', 'velvet'))->toBe('resources/js/pages/admin/sites/index.tsx');
 
-    foreach (['default', 'editorial'] as $theme) {
+    foreach (['default', 'velvet'] as $theme) {
         expect(base_path(Themes::pageFile('front/layout', $theme)))->toBeFile();
     }
 });
 
 it('gives each theme its own stylesheet', function (): void {
     expect(Themes::styleFile('default'))->toBe('resources/themes/default/css/theme.css')
-        ->and(Themes::styleFile('editorial'))->toBe('resources/themes/editorial/css/theme.css')
+        ->and(Themes::styleFile('velvet'))->toBe('resources/themes/velvet/css/theme.css')
         ->and(Themes::styleFile('missing'))->toBe('resources/themes/default/css/theme.css');
 });
 
 it('uses the current site\'s theme, and the default theme without a site', function (): void {
     expect(Themes::current())->toBe('default');
 
-    $site = CmsSite::create(['name' => 'B', 'domains' => ['b.test'], 'theme' => 'editorial', 'active' => true]);
-    expect(Sites::as($site, fn () => Themes::current()))->toBe('editorial');
+    $site = CmsSite::create(['name' => 'B', 'domains' => ['b.test'], 'theme' => 'velvet', 'active' => true]);
+    expect(Sites::as($site, fn () => Themes::current()))->toBe('velvet');
 });
 
 it('falls back to the default theme when a site names a missing one', function (): void {
@@ -52,7 +53,7 @@ it('offers the page templates of the default theme', function (): void {
 it('reads the screenshot of each theme', function (): void {
     expect(Themes::all()['default']['screenshot'])->toBeTrue()
         ->and(Themes::all()['default']['uploaded'])->toBeFalse()
-        ->and(Themes::layout('editorial'))->toBe('editorial');
+        ->and(Themes::layout('velvet'))->toBe('velvet');
 });
 
 describe('uploaded themes', function (): void {
@@ -66,7 +67,7 @@ describe('uploaded themes', function (): void {
         File::put($this->themeDir.'/theme.json', json_encode([
             'name' => 'Aurora',
             'version' => '1.0.0',
-            'layout' => 'editorial',
+            'layout' => 'velvet',
             'styles' => [
                 'css/main.css',
                 ['href' => 'https://fonts.bunny.net/css?family=lora:400', 'media' => 'screen'],
@@ -94,7 +95,7 @@ describe('uploaded themes', function (): void {
 
         expect(array_key_last(Themes::all()))->toBe('aurora')
             ->and($theme['uploaded'])->toBeTrue()
-            ->and($theme['layout'])->toBe('editorial')
+            ->and($theme['layout'])->toBe('velvet')
             ->and($theme['styles'])->toHaveCount(2)
             ->and($theme['styles'][0]['href'])->toStartWith('/storage/themes/aurora/css/main.css?v=')
             ->and($theme['styles'][1])->toBe(['href' => 'https://fonts.bunny.net/css?family=lora:400', 'media' => 'screen'])
@@ -112,8 +113,9 @@ describe('uploaded themes', function (): void {
     });
 
     it('uses the pages and stylesheet of its layout', function (): void {
-        expect(Themes::pageFile('front/templates/page', 'aurora'))->toBe('resources/themes/default/front/templates/page.tsx')
-            ->and(Themes::styleFile('aurora'))->toBe('resources/themes/editorial/css/theme.css');
+        expect(Themes::pageFile('front/templates/page', 'aurora'))->toBe('resources/themes/velvet/front/templates/page.tsx')
+            ->and(Themes::pageFile('front/templates/post', 'aurora'))->toBe('resources/themes/default/front/templates/post.tsx')
+            ->and(Themes::styleFile('aurora'))->toBe('resources/themes/velvet/css/theme.css');
     });
 
     it('falls back to the default layout when it names an unknown one', function (): void {

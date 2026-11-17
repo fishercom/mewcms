@@ -11,7 +11,7 @@ use App\Support\Sites;
 use App\Support\Themes;
 
 beforeEach(function (): void {
-    $this->file = Themes::path('editorial', 'blocks/zz_cards.json');
+    $this->file = Themes::path('velvet', 'blocks/zz_cards.json');
     @mkdir(dirname($this->file), 0777, true);
     file_put_contents($this->file, json_encode([
         'name' => 'Tarjetas',
@@ -29,7 +29,7 @@ beforeEach(function (): void {
     file_put_contents(dirname($this->file).'/Bad-Name.json', '{"name": "No"}');
     BlockRegistry::flush();
     $this->lang = CmsLang::create(['name' => 'Español', 'iso' => 'es', 'active' => 1]);
-    $this->site = CmsSite::create(['name' => 'B', 'domains' => ['b.test'], 'theme' => 'editorial', 'lang_id' => $this->lang->id, 'active' => true]);
+    $this->site = CmsSite::create(['name' => 'B', 'domains' => ['b.test'], 'theme' => 'velvet', 'lang_id' => $this->lang->id, 'active' => true]);
 });
 
 afterEach(function (): void {
@@ -48,7 +48,7 @@ it('offers the blocks of the site\'s theme beside the CMS\'s own', function (): 
             ->and($definition['name'])->toBe('Tarjetas')
             ->and($definition['category'])->toBe('theme')
             ->and(BlockRegistry::get('rich_text'))->not->toBeNull()
-            ->and(BlockRegistry::themeBlocks('editorial'))->toHaveKeys(['zz_cards'])->not->toHaveKey('Bad-Name');
+            ->and(BlockRegistry::themeBlocks('velvet'))->toHaveKeys(['zz_cards'])->not->toHaveKey('Bad-Name');
     });
 });
 
@@ -113,5 +113,5 @@ it('gives the admin the site\'s stylesheets, so the editor draws blocks as the s
     $this->actingAs(User::factory()->superAdmin()->create())
         ->withSession([Sites::SESSION_KEY => $this->site->id])
         ->get('/admin/articles')
-        ->assertInertia(fn ($page) => $page->where('block_preview.theme', 'editorial')->has('block_preview.styles', fn ($styles) => $styles->etc()));
+        ->assertInertia(fn ($page) => $page->where('block_preview.theme', 'velvet')->has('block_preview.styles', fn ($styles) => $styles->etc()));
 });

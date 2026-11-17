@@ -11,7 +11,7 @@
     <a href="#-core-workflows"><strong>System Flows</strong></a>
   </p>
   <p align="center">
-    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" />
+    <img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3" />
     <img src="https://img.shields.io/badge/PHP-8.3%2B-777bb4.svg" alt="PHP Version" />
     <img src="https://img.shields.io/badge/Laravel-12.x-ff2d20.svg" alt="Laravel 12" />
     <img src="https://img.shields.io/badge/Inertia.js-2.0-9553e9.svg" alt="Inertia.js 2.0" />
@@ -437,4 +437,7 @@ Please review our contribution guidelines and code of conduct before opening pul
 
 ## 📄 License
 
-MewCMS is open-source software licensed under the **[MIT License](LICENSE)**. You are free to use, modify, distribute, and build commercial or non-commercial websites with it.
+MewCMS is free software licensed under the **[GNU Affero General Public License v3.0](LICENSE)** (AGPL-3.0-only).
+
+- You can use it to build commercial or non-commercial websites, and you can modify and redistribute it.
+- If you modify MewCMS and run it on a server that people use over a network (a website, a hosted CMS, a SaaS), you must offer those users the source code of your modified version under the same license.
