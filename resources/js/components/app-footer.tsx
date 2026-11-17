@@ -14,10 +14,15 @@ export function AppFooter() {
                 rel="noopener noreferrer"
                 className="hover:text-foreground underline-offset-4 hover:underline"
             >
-                {t('MIT License')}
+                {t('AGPL v3 License')}
             </a>
             <span aria-hidden="true">·</span>
-            <a href="https://mewcms.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground underline-offset-4 hover:underline">
+            <a
+                href="https://mewcms.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground underline-offset-4 hover:underline"
+            >
                 mewcms.com
             </a>
         </footer>
