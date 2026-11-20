@@ -276,7 +276,10 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                                             ) : (
                                                 <span className="flex items-center gap-2.5">
                                                     <AppLogoIcon className={cn('size-8', dark ? 'text-[#8B74FF]' : 'text-[#6447F0]')} />
-                                                    <AppWordmark className="text-[15px]" />
+                                                    <span className="grid leading-none">
+                                                        <AppWordmark className="text-[15px]" />
+                                                        <span className="mt-1 text-[11px] opacity-60">{t('Content Studio')}</span>
+                                                    </span>
                                                 </span>
                                             )}
                                         </div>

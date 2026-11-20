@@ -28,7 +28,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                             className="text-foreground rounded-lg transition-opacity hover:opacity-85"
                             aria-label={t(':name — ir al sitio', { name: brandName })}
                         >
-                            <BrandLockup stacked />
+                            <BrandLockup />
                         </Link>
 
                         <div className="space-y-1.5 text-center">
