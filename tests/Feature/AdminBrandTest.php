@@ -61,9 +61,17 @@ it('saves the client logo and shares it with the panel and the login screen', fu
         ->where('brand.tagline', 'Gestor de contenidos')
     );
 
-    // Removing both brings MewCMS's back, and the uploaded icon file is deleted
+    // The name alone is enough: it is shown as text, with its initial as the icon
     actingAs($user)->post('/settings/brand', ['name' => 'EMSAL', 'logo' => '', 'icon' => ''])->assertSessionHasNoErrors();
     Storage::disk('public')->assertMissing($iconPath);
+    actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page
+        ->where('brand.name', 'EMSAL')
+        ->where('brand.logo', null)
+        ->where('brand.icon', null)
+    );
+
+    // Clearing the name too brings MewCMS's back
+    actingAs($user)->post('/settings/brand', ['name' => '', 'tagline' => ''])->assertSessionHasNoErrors();
     $this->app['auth']->guard()->logout();
     get('/login')->assertInertia(fn (Assert $page): Assert => $page->where('brand', null));
 });
