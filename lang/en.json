@@ -976,7 +976,6 @@
     "Tono": "Tone",
     "Público": "Audience",
     "Por ejemplo: pequeñas empresas de Lima": "For example: small businesses in Lima",
-    "Solo quien administra Configuración puede cambiar estos ajustes.": "Only users who manage Configuración can change these settings.",
     "Modelos con precio conocido": "Models with a known price",
     "Entrada / salida": "Input / output",
     "Precios en USD por millón de tokens.": "Prices in USD per million tokens.",
@@ -1295,5 +1294,6 @@
     "Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.": "Shown next to the icon when there is no wide logo, and used as the logo's alt text.",
     "Ej.: Gestor de contenidos": "E.g. Content manager",
     "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Optional. Small line under the name in the sidebar.",
-    "Logo del cliente en el panel y en el inicio de sesión": "The client's logo in the panel and on the login screen"
+    "Logo del cliente en el panel y en el inicio de sesión": "The client's logo in the panel and on the login screen",
+    "Solo un Super Admin puede cambiar estos ajustes.": "Only a super admin can change these settings."
 }

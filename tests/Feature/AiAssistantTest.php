@@ -153,7 +153,7 @@ test('editors need the assistant module and the content module', function (): vo
     $this->actingAs($user->fresh())->postJson(route('ai.metadata'), metadataRequest(['module' => 'posts']))->assertForbidden();
 });
 
-test('editors see the settings but only Configuración managers change them', function (): void {
+test('editors see the settings but only super admins change them', function (): void {
     $user = User::factory()->create();
     grantPermissions($user, ['ai' => 'administrar']);
 
@@ -167,8 +167,8 @@ test('editors see the settings but only Configuración managers change them', fu
 
     $this->actingAs($user)->put(route('ai.update'), ['monthly_budget' => 50, 'tone' => 'cercano'])->assertForbidden();
 
-    grantPermissions($user, ['configs' => 'administrar']);
-    $this->actingAs($user->fresh())->put(route('ai.update'), ['monthly_budget' => 50, 'tone' => 'cercano'])->assertRedirect();
+    // Settings are the whole panel's: super admins only
+    $this->actingAs(User::factory()->superAdmin()->create())->put(route('ai.update'), ['monthly_budget' => 50, 'tone' => 'cercano'])->assertRedirect();
 
     expect(AiSettings::all())->toMatchArray(['monthly_budget' => 50.0, 'tone' => 'cercano', 'audience' => '']);
 });

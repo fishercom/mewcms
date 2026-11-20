@@ -5,7 +5,6 @@ export * from './models/adm-module';
 export * from './models/auth';
 export * from './models/breadcrumb-item';
 export * from './models/cms-article';
-export * from './models/cms-config';
 export * from './models/cms-directory';
 export * from './models/cms-filetype';
 export * from './models/cms-form';

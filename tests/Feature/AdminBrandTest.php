@@ -51,11 +51,11 @@ it('saves the client logo and shares it with the panel and the login screen', fu
         ->where('brand.icon', $brand['icon'])
     );
 
-    actingAs($user)->get('/admin/configs')->assertInertia(fn (Assert $page): Assert => $page->where('brand.name', 'EMSAL'));
+    actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page->where('brand.name', 'EMSAL'));
 
     // A tall logo goes in as the icon alone: it is shown next to the name
     actingAs($user)->post('/settings/brand', ['name' => 'EMSAL', 'tagline' => 'Gestor de contenidos', 'logo' => ''])->assertSessionHasNoErrors();
-    actingAs($user)->get('/admin/configs')->assertInertia(fn (Assert $page): Assert => $page
+    actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page
         ->where('brand.logo', null)
         ->where('brand.icon', $brand['icon'])
         ->where('brand.tagline', 'Gestor de contenidos')
@@ -114,9 +114,9 @@ it('rejects other file types and unreadable SVG', function (): void {
 });
 
 it('lets only super admins see and change the brand', function (): void {
-    // Even full Configuración rights are not enough
+    // Even full rights on the layout are not enough
     $admin = User::factory()->create();
-    grantPermissions($admin, ['configs' => 'administrar']);
+    grantPermissions($admin, ['layout' => 'administrar']);
 
     actingAs($admin)->get('/settings/brand')->assertForbidden();
     actingAs($admin)->post('/settings/brand', ['name' => 'Nope'])->assertForbidden();
