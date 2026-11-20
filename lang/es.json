@@ -1294,5 +1294,6 @@
     "Para logos cuadrados o verticales: sin logo horizontal, se muestra junto al nombre del cliente en texto. También se usa en el menú lateral contraído.": "Para logos cuadrados o verticales: sin logo horizontal, se muestra junto al nombre del cliente en texto. También se usa en el menú lateral contraído.",
     "Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.": "Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.",
     "Ej.: Gestor de contenidos": "Ej.: Gestor de contenidos",
-    "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Opcional. Línea pequeña bajo el nombre en el menú lateral."
+    "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Opcional. Línea pequeña bajo el nombre en el menú lateral.",
+    "Logo del cliente en el panel y en el inicio de sesión": "Logo del cliente en el panel y en el inicio de sesión"
 }

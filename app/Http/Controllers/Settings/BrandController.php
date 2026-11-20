@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdmAction;
@@ -14,14 +14,16 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Configuración > Marca: the client's name and logos for the admin panel and the login screen.
- * Part of the Configuración module, with its permissions.
+ * Settings > Marca del panel (user menu): the client's name and logos for the admin panel and
+ * the login screen. Super admins only.
  */
 class BrandController extends Controller
 {
-    public function edit(): Response
+    public function edit(Request $request): Response
     {
-        return Inertia::render('admin/configs/brand', [
+        abort_unless($request->user()?->isSuperAdmin(), 403);
+
+        return Inertia::render('settings/brand', [
             'settings' => AdminBrand::all(),
             'upload' => ['extensions' => AdminBrand::UPLOAD_EXTENSIONS, 'max_kb' => AdminBrand::MAX_UPLOAD_KB],
         ]);
@@ -29,6 +31,8 @@ class BrandController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        abort_unless($request->user()?->isSuperAdmin(), 403);
+
         $url = ['nullable', 'string', 'max:2048', new SafeUrl];
         $file = ['nullable', 'file', 'max:'.AdminBrand::MAX_UPLOAD_KB, 'extensions:'.implode(',', AdminBrand::UPLOAD_EXTENSIONS)];
 
@@ -59,6 +63,6 @@ class BrandController extends Controller
         AdminBrand::save($data);
         AdminActivity::record('configs', AdmAction::MANAGE, 'Actualizado', 'marca del panel');
 
-        return redirect()->route('configs.brand')->with('success', __('Marca del panel guardada.'));
+        return redirect()->route('brand.edit')->with('success', __('Marca del panel guardada.'));
     }
 }
