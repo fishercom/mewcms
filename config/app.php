@@ -16,6 +16,12 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | MewCMS's version, shown in the admin footer: major.minor.build, where the build is the
+    | number of the mewcms pull request that last changed the CMS. Bump it in every PR.
+    */
+    'version' => trim((string) @file_get_contents(base_path('VERSION'))),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
