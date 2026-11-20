@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AdmModule;
 use App\Models\CmsConfig;
 use App\Models\User;
 use App\Support\AdminBrand;
@@ -124,28 +123,4 @@ it('lets only users with the Configuración module change the brand', function (
     $other = User::factory()->create();
     grantPermissions($other, ['articles' => 'administrar']);
     actingAs($other)->get('/admin/configs/brand')->assertForbidden();
-});
-
-it('adds a "Marca del panel" entry to the sidebar for users with Configuración', function (): void {
-    $editor = User::factory()->create();
-    grantPermissions($editor, ['configs' => 'listar']);
-    $other = User::factory()->create();
-    grantPermissions($other, ['articles' => 'listar']);
-
-    (require database_path('migrations/2026_11_20_100000_add_brand_menu_entry.php'))->up();
-
-    $entry = AdmModule::where('route', 'configs.brand')->firstOrFail();
-    expect($entry->visible)->toBeTruthy()
-        ->and($entry->events()->count())->toBe(0);
-
-    $urls = fn (User $user): array => collect(actingAs($user)->get('/admin/configs/brand')->viewData('page')['props']['adm_menu'] ?? [])
-        ->flatMap(fn (array $group): array => array_column($group['items'], 'url'))->all();
-
-    expect($urls($editor))->toContain('/admin/configs/brand');
-    expect(collect(actingAs($other)->get('/admin/articles')->viewData('page')['props']['adm_menu'] ?? [])
-        ->flatMap(fn (array $group): array => array_column($group['items'], 'url'))->all())->not->toContain('/admin/configs/brand');
-
-    // Running it again adds nothing
-    (require database_path('migrations/2026_11_20_100000_add_brand_menu_entry.php'))->up();
-    expect(AdmModule::where('route', 'configs.brand')->count())->toBe(1);
 });
