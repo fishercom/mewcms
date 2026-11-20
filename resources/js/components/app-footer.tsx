@@ -48,7 +48,7 @@ export function AppFooter() {
             )}
             {version && (
                 <span className="text-muted-foreground/70 text-[11px] tabular-nums sm:absolute sm:right-4" title={t('Versión de MewCMS')}>
-                    v{version}
+                    MewCMS v{version}
                 </span>
             )}
         </footer>
