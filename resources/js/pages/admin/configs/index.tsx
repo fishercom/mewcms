@@ -11,7 +11,7 @@ import { Pagination } from '@/types';
 import { CmsConfig } from '@/types/models/cms-config';
 import { Input } from '@headlessui/react';
 import { format } from 'date-fns';
-import { Edit, Search, Trash2 } from 'lucide-react';
+import { Edit, Palette, Search, Trash2 } from 'lucide-react';
 
 export default function Index() {
     const { items } = usePage<{ items: Pagination<CmsConfig> }>().props;
@@ -53,6 +53,11 @@ export default function Index() {
                             </div>
                         </form>
                     </div>
+                    {/* The client's logo in the panel and on the login screen */}
+                    <Button variant="outline" className="shrink-0" onClick={() => router.visit(route('configs.brand'))}>
+                        <Palette className="h-4 w-4" />
+                        {t('Marca del panel')}
+                    </Button>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="text-muted-foreground w-full text-left text-sm">
