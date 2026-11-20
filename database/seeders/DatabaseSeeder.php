@@ -255,18 +255,6 @@ class DatabaseSeeder extends Seeder
                 'visible' => true,
             ],
             [
-                // A shortcut into Configuración, with its permissions: no actions of its own
-                'menu_id' => $menuAdmin->id,
-                'name' => 'Marca del panel',
-                'description' => 'Logo del cliente en el panel y en el inicio de sesión',
-                'url' => '/admin/configs/brand',
-                'route' => 'configs.brand',
-                'icon' => 'badge-check',
-                'position' => 1,
-                'visible' => true,
-                'custom_actions' => 'none',
-            ],
-            [
                 'menu_id' => $menuAdmin->id,
                 'name' => 'Usuarios',
                 'url' => '/admin/users',
@@ -338,9 +326,6 @@ class DatabaseSeeder extends Seeder
 
             $module = AdmModule::create($modData);
 
-            if ($customActions === 'none') {
-                continue;
-            }
             if ($customActions) {
                 foreach ($customActions as $actionId) {
                     AdmEvent::create(['module_id' => $module->id, 'action_id' => $actionId]);

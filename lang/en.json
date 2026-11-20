@@ -1294,5 +1294,6 @@
     "Para logos cuadrados o verticales: sin logo horizontal, se muestra junto al nombre del cliente en texto. También se usa en el menú lateral contraído.": "For square or tall logos: with no wide logo, it is shown next to the client's name as text. Also used in the collapsed sidebar.",
     "Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.": "Shown next to the icon when there is no wide logo, and used as the logo's alt text.",
     "Ej.: Gestor de contenidos": "E.g. Content manager",
-    "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Optional. Small line under the name in the sidebar."
+    "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Optional. Small line under the name in the sidebar.",
+    "Logo del cliente en el panel y en el inicio de sesión": "The client's logo in the panel and on the login screen"
 }

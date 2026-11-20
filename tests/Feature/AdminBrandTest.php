@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\AdmModule;
 use App\Models\CmsConfig;
 use App\Models\User;
 use App\Support\AdminBrand;
 use App\Support\SvgSanitizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -24,14 +24,13 @@ it('shows the MewCMS logo until the client has one', function (): void {
 });
 
 it('saves the client logo and shares it with the panel and the login screen', function (): void {
-    $user = User::factory()->create();
-    grantPermissions($user, ['configs' => 'administrar']);
+    $user = User::factory()->superAdmin()->create();
 
-    actingAs($user)->post('/admin/configs/brand', [
+    actingAs($user)->post('/settings/brand', [
         'name' => 'EMSAL',
         'logo' => 'https://cdn.example.com/emsal.png',
         'icon_file' => UploadedFile::fake()->createWithContent('icon.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>'),
-    ])->assertSessionHasNoErrors()->assertRedirect('/admin/configs/brand');
+    ])->assertSessionHasNoErrors()->assertRedirect('/settings/brand');
 
     $brand = AdminBrand::all();
     expect($brand['name'])->toBe('EMSAL')
@@ -55,7 +54,7 @@ it('saves the client logo and shares it with the panel and the login screen', fu
     actingAs($user)->get('/admin/configs')->assertInertia(fn (Assert $page): Assert => $page->where('brand.name', 'EMSAL'));
 
     // A tall logo goes in as the icon alone: it is shown next to the name
-    actingAs($user)->post('/admin/configs/brand', ['name' => 'EMSAL', 'tagline' => 'Gestor de contenidos', 'logo' => ''])->assertSessionHasNoErrors();
+    actingAs($user)->post('/settings/brand', ['name' => 'EMSAL', 'tagline' => 'Gestor de contenidos', 'logo' => ''])->assertSessionHasNoErrors();
     actingAs($user)->get('/admin/configs')->assertInertia(fn (Assert $page): Assert => $page
         ->where('brand.logo', null)
         ->where('brand.icon', $brand['icon'])
@@ -63,7 +62,7 @@ it('saves the client logo and shares it with the panel and the login screen', fu
     );
 
     // Removing both brings MewCMS's back, and the uploaded icon file is deleted
-    actingAs($user)->post('/admin/configs/brand', ['name' => 'EMSAL', 'logo' => '', 'icon' => ''])->assertSessionHasNoErrors();
+    actingAs($user)->post('/settings/brand', ['name' => 'EMSAL', 'logo' => '', 'icon' => ''])->assertSessionHasNoErrors();
     Storage::disk('public')->assertMissing($iconPath);
     $this->app['auth']->guard()->logout();
     get('/login')->assertInertia(fn (Assert $page): Assert => $page->where('brand', null));
@@ -84,7 +83,7 @@ it('cleans scripts and external references out of uploaded SVG logos', function 
     </svg>
     SVG;
 
-    actingAs($user)->post('/admin/configs/brand', [
+    actingAs($user)->post('/settings/brand', [
         'logo_file' => UploadedFile::fake()->createWithContent('logo.svg', $svg),
     ])->assertSessionHasNoErrors();
 
@@ -104,48 +103,35 @@ it('cleans scripts and external references out of uploaded SVG logos', function 
 it('rejects other file types and unreadable SVG', function (): void {
     $user = User::factory()->superAdmin()->create();
 
-    actingAs($user)->post('/admin/configs/brand', ['logo_file' => UploadedFile::fake()->createWithContent('logo.html', '<b>hi</b>')])
+    actingAs($user)->post('/settings/brand', ['logo_file' => UploadedFile::fake()->createWithContent('logo.html', '<b>hi</b>')])
         ->assertSessionHasErrors('logo_file');
 
-    actingAs($user)->post('/admin/configs/brand', ['logo_file' => UploadedFile::fake()->createWithContent('logo.svg', '<!DOCTYPE svg [<!ENTITY x SYSTEM "file:///etc/passwd">]><svg>&x;</svg>')])
+    actingAs($user)->post('/settings/brand', ['logo_file' => UploadedFile::fake()->createWithContent('logo.svg', '<!DOCTYPE svg [<!ENTITY x SYSTEM "file:///etc/passwd">]><svg>&x;</svg>')])
         ->assertSessionHasErrors('logo_file');
 
     expect(AdminBrand::all()['logo'])->toBe('')
         ->and(SvgSanitizer::clean('<html/>'))->toBeNull();
 });
 
-it('lets only users with the Configuración module change the brand', function (): void {
-    $viewer = User::factory()->create();
-    grantPermissions($viewer, ['configs' => 'listar']);
+it('lets only super admins see and change the brand', function (): void {
+    // Even full Configuración rights are not enough
+    $admin = User::factory()->create();
+    grantPermissions($admin, ['configs' => 'administrar']);
 
-    actingAs($viewer)->get('/admin/configs/brand')->assertOk();
-    actingAs($viewer)->post('/admin/configs/brand', ['name' => 'Nope'])->assertForbidden();
+    actingAs($admin)->get('/settings/brand')->assertForbidden();
+    actingAs($admin)->post('/settings/brand', ['name' => 'Nope'])->assertForbidden();
+    expect(AdminBrand::all()['name'])->toBe('');
 
-    $other = User::factory()->create();
-    grantPermissions($other, ['articles' => 'administrar']);
-    actingAs($other)->get('/admin/configs/brand')->assertForbidden();
+    $superAdmin = User::factory()->superAdmin()->create();
+    actingAs($superAdmin)->get('/settings/brand')->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page->component('settings/brand')->where('auth.permissions.super_admin', true));
 });
 
-it('adds a "Marca del panel" entry to the sidebar for users with Configuración', function (): void {
-    $editor = User::factory()->create();
-    grantPermissions($editor, ['configs' => 'listar']);
-    $other = User::factory()->create();
-    grantPermissions($other, ['articles' => 'listar']);
+it('removes the sidebar entry an earlier version added', function (): void {
+    $menu = DB::table('adm_menus')->insertGetId(['name' => 'Administración', 'position' => 0, 'visible' => true]);
+    $module = DB::table('adm_modules')->insertGetId(['menu_id' => $menu, 'name' => 'Marca del panel', 'url' => '/admin/configs/brand', 'route' => 'configs.brand', 'position' => 1, 'visible' => true]);
 
-    (require database_path('migrations/2026_11_20_100000_add_brand_menu_entry.php'))->up();
+    (require database_path('migrations/2026_11_20_200000_remove_brand_menu_entry.php'))->up();
 
-    $entry = AdmModule::where('route', 'configs.brand')->firstOrFail();
-    expect($entry->visible)->toBeTruthy()
-        ->and($entry->events()->count())->toBe(0);
-
-    $urls = fn (User $user): array => collect(actingAs($user)->get('/admin/configs/brand')->viewData('page')['props']['adm_menu'] ?? [])
-        ->flatMap(fn (array $group): array => array_column($group['items'], 'url'))->all();
-
-    expect($urls($editor))->toContain('/admin/configs/brand');
-    expect(collect(actingAs($other)->get('/admin/articles')->viewData('page')['props']['adm_menu'] ?? [])
-        ->flatMap(fn (array $group): array => array_column($group['items'], 'url'))->all())->not->toContain('/admin/configs/brand');
-
-    // Running it again adds nothing
-    (require database_path('migrations/2026_11_20_100000_add_brand_menu_entry.php'))->up();
-    expect(AdmModule::where('route', 'configs.brand')->count())->toBe(1);
+    expect(DB::table('adm_modules')->where('id', $module)->exists())->toBeFalse();
 });

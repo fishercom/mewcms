@@ -1,16 +1,18 @@
 import { AppWordmark } from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
+import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import QuickMediaDrawer from '@/components/quick-media-drawer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import FormLayout from '@/layouts/module/Form';
-import ModuleLayout from '@/layouts/module/layout';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from '@/layouts/settings/layout';
+import { generateBreadcrumb } from '@/lib/breadcrumbs';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, ImageIcon, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
+import { Head, useForm } from '@inertiajs/react';
+import { CheckCircle2, ImageIcon, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type ImageKey = 'logo' | 'logo_dark' | 'icon';
@@ -82,7 +84,7 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setSaved(false);
-        post(route('configs.brand.update'), {
+        post(route('brand.update'), {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: (page) => {
@@ -114,27 +116,17 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
     const icon = src('icon');
 
     return (
-        <ModuleLayout title={t('Configuración')}>
+        <AppLayout breadcrumbs={generateBreadcrumb(t('Marca del panel'), '', route('brand.edit'))}>
             <Head title={t('Marca del panel')} />
 
-            <FormLayout>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                            <h2 className="text-foreground text-base font-semibold">{t('Marca del panel')}</h2>
-                            <p className="text-muted-foreground mt-0.5 max-w-2xl text-sm">
-                                {t(
-                                    'El logo del cliente reemplaza al de MewCMS en el panel y en el inicio de sesión. Debajo queda una pequeña firma "Con tecnología de MewCMS".',
-                                )}
-                            </p>
-                        </div>
-                        <Button variant="outline" size="sm" asChild>
-                            <Link href={route('configs.index')}>
-                                <ArrowLeft className="h-4 w-4" />
-                                {t('Configuración')}
-                            </Link>
-                        </Button>
-                    </div>
+            <SettingsLayout wide>
+                <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
+                    <HeadingSmall
+                        title={t('Marca del panel')}
+                        description={t(
+                            'El logo del cliente reemplaza al de MewCMS en el panel y en el inicio de sesión. Debajo queda una pequeña firma "Con tecnología de MewCMS".',
+                        )}
+                    />
 
                     {(saved || flash?.success) && (
                         <div className="animate-in fade-in border-success/30 bg-success-soft text-success flex items-center gap-2 rounded-xl border p-4 text-xs font-semibold duration-200">
@@ -315,7 +307,7 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                         </Button>
                     </div>
                 </form>
-            </FormLayout>
+            </SettingsLayout>
 
             <QuickMediaDrawer
                 isOpen={drawerTarget !== null}
@@ -329,6 +321,6 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                 }}
                 initialType="Images"
             />
-        </ModuleLayout>
+        </AppLayout>
     );
 }

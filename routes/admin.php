@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AiController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\BlockPatternController;
 use App\Http\Controllers\Admin\BlockPreviewController;
-use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\ContentRevisionController;
 use App\Http\Controllers\Admin\FormController;
@@ -66,9 +65,6 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     // Missing texts translated by the AI assistant, as suggestions to review before saving
     Route::post('translations/ai', [TranslationController::class, 'suggest'])->middleware('throttle:ai')->name('translations.ai');
     Route::delete('translations/{translation}', [TranslationController::class, 'destroy'])->name('translations.destroy');
-    // Configuración > Marca: the client's logo in the panel and on the login screen
-    Route::get('configs/brand', [BrandController::class, 'edit'])->name('configs.brand');
-    Route::post('configs/brand', [BrandController::class, 'update'])->name('configs.brand.update');
     Route::resource('configs', ConfigController::class);
 
     Route::get('ai', [AiController::class, 'index'])->name('ai.index');
