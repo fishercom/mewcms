@@ -36,7 +36,8 @@ class ProfileController extends Controller
 
     public function create()
     {
-        $modules = AdmModule::with('events.action')->where('visible', true)->orderBy('name')->get();
+        // Entries with no actions of their own (Marca del panel follows Configuración) are not listed
+        $modules = AdmModule::with('events.action')->where('visible', true)->has('events')->orderBy('name')->get();
 
         return Inertia::render('admin/profiles/create', [
             'modules' => $modules,
@@ -67,7 +68,7 @@ class ProfileController extends Controller
     public function edit($id, Request $request): Response
     {
         $item = Profile::find($id);
-        $modules = AdmModule::with('events.action')->where('visible', true)->orderBy('name')->get();
+        $modules = AdmModule::with('events.action')->where('visible', true)->has('events')->orderBy('name')->get();
         $item->permissions = AdmPermission::where('profile_id', $id)->pluck('event_id')->toArray();
 
         return Inertia::render('admin/profiles/edit', [
