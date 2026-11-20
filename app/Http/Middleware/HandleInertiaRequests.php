@@ -93,6 +93,8 @@ class HandleInertiaRequests extends Middleware
             'adm_menu' => fn (): array => $this->adminMenu($request),
             // The client's logo for the panel and the login screen (Configuración > Marca); null shows MewCMS's
             'brand' => fn (): ?array => $this->isPublic($request) ? null : AdminBrand::shared(),
+            // MewCMS's version (the VERSION file), small in the admin footer
+            'app_version' => fn (): ?string => $this->isPublic($request) ? null : (config('app.version') ?: null),
             // The built theme whose pages the site uses (an uploaded theme borrows one)
             'theme' => fn (): string => Themes::layout(),
             // The site's stylesheets, for the block editor's previews

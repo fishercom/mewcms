@@ -20,5 +20,6 @@ export interface SharedData {
     ziggy: Config & { location: string };
     /** Null when the panel shows MewCMS's own logo */
     brand?: AdminBrand | null;
+    app_version?: string | null;
     [key: string]: unknown;
 }
