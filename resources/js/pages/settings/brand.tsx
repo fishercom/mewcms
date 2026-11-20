@@ -111,6 +111,7 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
 
     const accept = upload.extensions.map((ext) => '.' + ext).join(',');
     const brandName = data.name.trim() || t('Nombre del cliente');
+    const hasName = data.name.trim() !== '';
     const logo = src('logo');
     const logoDark = src('logo_dark') || logo;
     const icon = src('icon');
@@ -258,9 +259,15 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                                         <div className="flex h-12 w-full max-w-60 items-center">
                                             {current ? (
                                                 <img src={current} alt={brandName} className="max-h-10 max-w-full object-contain" />
-                                            ) : icon ? (
+                                            ) : icon || hasName ? (
                                                 <span className="flex min-w-0 items-center gap-2.5">
-                                                    <img src={icon} alt="" className="size-8 shrink-0 object-contain" />
+                                                    {icon ? (
+                                                        <img src={icon} alt="" className="size-8 shrink-0 object-contain" />
+                                                    ) : (
+                                                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#6447F0] text-sm font-bold text-white">
+                                                            {brandName.charAt(0).toUpperCase()}
+                                                        </span>
+                                                    )}
                                                     <span className="grid min-w-0 leading-none">
                                                         <span className="truncate text-[15px] font-bold tracking-tight">{brandName}</span>
                                                         {data.tagline && <span className="mt-1 truncate text-[11px] opacity-60">{data.tagline}</span>}
@@ -277,7 +284,7 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                                             <span className="flex size-8 items-center justify-center overflow-hidden rounded-lg">
                                                 {icon ? (
                                                     <img src={icon} alt="" className="size-8 object-contain" />
-                                                ) : logo ? (
+                                                ) : logo || hasName ? (
                                                     <span className="flex size-8 items-center justify-center rounded-lg bg-[#6447F0] text-sm font-bold text-white">
                                                         {brandName.charAt(0).toUpperCase()}
                                                     </span>
@@ -287,7 +294,7 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                                             </span>
                                             {t('Menú lateral contraído')}
                                         </div>
-                                        {(logo || icon) && <span className="text-xs opacity-60">{t('Con tecnología de MewCMS')}</span>}
+                                        {(logo || icon || hasName) && <span className="text-xs opacity-60">{t('Con tecnología de MewCMS')}</span>}
                                     </div>
                                 );
                             })}

@@ -54,16 +54,16 @@ class AdminBrand
     }
 
     /**
-     * What the panel and the login screen need, or null when the client has neither a logo
-     * nor an icon. A wide logo is shown alone; a square or tall one goes in as the icon and
-     * is shown next to the name, set as text.
+     * What the panel and the login screen need, or null when the client has set no name,
+     * logo or icon. A wide logo is shown alone; a square or tall one goes in as the icon and
+     * is shown next to the name, set as text. A name alone gets its initial as the icon.
      *
      * @return array{name: string, tagline: ?string, logo: ?string, logo_dark: ?string, icon: ?string}|null
      */
     public static function shared(): ?array
     {
         $brand = self::all();
-        if ($brand['logo'] === '' && $brand['icon'] === '') {
+        if ($brand['name'] === '' && $brand['logo'] === '' && $brand['icon'] === '') {
             return null;
         }
 
