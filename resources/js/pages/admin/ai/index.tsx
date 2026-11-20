@@ -211,7 +211,7 @@ export default function Index() {
                                 {t('Guardar')}
                             </Button>
                         ) : (
-                            <p className="text-muted-foreground text-xs">{t('Solo quien administra Configuración puede cambiar estos ajustes.')}</p>
+                            <p className="text-muted-foreground text-xs">{t('Solo un Super Admin puede cambiar estos ajustes.')}</p>
                         )}
                     </form>
 

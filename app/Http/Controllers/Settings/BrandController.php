@@ -61,7 +61,7 @@ class BrandController extends Controller
         }
 
         AdminBrand::save($data);
-        AdminActivity::record('configs', AdmAction::MANAGE, 'Actualizado', 'marca del panel');
+        AdminActivity::record('layout', AdmAction::MANAGE, 'Actualizado', 'marca del panel');
 
         return redirect()->route('brand.edit')->with('success', __('Marca del panel guardada.'));
     }

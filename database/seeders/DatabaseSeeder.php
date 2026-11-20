@@ -301,15 +301,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'menu_id' => $menuAdmin->id,
-                'name' => 'Configuración',
-                'url' => '/admin/configs',
-                'route' => 'configs.index',
-                'icon' => 'cog',
-                'position' => 8,
-                'visible' => false,
-            ],
-            [
-                'menu_id' => $menuAdmin->id,
                 'name' => 'Asistente IA',
                 'description' => 'Proveedores, modelos y consumo del asistente de contenido',
                 'url' => '/admin/ai',

@@ -108,8 +108,9 @@ class CmsConfig extends Model
         $row->saveQuietly();
     }
 
+    /** Logged under the screen that edits the setting (there is no generic settings module) */
     public function adminActivityModule(): string
     {
-        return 'configs';
+        return str_starts_with((string) $this->alias, 'ai_') ? 'ai' : 'layout';
     }
 }

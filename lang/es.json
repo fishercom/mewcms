@@ -976,7 +976,6 @@
     "Tono": "Tono",
     "Público": "Público",
     "Por ejemplo: pequeñas empresas de Lima": "Por ejemplo: pequeñas empresas de Lima",
-    "Solo quien administra Configuración puede cambiar estos ajustes.": "Solo quien administra Configuración puede cambiar estos ajustes.",
     "Modelos con precio conocido": "Modelos con precio conocido",
     "Entrada / salida": "Entrada / salida",
     "Precios en USD por millón de tokens.": "Precios en USD por millón de tokens.",
@@ -1295,5 +1294,6 @@
     "Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.": "Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.",
     "Ej.: Gestor de contenidos": "Ej.: Gestor de contenidos",
     "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Opcional. Línea pequeña bajo el nombre en el menú lateral.",
-    "Logo del cliente en el panel y en el inicio de sesión": "Logo del cliente en el panel y en el inicio de sesión"
+    "Logo del cliente en el panel y en el inicio de sesión": "Logo del cliente en el panel y en el inicio de sesión",
+    "Solo un Super Admin puede cambiar estos ajustes.": "Solo un Super Admin puede cambiar estos ajustes."
 }

@@ -18,8 +18,8 @@ use Inertia\Response;
 
 /**
  * The "Asistente IA" module: its settings page and the assistant's endpoints. Using the
- * assistant needs the module's manage action; changing its settings also needs
- * Configuración's, so editors can use it without touching the budget.
+ * assistant needs the module's manage action; changing its settings is for super admins,
+ * so editors can use it without touching the budget.
  */
 class AiController extends Controller
 {
@@ -192,8 +192,9 @@ class AiController extends Controller
         return $brief + ['keyword' => null, 'audience' => null, 'length' => null, 'lang_id' => null, 'schema_id' => null];
     }
 
+    /** The budget, tone and audience are the whole panel's: super admins only */
     protected function canConfigure(Request $request): bool
     {
-        return $request->user()->hasAdminPermission('configs', AdmAction::MANAGE);
+        return $request->user()->isSuperAdmin();
     }
 }
