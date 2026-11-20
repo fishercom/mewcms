@@ -1,4 +1,4 @@
-import { BrandLockup } from '@/components/app-logo';
+import { BrandLockup, PoweredByMewCMS, useBrand, useBrandName } from '@/components/app-logo';
 import { t } from '@/lib/i18n';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -10,6 +10,9 @@ interface AuthLayoutProps {
 }
 
 export default function AuthSimpleLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
+    const brand = useBrand();
+    const brandName = useBrandName();
+
     return (
         <div className="bg-background relative flex min-h-svh flex-col items-center justify-center gap-6 overflow-hidden p-4 sm:p-6 md:p-10">
             {/* Soft brand glow behind the card */}
@@ -23,7 +26,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                         <Link
                             href={route('home')}
                             className="text-foreground rounded-lg transition-opacity hover:opacity-85"
-                            aria-label={t('MewCMS — ir al sitio')}
+                            aria-label={t(':name — ir al sitio', { name: brandName })}
                         >
                             <BrandLockup stacked />
                         </Link>
@@ -35,6 +38,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                     </div>
                     {children}
                 </div>
+                {brand && <PoweredByMewCMS className="mt-5 flex justify-center" />}
             </div>
         </div>
     );
