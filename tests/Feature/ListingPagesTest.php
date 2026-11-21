@@ -56,13 +56,13 @@ it('finds the listing page from a template field and gives its banner to the ent
 });
 
 it('takes the field\'s own post type when the page leaves it empty, for the blog', function (): void {
-    $blog = listingPage('Salud y bienestar', 'salud', [], ['featured_image' => '/storage/media/salud.jpg']);
+    $blog = listingPage('Noticias', 'noticias', [], ['featured_image' => '/storage/media/noticias.jpg']);
     CmsPost::create(['title' => 'Nota', 'slug' => 'nota', 'post_type' => 'post', 'lang_id' => $this->lang->id, 'user_id' => $this->user->id, 'status' => 'published', 'published_at' => now()->subDay()]);
 
     $this->get('/blog/nota')->assertOk()->assertInertia(fn (Assert $page): Assert => $page
         ->component('front/blog/show')
-        ->where('listing.title', 'Salud y bienestar')
-        ->where('listing.featured_image', '/storage/media/salud.jpg')
+        ->where('listing.title', 'Noticias')
+        ->where('listing.featured_image', '/storage/media/noticias.jpg')
         ->where('listing.url', $blog->url));
 });
 

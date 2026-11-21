@@ -22,7 +22,7 @@ it('removes the module and its permissions, moving its log history to Personaliz
     $configs = AdmModule::where('route', 'configs.index')->firstOrFail();
     $configsEvent = AdmEvent::where('module_id', $configs->id)->firstOrFail();
     $log = AdmLog::create(['event_id' => $configsEvent->id, 'user_id' => $user->id, 'comment' => 'Actualizado en Configuración: #1']);
-    CmsConfig::create(['alias' => 'layout_copyright', 'name' => 'Copyright', 'type' => 'string', 'value' => '© EMSAL']);
+    CmsConfig::create(['alias' => 'layout_copyright', 'name' => 'Copyright', 'type' => 'string', 'value' => '© Cliente ABC']);
 
     (require database_path('migrations/2026_11_20_300000_remove_configs_module.php'))->up();
 
@@ -35,5 +35,5 @@ it('removes the module and its permissions, moving its log history to Personaliz
         ->and(AdmPermission::where('event_id', $configsEvent->id)->exists())->toBeFalse()
         ->and($log->fresh()->event_id)->toBe($layoutEvent)
         // The settings themselves stay
-        ->and(CmsConfig::where('alias', 'layout_copyright')->value('value'))->toBe('© EMSAL');
+        ->and(CmsConfig::where('alias', 'layout_copyright')->value('value'))->toBe('© Cliente ABC');
 });

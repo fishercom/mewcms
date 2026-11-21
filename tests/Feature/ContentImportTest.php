@@ -28,11 +28,11 @@ beforeEach(function (): void {
     $this->dir = sys_get_temp_dir().'/mewcms-content-'.uniqid();
     mkdir($this->dir.'/media', 0777, true);
     $image = imagecreatetruecolor(40, 30);
-    imagejpeg($image, $this->dir.'/media/salinas.jpg');
+    imagejpeg($image, $this->dir.'/media/portada.jpg');
 });
 
 afterEach(function (): void {
-    @unlink($this->dir.'/media/salinas.jpg');
+    @unlink($this->dir.'/media/portada.jpg');
     @unlink($this->dir.'/content.json');
     @rmdir($this->dir.'/media');
     @rmdir($this->dir);
@@ -98,11 +98,11 @@ it('reloads a content file only when it changed, with --if-changed', function ()
 
 it('loads a content file into a site: media, field groups, post types, posts and menus', function (): void {
     $file = writeContent($this->dir, [
-        'site' => ['name' => 'EMSAL', 'title' => 'EMSAL', 'currency' => 'PEN', 'lang' => 'es'],
-        'media' => ['salinas' => ['file' => 'media/salinas.jpg', 'alt' => 'Las salinas']],
+        'site' => ['name' => 'Cliente ABC', 'title' => 'Cliente ABC', 'currency' => 'PEN', 'lang' => 'es'],
+        'media' => ['portada' => ['file' => 'media/portada.jpg', 'alt' => 'Portada']],
         'settings' => ['layout_phone' => '(01) 6142000'],
         'schemas' => [
-            'home' => ['name' => 'Inicio EMSAL', 'type' => 'HOME', 'template' => 'front/templates/home', 'fields' => [
+            'home' => ['name' => 'Inicio Cliente ABC', 'type' => 'HOME', 'template' => 'front/templates/home', 'fields' => [
                 ['key' => 'hero_title', 'label' => 'Título', 'type' => 'text'],
                 ['key' => 'hero_image', 'label' => 'Imagen', 'type' => 'image'],
                 ['key' => 'productos', 'label' => 'Productos', 'type' => 'posts'],
@@ -112,9 +112,9 @@ it('loads a content file into a site: media, field groups, post types, posts and
         'post_types' => [['slug' => 'productos', 'name' => 'Productos', 'singular_name' => 'Producto', 'schema' => 'producto', 'per_page' => 0, 'order' => 'title']],
         'tags' => ['cocina' => 'Cocina', 'parrilla' => 'Parrilla'],
         'forms' => [['alias' => 'contacto', 'name' => 'Contacto', 'fields' => [['name' => 'Nombre', 'alias' => 'nombre'], ['name' => 'Correo', 'type' => 'email']]]],
-        'sliders' => [['key' => 'proceso', 'slides' => [['title' => 'El mar', 'image' => '@salinas'], ['title' => 'El sol']]]],
+        'sliders' => [['key' => 'proceso', 'slides' => [['title' => 'El mar', 'image' => '@portada'], ['title' => 'El sol']]]],
         'pages' => [
-            ['slug' => 'home', 'title' => 'Inicio', 'schema' => 'home', 'metadata' => ['hero_title' => 'Naturalmente peruana', 'hero_image' => '@salinas', 'productos' => ['post_type' => 'productos', 'limit' => 2]]],
+            ['slug' => 'home', 'title' => 'Inicio', 'schema' => 'home', 'metadata' => ['hero_title' => 'Naturalmente peruana', 'hero_image' => '@portada', 'productos' => ['post_type' => 'productos', 'limit' => 2]]],
             ['slug' => 'quienes-somos', 'title' => 'Quiénes somos', 'body' => '<p>Más de 70 años en {site}</p>'],
             ['slug' => 'historia', 'title' => 'Historia', 'parent' => 'quienes-somos'],
         ],
@@ -132,9 +132,9 @@ it('loads a content file into a site: media, field groups, post types, posts and
     $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertSuccessful();
 
     $site = $this->site->fresh();
-    expect($site->name)->toBe('EMSAL')->and($site->currency)->toBe('PEN')->and($site->theme)->toBe('default');
+    expect($site->name)->toBe('Cliente ABC')->and($site->currency)->toBe('PEN')->and($site->theme)->toBe('default');
 
-    $media = CmsMedia::where('alt', 'Las salinas')->first();
+    $media = CmsMedia::where('alt', 'Portada')->first();
     expect($media)->not->toBeNull();
     Storage::disk('public')->assertExists($media->path);
 
@@ -173,8 +173,8 @@ it('loads a content file into a site: media, field groups, post types, posts and
     expect(CmsArticle::withoutGlobalScopes()->count())->toBe(3)
         ->and(CmsMenu::withoutGlobalScopes()->count())->toBe(1)
         ->and(CmsForm::withoutGlobalScopes()->count())->toBe(1)
-        ->and(CmsMedia::where('alt', 'Las salinas')->count())->toBe(1)
-        ->and(CmsSchema::where('name', 'Inicio EMSAL')->count())->toBe(1);
+        ->and(CmsMedia::where('alt', 'Portada')->count())->toBe(1)
+        ->and(CmsSchema::where('name', 'Inicio Cliente ABC')->count())->toBe(1);
 });
 
 it('filters a post list by tag', function (): void {
@@ -234,7 +234,7 @@ it('refuses a theme without content, a menu link to a missing page and media out
 
 it('loads slides with their extra media and button, and reusable blocks', function (): void {
     $file = writeContent($this->dir, [
-        'media' => ['salinas' => ['file' => 'media/salinas.jpg', 'alt' => 'Las salinas']],
+        'media' => ['portada' => ['file' => 'media/portada.jpg', 'alt' => 'Portada']],
         'schemas' => ['home' => ['name' => 'Inicio', 'type' => 'HOME', 'template' => 'front/templates/home', 'fields' => [
             ['key' => 'banners', 'label' => 'Banners', 'type' => 'slider'],
             ['key' => 'process', 'label' => 'Proceso', 'type' => 'slider'],
@@ -242,15 +242,15 @@ it('loads slides with their extra media and button, and reusable blocks', functi
         'sliders' => [
             ['key' => 'banners', 'slides' => [[
                 'title' => 'Naturalmente peruana',
-                'image' => '@salinas',
-                'image_mobile' => '@salinas',
+                'image' => '@portada',
+                'image_mobile' => '@portada',
                 'video' => '/storage/media/mar.mp4',
-                'secondary_image' => '@salinas',
+                'secondary_image' => '@portada',
                 'url' => '/productos',
                 'button_label' => 'Conoce más',
                 'dark_text' => true,
             ]]],
-            ['key' => 'proceso', 'slides' => [['title' => 'El mar', 'image' => '@salinas']]],
+            ['key' => 'proceso', 'slides' => [['title' => 'El mar', 'image' => '@portada']]],
         ],
         'patterns' => ['contactanos' => ['name' => 'Contáctanos', 'category' => 'cta', 'blocks' => [['type' => 'rich_text', 'data' => ['html' => '<p>Escríbenos</p>']]]]],
         'pages' => [['slug' => 'home', 'title' => 'Inicio', 'schema' => 'home', 'metadata' => ['banners' => 'banners', 'process' => 'proceso'],
@@ -258,7 +258,7 @@ it('loads slides with their extra media and button, and reusable blocks', functi
     ]);
 
     $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertSuccessful();
-    $image = '/storage/'.CmsMedia::where('alt', 'Las salinas')->value('path');
+    $image = '/storage/'.CmsMedia::where('alt', 'Portada')->value('path');
 
     $slide = CmsSlider::withoutGlobalScopes()->where('key', 'banners')->first()->slides()->first();
     expect($slide->only(['image_mobile_url', 'video_url', 'secondary_image_url', 'link_url', 'button_label']))->toBe([
@@ -314,7 +314,7 @@ it('gives a post the related posts of its type, those sharing tags first', funct
 it('points the site favicon to a media item of the file', function (): void {
     $file = writeContent($this->dir, [
         'site' => ['favicon' => '@favicon'],
-        'media' => ['favicon' => ['file' => 'media/salinas.jpg', 'alt' => 'Favicon']],
+        'media' => ['favicon' => ['file' => 'media/portada.jpg', 'alt' => 'Favicon']],
     ]);
 
     $this->artisan('cms:content-import', ['source' => $file, '--force' => true])->assertSuccessful();
