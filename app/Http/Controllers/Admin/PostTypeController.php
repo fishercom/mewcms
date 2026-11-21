@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CmsArticle;
 use App\Models\CmsPostType;
 use App\Models\CmsSchema;
 use App\Support\ListingPages;
@@ -31,9 +30,8 @@ class PostTypeController extends Controller
 
         return Inertia::render('admin/post-types/index', [
             'items' => $items,
-            // The blog has no post type of its own: its listing page is chosen here
-            'pages' => ListingPages::options(),
-            'blogListingPageId' => ListingPages::id('post'),
+            // The page that lists each type, found from the pages' content (and the blog's)
+            'listings' => ListingPages::summary(['post', ...$items->getCollection()->pluck('slug')->all()]),
         ]);
     }
 
@@ -43,7 +41,6 @@ class PostTypeController extends Controller
 
         return Inertia::render('admin/post-types/create', [
             'schemas' => $schemas,
-            'pages' => ListingPages::options(),
         ]);
     }
 
@@ -59,14 +56,10 @@ class PostTypeController extends Controller
             'per_page' => 'nullable|integer|min:0|max:'.CmsPostType::MAX_PER_PAGE,
             'order' => ['nullable', Rule::in(CmsPostType::ORDERS)],
             'active' => 'boolean',
-            'listing_page_id' => $this->listingPageRule(),
         ]);
 
-        $listingPageId = $data['listing_page_id'] ?? null;
-        unset($data['listing_page_id']);
         $cpt = new CmsPostType($this->withDefaults($data));
         $cpt->save();
-        ListingPages::set($cpt->slug, $listingPageId);
 
         return redirect()->route('post-types.index');
     }
@@ -79,8 +72,6 @@ class PostTypeController extends Controller
         return Inertia::render('admin/post-types/edit', [
             'item' => $item,
             'schemas' => $schemas,
-            'pages' => ListingPages::options(),
-            'listingPageId' => ListingPages::id($item->slug),
         ]);
     }
 
@@ -98,15 +89,11 @@ class PostTypeController extends Controller
             'per_page' => 'nullable|integer|min:0|max:'.CmsPostType::MAX_PER_PAGE,
             'order' => ['nullable', Rule::in(CmsPostType::ORDERS)],
             'active' => 'boolean',
-            'listing_page_id' => $this->listingPageRule(),
         ]);
 
-        $listingPageId = $data['listing_page_id'] ?? null;
-        unset($data['listing_page_id']);
         $slug = $item->slug;
         $item->update($this->withDefaults($data));
         ListingPages::rename($slug, $item->slug);
-        ListingPages::set($item->slug, $listingPageId);
 
         return redirect()->route('post-types.index');
     }
@@ -129,31 +116,6 @@ class PostTypeController extends Controller
             ->map(fn (CmsPostType $type): array => ['slug' => $type->slug, 'name' => $type->name]);
 
         return response()->json([['slug' => 'post', 'name' => __('Entradas del blog')], ...$types]);
-    }
-
-    /**
-     * Save the page that lists the blog's entries on the current site.
-     */
-    public function blogListing(Request $request): RedirectResponse
-    {
-        $data = $request->validate(['listing_page_id' => $this->listingPageRule()]);
-        ListingPages::set('post', $data['listing_page_id'] ?? null);
-
-        return redirect()->route('post-types.index')->with('success', __('Página del blog guardada.'));
-    }
-
-    /**
-     * A page of the current site, or none.
-     *
-     * @return list<mixed>
-     */
-    private function listingPageRule(): array
-    {
-        return ['nullable', 'integer', function (string $attribute, mixed $value, \Closure $fail): void {
-            if (! CmsArticle::whereKey($value)->exists()) {
-                $fail(__('Elige una página de este sitio.'));
-            }
-        }];
     }
 
     /**

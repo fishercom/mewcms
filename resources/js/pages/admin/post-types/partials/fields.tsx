@@ -5,7 +5,6 @@ import { Label } from '@/components/ui/label';
 import { t } from '@/lib/i18n';
 import { CmsPostType } from '@/types/models/cms-post';
 import * as LucideIcons from 'lucide-react';
-import ListingPageSelect, { type ListingPageOption } from './listing-page-select';
 
 interface Props {
     data: Partial<CmsPostType>;
@@ -14,7 +13,6 @@ interface Props {
     errors: Record<string, string>;
     processing: boolean;
     schemas: { id: number; name: string }[];
-    pages: ListingPageOption[];
 }
 
 const AVAILABLE_ICONS = [
@@ -31,7 +29,7 @@ const AVAILABLE_ICONS = [
     { value: 'newspaper', label: t('Noticias'), desc: t('Novedades de prensa, anuncios o boletines') },
 ];
 
-export default function PostTypeFormFields({ data, setData, errors, processing, schemas, pages }: Props) {
+export default function PostTypeFormFields({ data, setData, errors, processing, schemas }: Props) {
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const nameVal = e.target.value;
         const generatedSlug = nameVal
@@ -157,23 +155,6 @@ export default function PostTypeFormFields({ data, setData, errors, processing, 
                     </select>
                     <InputError message={errors.order} />
                 </div>
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="listing_page_id">{t('Página del listado')}</Label>
-                <ListingPageSelect
-                    id="listing_page_id"
-                    pages={pages}
-                    value={data.listing_page_id}
-                    onChange={(value) => setData({ ...data, listing_page_id: value })}
-                    disabled={processing}
-                />
-                <p className="text-muted-foreground text-xs">
-                    {t(
-                        'La página de este sitio que muestra estas entradas. Cada entrada toma de ella su banner, su título y el enlace para regresar.',
-                    )}
-                </p>
-                <InputError message={errors.listing_page_id} />
             </div>
 
             <div className="grid gap-2">

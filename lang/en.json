@@ -1303,9 +1303,10 @@
     "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Data the theme shows on the site. Each site keeps its own.",
     "Página del listado": "Listing page",
     "Página del listado del blog": "Blog listing page",
-    "Guardado.": "Saved.",
-    "La página de este sitio que muestra estas entradas. Cada entrada toma de ella su banner, su título y el enlace para regresar.": "The page of this site that shows these entries. Each entry takes its banner, title and back link from it.",
-    "La página de este sitio que muestra las entradas del blog. Cada entrada toma de ella su banner, su título y el enlace para regresar.": "The page of this site that shows the blog entries. Each entry takes its banner, title and back link from it.",
-    "Elige una página de este sitio.": "Choose a page of this site.",
-    "Página del blog guardada.": "Blog page saved."
+    "Se detecta sola: es la página que muestra esas entradas con un bloque o campo de lista de posts. Si varias las muestran, se elige la principal en el editor de la página.": "Found automatically: the page that shows those entries with a post list block or field. If several show them, the main one is chosen in the page editor.",
+    "Es la página principal de :name: sus entradas toman de ella su banner y el enlace para regresar.": "It is the main page of :name: its entries take their banner and back link from it.",
+    "Otra página también muestra :name y es la principal.": "Another page also shows :name and is the main one.",
+    "Usar esta página como principal": "Use this page as the main one",
+    "Página principal del listado guardada.": "Main listing page saved.",
+    "Blog (Posts)": "Blog (Posts)"
 }

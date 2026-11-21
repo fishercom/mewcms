@@ -14,6 +14,7 @@ use App\Models\CmsSchema;
 use App\Models\CmsTag;
 use App\Support\ContentVersions;
 use App\Support\FrontCache;
+use App\Support\ListingPages;
 use App\Support\Locales;
 use App\Support\PageMenus;
 use Illuminate\Http\RedirectResponse;
@@ -213,7 +214,24 @@ class ArticleController extends Controller
             'menuIds' => PageMenus::membership($item),
             'autosave' => $item->pendingAutosave($request->user()->id),
             'translations' => $this->translationOptions($item),
+            // Only when other pages list the same entries: which one is the main listing
+            'listingChoices' => ListingPages::choicesFor($item),
         ]);
+    }
+
+    /**
+     * Make this page the main listing of a kind of entry it lists (when several pages do).
+     */
+    public function listing(Request $request, int $article): RedirectResponse
+    {
+        abort_unless($request->user()?->hasAdminPermission('articles', AdmAction::MANAGE), 403);
+        $page = CmsArticle::findOrFail($article);
+        $type = (string) $request->validate(['type' => 'required|string|max:100'])['type'];
+        abort_unless(array_key_exists($type, ListingPages::listedBy($page)), 422);
+
+        ListingPages::choose($type, $page->id);
+
+        return back()->with('success', __('Página principal del listado guardada.'));
     }
 
     /**

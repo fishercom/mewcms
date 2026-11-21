@@ -499,8 +499,8 @@ class ContentImporter
     }
 
     /**
-     * "listing_pages": the page that lists each kind of entry, by its slug
-     * ({"post": "blog", "productos": "nuestros-productos"}).
+     * "listing_pages": which page is the main listing of a kind of entry, by its slug
+     * ({"productos": "catalogo"}), when more than one page lists it.
      */
     private function importListingPages(): void
     {
@@ -508,7 +508,7 @@ class ContentImporter
             if (! isset($this->pages[$slug])) {
                 throw new RuntimeException("listing_pages: no page with the slug \"{$slug}\".");
             }
-            ListingPages::set((string) $type, $this->pages[$slug]->id);
+            ListingPages::choose((string) $type, $this->pages[$slug]->id);
         }
     }
 

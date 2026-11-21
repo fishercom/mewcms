@@ -183,11 +183,14 @@ A post's page (`front/blog/show`) also gets `related`: up to six posts of the sa
 share a tag with it (those sharing the most first), filled with the type's latest posts, in
 the same shape as a `postLists` item.
 
-Both pages, and a blog listing or post, also get `listing`: the page of the site chosen to
-list that kind of entry (**Página del listado** in Admin → Post types; the blog's is at the
-bottom of that screen), as `{ id, title, url, excerpt, featured_image }` in the post's
-language, or `null`. Draw an entry's banner, breadcrumb and "back" link from it, so the
-banner lives in one place: that page. Type it with `ListingPage` from `@/types/models/cms-post`.
+Both pages, and a blog listing or post, also get `listing`: the page of the site that lists
+that kind of entry, as `{ id, title, url, excerpt, featured_image }` in the post's language,
+or `null`. Nobody sets it: it is the published page with a **Lista de posts** of that kind,
+in a block or in a field of its template. When several pages list it (a catalogue, and a
+home with four featured products), the editor of one of them can make it the main one, and
+until then the one showing the most posts wins. Draw an entry's banner, breadcrumb and
+"back" link from it, so the banner lives in one place: that page. Type it with `ListingPage`
+from `@/types/models/cms-post`.
 
 ## Theme blocks
 
@@ -275,7 +278,7 @@ php artisan cms:content-import emsal --fresh      # delete the site's pages, pos
         "product": { "name": "Producto", "fields": [{ "key": "weight", "label": "Peso", "type": "text" }] }
     },
     "post_types": [{ "slug": "productos", "name": "Productos", "singular_name": "Producto", "schema": "product", "per_page": 0, "order": "title" }],
-    "listing_pages": { "productos": "nuestros-productos", "post": "blog" },
+    "listing_pages": { "productos": "catalogo" },
     "tags": { "cocina": "Cocina", "parrilla": "Parrilla" },
     "forms": [{ "alias": "contacto", "name": "Contacto", "fields": [{ "name": "Nombre", "alias": "nombre", "type": "text" }] }],
     "sliders": [

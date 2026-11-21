@@ -6,25 +6,26 @@ import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsPostType } from '@/types/models/cms-post';
 import { Input } from '@headlessui/react';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import * as LucideIcons from 'lucide-react';
 import { BookOpen, Check, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import ListingPageSelect, { type ListingPageOption } from './partials/listing-page-select';
 
 export default function Index() {
-    const {
-        items,
-        pages = [],
-        blogListingPageId = null,
-    } = usePage<{
-        items: Pagination<CmsPostType>;
-        pages?: ListingPageOption[];
-        blogListingPageId?: number | null;
-    }>().props;
-    // The blog has no post type of its own: its listing page is chosen below the table
-    const blog = useForm<{ listing_page_id: number | null }>({ listing_page_id: blogListingPageId });
+    // The page that lists each type (and the blog, "post"), found from the pages' content
+    const { items, listings = {} } = usePage<{ items: Pagination<CmsPostType>; listings?: Record<string, { id: number; title: string } | null> }>()
+        .props;
+    const listingLink = (type: string) => {
+        const page = listings[type];
+        return page ? (
+            <Link href={route('articles.edit', page.id)} className="text-primary hover:underline">
+                {page.title}
+            </Link>
+        ) : (
+            <em className="text-muted-foreground text-xs">{t('Ninguna')}</em>
+        );
+    };
     const [query, setQuery] = useState({ s: '' });
 
     useEffect(() => {
@@ -113,6 +114,9 @@ export default function Index() {
                                     {t('Plantilla Predefinida')}
                                 </th>
                                 <th scope="col" className="px-4 py-3">
+                                    {t('Página del listado')}
+                                </th>
+                                <th scope="col" className="px-4 py-3">
                                     {t('Descripción')}
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-center">
@@ -140,6 +144,7 @@ export default function Index() {
                                                 <em className="text-muted-foreground text-xs">{t('Ninguna')}</em>
                                             )}
                                         </td>
+                                        <td className="px-4 py-3">{listingLink(item.slug)}</td>
                                         <td className="text-muted-foreground max-w-xs truncate px-4 py-3">{item.description || '-'}</td>
                                         <td className="px-4 py-3 text-center">
                                             {item.active ? (
@@ -178,7 +183,7 @@ export default function Index() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="text-muted-foreground px-4 py-8 text-center italic">
+                                    <td colSpan={8} className="text-muted-foreground px-4 py-8 text-center italic">
                                         {t('No se encontraron tipos de contenido.')}
                                     </td>
                                 </tr>
@@ -193,37 +198,12 @@ export default function Index() {
                     </div>
                 )}
 
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        blog.post(route('post-types.blog_listing'), { preserveScroll: true });
-                    }}
-                    className="border-border bg-card mt-6 grid gap-2 rounded-xl border p-5 shadow-xs"
-                >
-                    <label htmlFor="blog_listing_page_id" className="text-foreground text-sm font-semibold">
-                        {t('Página del listado del blog')}
-                    </label>
-                    <div className="flex flex-col gap-2 sm:flex-row">
-                        <ListingPageSelect
-                            id="blog_listing_page_id"
-                            pages={pages}
-                            value={blog.data.listing_page_id}
-                            onChange={(value) => blog.setData('listing_page_id', value)}
-                            disabled={blog.processing}
-                        />
-                        <Button type="submit" disabled={blog.processing || !blog.isDirty} className="shrink-0">
-                            {t('Guardar')}
-                        </Button>
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                        {blog.recentlySuccessful
-                            ? t('Guardado.')
-                            : t(
-                                  'La página de este sitio que muestra las entradas del blog. Cada entrada toma de ella su banner, su título y el enlace para regresar.',
-                              )}
-                    </p>
-                    {blog.errors.listing_page_id && <p className="text-destructive text-xs">{blog.errors.listing_page_id}</p>}
-                </form>
+                <p className="text-muted-foreground mt-6 text-xs">
+                    {t('Página del listado del blog')}: {listingLink('post')}.{' '}
+                    {t(
+                        'Se detecta sola: es la página que muestra esas entradas con un bloque o campo de lista de posts. Si varias las muestran, se elige la principal en el editor de la página.',
+                    )}
+                </p>
             </div>
         </ModuleLayout>
     );
