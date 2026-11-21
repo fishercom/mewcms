@@ -1300,5 +1300,12 @@
     "Parámetros": "Parameters",
     "Otros parámetros": "Other parameters",
     "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Data the :name theme shows on the site (contact details, links, images). Each site keeps its own.",
-    "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Data the theme shows on the site. Each site keeps its own."
+    "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Data the theme shows on the site. Each site keeps its own.",
+    "Página del listado": "Listing page",
+    "Página del listado del blog": "Blog listing page",
+    "Guardado.": "Saved.",
+    "La página de este sitio que muestra estas entradas. Cada entrada toma de ella su banner, su título y el enlace para regresar.": "The page of this site that shows these entries. Each entry takes its banner, title and back link from it.",
+    "La página de este sitio que muestra las entradas del blog. Cada entrada toma de ella su banner, su título y el enlace para regresar.": "The page of this site that shows the blog entries. Each entry takes its banner, title and back link from it.",
+    "Elige una página de este sitio.": "Choose a page of this site.",
+    "Página del blog guardada.": "Blog page saved."
 }

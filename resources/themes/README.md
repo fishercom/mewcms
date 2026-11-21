@@ -121,8 +121,8 @@ Layout → Parámetros with no change to the CMS:
 "layout_fields": [
     { "alias": "whatsapp", "name": "WhatsApp", "type": "text", "group": "Contacto", "help": "El número con código de país" },
     { "alias": "address", "name": "Dirección", "type": "textarea", "group": "Contacto" },
-    { "alias": "products_banner", "name": "Banner de productos", "type": "image", "group": "Banners" },
-    { "alias": "products_url", "name": "Página de productos", "type": "url", "group": "Banners" }
+    { "alias": "footer_badge", "name": "Sello del pie", "type": "image", "group": "Pie de página" },
+    { "alias": "shop_url", "name": "Tienda en línea", "type": "url", "group": "Pie de página" }
 ]
 ```
 
@@ -136,6 +136,10 @@ Layout → Parámetros with no change to the CMS:
 The values are saved per site, so two sites with the same theme keep their own. A setting
 needed by one site only does not need the theme either: any other `layout_*` row that site
 has in `cms_configs` (not JSON) is shown under «Otros parámetros», with the row's `name`.
+
+Only data for the whole site belongs here. What belongs to a page (its banner, its texts)
+goes in the page itself, in the Pages module; an entry's page takes the banner of its
+listing page (see `listing` below).
 
 Tracking code that differs per site (Google Analytics, Tag Manager, a pixel) does not go
 in the theme: each site has **Scripts** fields in Admin → Sites, printed in `<head>` and at
@@ -178,6 +182,12 @@ shows (0 for all) and their order (newest, oldest or by title) are set per post 
 A post's page (`front/blog/show`) also gets `related`: up to six posts of the same type that
 share a tag with it (those sharing the most first), filled with the type's latest posts, in
 the same shape as a `postLists` item.
+
+Both pages, and a blog listing or post, also get `listing`: the page of the site chosen to
+list that kind of entry (**Página del listado** in Admin → Post types; the blog's is at the
+bottom of that screen), as `{ id, title, url, excerpt, featured_image }` in the post's
+language, or `null`. Draw an entry's banner, breadcrumb and "back" link from it, so the
+banner lives in one place: that page. Type it with `ListingPage` from `@/types/models/cms-post`.
 
 ## Theme blocks
 
@@ -265,6 +275,7 @@ php artisan cms:content-import emsal --fresh      # delete the site's pages, pos
         "product": { "name": "Producto", "fields": [{ "key": "weight", "label": "Peso", "type": "text" }] }
     },
     "post_types": [{ "slug": "productos", "name": "Productos", "singular_name": "Producto", "schema": "product", "per_page": 0, "order": "title" }],
+    "listing_pages": { "productos": "nuestros-productos", "post": "blog" },
     "tags": { "cocina": "Cocina", "parrilla": "Parrilla" },
     "forms": [{ "alias": "contacto", "name": "Contacto", "fields": [{ "name": "Nombre", "alias": "nombre", "type": "text" }] }],
     "sliders": [

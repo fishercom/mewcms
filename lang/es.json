@@ -1296,5 +1296,16 @@
     "Ej.: Gestor de contenidos": "Ej.: Gestor de contenidos",
     "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Opcional. Línea pequeña bajo el nombre en el menú lateral.",
     "Logo del cliente en el panel y en el inicio de sesión": "Logo del cliente en el panel y en el inicio de sesión",
-    "Solo un Super Admin puede cambiar estos ajustes.": "Solo un Super Admin puede cambiar estos ajustes."
+    "Solo un Super Admin puede cambiar estos ajustes.": "Solo un Super Admin puede cambiar estos ajustes.",
+    "Parámetros": "Parámetros",
+    "Otros parámetros": "Otros parámetros",
+    "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.",
+    "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.",
+    "Página del listado": "Página del listado",
+    "Página del listado del blog": "Página del listado del blog",
+    "Guardado.": "Guardado.",
+    "La página de este sitio que muestra estas entradas. Cada entrada toma de ella su banner, su título y el enlace para regresar.": "La página de este sitio que muestra estas entradas. Cada entrada toma de ella su banner, su título y el enlace para regresar.",
+    "La página de este sitio que muestra las entradas del blog. Cada entrada toma de ella su banner, su título y el enlace para regresar.": "La página de este sitio que muestra las entradas del blog. Cada entrada toma de ella su banner, su título y el enlace para regresar.",
+    "Elige una página de este sitio.": "Elige una página de este sitio.",
+    "Página del blog guardada.": "Página del blog guardada."
 }

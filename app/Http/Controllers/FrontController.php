@@ -13,6 +13,7 @@ use App\Models\CmsSlider;
 use App\Models\CmsTag;
 use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
+use App\Support\ListingPages;
 use App\Support\Locales;
 use App\Support\MediaLibrary;
 use App\Support\PostLists;
@@ -171,6 +172,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => $post->post_type !== 'post' ? CmsPostType::where('slug', $post->post_type)->first() : null,
+            'listing' => ListingPages::for($post->post_type ?: 'post', $post->lang_id),
             ...FrontCache::shared(),
         ]);
     }
@@ -369,6 +371,8 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => null,
+            // The page chosen to list the blog (Admin → Tipos de contenido): its banner and title
+            'listing' => ListingPages::for('post', Locales::currentId()),
             'media' => MediaLibrary::lookup($posts->getCollection()->pluck('featured_image')->filter()),
             ...$shared,
         ]);
@@ -390,6 +394,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => null,
+            'listing' => ListingPages::for('post', $post->lang_id),
             // The page may list the recent posts ("keep reading"), so their images get srcsets too
             'media' => $this->mediaFor($post, $post->metadata ?? null)
                 + MediaLibrary::lookup(collect($shared['recentPosts'])->pluck('featured_image')->filter())
@@ -417,6 +422,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => $cpt,
+            'listing' => ListingPages::for($cpt->slug, Locales::currentId()),
             'media' => MediaLibrary::lookup($posts->getCollection()->pluck('featured_image')->filter()),
             ...$shared,
         ]);
@@ -438,6 +444,8 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => $cpt,
+            // The page that lists this post type (Admin → Tipos de contenido): its banner, title and address
+            'listing' => ListingPages::for($cpt->slug, $post->lang_id),
             'media' => $this->mediaFor($post, $post->metadata ?? null)
                 + MediaLibrary::lookup($related->pluck('featured_image')->filter()),
             ...$shared,

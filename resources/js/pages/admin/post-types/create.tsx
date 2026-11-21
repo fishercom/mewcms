@@ -6,9 +6,10 @@ import { CmsPostType } from '@/types/models/cms-post';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import PostTypeFormFields from './partials/fields';
+import { type ListingPageOption } from './partials/listing-page-select';
 
 export default function Create() {
-    const { schemas } = usePage<{ schemas: { id: number; name: string }[] }>().props;
+    const { schemas, pages } = usePage<{ schemas: { id: number; name: string }[]; pages: ListingPageOption[] }>().props;
 
     const initialItem: Partial<CmsPostType> = {
         name: '',
@@ -20,6 +21,7 @@ export default function Create() {
         per_page: 6,
         order: 'newest',
         active: true,
+        listing_page_id: null,
     };
 
     const [data, setData] = useState<Partial<CmsPostType>>(initialItem);
@@ -47,7 +49,7 @@ export default function Create() {
         <ModuleLayout view={t('Crear')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <PostTypeFormFields data={data} setData={setData} errors={errors} processing={processing} schemas={schemas} />
+                    <PostTypeFormFields data={data} setData={setData} errors={errors} processing={processing} schemas={schemas} pages={pages} />
 
                     <div className="border-border flex items-center gap-4 border-t pt-4">
                         <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">

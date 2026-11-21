@@ -198,6 +198,7 @@ class ContentImporter
                 $this->importPages($langId);
                 $this->importPosts($langId, $userId);
                 $this->importMenus($langId);
+                $this->importListingPages();
             });
         });
 
@@ -494,6 +495,20 @@ class ContentImporter
         }
         if ($pages !== []) {
             $this->say('  '.Sites::current()?->name.': '.count($pages).' pages');
+        }
+    }
+
+    /**
+     * "listing_pages": the page that lists each kind of entry, by its slug
+     * ({"post": "blog", "productos": "nuestros-productos"}).
+     */
+    private function importListingPages(): void
+    {
+        foreach ((array) ($this->data['listing_pages'] ?? []) as $type => $slug) {
+            if (! isset($this->pages[$slug])) {
+                throw new RuntimeException("listing_pages: no page with the slug \"{$slug}\".");
+            }
+            ListingPages::set((string) $type, $this->pages[$slug]->id);
         }
     }
 

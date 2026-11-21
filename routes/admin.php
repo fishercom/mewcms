@@ -121,6 +121,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::post('block-patterns/quick', [BlockPatternController::class, 'quickStore'])->name('block-patterns.quick');
     Route::resource('block-patterns', BlockPatternController::class)->except(['show']);
 
+    Route::post('post-types/blog-listing', [PostTypeController::class, 'blogListing'])->name('post-types.blog_listing');
     Route::resource('post-types', PostTypeController::class);
     Route::post('posts/bulk', [PostController::class, 'bulk'])->name('posts.bulk');
     Route::post('posts/{post}/translate/{lang}', [PostController::class, 'translate'])->whereNumber(['post', 'lang'])->name('posts.translate');
