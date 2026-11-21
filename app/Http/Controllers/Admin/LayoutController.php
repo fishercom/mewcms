@@ -9,7 +9,9 @@ use App\Rules\SafeUrl;
 use App\Support\AdminActivity;
 use App\Support\ContentSanitizer;
 use App\Support\FrontCache;
+use App\Support\Sites;
 use App\Support\SocialLinks;
+use App\Support\Themes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -30,6 +32,9 @@ class LayoutController extends Controller
         return Inertia::render('admin/layout/index', [
             'settings' => $settings,
             'socialLinks' => SocialLinks::all(),
+            // The settings the site's theme declares in its theme.json ("layout_fields")
+            'themeFields' => self::fields(),
+            'themeName' => Themes::all()[Themes::current()]['name'] ?? '',
         ]);
     }
 
@@ -40,7 +45,17 @@ class LayoutController extends Controller
     {
         $url = ['nullable', 'string', 'max:2048', new SafeUrl];
 
-        $data = $request->validate([
+        $themeFields = self::fields();
+        $themeRules = [];
+        foreach ($themeFields as $field) {
+            $themeRules[$field['alias']] = match ($field['type']) {
+                'url', 'image' => $url,
+                'textarea' => 'nullable|string|max:5000',
+                default => 'nullable|string|max:1000',
+            };
+        }
+
+        $data = $request->validate($themeRules + [
             'layout_header_logo' => $url,
             'layout_footer_logo' => $url,
             'layout_copyright' => 'nullable|string|max:1000',
@@ -76,8 +91,20 @@ class LayoutController extends Controller
             $data['layout_custom_css'] = ContentSanitizer::css($data['layout_custom_css']);
         }
 
+        // The theme's own fields are plain text or addresses: no markup is kept
+        foreach ($themeFields as $field) {
+            if (array_key_exists($field['alias'], $data) && in_array($field['type'], ['text', 'textarea'], true)) {
+                $data[$field['alias']] = trim(strip_tags((string) $data[$field['alias']]));
+            }
+        }
+        $names = array_column($themeFields, 'name', 'alias');
+        $types = array_column($themeFields, 'type', 'alias');
+
         foreach ($data as $alias => $value) {
-            CmsConfig::saveForSite($alias, $value ?? '');
+            CmsConfig::saveForSite($alias, $value ?? '', isset($names[$alias]) ? [
+                'type' => ($types[$alias] ?? '') === 'textarea' ? 'text' : 'string',
+                'name' => $names[$alias],
+            ] : []);
         }
 
         // Saved without model events
@@ -87,5 +114,42 @@ class LayoutController extends Controller
             : 'logos y textos');
 
         return redirect()->route('layout.index')->with('success', __('Configuraciones de layout guardadas.'));
+    }
+
+    /**
+     * The extra fields of the form: those the site's theme declares in its theme.json
+     * ("layout_fields"), then any other "layout_*" setting the site has in cms_configs
+     * (a parameter added for one site), as plain text under «Otros parámetros».
+     *
+     * @return list<array{alias: string, name: string, type: string, help: string, placeholder: string, group: string}>
+     */
+    private static function fields(): array
+    {
+        $fields = Themes::all()[Themes::current()]['layout_fields'] ?? [];
+        $known = array_merge(Themes::RESERVED_LAYOUT_FIELDS, array_keys(SocialLinks::LEGACY_ALIASES), array_column($fields, 'alias'));
+
+        $siteId = Sites::currentId();
+        $rows = CmsConfig::where('alias', 'like', 'layout_%')
+            ->where(fn ($query) => $query->whereNull('site_id')->when($siteId, fn ($query) => $query->orWhere('site_id', $siteId)))
+            ->where('type', '!=', 'json')
+            ->orderBy('id')
+            ->get(['alias', 'name', 'type']);
+
+        foreach ($rows as $row) {
+            if (in_array($row->alias, $known, true) || ! preg_match('/^layout_[a-z0-9_]{1,60}$/', (string) $row->alias)) {
+                continue;
+            }
+            $known[] = $row->alias;
+            $fields[] = [
+                'alias' => $row->alias,
+                'name' => (string) ($row->name ?: $row->alias),
+                'type' => $row->type === 'text' ? 'textarea' : 'text',
+                'help' => '',
+                'placeholder' => '',
+                'group' => __('Otros parámetros'),
+            ];
+        }
+
+        return $fields;
     }
 }
