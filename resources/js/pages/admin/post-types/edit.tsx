@@ -6,15 +6,9 @@ import { CmsPostType } from '@/types/models/cms-post';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import PostTypeFormFields from './partials/fields';
-import { type ListingPageOption } from './partials/listing-page-select';
 
 export default function Edit() {
-    const { item, schemas, pages, listingPageId } = usePage<{
-        item: CmsPostType;
-        schemas: { id: number; name: string }[];
-        pages: ListingPageOption[];
-        listingPageId: number | null;
-    }>().props;
+    const { item, schemas } = usePage<{ item: CmsPostType; schemas: { id: number; name: string }[] }>().props;
 
     const [data, setData] = useState<Partial<CmsPostType>>({
         id: item.id,
@@ -27,7 +21,6 @@ export default function Edit() {
         per_page: item.per_page ?? 6,
         order: item.order ?? 'newest',
         active: item.active,
-        listing_page_id: listingPageId,
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -53,7 +46,7 @@ export default function Edit() {
         <ModuleLayout view={t('Editar')}>
             <FormLayout>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <PostTypeFormFields data={data} setData={setData} errors={errors} processing={processing} schemas={schemas} pages={pages} />
+                    <PostTypeFormFields data={data} setData={setData} errors={errors} processing={processing} schemas={schemas} />
 
                     <div className="border-border flex items-center gap-4 border-t pt-4">
                         <Button disabled={processing} className="bg-primary text-primary-foreground hover:bg-primary/90">

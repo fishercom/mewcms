@@ -18,7 +18,7 @@ class FrontCache
 {
     public const TTL = 3600;
 
-    private const KEYS = ['shared', 'menus', 'layout', 'sitemap', 'texts'];
+    private const KEYS = ['shared', 'menus', 'layout', 'sitemap', 'texts', 'listings'];
 
     /**
      * Navigation, popular tags, recent articles and recent posts shared by the public templates.

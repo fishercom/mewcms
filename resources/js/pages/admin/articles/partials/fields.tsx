@@ -16,10 +16,17 @@ import { cn } from '@/lib/utils';
 import { CmsArticle, CmsArticleForm, JsonValue } from '@/types/models/cms-article';
 import { CmsSchema } from '@/types/models/cms-schema';
 import { CmsTag } from '@/types/models/cms-tag';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { FileText, Globe, Image as ImageIcon, Settings, Sliders, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import SeoFields from '../../partials/seo-fields';
+
+/** A kind of entry this page lists that other pages list too (only then the editor picks the main one) */
+interface ListingChoice {
+    type: string;
+    name: string;
+    main: boolean;
+}
 
 /** A menu the page can appear in. */
 export interface PageMenu {
@@ -75,6 +82,7 @@ export default function ArticleFields({
     onChangeSchema,
 }: Props) {
     const [mediaOpen, setMediaOpen] = useState(false);
+    const { listingChoices = [] } = usePage<{ listingChoices?: ListingChoice[] }>().props;
     // The dashboard links here with ?tab=seo to open the review directly
     const [activeTab, setActiveTab] = useState<'content' | 'schema' | 'seo'>(() =>
         typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tab') === 'seo' ? 'seo' : 'content',
@@ -555,6 +563,45 @@ export default function ArticleFields({
                                 ? t('Se añade al final del menú; el orden se cambia en Menús.')
                                 : t('Solo lectura: necesitas permiso para administrar Menús.')}
                         </p>
+                    </div>
+                )}
+
+                {/* Main listing: only on pages that list entries other pages list too */}
+                {listingChoices.length > 0 && (
+                    <div className="border-border/70 bg-card space-y-3 rounded-2xl border p-4 shadow-2xs">
+                        <h3 className="border-border/60 text-muted-foreground border-b pb-2 text-xs font-bold tracking-wider uppercase">
+                            {t('Página del listado')}
+                        </h3>
+                        {listingChoices.map((choice) =>
+                            choice.main ? (
+                                <p key={choice.type} className="text-xs">
+                                    {t('Es la página principal de :name: sus entradas toman de ella su banner y el enlace para regresar.', {
+                                        name: choice.name,
+                                    })}
+                                </p>
+                            ) : (
+                                <div key={choice.type} className="space-y-2">
+                                    <p className="text-muted-foreground text-xs">
+                                        {t('Otra página también muestra :name y es la principal.', { name: choice.name })}
+                                    </p>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8 text-xs"
+                                        onClick={() =>
+                                            router.post(
+                                                route('articles.listing', data.id ?? 0),
+                                                { type: choice.type },
+                                                { preserveScroll: true, preserveState: true },
+                                            )
+                                        }
+                                    >
+                                        {t('Usar esta página como principal')}
+                                    </Button>
+                                </div>
+                            ),
+                        )}
                     </div>
                 )}
             </div>

@@ -99,6 +99,7 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
 
     Route::post('articles/bulk', [ArticleController::class, 'bulk'])->name('articles.bulk');
     Route::post('articles/{article}/translate/{lang}', [ArticleController::class, 'translate'])->whereNumber(['article', 'lang'])->name('articles.translate');
+    Route::post('articles/{article}/listing', [ArticleController::class, 'listing'])->whereNumber('article')->name('articles.listing');
     Route::resource('articles', ArticleController::class);
     Route::post('articles/sort', [ArticleController::class, 'sort'])->name('articles.sort');
     Route::post('tags/quick', [TagController::class, 'quickStore'])->name('tags.quick');
@@ -121,7 +122,6 @@ Route::middleware(['auth', 'admin.permission'])->prefix('admin')->group(function
     Route::post('block-patterns/quick', [BlockPatternController::class, 'quickStore'])->name('block-patterns.quick');
     Route::resource('block-patterns', BlockPatternController::class)->except(['show']);
 
-    Route::post('post-types/blog-listing', [PostTypeController::class, 'blogListing'])->name('post-types.blog_listing');
     Route::resource('post-types', PostTypeController::class);
     Route::post('posts/bulk', [PostController::class, 'bulk'])->name('posts.bulk');
     Route::post('posts/{post}/translate/{lang}', [PostController::class, 'translate'])->whereNumber(['post', 'lang'])->name('posts.translate');

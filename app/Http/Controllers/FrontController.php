@@ -371,7 +371,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/index', [
             'posts' => $posts,
             'cpt' => null,
-            // The page chosen to list the blog (Admin → Tipos de contenido): its banner and title
+            // The page that lists the blog's posts (found from the pages' content): its banner and title
             'listing' => ListingPages::for('post', Locales::currentId()),
             'media' => MediaLibrary::lookup($posts->getCollection()->pluck('featured_image')->filter()),
             ...$shared,
@@ -444,7 +444,7 @@ class FrontController extends Controller
         return Inertia::render('front/blog/show', [
             'post' => $post,
             'cpt' => $cpt,
-            // The page that lists this post type (Admin → Tipos de contenido): its banner, title and address
+            // The page that lists this post type (found from the pages' content): its banner, title and address
             'listing' => ListingPages::for($cpt->slug, $post->lang_id),
             'media' => $this->mediaFor($post, $post->metadata ?? null)
                 + MediaLibrary::lookup($related->pluck('featured_image')->filter()),

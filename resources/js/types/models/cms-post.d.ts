@@ -19,7 +19,6 @@ export interface CmsPostType {
     updated_at?: string;
     default_schema?: CmsSchema;
     /** Form only: the page of the current site that lists these entries */
-    listing_page_id?: number | null;
 }
 
 /** The page that lists a kind of entry (Admin → Tipos de contenido), as the public pages get it */
