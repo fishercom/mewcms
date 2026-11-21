@@ -316,7 +316,7 @@ export default function LayoutCustomizer({ settings, socialLinks, themeFields = 
                             <div className="space-y-6">
                                 <p className="text-muted-foreground text-xs">
                                     {themeName
-                                        ? t('Datos que usa el tema {name} en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.', {
+                                        ? t('Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.', {
                                               name: themeName,
                                           })
                                         : t('Datos que usa el tema en el sitio. Cada sitio guarda los suyos.')}

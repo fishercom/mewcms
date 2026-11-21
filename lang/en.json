@@ -1299,6 +1299,6 @@
     "Solo un Super Admin puede cambiar estos ajustes.": "Only a super admin can change these settings.",
     "Parámetros": "Parameters",
     "Otros parámetros": "Other parameters",
-    "Datos que usa el tema {name} en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Data the {name} theme shows on the site (contact details, links, images). Each site keeps its own.",
+    "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Data the :name theme shows on the site (contact details, links, images). Each site keeps its own.",
     "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Data the theme shows on the site. Each site keeps its own."
 }
