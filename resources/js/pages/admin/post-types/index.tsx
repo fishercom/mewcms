@@ -6,14 +6,25 @@ import { t } from '@/lib/i18n';
 import { Pagination } from '@/types';
 import { CmsPostType } from '@/types/models/cms-post';
 import { Input } from '@headlessui/react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import * as LucideIcons from 'lucide-react';
 import { BookOpen, Check, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import ListingPageSelect, { type ListingPageOption } from './partials/listing-page-select';
 
 export default function Index() {
-    const { items } = usePage<{ items: Pagination<CmsPostType> }>().props;
+    const {
+        items,
+        pages = [],
+        blogListingPageId = null,
+    } = usePage<{
+        items: Pagination<CmsPostType>;
+        pages?: ListingPageOption[];
+        blogListingPageId?: number | null;
+    }>().props;
+    // The blog has no post type of its own: its listing page is chosen below the table
+    const blog = useForm<{ listing_page_id: number | null }>({ listing_page_id: blogListingPageId });
     const [query, setQuery] = useState({ s: '' });
 
     useEffect(() => {
@@ -181,6 +192,38 @@ export default function Index() {
                         <PaginationNav data={items} />
                     </div>
                 )}
+
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        blog.post(route('post-types.blog_listing'), { preserveScroll: true });
+                    }}
+                    className="border-border bg-card mt-6 grid gap-2 rounded-xl border p-5 shadow-xs"
+                >
+                    <label htmlFor="blog_listing_page_id" className="text-foreground text-sm font-semibold">
+                        {t('Página del listado del blog')}
+                    </label>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <ListingPageSelect
+                            id="blog_listing_page_id"
+                            pages={pages}
+                            value={blog.data.listing_page_id}
+                            onChange={(value) => blog.setData('listing_page_id', value)}
+                            disabled={blog.processing}
+                        />
+                        <Button type="submit" disabled={blog.processing || !blog.isDirty} className="shrink-0">
+                            {t('Guardar')}
+                        </Button>
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                        {blog.recentlySuccessful
+                            ? t('Guardado.')
+                            : t(
+                                  'La página de este sitio que muestra las entradas del blog. Cada entrada toma de ella su banner, su título y el enlace para regresar.',
+                              )}
+                    </p>
+                    {blog.errors.listing_page_id && <p className="text-destructive text-xs">{blog.errors.listing_page_id}</p>}
+                </form>
             </div>
         </ModuleLayout>
     );

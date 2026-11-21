@@ -18,6 +18,17 @@ export interface CmsPostType {
     created_at?: string;
     updated_at?: string;
     default_schema?: CmsSchema;
+    /** Form only: the page of the current site that lists these entries */
+    listing_page_id?: number | null;
+}
+
+/** The page that lists a kind of entry (Admin → Tipos de contenido), as the public pages get it */
+export interface ListingPage {
+    id: number;
+    title: string;
+    url: string;
+    excerpt: string | null;
+    featured_image: string | null;
 }
 
 export interface CmsPost {
