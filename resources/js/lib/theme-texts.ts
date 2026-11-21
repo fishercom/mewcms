@@ -23,6 +23,8 @@ interface SiteProps {
     [key: string]: unknown;
     texts?: Texts;
     site?: { locale?: string | null; currency?: string | null } | null;
+    /** Admin pages: the current site's theme, for block previews (Themes::preview) */
+    block_preview?: { texts?: Texts; locale?: string } | null;
 }
 
 export const DEFAULT_CURRENCY = 'USD';
@@ -126,8 +128,10 @@ export function formatPrice(value: unknown, locale: string, currency: string = D
  *     choice('search.results', results.length, { query })
  */
 export function useTexts() {
-    const { texts, site } = usePage<SiteProps>().props;
-    const locale = site?.locale || 'en';
+    const { site, block_preview: preview, ...props } = usePage<SiteProps>().props;
+    // Public pages get the texts; in the admin, a block preview takes the site's from block_preview
+    const texts = props.texts && Object.keys(props.texts).length > 0 ? props.texts : preview?.texts;
+    const locale = site?.locale || preview?.locale || 'en';
     const currency = site?.currency || DEFAULT_CURRENCY;
 
     return useMemo(() => {

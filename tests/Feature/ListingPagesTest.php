@@ -122,7 +122,7 @@ it('keeps the choice when the post type changes its slug, and shows the page in 
 
     $this->actingAs($this->user)->get(route('post-types.index'))->assertInertia(fn (Assert $page): Assert => $page
         ->where('listings.productos', ['id' => $this->catalog->id, 'title' => 'Nuestros productos'])
-        ->where('listings.post', null));
+        ->missing('listings.post'));
 
     $this->actingAs($this->user)->put(route('post-types.update', $this->type->id), [
         'name' => 'Productos', 'singular_name' => 'Producto', 'slug' => 'catalogo', 'active' => true,

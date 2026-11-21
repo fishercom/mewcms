@@ -113,5 +113,8 @@ it('gives the admin the site\'s stylesheets, so the editor draws blocks as the s
     $this->actingAs(User::factory()->superAdmin()->create())
         ->withSession([Sites::SESSION_KEY => $this->site->id])
         ->get('/admin/articles')
-        ->assertInertia(fn ($page) => $page->where('block_preview.theme', 'velvet')->has('block_preview.styles', fn ($styles) => $styles->etc()));
+        ->assertInertia(fn ($page) => $page->where('block_preview.theme', 'velvet')->has('block_preview.styles', fn ($styles) => $styles->etc())
+            // And its fixed texts in the site's language, so a block does not show bare keys
+            ->where('block_preview.locale', 'es')
+            ->has('block_preview.texts', fn ($texts) => $texts->etc()));
 });

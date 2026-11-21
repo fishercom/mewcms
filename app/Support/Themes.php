@@ -328,6 +328,9 @@ class Themes
         return [
             'theme' => self::layout($theme),
             'styles' => [$style, ...array_column(self::all()[$theme]['styles'] ?? [], 'href')],
+            // The theme's fixed texts, so a block drawn in the editor reads as on the site
+            'texts' => ThemeTexts::forCurrentSite(),
+            'locale' => ThemeTexts::locale(),
         ];
     }
 
