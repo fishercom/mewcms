@@ -62,7 +62,7 @@ class Themes
     /**
      * Installed themes, keyed by slug: the built ones (default first), then the uploaded ones.
      *
-     * @return array<string, array{slug: string, name: string, description: string, version: string, author: string, screenshot: bool, uploaded: bool, layout: string, styles: list<array{href: string, media: string|null}>, scripts: list<array{src: string, position: string, defer: bool, async: bool, module: bool}>}>
+     * @return array<string, array{slug: string, name: string, description: string, version: string, author: string, screenshot: bool, uploaded: bool, layout: string, styles: list<array{href: string, media: string|null}>, scripts: list<array{src: string, position: string, defer: bool, async: bool, module: bool}>, dark_mode: bool, ai_blocks: list<string>|null, layout_fields: list<array{alias: string, name: string, type: string, help: string, placeholder: string, group: string}>}>
      */
     public static function all(): array
     {
@@ -158,7 +158,51 @@ class Themes
             'dark_mode' => ($info['dark_mode'] ?? true) !== false,
             // "ai_blocks": the block types the AI may draft pages with (all when missing)
             'ai_blocks' => is_array($info['ai_blocks'] ?? null) ? array_values(array_filter($info['ai_blocks'], 'is_string')) : null,
+            // "layout_fields": the theme's own settings, edited in Personalizar Layout
+            'layout_fields' => self::layoutFields($info['layout_fields'] ?? null),
         ];
+    }
+
+    /** Settings that Personalizar Layout already edits on its own: a theme cannot declare them */
+    public const RESERVED_LAYOUT_FIELDS = ['layout_header_logo', 'layout_footer_logo', 'layout_copyright', 'layout_custom_css', 'layout_social_links'];
+
+    /** The kinds of field a theme may declare for Personalizar Layout */
+    public const LAYOUT_FIELD_TYPES = ['text', 'textarea', 'url', 'image'];
+
+    public const MAX_LAYOUT_FIELDS = 40;
+
+    /**
+     * The "layout_fields" of a theme.json, cleaned: each one an alias (saved as the setting
+     * "layout_<alias>"), a name, a type (text, textarea, url or image), and an optional help
+     * text, placeholder and group (the heading it is shown under). Fields with a bad or
+     * repeated alias are left out.
+     *
+     * @return list<array{alias: string, name: string, type: string, help: string, placeholder: string, group: string}>
+     */
+    public static function layoutFields(mixed $fields): array
+    {
+        $clean = [];
+        foreach (array_slice(is_array($fields) ? array_values($fields) : [], 0, self::MAX_LAYOUT_FIELDS) as $field) {
+            if (! is_array($field) || ! is_string($field['alias'] ?? null)) {
+                continue;
+            }
+            $alias = strtolower(trim($field['alias']));
+            $alias = str_starts_with($alias, 'layout_') ? $alias : 'layout_'.$alias;
+            if (! preg_match('/^layout_[a-z0-9_]{1,60}$/', $alias) || in_array($alias, self::RESERVED_LAYOUT_FIELDS, true) || isset($clean[$alias])) {
+                continue;
+            }
+            $text = fn (string $key, int $max): string => is_string($field[$key] ?? null) ? mb_substr(trim($field[$key]), 0, $max) : '';
+            $clean[$alias] = [
+                'alias' => $alias,
+                'name' => $text('name', 80) ?: $alias,
+                'type' => in_array($field['type'] ?? null, self::LAYOUT_FIELD_TYPES, true) ? $field['type'] : 'text',
+                'help' => $text('help', 300),
+                'placeholder' => $text('placeholder', 120),
+                'group' => $text('group', 60),
+            ];
+        }
+
+        return array_values($clean);
     }
 
     /**

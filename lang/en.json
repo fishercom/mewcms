@@ -1296,5 +1296,9 @@
     "Ej.: Gestor de contenidos": "E.g. Content manager",
     "Opcional. Línea pequeña bajo el nombre en el menú lateral.": "Optional. Small line under the name in the sidebar.",
     "Logo del cliente en el panel y en el inicio de sesión": "The client's logo in the panel and on the login screen",
-    "Solo un Super Admin puede cambiar estos ajustes.": "Only a super admin can change these settings."
+    "Solo un Super Admin puede cambiar estos ajustes.": "Only a super admin can change these settings.",
+    "Parámetros": "Parameters",
+    "Otros parámetros": "Other parameters",
+    "Datos que usa el tema {name} en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Data the {name} theme shows on the site (contact details, links, images). Each site keeps its own.",
+    "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Data the theme shows on the site. Each site keeps its own."
 }

@@ -9,11 +9,23 @@ import FormLayout from '@/layouts/module/Form';
 import ModuleLayout from '@/layouts/module/layout';
 import { t } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
-import { CheckCircle2, Code, Globe, Layout, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
+import { CheckCircle2, Code, Globe, Layout, Palette, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import React, { useState } from 'react';
 
+/** A setting the site's theme declares in its theme.json ("layout_fields") */
+interface ThemeField {
+    alias: string;
+    name: string;
+    type: 'text' | 'textarea' | 'url' | 'image';
+    help: string;
+    placeholder: string;
+    group: string;
+}
+
 interface Props {
-    settings: {
+    themeFields?: ThemeField[];
+    themeName?: string;
+    settings: Record<string, string | null> & {
         layout_header_logo: string | null;
         layout_footer_logo: string | null;
         layout_copyright: string;
@@ -25,12 +37,25 @@ interface Props {
     };
 }
 
-export default function LayoutCustomizer({ settings, socialLinks, flash }: Props) {
-    const [activeTab, setActiveTab] = useState<'general' | 'social' | 'css'>('general');
+export default function LayoutCustomizer({ settings, socialLinks, themeFields = [], themeName = '', flash }: Props) {
+    const [activeTab, setActiveTab] = useState<'general' | 'theme' | 'social' | 'css'>('general');
     const [saved, setSaved] = useState(false);
-    const [drawerTarget, setDrawerTarget] = useState<'header' | 'footer' | null>(null);
+    // "header", "footer" or the alias of a theme image field
+    const [drawerTarget, setDrawerTarget] = useState<string | null>(null);
+
+    // The theme's fields, under their group headings in the order they first appear
+    const themeGroups = themeFields.reduce<{ name: string; fields: ThemeField[] }[]>((groups, field) => {
+        const group = groups.find((g) => g.name === field.group);
+        if (group) {
+            group.fields.push(field);
+        } else {
+            groups.push({ name: field.group, fields: [field] });
+        }
+        return groups;
+    }, []);
 
     const { data, setData, post, processing, errors, clearErrors } = useForm({
+        ...Object.fromEntries(themeFields.map((field) => [field.alias, settings[field.alias] || ''])),
         layout_header_logo: settings.layout_header_logo || '',
         layout_footer_logo: settings.layout_footer_logo || '',
         layout_copyright: settings.layout_copyright || '',
@@ -89,6 +114,20 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                                 <Layout className="h-4 w-4" />
                                 <span>{t('General & Logos')}</span>
                             </button>
+                            {themeFields.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('theme')}
+                                    className={`flex cursor-pointer items-center gap-2 border-b-2 pb-3.5 text-xs font-bold transition-all ${
+                                        activeTab === 'theme'
+                                            ? 'border-primary text-primary'
+                                            : 'text-muted-foreground hover:text-foreground border-transparent'
+                                    }`}
+                                >
+                                    <Palette className="h-4 w-4" />
+                                    <span>{t('Parámetros')}</span>
+                                </button>
+                            )}
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('social')}
@@ -272,6 +311,84 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                             </div>
                         )}
 
+                        {/* Tab Content: the fields the site's theme declares */}
+                        {activeTab === 'theme' && (
+                            <div className="space-y-6">
+                                <p className="text-muted-foreground text-xs">
+                                    {themeName
+                                        ? t('Datos que usa el tema {name} en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.', {
+                                              name: themeName,
+                                          })
+                                        : t('Datos que usa el tema en el sitio. Cada sitio guarda los suyos.')}
+                                </p>
+                                {themeGroups.map((group) => (
+                                    <div key={group.name} className="border-border bg-card space-y-5 rounded-xl border p-5 shadow-xs">
+                                        {group.name && (
+                                            <h3 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">{group.name}</h3>
+                                        )}
+                                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                            {group.fields.map((field) => {
+                                                const value = (data as Record<string, unknown>)[field.alias] as string;
+                                                const error = (errors as Record<string, string | undefined>)[field.alias];
+                                                const set = (next: string) => setData(field.alias as never, next as never);
+                                                return (
+                                                    <div
+                                                        key={field.alias}
+                                                        className={`space-y-1.5 ${field.type === 'textarea' ? 'md:col-span-2' : ''}`}
+                                                    >
+                                                        <Label htmlFor={field.alias} className="text-xs font-semibold">
+                                                            {field.name}
+                                                        </Label>
+                                                        {field.type === 'textarea' ? (
+                                                            <Textarea
+                                                                id={field.alias}
+                                                                value={value}
+                                                                onChange={(e) => set(e.target.value)}
+                                                                placeholder={field.placeholder}
+                                                                className="bg-card min-h-[90px] text-xs"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex gap-1.5">
+                                                                {field.type === 'image' && value && (
+                                                                    <div className="border-border bg-muted flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+                                                                        <img src={value} alt="" className="max-h-full max-w-full object-contain" />
+                                                                    </div>
+                                                                )}
+                                                                <Input
+                                                                    id={field.alias}
+                                                                    type={field.type === 'url' ? 'url' : 'text'}
+                                                                    value={value}
+                                                                    onChange={(e) => set(e.target.value)}
+                                                                    placeholder={field.placeholder}
+                                                                    className="bg-card h-9 w-full text-xs"
+                                                                />
+                                                                {field.type === 'image' && (
+                                                                    <Button
+                                                                        type="button"
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        className="h-9 shrink-0 text-xs"
+                                                                        onClick={() => setDrawerTarget(field.alias)}
+                                                                    >
+                                                                        {t('Elegir')}
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {error ? (
+                                                            <p className="text-destructive text-xs">{error}</p>
+                                                        ) : (
+                                                            field.help && <p className="text-muted-foreground text-xs">{field.help}</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Tab Content: Social Networks */}
                         {activeTab === 'social' && (
                             <div className="border-border bg-card space-y-5 rounded-xl border p-5 shadow-xs">
@@ -354,6 +471,8 @@ export default function LayoutCustomizer({ settings, socialLinks, flash }: Props
                         setData('layout_header_logo', url);
                     } else if (drawerTarget === 'footer') {
                         setData('layout_footer_logo', url);
+                    } else if (drawerTarget) {
+                        setData(drawerTarget as never, url as never);
                     }
                     setDrawerTarget(null);
                 }}

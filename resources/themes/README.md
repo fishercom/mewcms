@@ -111,6 +111,32 @@ that use the theme, from `hero`, `rich_text`, `features` and `cta` (all of them 
 missing; a template's allowed blocks narrow it further). A theme whose pages already open
 with a banner can leave `hero` out, for example `"ai_blocks": ["rich_text"]`.
 
+### Settings of the theme in Personalizar Layout
+
+`"layout_fields"` lists the settings the theme's pages read from `layout_settings` (a
+WhatsApp number, an address, a banner), so they can be edited in Admin → Personalizar
+Layout → Parámetros with no change to the CMS:
+
+```json
+"layout_fields": [
+    { "alias": "whatsapp", "name": "WhatsApp", "type": "text", "group": "Contacto", "help": "El número con código de país" },
+    { "alias": "address", "name": "Dirección", "type": "textarea", "group": "Contacto" },
+    { "alias": "products_banner", "name": "Banner de productos", "type": "image", "group": "Banners" },
+    { "alias": "products_url", "name": "Página de productos", "type": "url", "group": "Banners" }
+]
+```
+
+- `alias`: saved as the setting `layout_<alias>` (`layout_` is added when missing), and read
+  in the pages as `layout_settings.layout_<alias>`. The settings the screen already edits
+  (logos, copyright, social links, CSS) cannot be declared.
+- `type`: `text` (the default), `textarea`, `url` or `image` (an address or a file of the
+  media library). Text is saved without markup; addresses must be safe (`https://`, `/…`).
+- `name`, `help`, `placeholder` and `group` (the heading the field is shown under) are optional.
+
+The values are saved per site, so two sites with the same theme keep their own. A setting
+needed by one site only does not need the theme either: any other `layout_*` row that site
+has in `cms_configs` (not JSON) is shown under «Otros parámetros», with the row's `name`.
+
 Tracking code that differs per site (Google Analytics, Tag Manager, a pixel) does not go
 in the theme: each site has **Scripts** fields in Admin → Sites, printed in `<head>` and at
 the end of `<body>` of its public pages.
