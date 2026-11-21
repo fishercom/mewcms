@@ -251,17 +251,17 @@ admin. Load it into the default site (or `--site=<id>`), which also switches the
 theme:
 
 ```bash
-php artisan cms:content-import emsal              # resources/themes/emsal/content/content.json
-php artisan cms:content-import ../emsal/content.json --theme=emsal
-php artisan cms:content-import emsal --fresh      # delete the site's pages, posts, menus, forms and sliders first (reusable blocks are kept)
+php artisan cms:content-import cliente-abc              # resources/themes/cliente-abc/content/content.json
+php artisan cms:content-import ../cliente-abc/content.json --theme=cliente-abc
+php artisan cms:content-import cliente-abc --fresh      # delete the site's pages, posts, menus, forms and sliders first (reusable blocks are kept)
 ```
 
 ```json
 {
-    "site": { "name": "EMSAL", "title": "EMSAL", "description": "...", "lang": "es", "currency": "PEN" },
+    "site": { "name": "Cliente ABC", "title": "Cliente ABC", "description": "...", "lang": "es", "currency": "PEN" },
     "media": {
-        "hero": { "file": "media/hero.jpg", "alt": "Las salinas al atardecer" },
-        "logo": { "url": "https://example.com/logo.svg", "alt": "EMSAL" }
+        "hero": { "file": "media/hero.jpg", "alt": "Portada del sitio" },
+        "logo": { "url": "https://example.com/logo.svg", "alt": "Cliente ABC" }
     },
     "settings": { "layout_header_logo": "@logo", "layout_phone": "(01) 6142000" },
     "schemas": {
@@ -359,8 +359,8 @@ A site's theme does not have to live in this repository. Keep it in its own (wit
 `content/` folder) and link or copy it into `resources/themes/<slug>` before building:
 
 ```bash
-git clone git@github.com:acme/emsal.git ../emsal
-ln -s ../../../emsal/theme resources/themes/emsal    # or: cp -r ../emsal/theme resources/themes/emsal
+git clone git@github.com:acme/cliente-abc.git ../cliente-abc
+ln -s ../../../cliente-abc/theme resources/themes/cliente-abc    # or: cp -r ../cliente-abc/theme resources/themes/cliente-abc
 npm run build
 ```
 

@@ -27,14 +27,14 @@ it('saves the client logo and shares it with the panel and the login screen', fu
     $user = User::factory()->superAdmin()->create();
 
     actingAs($user)->post('/settings/brand', [
-        'name' => 'EMSAL',
-        'logo' => 'https://cdn.example.com/emsal.png',
+        'name' => 'Cliente ABC',
+        'logo' => 'https://cdn.example.com/cliente-abc.png',
         'icon_file' => UploadedFile::fake()->createWithContent('icon.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>'),
     ])->assertSessionHasNoErrors()->assertRedirect('/settings/brand');
 
     $brand = AdminBrand::all();
-    expect($brand['name'])->toBe('EMSAL')
-        ->and($brand['logo'])->toBe('https://cdn.example.com/emsal.png')
+    expect($brand['name'])->toBe('Cliente ABC')
+        ->and($brand['logo'])->toBe('https://cdn.example.com/cliente-abc.png')
         ->and($brand['logo_dark'])->toBe('')
         ->and($brand['icon'])->toEndWith('.svg')
         ->and(CmsConfig::where('alias', 'admin_brand_name')->value('site_id'))->toBeNull();
@@ -44,17 +44,17 @@ it('saves the client logo and shares it with the panel and the login screen', fu
 
     $this->app['auth']->guard()->logout();
     get('/login')->assertInertia(fn (Assert $page): Assert => $page
-        ->where('brand.name', 'EMSAL')
-        ->where('brand.logo', 'https://cdn.example.com/emsal.png')
+        ->where('brand.name', 'Cliente ABC')
+        ->where('brand.logo', 'https://cdn.example.com/cliente-abc.png')
         ->where('brand.logo_dark', null)
         ->where('brand.tagline', null)
         ->where('brand.icon', $brand['icon'])
     );
 
-    actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page->where('brand.name', 'EMSAL'));
+    actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page->where('brand.name', 'Cliente ABC'));
 
     // A tall logo goes in as the icon alone: it is shown next to the name
-    actingAs($user)->post('/settings/brand', ['name' => 'EMSAL', 'tagline' => 'Gestor de contenidos', 'logo' => ''])->assertSessionHasNoErrors();
+    actingAs($user)->post('/settings/brand', ['name' => 'Cliente ABC', 'tagline' => 'Gestor de contenidos', 'logo' => ''])->assertSessionHasNoErrors();
     actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page
         ->where('brand.logo', null)
         ->where('brand.icon', $brand['icon'])
@@ -62,10 +62,10 @@ it('saves the client logo and shares it with the panel and the login screen', fu
     );
 
     // The name alone is enough: it is shown as text, with its initial as the icon
-    actingAs($user)->post('/settings/brand', ['name' => 'EMSAL', 'logo' => '', 'icon' => ''])->assertSessionHasNoErrors();
+    actingAs($user)->post('/settings/brand', ['name' => 'Cliente ABC', 'logo' => '', 'icon' => ''])->assertSessionHasNoErrors();
     Storage::disk('public')->assertMissing($iconPath);
     actingAs($user)->get('/admin/layout')->assertInertia(fn (Assert $page): Assert => $page
-        ->where('brand.name', 'EMSAL')
+        ->where('brand.name', 'Cliente ABC')
         ->where('brand.logo', null)
         ->where('brand.icon', null)
     );

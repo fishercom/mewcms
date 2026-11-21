@@ -144,7 +144,7 @@ export default function BrandSettings({ settings, upload, flash }: Props) {
                                 value={data.name}
                                 maxLength={120}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder={t('Ej.: EMSAL')}
+                                placeholder={t('Ej.: Cliente ABC')}
                             />
                             <p className="text-muted-foreground text-xs">
                                 {t('Se muestra junto al ícono cuando no hay logo horizontal, y es el texto alternativo del logo.')}

@@ -1280,7 +1280,7 @@
     "Marca del panel guardada.": "Panel branding saved.",
     "El logo del cliente reemplaza al de MewCMS en el panel y en el inicio de sesión. Debajo queda una pequeña firma \"Con tecnología de MewCMS\".": "The client's logo replaces MewCMS's in the panel and on the login screen. A small \"Powered by MewCMS\" credit stays below it.",
     "Nombre del cliente": "Client name",
-    "Ej.: EMSAL": "E.g. Acme",
+    "Ej.: Cliente ABC": "E.g. Client ABC",
     "Logo": "Logo",
     "Logo para modo oscuro": "Dark mode logo",
     "Opcional. Se usa cuando el panel está en modo oscuro, por ejemplo un logo con texto claro.": "Optional. Used when the panel is in dark mode, e.g. a logo with light text.",
