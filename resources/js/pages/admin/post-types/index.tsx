@@ -197,13 +197,6 @@ export default function Index() {
                         <PaginationNav data={items} />
                     </div>
                 )}
-
-                <p className="text-muted-foreground mt-6 text-xs">
-                    {t('Página del listado del blog')}: {listingLink('post')}.{' '}
-                    {t(
-                        'Se detecta sola: es la página que muestra esas entradas con un bloque o campo de lista de posts. Si varias las muestran, se elige la principal en el editor de la página.',
-                    )}
-                </p>
             </div>
         </ModuleLayout>
     );

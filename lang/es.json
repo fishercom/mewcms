@@ -1302,8 +1302,6 @@
     "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.",
     "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.",
     "Página del listado": "Página del listado",
-    "Página del listado del blog": "Página del listado del blog",
-    "Se detecta sola: es la página que muestra esas entradas con un bloque o campo de lista de posts. Si varias las muestran, se elige la principal en el editor de la página.": "Se detecta sola: es la página que muestra esas entradas con un bloque o campo de lista de posts. Si varias las muestran, se elige la principal en el editor de la página.",
     "Es la página principal de :name: sus entradas toman de ella su banner y el enlace para regresar.": "Es la página principal de :name: sus entradas toman de ella su banner y el enlace para regresar.",
     "Otra página también muestra :name y es la principal.": "Otra página también muestra :name y es la principal.",
     "Usar esta página como principal": "Usar esta página como principal",

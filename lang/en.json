@@ -1302,8 +1302,6 @@
     "Datos que usa el tema :name en el sitio (contacto, enlaces, imágenes). Cada sitio guarda los suyos.": "Data the :name theme shows on the site (contact details, links, images). Each site keeps its own.",
     "Datos que usa el tema en el sitio. Cada sitio guarda los suyos.": "Data the theme shows on the site. Each site keeps its own.",
     "Página del listado": "Listing page",
-    "Página del listado del blog": "Blog listing page",
-    "Se detecta sola: es la página que muestra esas entradas con un bloque o campo de lista de posts. Si varias las muestran, se elige la principal en el editor de la página.": "Found automatically: the page that shows those entries with a post list block or field. If several show them, the main one is chosen in the page editor.",
     "Es la página principal de :name: sus entradas toman de ella su banner y el enlace para regresar.": "It is the main page of :name: its entries take their banner and back link from it.",
     "Otra página también muestra :name y es la principal.": "Another page also shows :name and is the main one.",
     "Usar esta página como principal": "Use this page as the main one",

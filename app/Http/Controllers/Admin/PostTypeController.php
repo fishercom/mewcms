@@ -31,7 +31,7 @@ class PostTypeController extends Controller
         return Inertia::render('admin/post-types/index', [
             'items' => $items,
             // The page that lists each type, found from the pages' content (and the blog's)
-            'listings' => ListingPages::summary(['post', ...$items->getCollection()->pluck('slug')->all()]),
+            'listings' => ListingPages::summary($items->getCollection()->pluck('slug')->all()),
         ]);
     }
 
