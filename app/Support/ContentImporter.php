@@ -254,6 +254,48 @@ class ContentImporter
         $site->save();
     }
 
+    /**
+     * Put back the files of media this file already loaded when they are gone from the
+     * disk. On hosts without a persistent disk (Render's free plan) storage/app/public is
+     * empty after each restart while the database still lists the media.
+     *
+     * @return int how many media items were restored
+     */
+    public function restoreMedia(): int
+    {
+        $restored = 0;
+        foreach ((array) ($this->data['media'] ?? []) as $key => $item) {
+            $item = is_string($item) ? ['url' => $item] : (array) $item;
+            [$contents, $extension] = $this->mediaContents((string) $key, $item);
+            $media = CmsMedia::where('path', "media/{$this->mediaFolder}/".Str::slug((string) $key).'.'.$extension)->first();
+            if ($media && $this->restoreFiles($media, $contents)) {
+                $restored++;
+            }
+        }
+
+        return $restored;
+    }
+
+    /** Write the original back when it is missing, and rebuild the WebP versions when any is missing */
+    private function restoreFiles(CmsMedia $media, string $contents): bool
+    {
+        $disk = Storage::disk($media->disk ?: MediaLibrary::DISK);
+        $missingOriginal = ! $disk->exists($media->path);
+        if ($missingOriginal) {
+            $disk->put($media->path, $contents);
+        }
+
+        $missingVariant = collect($media->variants ?? [])->contains(fn (string $path): bool => ! $disk->exists($path));
+        if (! $missingOriginal && ! $missingVariant) {
+            return false;
+        }
+
+        MediaLibrary::makeVariants($media);
+        $this->say("  ~ {$media->path} (restored)");
+
+        return true;
+    }
+
     private function importMedia(?int $userId): void
     {
         $items = (array) ($this->data['media'] ?? []);
@@ -270,7 +312,9 @@ class ContentImporter
             $path = "media/{$this->mediaFolder}/".Str::slug((string) $key).'.'.$extension;
 
             $media = CmsMedia::where('path', $path)->first();
-            if (! $media) {
+            if ($media) {
+                $this->restoreFiles($media, $contents);
+            } else {
                 $disk->put($path, $contents);
                 $media = MediaLibrary::register($path, $this->mime($extension), $userId, [
                     'filename' => basename($path),
