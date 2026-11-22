@@ -39,16 +39,21 @@ Combining the rock-solid foundation of **Laravel 12** with the reactivity and sp
 ## ⚡ Key Features
 
 - 🧩 **Dynamic Schema Engine (`CmsSchema`)**: Create custom content schemas with dynamic fields (text, textarea, repeater, images) without altering database tables or writing backend migrations.
-- 📝 **Flexible Content System**: Full support for hierarchical Pages (`CmsArticle`), Custom Post Types (`CmsPostType`), and custom blog posts (`CmsPost`).
-- 🏷️ **Hierarchical Taxonomies**: WordPress-style Categories and Tags with parent-child nesting, slug generation, and built-in frontend routing (`/category/{slug}`, `/tag/{slug}`).
+- 📝 **Flexible Content System**: Full support for hierarchical Pages (`CmsArticle`, each with an optional parent for breadcrumbs), Custom Post Types (`CmsPostType`), and blog posts (`CmsPost`). Each post type chooses how its public listing is paged and sorted, and a post's page gets up to six related posts that share a tag.
+- 📚 **Listing pages found from the content**: the published page that shows a *Lista de posts* of a kind of entry (in a block, inside columns, or in a field of its template) is that kind's listing page. Its entries take their banner, breadcrumb and back link from it, with nothing to set up. When several pages list the same kind, the editor lets you pick the main one, and *Tipos de contenido* shows the page it found.
+- 🧱 **Block Editor**: Pages are built from CMS blocks, blocks a theme brings, and reusable blocks. Previews are drawn in a frame with the site's own theme stylesheet and web fonts, and blocks with a slider or a list of posts show what the public page will get.
+- 🤖 **AI Writing Assistant** (*Asistente IA*): Drafts outlines, pages and metadata, improves single blocks and suggests translations. Each theme chooses which block types the assistant may draft with (`ai_blocks`). Its settings (budget, tone, audience) are for super admins.
+- 🎞️ **Sliders**: Slides can carry an image for phones, a video, a secondary image (a cut-out, icon or logo), a button text and a *dark text* option. A page gets every slider its fields name, so one template can show several. The admin lists sliders by name.
+- 🏷️ **Tags**: Tags with slug generation and public listings at `/tag/{slug}` (`CmsTag`). Old `/category/{slug}` addresses redirect to the matching tag.
 - 🖼️ **TipTap WYSIWYG & Media Drawer**: Rich-text editing powered by TipTap, paired with the `QuickMediaDrawer` slide-out panel for fast folder navigation, drag-and-drop file uploads, and image insertion via Laravel Filemanager.
 - 🗂️ **Visual Menu Builder**: Drag-and-drop structural editor with nested parent-child items, custom URLs, and automatic target article resolution.
 - 📬 **Dynamic Form & Lead Engine**: Build custom contact forms (`CmsForm`), accept submissions via public JSON API (`/api/forms/submit`), store leads (`CmsRegister`), and trigger notifications (`CmsNotify`).
 - 📊 **Executive Admin Dashboard**: Real-time operational widgets, interactive SVG trend charts (Articles vs. Leads, activity logs), quick action consoles, and complete audit trails (`AdmLog`).
-- 🌐 **Multi-Site & Multi-Language**: One install and one build serve several sites, each picked by its domain (`CmsSite`), with its own pages, posts, menus, forms, sliders, redirects and layout settings. Built-in multi-language translation management (`CmsLang`, `CmsTranslate`).
+- 🌐 **Multi-Site & Multi-Language**: One install and one build serve several sites, each picked by its domain (`CmsSite`), with its own pages, posts, menus, forms, sliders, redirects and layout settings. Built-in multi-language translation management (`CmsLang`, `CmsTranslation`).
 - 🎨 **Themes**: Each site chooses a theme from `resources/themes/<theme>`: its own pages, stylesheet and assets, falling back to the default theme for any page it does not change.
 - 🔍 **Native SEO & Discovery**: Automated dynamic XML sitemaps (`/sitemap.xml`), configurable `robots.txt`, and full OpenGraph social metadata out of the box.
 - 🔐 **Granular Access Control**: Role-based permissions across profiles (Super Admin, Admin, Webmaster) mapped to individual modules and actions.
+- 🏢 **Client Branding** (*Marca del panel*): Super admins can replace MewCMS's logo in the admin sidebar, the login screen and the footer with the client's name, subtitle, wide logo (with an optional dark version) and square icon. A name alone is enough: its initial becomes the icon. Uploaded SVG logos are cleaned to an allow-list of drawing elements. MewCMS's own logo files (horizontal, stacked and wordmark, in light, dark and one colour) are in [`public/brand`](public/brand).
 
 ---
 
@@ -76,7 +81,7 @@ flowchart TB
         subgraph Services ["Core Engines & Models"]
             SchemaEngine["Schema Engine (CmsSchema)<br/>Dynamic Fields & Repeaters"]
             ContentEngine["Content Models (CmsArticle, CmsPost, CmsMenu)"]
-            TaxonomyEngine["Taxonomy Engine (CmsTaxonomy, CmsTaxonomyTerm)"]
+            TaxonomyEngine["Tags (CmsTag)"]
             MediaEngine["Media & File Manager (LFM & QuickMediaDrawer)"]
         end
     end
@@ -161,8 +166,24 @@ sequenceDiagram
 - **Admin**: the site switcher in the header picks the site you work on; every list and editor then shows that site's content.
 - **Themes** carry each site's whole design. Built themes live in `resources/themes/<theme>` (`theme.json`, `screenshot.png`, `css/theme.css`, `front/` pages, `assets/`) and are built in the same `npm run build`; only the site's theme stylesheet is loaded. Uploaded themes are a .zip with `theme.json`, stylesheets, scripts, images and fonts (Admin → Sites → Themes) that use the pages of a built theme, with no build. Each site has its own head and body scripts for Google Analytics and the like. See [`resources/themes/README.md`](resources/themes/README.md) to make one.
 - **Themes in their own repository**: a site's theme (and its starting content) can live in a repository of its own. Link or copy it into `resources/themes/<theme>` before building (`ln -s ../../../my-site/theme resources/themes/my-site`): Vite follows the link, and git ignores every theme folder that does not ship with MewCMS, so this repository stays clean.
-- **Starting content**: a theme may ship `content/content.json` with its pages, posts, post types, menus, forms, sliders, settings and media. It is optional and only loaded when asked: `php artisan cms:content-import <theme>` (see [Starting content](resources/themes/README.md#starting-content)).
+- **What a theme can declare** in `theme.json`: `"dark_mode": false` keeps its public pages light whatever the visitor's system says; `"ai_blocks"` lists the blocks the AI assistant may draft with; `"layout_fields"` adds the theme's own settings to *Personalizar Layout* (a *Parámetros* tab, saved per site, with any other `layout_*` setting of the site under *Otros parámetros*). A theme can also bring its own block types (`blocks/<key>.json` and `front/blocks/<key>.tsx`), restyle a CMS block, and draw a public form with the `useFrontForm` hook.
+- **Bundled themes**: `default` (light and modern with a violet accent and a dark mode, the theme every other theme falls back to), and the two demo themes `velvet` (Velvet Paw Boutique) and `journal` (Velvet Paw Journal).
+- **Starting content**: a theme may ship `content/content.json` with its pages, posts, post types, menus, forms, sliders, settings and media. It is optional and only loaded when asked: `php artisan cms:content-import <theme>` (see [Starting content](resources/themes/README.md#starting-content)). `--if-changed` skips the import when the file has not changed since the last one. The file can also hold reusable blocks, rich slides, listing pages and a favicon that points to one of its media files.
 - **Deploying**: point every site's domain at the same app, and add each domain to the site in the admin. No separate builds are needed.
+
+---
+
+### Admin Panel
+
+- **Site switcher**: switching sites from a record's editor lands on that module's list, since the record belongs to the previous site.
+- **Personalizar Layout** holds the site's layout settings, including the ones its theme declares. The footer credit field accepts `{year}`, replaced by the current year.
+- **Settings → Sistema** (user menu, super admins only) holds *Marca del panel*. The routes check the super admin flag too, so module permissions are not enough.
+- **Removed modules**: the old *Parámetros* module and the generic *Configuración* editor (`/admin/configs`) are gone. Every setting has its own screen (*Personalizar Layout*, *Asistente IA*, *Marca del panel*), and the `cms_configs` table and its settings stay. Migrations remove their menu entries and permissions; the `cms_parameters` tables are dropped only when empty.
+- **Footer**: one credit line, "© 2026 MewCMS · AGPL v3 License", or "© 2026 Client · Powered by MewCMS" with a client brand, plus the CMS version on the right.
+
+### Versioning
+
+The [`VERSION`](VERSION) file holds `major.minor.build`, where the build is the number of the pull request that last changed the CMS (for example `1.0.75`). The admin footer shows it as "MewCMS v1.0.75". Sites built on MewCMS get the file with each upstream merge, so the footer tells which CMS build they run.
 
 ---
 
@@ -202,7 +223,7 @@ flowchart LR
     B -->|"2. Select Schema"| C["Dynamic Fields & Repeaters"]
     B -->|"3. Open QuickMediaDrawer"| D["Browse & Upload Images"]
     D -->|"Insert into"| E["TipTap WYSIWYG"]
-    B -->|"4. Assign"| F["Taxonomy Terms (Categories / Tags)"]
+    B -->|"4. Assign"| F["Tags"]
     B -->|"5. Save & Publish"| G[("Database")]
     G -->|"Cache Update"| H["Live Public Website"]
 ```
