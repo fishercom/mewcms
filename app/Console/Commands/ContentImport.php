@@ -56,7 +56,15 @@ class ContentImport extends Command
         $stamp = 'content-import.'.$site->id.'.'.md5(realpath($file) ?: $file);
         $hash = (string) md5_file($file).':'.($theme ?? '');
         if ($this->option('if-changed') && Cache::get($stamp) === $hash) {
-            $this->info("{$file} is already loaded into \"{$site->name}\".");
+            // The database outlives the disk on some hosts: put back media files lost on a restart
+            try {
+                $restored = ContentImporter::fromFile($file)->logUsing(fn (string $line) => $this->line($line))->restoreMedia();
+            } catch (RuntimeException $e) {
+                $this->error($e->getMessage());
+
+                return self::FAILURE;
+            }
+            $this->info("{$file} is already loaded into \"{$site->name}\"".($restored ? " ({$restored} media files restored)" : '').'.');
 
             return self::SUCCESS;
         }

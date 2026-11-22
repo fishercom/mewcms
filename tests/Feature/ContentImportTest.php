@@ -96,6 +96,32 @@ it('reloads a content file only when it changed, with --if-changed', function ()
     expect(CmsArticle::withoutGlobalScopes()->where('slug', 'home')->value('title'))->toBe('Bienvenidos');
 });
 
+it('puts back media files lost from the disk while the database kept them', function (): void {
+    $file = writeContent($this->dir, [
+        'media' => ['portada' => ['file' => 'media/portada.jpg']],
+        'pages' => [['slug' => 'home', 'title' => 'Inicio']],
+    ]);
+    $import = fn (array $options = []) => $this->artisan('cms:content-import', ['source' => $file, '--fresh' => true, '--force' => true, ...$options]);
+
+    $import(['--if-changed' => true])->assertSuccessful();
+    $media = CmsMedia::where('path', 'like', 'media/content/portada.%')->firstOrFail();
+    $variant = collect($media->variants)->first();
+    Storage::disk('public')->assertExists([$media->path, $variant]);
+
+    // A new container on a host without a persistent disk: the files are gone
+    Storage::fake('public');
+
+    // Same file: the content is not reloaded, but the files come back
+    $import(['--if-changed' => true])->expectsOutputToContain('1 media files restored')->assertSuccessful();
+    Storage::disk('public')->assertExists([$media->path, ...array_values($media->fresh()->variants)]);
+
+    // A full import restores them too, instead of keeping a row with no file
+    Storage::fake('public');
+    $import()->expectsOutputToContain('Content loaded')->assertSuccessful();
+    Storage::disk('public')->assertExists([$media->path, ...array_values($media->fresh()->variants)]);
+    expect(CmsMedia::count())->toBe(1);
+});
+
 it('loads a content file into a site: media, field groups, post types, posts and menus', function (): void {
     $file = writeContent($this->dir, [
         'site' => ['name' => 'Cliente ABC', 'title' => 'Cliente ABC', 'currency' => 'PEN', 'lang' => 'es'],
