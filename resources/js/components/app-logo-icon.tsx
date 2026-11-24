@@ -1,15 +1,25 @@
 import { SVGAttributes } from 'react';
 
-// The "code cat" mark: the eyes are cut out (evenodd), so it works in one colour on any background.
-// Keep in sync with public/brand/*.svg and public/favicon.svg.
-export const MARK_PATH =
-    'M13 27L15 7L29 19H35L49 7L51 27C55 31 56 36 56 41C56 51 46 58 32 58C18 58 8 51 8 41C8 36 9 31 13 27Z' +
-    'M25.414 35.414L21.828 39L25.414 42.586A2 2 0 0 1 22.586 45.414L17.586 40.414A2 2 0 0 1 17.586 37.586L22.586 32.586A2 2 0 0 1 25.414 35.414Z' +
-    'M38.586 35.414L42.172 39L38.586 42.586A2 2 0 0 0 41.414 45.414L46.414 40.414A2 2 0 0 0 46.414 37.586L41.414 32.586A2 2 0 0 0 38.586 35.414Z';
+// The "code cat" mark: a cat head with soft ears, a white oval face and "< >" eyes in the same colour as the head.
+// Keep in sync with scripts/brand-logos.py (which builds public/brand/*.svg and public/favicon.svg).
+export const HEAD_PATH =
+    'M13 27L14.3 14Q15 7 20.3 11.6L29 19H35L43.7 11.6Q49 7 49.7 14L51 27C55 31 56 36 56 41C56 51 46 58 32 58C18 58 8 51 8 41C8 36 9 31 13 27Z';
+export const FACE_PATH = 'M10.5 40A21.5 14.5 0 0 1 53.5 40A21.5 14.5 0 0 1 10.5 40Z';
+export const EYES_PATH =
+    'M25.481 36.221L22.203 39.5L25.481 42.779A3 3 0 0 1 21.239 47.021L15.839 41.621A3 3 0 0 1 15.839 37.379L21.239 31.979A3 3 0 0 1 25.481 36.221Z' +
+    'M38.519 36.221L41.797 39.5L38.519 42.779A3 3 0 0 0 42.761 47.021L48.161 41.621A3 3 0 0 0 48.161 37.379L42.761 31.979A3 3 0 0 0 38.519 36.221Z';
+/** The mark in one colour: with evenodd the face is cut out of the head and the eyes sit inside it */
+export const MARK_PATH = HEAD_PATH + FACE_PATH + EYES_PATH;
 
-export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
+type Props = SVGAttributes<SVGElement> & {
+    /** One colour only, with the face left transparent (for engraving-like uses); by default the face is white */
+    mono?: boolean;
+};
+
+export default function AppLogoIcon({ mono = false, ...props }: Props) {
     return (
         <svg aria-hidden="true" {...props} viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            {!mono && <path fill="#FFFFFF" d={FACE_PATH} />}
             <path fill="currentColor" fillRule="evenodd" d={MARK_PATH} />
         </svg>
     );
