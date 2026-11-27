@@ -1,5 +1,5 @@
 """
-Builds the MewCMS logo files in public/brand/ from the "code cat" mark and the Sora font
+Builds the MewCMS logo files in public/brand/ (and public/favicon.svg) from the "code cat" mark and the Sora font
 (the same font the admin uses for the wordmark: "Mew" bold, "CMS" medium at 60% opacity).
 The text is converted to paths, so the files look the same everywhere, with no font to load.
 
@@ -21,12 +21,15 @@ FONTS = os.path.join(ROOT, 'node_modules/@fontsource/sora/files')
 OUT = os.path.join(ROOT, 'public/brand')
 
 # Keep in sync with resources/js/components/app-logo-icon.tsx
-MARK = (
-    'M13 27L15 7L29 19H35L49 7L51 27C55 31 56 36 56 41C56 51 46 58 32 58C18 58 8 51 8 41C8 36 9 31 13 27Z'
-    'M25.414 35.414L21.828 39L25.414 42.586A2 2 0 0 1 22.586 45.414L17.586 40.414A2 2 0 0 1 17.586 37.586L22.586 32.586A2 2 0 0 1 25.414 35.414Z'
-    'M38.586 35.414L42.172 39L38.586 42.586A2 2 0 0 0 41.414 45.414L46.414 40.414A2 2 0 0 0 46.414 37.586L41.414 32.586A2 2 0 0 0 38.586 35.414Z'
+HEAD = 'M13 27L14.3 14Q15 7 20.3 11.6L29 19H35L43.7 11.6Q49 7 49.7 14L51 27C55 31 56 36 56 41C56 51 46 58 32 58C18 58 8 51 8 41C8 36 9 31 13 27Z'
+EYES = (
+    'M25.481 36.221L22.203 39.5L25.481 42.779A3 3 0 0 1 21.239 47.021L15.839 41.621A3 3 0 0 1 15.839 37.379L21.239 31.979A3 3 0 0 1 25.481 36.221Z'
+    'M38.519 36.221L41.797 39.5L38.519 42.779A3 3 0 0 0 42.761 47.021L48.161 41.621A3 3 0 0 0 48.161 37.379L42.761 31.979A3 3 0 0 0 38.519 36.221Z'
 )
-MARK_TOP, MARK_BOTTOM, MARK_LEFT, MARK_RIGHT = 7, 58, 8, 56
+# With evenodd the eyes are cut out of the head: the mark in one colour
+MARK = HEAD + EYES
+MARK_TOP, MARK_BOTTOM, MARK_LEFT, MARK_RIGHT = 9.8, 58, 8, 56
+EYES_FILL = '#FFFFFF'
 
 IRIS, IRIS_DARK = '#6447F0', '#8B74FF'
 INK, INK_DARK = '#18142B', '#FFFFFF'
@@ -89,6 +92,13 @@ def paint(fill):
     return f'fill="{fill}"' if fill != 'currentColor' else 'fill="currentColor"'
 
 
+def mark(fill, dx=0):
+    """The cat: white eyes under the one-colour mark, or only the mark for mono (the eyes stay transparent)"""
+    move = f' transform="translate({dx:.2f} 0)"' if dx else ''
+    eyes = '' if fill == 'currentColor' else f'<path fill="{EYES_FILL}"{move} d="{EYES}"/>'
+    return f'{eyes}<path {paint(fill)} fill-rule="evenodd"{move} d="{MARK}"/>'
+
+
 def write(name, content):
     with open(os.path.join(OUT, name), 'w') as f:
         f.write(content)
@@ -105,7 +115,7 @@ def main():
     width = end + MARK_LEFT  # the same margin on the right as the mark has on the left
     for theme, (mark_fill, ink) in themes.items():
         write(f'lockup-{theme}.svg', svg(width, 64,
-            f'<path {paint(mark_fill)} fill-rule="evenodd" d="{MARK}"/>'
+            mark(mark_fill) +
             f'<path {paint(ink)} d="{mew}"/><path {paint(ink)} fill-opacity="{CMS_OPACITY}" d="{cms}"/>'))
 
     # Wordmark alone, trimmed to the letters (cap height + a little room for the descender-less text)
@@ -123,8 +133,19 @@ def main():
     height = baseline + 8
     for theme, (mark_fill, ink) in themes.items():
         write(f'lockup-stacked-{theme}.svg', svg(width, height,
-            f'<path {paint(mark_fill)} fill-rule="evenodd" transform="translate({mark_x:.2f} 0)" d="{MARK}"/>'
+            mark(mark_fill, mark_x) +
             f'<path {paint(ink)} d="{mew}"/><path {paint(ink)} fill-opacity="{CMS_OPACITY}" d="{cms}"/>'))
+
+    # The mark alone, and the favicon (the lighter purple when the browser is in dark mode)
+    write('mark.svg', svg(64, 64, mark(IRIS)))
+    write('mark-dark.svg', svg(64, 64, mark(IRIS_DARK)))
+    write('mark-mono.svg', svg(64, 64, mark('currentColor')))
+    favicon = (f'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
+               f'<style>.m{{fill:{IRIS}}}@media (prefers-color-scheme:dark){{.m{{fill:{IRIS_DARK}}}}}</style>'
+               f'<path fill="{EYES_FILL}" d="{EYES}"/><path class="m" fill-rule="evenodd" d="{MARK}"/></svg>\n')
+    with open(os.path.join(ROOT, 'public/favicon.svg'), 'w') as f:
+        f.write(favicon)
+    print('wrote public/favicon.svg')
 
 
 if __name__ == '__main__':
